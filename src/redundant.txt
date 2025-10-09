@@ -1,0 +1,25 @@
+        {/* Content Section */}
+        <View style={styles.content}>
+          {/* Flower of Life Background */}
+          <View style={styles.flowerContainer}>
+          </View>
+
+          {/* Main Heading */}
+          <View style={styles.headingContainer}>
+            <Text style={styles.heading}>Learning,</Text>
+            <Text style={styles.heading}>Reimagined.</Text>
+            <Text style={styles.heading}>Ethically.</Text>
+          </View>
+
+          {/* Subheading */}
+          <Text style={styles.subheading}>
+            Designed to combine transparency,{'\n'}privacy, and empathy to support{'\n'}your learning journey.
+          </Text>
+
+          {/* Progress Indicators */}
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar, styles.progressActive]} />
+            <View style={styles.progressBar} />
+            <View style={styles.progressBar} />
+          </View>
+        </View>

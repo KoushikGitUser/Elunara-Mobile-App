@@ -1,67 +1,113 @@
-import { View, Text, StatusBar, TouchableOpacity, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import AntDesign from '@expo/vector-icons/AntDesign';
-import React, { useMemo } from 'react'
-import { createStyles } from './SignIn.styles';
-import mainLogo from '../../../assets/images/Knowledge Chakra 1.png';
-import chakraLogo from '../../../assets/images/Knowledge Chakra 2.png';
-import google from '../../../assets/images/search.png';
-import LinkedIn from '../../../assets/images/linkedin.png';
-import apple from '../../../assets/images/apple-logo.png';
-
+import {
+  View,
+  Text,
+  StatusBar,
+  TouchableOpacity,
+  Image,
+  TextInput,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import React, { useMemo, useState } from "react";
+import { createStyles } from "./SignIn.styles";
+import mainLogo from "../../../assets/images/Knowledge Chakra 1.png";
+import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
+import google from "../../../assets/images/search.png";
+import LinkedIn from "../../../assets/images/linkedin.png";
+import apple from "../../../assets/images/apple-logo.png";
+import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const SignIn = () => {
-  // You can pass custom props to override default styles
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
     // Example: headingColor: '#000000',
     // Add any dynamic values here
   };
 
+  const navigation = useNavigation();
+
   const styles = useMemo(() => createStyles(styleProps), []);
-
-
-
+  const subtitle = "Pick up right where you left off  /n—smarter learning awaits."
 
   return (
- <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Image source={mainLogo} style={styles.mainLogo}  />
+            <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={30} color="black" />
+            <Text style={styles.headTitle}>Welcome back</Text>
+            <Text style={styles.headDesc}>Pick up right where you left off</Text>
+            <Text style={[styles.headDesc,{marginTop:0}]}>—smarter learning awaits.</Text>
           </View>
           <View>
-            <Image source={chakraLogo} style={styles.chakraLogo}  />
+            <Image source={chakraLogo} style={styles.chakraLogo} />
           </View>
         </View>
 
-        {/* Content Section */}
-        <View style={styles.content}>
-          {/* Flower of Life Background */}
-          <View style={styles.flowerContainer}>
+        {/* Email Label */}
+        <View style={styles.inputFieldsMain}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor="#B0B7C3"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          {/* Password Label */}
+          <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Enter your password"
+              placeholderTextColor="#B0B7C3"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIconContainer}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color="#0F1419"
+              />
+            </TouchableOpacity>
           </View>
 
-          {/* Main Heading */}
-          <View style={styles.headingContainer}>
-            <Text style={styles.heading}>Learning,</Text>
-            <Text style={styles.heading}>Reimagined.</Text>
-            <Text style={styles.heading}>Ethically.</Text>
-          </View>
+          {/* Forgot Password */}
+          <TouchableOpacity onPress={()=> navigation.navigate("changepass")} style={styles.forgotPasswordMain} activeOpacity={0.6}>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          </TouchableOpacity>
+                  {/* Email Button */}
+        <TouchableOpacity style={styles.emailButton} activeOpacity={0.8}>
+          <Text style={styles.emailButtonText}>Login</Text>
+        </TouchableOpacity>
 
-          {/* Subheading */}
-          <Text style={styles.subheading}>
-            Designed to combine transparency,{'\n'}privacy, and empathy to support{'\n'}your learning journey.
-          </Text>
-
-          {/* Progress Indicators */}
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, styles.progressActive]} />
-            <View style={styles.progressBar} />
-            <View style={styles.progressBar} />
-          </View>
+        {/* Sign Up Link */}
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={()=> navigation.navigate("signup")} >
+            <Text style={styles.signupLink}>Sign Up</Text>
+            <View style={styles.customUnderline} />
+          </TouchableOpacity>
         </View>
+        <Text style={styles.divider}>or</Text>
+        {/* Divider */}
+        </View>
+
 
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
@@ -78,42 +124,17 @@ const SignIn = () => {
           </TouchableOpacity>
 
           {/* Apple Button */}
-          <TouchableOpacity style={[styles.socialButton,{marginBottom:0}]} activeOpacity={0.7}>
-          <Image source={apple} style={styles.socialIcons} />
+          <TouchableOpacity
+            style={[styles.socialButton, { marginBottom: 0 }]}
+            activeOpacity={0.7}
+          >
+            <Image source={apple} style={styles.socialIcons} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
-
-          {/* Divider */}
-          <Text style={styles.divider}>or</Text>
-
-          {/* Email Button */}
-          <TouchableOpacity style={styles.emailButton} activeOpacity={0.8}>
-            <Text style={styles.emailButtonText}>Login with Email</Text>
-          </TouchableOpacity>
-
-          {/* Sign Up Link */}
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don't have an account? </Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.signupLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Footer Links */}
-          <View style={styles.footer}>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Terms Of Use</Text>
-            </TouchableOpacity>
-            <Text style={styles.footerDot}>  •  </Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Privacy Policy</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-
-export default SignIn
+export default SignIn;

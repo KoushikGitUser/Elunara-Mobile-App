@@ -10,17 +10,17 @@ const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * fact
 export const createStyles = (props = {}) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor:'#FAFAFA',
+    backgroundColor:'#FFFFFF',
   },
   container: {
+    flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: '#FAFAFA',
-    gap:30
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    marginTop: 30,
+    marginTop: 50,
     marginBottom: 10,
     width:"90%",
     flexDirection:"row",
@@ -28,7 +28,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     alignItems:"start",
   },
   logoContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'flex-start',
   },
   mainLogo:{
@@ -40,21 +40,8 @@ export const createStyles = (props = {}) => StyleSheet.create({
     width:115,
     position:"absolute",
     right:-25,
-    zIndex:99
-  },
-  headTitle:{
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#4D5F75',
-    letterSpacing: -0.8,
-    marginTop:15
-  },
-  headDesc:{
-    fontSize: 12,
-    color: '#939FA9',
-    fontWeight: '400',
     marginTop:15,
-
+    zIndex:99
   },
   logo: {
     fontSize: moderateScale(30, 0.2),
@@ -93,12 +80,12 @@ export const createStyles = (props = {}) => StyleSheet.create({
   heading: {
     fontSize: 40,
     fontWeight: '700',
-    color: '#4D5F75',
+    color: props.headingColor || '#4D5F75',
     letterSpacing: -0.8,
   },
   subheading: {
     fontSize: 15,
-    color: '#939FA9',
+    color: props.subheadingColor || '#939FA9',
     lineHeight: moderateScale(25, 0.2),
     fontWeight: '400',
     marginTop:10,
@@ -125,7 +112,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     flexDirection:"column",
     justifyContent:"space-between",
     alignItems:"center",
-    marginBottom:50
+    marginTop:30
   },
   socialButton: {
     flexDirection: 'row',
@@ -153,9 +140,9 @@ export const createStyles = (props = {}) => StyleSheet.create({
   divider: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#8A97A3',
+    color: props.dividerColor || '#8A97A3',
+    marginVertical: 10,
     fontWeight: '400',
-    marginTop:20
   },
   emailButton: {
     backgroundColor: "#162845ff",
@@ -163,8 +150,8 @@ export const createStyles = (props = {}) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical:16,
-    width:"100%",
-
+    width:"90%",
+    marginBottom: 10,
   },
   emailButtonText: {
     fontSize: 11,
@@ -176,7 +163,8 @@ export const createStyles = (props = {}) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop:20
+    marginBottom: 25,
+    marginTop:10
   },
   signupText: {
     fontSize: 10,
@@ -209,58 +197,15 @@ customUnderline: {
     fontSize: 10,
     color: props.footerLinkColor || '#7A8794',
   },
-  inputFieldsMain:{
-   width:"90%",
+  homeIndicator: {
+    width: scale(134),
+    height: verticalScale(5),
+    backgroundColor: props.homeIndicatorColor || '#1C1C1E',
+    borderRadius: 100,
+    alignSelf: 'center',
+    marginBottom: verticalScale(8),
+    opacity: 1,
   },
-  label: {
-    fontSize: 10,
-    color: "#4E4E4E",
-    fontWeight: "500",
-    marginBottom: 8,
-    textAlign:'left'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ABB8CC",
-    borderRadius: 15,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    fontSize: 11,
-    color: "#0F1419",
-    backgroundColor:"white"
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ABB8CC",
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingRight: 10,
-    backgroundColor:"white"
-  },
-  passwordInput: {
-    flex: 1,
-    fontSize: 11,
-    color: "#0F1419",
-    paddingVertical: 14,
-  },
-  eyeIconContainer: {
-    padding: 6,
-  },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginTop: 10,
-    fontSize: 10,
-    color: "#0F1419",
-    fontWeight: "600",
-  },
-  forgotPasswordMain:{
-    borderBottomWidth:1.5,
-    borderColor:"black",
-    alignSelf:"flex-end",
-    marginBottom:25
-  }
 });
 
 // Export scaling functions for use in component if needed

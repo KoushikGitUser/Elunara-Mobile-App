@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SplashScreen from "../screens/SplashScreen/SplashScreen";
 import SignIn from "../screens/auth/SignIn/SignIn";
 import SignUp from "../screens/auth/SignUp/SignUp";
+import WelcomeScreen from "../screens/WelcomeScreen/WelcomeScreen";
+import ChangePassword from "../screens/auth/ChangePassword/ChangePassword";
 
 // Screens
 
@@ -28,6 +30,14 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
+          name="welcome"
+          component={WelcomeScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
           name="signin"
           component={SignIn}
           options={{
@@ -43,17 +53,13 @@ const AppNavigator = () => {
           }}
         />
 
-        {/* Add more screens here as you create them */}
-        {/* Example:
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
+          name="changepass"
+          component={ChangePassword}
           options={{
-            headerShown: true,
-            title: 'Home',
+            headerShown: false,
           }}
         />
-        */}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -7,7 +7,7 @@ import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png'
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('signin');
+      navigation.replace('welcome');
     }, 2500); // 2.5 seconds
 
     return () => clearTimeout(timer);   

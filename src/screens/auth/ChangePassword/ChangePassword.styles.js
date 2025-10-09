@@ -43,7 +43,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     zIndex:99
   },
   headTitle:{
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: '700',
     color: '#4D5F75',
     letterSpacing: -0.8,
@@ -164,7 +164,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     justifyContent: 'center',
     paddingVertical:16,
     width:"100%",
-
+    marginTop:30
   },
   emailButtonText: {
     fontSize: 11,
