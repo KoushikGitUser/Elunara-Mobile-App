@@ -18,11 +18,13 @@ import apple from "../../../assets/images/apple-logo.png";
 import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [toggleForgotPassword,setToggleForgotPassword] = useState(false);
 
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
@@ -38,6 +40,7 @@ const SignIn = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      {toggleForgotPassword && <ForgotPassword close={setToggleForgotPassword} toggleForgotPassword={toggleForgotPassword} />}
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -88,7 +91,7 @@ const SignIn = () => {
           </View>
 
           {/* Forgot Password */}
-          <TouchableOpacity onPress={()=> navigation.navigate("changepass")} style={styles.forgotPasswordMain} activeOpacity={0.6}>
+          <TouchableOpacity onPress={()=> setToggleForgotPassword(true)} style={styles.forgotPasswordMain} activeOpacity={0.6}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
                   {/* Email Button */}

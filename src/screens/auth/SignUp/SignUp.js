@@ -15,12 +15,16 @@ import apple from "../../../assets/images/apple-logo.png";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./SignUp.styles";
+import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
+import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked,setIsChecked] = useState(false);
+  const [verificationMailSent,setVerificationMailSent] = useState(false);
+  const [mobileVerificationPopup,setMobileVerificationPopup] = useState(false);
 
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
@@ -37,6 +41,8 @@ const SignUp = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      {verificationMailSent && <VerificationMailPopup close={setVerificationMailSent} verificationMailSent={verificationMailSent}/>}
+      {mobileVerificationPopup && <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} />}
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -129,7 +135,7 @@ const SignUp = () => {
 
             <View style={styles.textContainer}>
               <Text style={styles.text}>I agree to the </Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} activeOpacity={0.7}>
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
@@ -139,7 +145,7 @@ const SignUp = () => {
             </View>
           </View>
           {/* Email Button */}
-          <TouchableOpacity style={styles.emailButton} activeOpacity={0.8}>
+          <TouchableOpacity onPress={()=>setVerificationMailSent(true)} style={styles.emailButton} activeOpacity={0.8}>
             <Text style={styles.emailButtonText}>Verify Email</Text>
           </TouchableOpacity>
 
