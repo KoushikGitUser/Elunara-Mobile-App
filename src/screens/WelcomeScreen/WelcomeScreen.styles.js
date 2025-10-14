@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { scaleFont } from '../../utils/responsive';
 
 const { width, height } = Dimensions.get('window');
 
@@ -122,13 +123,13 @@ export const createStyles = (props = {}) => StyleSheet.create({
     backgroundColor: props.socialButtonBg || '#FFFFFF',
     borderWidth: 1.5,
     borderColor: "#999999ff",
-    paddingVertical:12,
+    height:verticalScale(44),
     borderRadius: moderateScale(100),
     marginBottom: 15,
   },
   socialButtonText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: scaleFont(14),
+    fontWeight: '600',
     color: props.socialButtonTextColor || '#1E2329',
     letterSpacing: -0.1,
     marginLeft: scale(12),
@@ -149,12 +150,12 @@ export const createStyles = (props = {}) => StyleSheet.create({
     borderRadius: moderateScale(100),
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical:16,
+    height:verticalScale(44),
     width:"90%",
     marginBottom: 10,
   },
   emailButtonText: {
-    fontSize: 11,
+    fontSize: scaleFont(14),
     fontWeight: '600',
     color: props.emailButtonTextColor || '#FFFFFF',
     letterSpacing: -0.2,

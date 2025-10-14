@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
+import { scaleFont, verticalScale } from "../../../utils/responsive";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const SignInSlider = () => {
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     flexDirection:"column",
     paddingHorizontal: 20,
     justifyContent: "flex-end",
-    marginTop:100,
+    marginTop:40,
     paddingVertical:10,
   },
   headingContainer: {
@@ -109,16 +110,16 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   heading: {
-    fontSize: 40,
-    fontWeight: "700",
-    lineHeight: 50,
+    fontSize: scaleFont(40),
+    fontWeight: "600",
+    lineHeight: verticalScale(45),
     color: "#3B5B7F",
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: 15,
+    fontSize: scaleFont(20),
     color: "#8A8A8A",
-    lineHeight: 24,
+    lineHeight: 30,
     fontWeight: "400",
     maxWidth: SCREEN_WIDTH,
   },
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom:10
   },
   dot: {
-    height: 6,
+    height: 5,
     borderRadius: 4,
     marginRight: 10,
   },

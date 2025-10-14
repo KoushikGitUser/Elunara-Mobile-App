@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StatusBar, TouchableOpacity, Image, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import React, { useMemo } from 'react'
@@ -10,7 +10,7 @@ import apple from '../../assets/images/apple-logo.png';
 import SignInSlider from '../../components/SignIn/SignInSlider/SignInSlider';
 import { createStyles } from './WelcomeScreen.styles';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const WelcomeScreen = () => {
 
@@ -24,6 +24,7 @@ const WelcomeScreen = () => {
 
   return (
  <SafeAreaView style={styles.safeArea}>
+  <ScrollView>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.container}>
         {/* Header Section */}
@@ -40,10 +41,6 @@ const WelcomeScreen = () => {
 
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
-            <TouchableOpacity  style={styles.socialButton} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="face-recognition" size={24} color="black" />
-            <Text style={styles.socialButtonText}>Continue with Face ID</Text>
-          </TouchableOpacity>
           {/* Google Button */}
           <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
             <Image source={google} style={styles.socialIcons} />
@@ -91,6 +88,7 @@ const WelcomeScreen = () => {
           </View>
         </View>
       </View>
+  </ScrollView>
     </SafeAreaView>
   )
 }
