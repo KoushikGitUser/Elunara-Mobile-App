@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions, Platform } from "react-native";
+import { scaleFont } from "../../../utils/responsive";
 
 const { width, height } = Dimensions.get("window");
 
@@ -46,14 +47,14 @@ export const createStyles = (props = {}) =>
       marginTop: 10,
     },
     headTitle: {
-      fontSize: 30,
+      fontSize: scaleFont(30),
       fontWeight: "700",
       color: "#4D5F75",
       letterSpacing: -0.8,
       marginTop: 15,
     },
     headDesc: {
-      fontSize: 10.5,
+      fontSize: scaleFont(10.5),
       color: "#939FA9",
       fontWeight: "400",
       marginTop: 15,
@@ -93,13 +94,13 @@ export const createStyles = (props = {}) =>
       marginTop: 80,
     },
     heading: {
-      fontSize: 40,
+      fontSize: scaleFont(40),
       fontWeight: "700",
       color: "#4D5F75",
       letterSpacing: -0.8,
     },
     subheading: {
-      fontSize: 15,
+      fontSize: scaleFont(15),
       color: "#939FA9",
       lineHeight: moderateScale(25, 0.2),
       fontWeight: "400",
@@ -142,7 +143,7 @@ export const createStyles = (props = {}) =>
       marginBottom: 15,
     },
     socialButtonText: {
-      fontSize: 11,
+      fontSize: scaleFont(11),
       fontWeight: "700",
       color: props.socialButtonTextColor || "#1E2329",
       letterSpacing: -0.1,
@@ -154,7 +155,7 @@ export const createStyles = (props = {}) =>
     },
     divider: {
       textAlign: "center",
-      fontSize: 12,
+      fontSize: scaleFont(12),
       color: "#8A97A3",
       fontWeight: "400",
       marginTop: 20,
@@ -168,7 +169,7 @@ export const createStyles = (props = {}) =>
       width: "100%",
     },
     emailButtonText: {
-      fontSize: 11,
+      fontSize: scaleFont(11),
       fontWeight: "600",
       color: props.emailButtonTextColor || "#FFFFFF",
       letterSpacing: -0.2,
@@ -180,12 +181,12 @@ export const createStyles = (props = {}) =>
       marginTop: 20,
     },
     signupText: {
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: props.signupTextColor || "#5A6B7D",
       fontWeight: "400",
     },
     signupLink: {
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: "#0F1419",
       fontWeight: "600",
       // remove textDecorationLine for manual underline
@@ -202,12 +203,12 @@ export const createStyles = (props = {}) =>
       alignItems: "center",
     },
     footerLink: {
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: props.footerLinkColor || "#7A8794",
       fontWeight: "400",
     },
     footerDot: {
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: props.footerLinkColor || "#7A8794",
     },
     inputFieldsMain: {
@@ -223,7 +224,7 @@ export const createStyles = (props = {}) =>
       width: "48%",
     },
     label: {
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: "#4E4E4E",
       fontWeight: "500",
       marginBottom: 8,
@@ -235,7 +236,7 @@ export const createStyles = (props = {}) =>
       borderRadius: 15,
       paddingHorizontal: 20,
       paddingVertical: 14,
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: "#0F1419",
       backgroundColor: "white",
       width: "100%",
@@ -252,7 +253,7 @@ export const createStyles = (props = {}) =>
     },
     passwordInput: {
       flex: 1,
-      fontSize: 10,
+      fontSize: scaleFont(10),
       color: "#0F1419",
       paddingVertical: 14,
     },
@@ -282,11 +283,11 @@ export const createStyles = (props = {}) =>
     alignItems: 'center',
   },
   text: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: '#5A5A5A',
   },
   link: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: '#2C3E50',
     fontWeight: '600',
   },

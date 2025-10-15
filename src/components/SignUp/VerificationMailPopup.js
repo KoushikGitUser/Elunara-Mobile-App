@@ -12,6 +12,7 @@ import {
 import { BlurView } from "@react-native-community/blur";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import verifiedIcon from '../../assets/images/Group.png';
+import { scaleFont } from "../../utils/responsive";
 
 const { width } = Dimensions.get("window");
 
@@ -134,14 +135,14 @@ verifiedIcon:{
     marginBottom: 24,
   },
   title: {
-    fontSize: 23,
+    fontSize: scaleFont(23),
     fontWeight: "700",
     color: "#1F2937",
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: 12,
+    fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -157,7 +158,7 @@ verifiedIcon:{
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 11,
+    fontSize: scaleFont(11),
     fontWeight: "500",
     letterSpacing: 0.3,
   },

@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./SignUp.styles";
 import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
 import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
+import { scaleFont } from "../../../utils/responsive";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -58,7 +59,7 @@ const SignUp = () => {
               <Text
                 style={[
                   styles.headTitle,
-                  { fontWeight: "400", color: "black", fontSize: 22 },
+                  { fontWeight: "400", color: "black", fontSize: scaleFont(22) },
                 ]}
               >
                 - Your AI
@@ -71,7 +72,7 @@ const SignUp = () => {
                   fontWeight: "400",
                   marginTop: 1,
                   color: "black",
-                  fontSize: 22,
+                  fontSize: scaleFont(22),
                 },
               ]}
             >

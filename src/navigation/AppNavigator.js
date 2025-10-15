@@ -6,6 +6,7 @@ import SignIn from "../screens/auth/SignIn/SignIn";
 import SignUp from "../screens/auth/SignUp/SignUp";
 import WelcomeScreen from "../screens/WelcomeScreen/WelcomeScreen";
 import ChangePassword from "../screens/auth/ChangePassword/ChangePassword";
+import ChatScreen from "../screens/ChatScreen/ChatScreen";
 
 // Screens
 
@@ -60,6 +61,15 @@ const AppNavigator = () => {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="chat"
+          component={ChatScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

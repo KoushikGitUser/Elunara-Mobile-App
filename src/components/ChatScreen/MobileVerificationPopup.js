@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { BlurView } from "@react-native-community/blur";
 import { Feather } from "@expo/vector-icons";
+import { scaleFont } from "../../utils/responsive";
 
 const { width } = Dimensions.get("window");
 
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   title: {
-    fontSize: 23,
+    fontSize: scaleFont(23),
     fontWeight: "700",
     color: "#1F2937",
     marginBottom: 5,
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: 11,
+    fontSize: scaleFont(11),
     lineHeight: 24,
     color: "#6B7280",
     letterSpacing: 0.2,
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   inputLabel: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     fontWeight: "600",
     color: "#374151",
     marginBottom: 8,
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: "#1F2937",
     letterSpacing: 0.2,
   },
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     borderColor: "#d1d5db",
     borderRadius: 16,
     textAlign: "center",
-    fontSize: 15,
+    fontSize: scaleFont(15),
     fontWeight: "600",
   },
   resendContainer: {
@@ -369,11 +370,11 @@ const styles = StyleSheet.create({
     marginBottom: 80,
   },
   resendText: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: "#6b7280",
   },
   resendLink: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     fontWeight: "600",
     color: "#111827",
     textDecorationLine: "underline",
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: 11,
+    fontSize: scaleFont(11),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     color: "#0F172A",
-    fontSize: 10,
+    fontSize: scaleFont(10),
     fontWeight: "600",
     textDecorationLine: "underline",
     letterSpacing: 0.2,
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   noteText: {
-    fontSize: 9,
+    fontSize: scaleFont(9),
     lineHeight: 20,
     color: "#6B7280",
     letterSpacing: 0.1,

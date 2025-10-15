@@ -259,3 +259,9 @@ const styles = StyleSheet.create({
 });
 
 export default MobileVerificationPopup;
+
+
+// Responsive scaling functions
+const scale = (size) => (width / 375) * size;
+const verticalScale = (size) => (height / 812) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;

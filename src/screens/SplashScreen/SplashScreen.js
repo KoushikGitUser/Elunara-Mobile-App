@@ -1,14 +1,15 @@
 import { DarkTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, StatusBar, ImageBackground, Image } from 'react-native';
+import { scaleFont } from '../../utils/responsive';
 import chakraLogoSplash from '../../assets/images/chakraBig.png';
 import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png'
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('welcome');
-    }, 2500); // 2.5 seconds
+      navigation.replace('chat');
+    }, 500); // 2.5 seconds
 
     return () => clearTimeout(timer);   
   }, [navigation]);
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#081A35',
   },
   logo: {
-    fontSize: 48,
+    fontSize: scaleFont(48),
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 8,
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
 
   },
   tagline: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     color: '#E1BEE7',
     marginBottom: 40,
   },

@@ -45,7 +45,7 @@ const SignIn = () => {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={30} color="black" />
+            <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={24} color="black" />
             <Text style={styles.headTitle}>Welcome back</Text>
             <Text style={styles.headDesc}>Pick up right where you left off</Text>
             <Text style={[styles.headDesc,{marginTop:0}]}>—smarter learning awaits.</Text>
@@ -94,8 +94,8 @@ const SignIn = () => {
           <TouchableOpacity onPress={()=> setToggleForgotPassword(true)} style={styles.forgotPasswordMain} activeOpacity={0.6}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-                  {/* Email Button */}
-        <TouchableOpacity style={styles.emailButton} activeOpacity={0.8}>
+          {/* Email Button */}
+        <TouchableOpacity onPress={()=>navigation.navigate("chat")} style={styles.emailButton} activeOpacity={0.8}>
           <Text style={styles.emailButtonText}>Login</Text>
         </TouchableOpacity>
 

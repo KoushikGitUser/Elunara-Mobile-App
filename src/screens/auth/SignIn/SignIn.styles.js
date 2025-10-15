@@ -1,11 +1,8 @@
 import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { moderateScale, scale, scaleFont, verticalScale } from '../../../utils/responsive';
 
 const { width, height } = Dimensions.get('window');
 
-// Responsive scaling functions
-const scale = (size) => (width / 375) * size;
-const verticalScale = (size) => (height / 812) * size;
-const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
 
 export const createStyles = (props = {}) => StyleSheet.create({
   safeArea: {
@@ -36,21 +33,22 @@ export const createStyles = (props = {}) => StyleSheet.create({
     width:130
   }, 
   chakraLogo:{
-    height:165,
-    width:115,
+    height:134,
+    width:93,
     position:"absolute",
     right:-25,
-    zIndex:99
+    marginTop:15,
+    zIndex:99,
   },
   headTitle:{
-    fontSize: 30,
+    fontSize: scaleFont(24),
     fontWeight: '700',
     color: '#4D5F75',
     letterSpacing: -0.8,
     marginTop:15
   },
   headDesc:{
-    fontSize: 12,
+    fontSize: scaleFont(16),
     color: '#939FA9',
     fontWeight: '400',
     marginTop:15,
@@ -91,13 +89,13 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginTop: 80,
   },
   heading: {
-    fontSize: 40,
+    fontSize: scaleFont(40),
     fontWeight: '700',
     color: '#4D5F75',
     letterSpacing: -0.8,
   },
   subheading: {
-    fontSize: 15,
+    fontSize: scaleFont(15),
     color: '#939FA9',
     lineHeight: moderateScale(25, 0.2),
     fontWeight: '400',
@@ -140,7 +138,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginBottom: 15,
   },
   socialButtonText: {
-    fontSize: 11,
+    fontSize: scaleFont(11),
     fontWeight: '700',
     color: props.socialButtonTextColor || '#1E2329',
     letterSpacing: -0.1,
@@ -152,7 +150,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
   },
   divider: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: scaleFont(12),
     color: '#8A97A3',
     fontWeight: '400',
     marginTop:20
@@ -162,12 +160,12 @@ export const createStyles = (props = {}) => StyleSheet.create({
     borderRadius: moderateScale(100),
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical:16,
+    height:verticalScale(40),
     width:"100%",
 
   },
   emailButtonText: {
-    fontSize: 11,
+    fontSize: scaleFont(14),
     fontWeight: '600',
     color: props.emailButtonTextColor || '#FFFFFF',
     letterSpacing: -0.2,
@@ -179,12 +177,12 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginTop:20
   },
   signupText: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: props.signupTextColor || '#5A6B7D',
     fontWeight: '400',
   },
   signupLink: {
-  fontSize: 10,
+  fontSize: scaleFont(10),
   color: '#0F1419',
   fontWeight: '600',
   // remove textDecorationLine for manual underline
@@ -201,19 +199,19 @@ customUnderline: {
     alignItems: 'center',
   },
   footerLink: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: props.footerLinkColor || '#7A8794',
     fontWeight: '400',
   },
   footerDot: {
-    fontSize: 10,
+    fontSize: scaleFont(10),
     color: props.footerLinkColor || '#7A8794',
   },
   inputFieldsMain:{
    width:"90%",
   },
   label: {
-    fontSize: 10,
+    fontSize: scaleFont(12),
     color: "#4E4E4E",
     fontWeight: "500",
     marginBottom: 8,
@@ -224,8 +222,8 @@ customUnderline: {
     borderColor: "#ABB8CC",
     borderRadius: 15,
     paddingHorizontal: 20,
-    paddingVertical: 14,
-    fontSize: 11,
+    height:50,
+    fontSize: scaleFont(14),
     color: "#0F1419",
     backgroundColor:"white"
   },
@@ -236,12 +234,13 @@ customUnderline: {
     borderColor: "#ABB8CC",
     borderRadius: 15,
     paddingHorizontal: 15,
+    height:50,
     paddingRight: 10,
     backgroundColor:"white"
   },
   passwordInput: {
     flex: 1,
-    fontSize: 11,
+    fontSize: scaleFont(14),
     color: "#0F1419",
     paddingVertical: 14,
   },
@@ -250,8 +249,8 @@ customUnderline: {
   },
   forgotPassword: {
     alignSelf: "flex-end",
-    marginTop: 10,
-    fontSize: 10,
+    marginTop: verticalScale(10),
+    fontSize: scaleFont(14),
     color: "#0F1419",
     fontWeight: "600",
   },
