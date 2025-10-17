@@ -7,6 +7,7 @@ import SignUp from "../screens/auth/SignUp/SignUp";
 import WelcomeScreen from "../screens/WelcomeScreen/WelcomeScreen";
 import ChangePassword from "../screens/auth/ChangePassword/ChangePassword";
 import ChatScreen from "../screens/ChatScreen/ChatScreen";
+import Notes from "../screens/Notes/Notes";
 
 // Screens
 
@@ -65,6 +66,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="chat"
           component={ChatScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="notes"
+          component={Notes}
           options={{
             headerShown: false,
           }}

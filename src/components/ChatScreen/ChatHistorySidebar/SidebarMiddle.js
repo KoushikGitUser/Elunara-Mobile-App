@@ -1,0 +1,86 @@
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, Folder, Pin } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
+import { createStyles } from "./chatSidebarStyles.styles";
+import { moderateScale } from "../../../utils/responsive";
+import { recentChats } from "../../../data/datas";
+import IndividualRecentChat from "./IndividualRecentChat";
+import IndividualPinnedChat from "./IndividualPinnedChat";
+import IndividualPinnedRoom from "./IndividualPinnedRoom";
+
+const SidebarMiddle = () => {
+  const [recentChatsOpened, setRecentChatsOpened] = useState(false);
+  const [pinnedChatsOpened,setPinnedChatsOpened] = useState(false);
+  const [pinnedRoomsOpened,setPinnedRoomsOpened] = useState(false);
+  const styleProps = {};
+  const styles = useMemo(() => createStyles(styleProps), []);
+  const navigation = useNavigation();
+
+  return (
+    <ScrollView style={styles.chatHistorySidebarMiddle}>
+      <View style={styles.pinnedSectionMain}>
+        <TouchableOpacity onPress={()=>setPinnedChatsOpened(!pinnedChatsOpened)} style={styles.pinnedBtn}>
+          <Pin size={25} strokeWidth={1.25} />
+          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+            Pinned Chats (06)
+          </Text>
+          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+        </TouchableOpacity>
+         {pinnedChatsOpened && (
+          <View style={styles.individualPinnedChatsMain}>
+            {recentChats.map((chat, chatIndex) => {
+              return (
+                <IndividualPinnedChat key={chatIndex} title={chat?.title} />
+              );
+            })}
+          </View>
+        )}
+        <TouchableOpacity onPress={()=>setPinnedRoomsOpened(!pinnedRoomsOpened)} style={styles.pinnedBtn}>
+          <Pin size={25} strokeWidth={1.25} />
+          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+            Pinned Learning Labs (10)
+          </Text>
+          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+        </TouchableOpacity>
+        {pinnedRoomsOpened && (
+          <View style={styles.individualPinnedChatsMain}>
+            {recentChats.map((chat, chatIndex) => {
+              return (
+                <IndividualPinnedRoom key={chatIndex} title={chat?.title} />
+              );
+            })}
+          </View>
+        )}
+      </View>
+      <View style={styles.pinnedSectionMain}>
+        <TouchableOpacity onPress={()=>setRecentChatsOpened(!recentChatsOpened)} style={[styles.pinnedBtn, { paddingLeft: 0 }]}>
+          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+            Recent chats
+          </Text>
+          {recentChatsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
+        </TouchableOpacity>
+        {recentChatsOpened && (
+          <View style={styles.individualRecentChatsMain}>
+            {recentChats.map((chat, chatIndex) => {
+              return (
+                <IndividualRecentChat key={chatIndex} title={chat?.title} />
+              );
+            })}
+          </View>
+        )}
+      </View>
+      <View style={styles.pinnedSectionMain}>
+        <TouchableOpacity style={[styles.pinnedBtn]}>
+          <Folder size={21} strokeWidth={1.25} />
+          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+            Rooms
+          </Text>
+          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default SidebarMiddle;

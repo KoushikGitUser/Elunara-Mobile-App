@@ -1,9 +1,9 @@
 import { View, Text, TextInput } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { createStyles } from "./ChatScreenCompo.styles";
 import { Feather,Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LibraryBig, Mic, Paperclip, Send } from "lucide-react-native";
+import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
 
 const ChatInputMain = () => {
   const styleProps = {};

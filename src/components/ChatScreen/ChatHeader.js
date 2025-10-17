@@ -25,7 +25,7 @@ const ChatHeader = () => {
         />
         <Text>Upgrade Plan</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={()=>navigation.navigate("notes")}>
         <MessageCirclePlus size={30} strokeWidth={1.25} />
       </TouchableOpacity>
     </View>

@@ -61,3 +61,18 @@ export const topicsUnopened = [
     iconColor:"#92470A"
   },
 ];
+
+export const recentChats = [
+  { title: "Marketing Plan for 2024" },
+  { title: "Financial Analysis of Q1" },
+  { title: "Employee Engagement Strategies" },
+  { title: "IT Infrastructure Overview" },
+  { title: "Operations Optimization" },
+  { title: "Customer Journey Mapping" },
+  { title: "Product Launch Strategy" },
+  { title: "Market Research Report" },
+  { title: "Sales Forecasting" },
+  { title: "Budget Planning for Next Fiscal Year" },
+  { title: "Competitive Analysis" },
+  { title: "Social Media Campaign Ideas" },
+]

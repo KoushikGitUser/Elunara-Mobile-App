@@ -1,10 +1,28 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { createStyles } from "../ChatScreenCompo.styles";
-import chakraLogo from "../../../assets/images/chakraFull.png";
-import elunaraLogo from "../../../assets/images/elunaraLogo.png";
-import { FolderPlus, MessageCirclePlus, Search } from "lucide-react-native";
+import {
+  ChevronDown,
+  Folder,
+  FolderPlus,
+  MessageCirclePlus,
+  Pin,
+  Search,
+} from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { moderateScale } from "../../../utils/responsive";
+import Octicons from "@expo/vector-icons/Octicons";
+import { createStyles } from "./chatSidebarStyles.styles";
+import SidebarHeader from "./SidebarHeader";
+import SidebarMiddle from "./SidebarMiddle";
+import SidebarFooter from "./SidebarFooter";
 
 const ChatHistorySidebar = () => {
   const styleProps = {};
@@ -15,47 +33,19 @@ const ChatHistorySidebar = () => {
     <>
       <View style={styles.chatHistorySidebarBackgroundWrapper}></View>
       <View style={styles.chatHistorySidebarWrapper}>
+
         {/* chat history header */}
-        <View style={styles.chatHistorySidebarHeader}>
-          <View style={styles.sidebarTopImageMain}>
-            <Image style={styles.chakraLogoSidebar} source={chakraLogo} />
-            <Image style={styles.elunaraLogoSidebar} source={elunaraLogo} />
-          </View>
-          <View style={styles.searchInputMain}>
-            <Search
-              size={25}
-              strokeWidth={1.25}
-              color="#B5BECE"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor="#B5BECE"
-              style={styles.searchInput}
-            />
-          </View>
-          <View style={styles.newButtonsMain}>
-            <TouchableOpacity style={styles.newChatBtn}>
-              <MessageCirclePlus size={25} strokeWidth={1.25} />
-              <Text style={styles.btnTexts}>New Chat</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.newLearningTabBtn}>
-              <FolderPlus size={25} strokeWidth={1.25} />
-              <Text style={[styles.btnTexts,{fontWeight:400}]}>New Learning Tab</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <SidebarHeader/>
         {/* chat history header */}
 
         {/* chat history middle */}
-        <View style={styles.chatHistorySidebarMiddle}></View>
+         <SidebarMiddle/>
         {/* chat history middle */}
 
         {/* chat history footer */}
-        <View style={styles.chatHistorySidebarFooter}>
-            
-        </View>
+         <SidebarFooter/>
         {/* chat history footer */}
+        
       </View>
     </>
   );
