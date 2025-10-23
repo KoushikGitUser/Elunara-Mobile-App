@@ -71,7 +71,7 @@ const SidebarMiddle = () => {
         )}
       </View>
       <View style={styles.pinnedSectionMain}>
-        <TouchableOpacity style={[styles.pinnedBtn]}>
+        <TouchableOpacity onPress={()=>navigation.navigate("rooms")} style={[styles.pinnedBtn]}>
           <Folder size={21} strokeWidth={1.25} />
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Rooms

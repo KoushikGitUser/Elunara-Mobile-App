@@ -40,10 +40,22 @@ export const createStyles = ({}) =>
       fontWeight: 600,
       gap: 5,
     },
+    rightChatHeaderIcons: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems:"center",
+      gap:10
+    },
     chatMiddleSectionWrapper: {
       width: "100%",
       flex: 1,
       justifyContent: "flex-end",
+    },
+    messagesContainer:{
+      width:"100%",
+      flex:1,
+      flexDirection:"column",
+
     },
     topicsMainWrapper: {
       width: "100%",
@@ -86,5 +98,4 @@ export const createStyles = ({}) =>
       fontSize: moderateScale(12),
       fontWeight: 400,
     },
-   
   });

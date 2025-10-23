@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -23,29 +24,33 @@ import { createStyles } from "./chatSidebarStyles.styles";
 import SidebarHeader from "./SidebarHeader";
 import SidebarMiddle from "./SidebarMiddle";
 import SidebarFooter from "./SidebarFooter";
+import { useDispatch } from "react-redux";
+import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 
 const ChatHistorySidebar = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   return (
     <>
-      <View style={styles.chatHistorySidebarBackgroundWrapper}></View>
+      <TouchableOpacity
+        onPress={() => dispatch(setToggleChatHistorySidebar(false))}
+        style={styles.chatHistorySidebarBackgroundWrapper}
+      ></TouchableOpacity>
       <View style={styles.chatHistorySidebarWrapper}>
-
         {/* chat history header */}
-        <SidebarHeader/>
+        <SidebarHeader />
         {/* chat history header */}
 
         {/* chat history middle */}
-         <SidebarMiddle/>
+        <SidebarMiddle />
         {/* chat history middle */}
 
         {/* chat history footer */}
-         <SidebarFooter/>
+        <SidebarFooter />
         {/* chat history footer */}
-        
       </View>
     </>
   );

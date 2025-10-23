@@ -8,6 +8,7 @@ import WelcomeScreen from "../screens/WelcomeScreen/WelcomeScreen";
 import ChangePassword from "../screens/auth/ChangePassword/ChangePassword";
 import ChatScreen from "../screens/ChatScreen/ChatScreen";
 import Notes from "../screens/Notes/Notes";
+import Rooms from "../screens/Rooms/Rooms";
 
 // Screens
 
@@ -74,6 +75,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="notes"
           component={Notes}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+          <Stack.Screen
+          name="rooms"
+          component={Rooms}
           options={{
             headerShown: false,
           }}

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StatusBar } from "react-native";
 import React, { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -13,7 +13,7 @@ const ChatScreen = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
-  const { toggleChatHistorySidebar } = useSelector((state) => state.Toggle);
+  const { toggleStates } = useSelector((state) => state.Toggle);
 
   return (
     <SafeAreaView>
@@ -23,7 +23,7 @@ const ChatScreen = () => {
         {/* Header section */}
 
         {/* chatsidebar section */}
-        { toggleChatHistorySidebar && <ChatHistorySidebar/>}
+        { toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar/>}
          {/* chatsidebar section */}
 
         {/* middle section */}

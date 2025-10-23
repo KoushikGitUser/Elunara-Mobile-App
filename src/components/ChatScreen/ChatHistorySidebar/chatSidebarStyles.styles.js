@@ -163,7 +163,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 15,
       paddingVertical: 10,
-      paddingLeft:20,
+      paddingLeft: 20,
       borderLeftWidth: 1,
       borderColor: "#D3DAE5",
     },
@@ -174,7 +174,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 15,
       paddingVertical: 10,
-      paddingLeft:20,
+      paddingLeft: 20,
       borderLeftWidth: 1,
       borderColor: "#D3DAE5",
     },
@@ -185,15 +185,9 @@ export const createStyles = ({}) =>
       gap: verticalScale(15),
       backgroundColor: "white",
       padding: 20,
-      elevation: 10,
-      shadowColor: "#000000ff",
-      shadowOffset: {
-        width: 0,
-        height: 10, // negative height → shadow goes upwards
-      },
-      shadowOpacity: 1, // adjust for intensity
-      shadowRadius: 10, // larger value → more blur
       borderBottomRightRadius: 16,
+      borderTopWidth: 1,
+      borderColor: "lightgrey",
     },
     profileButton: {
       width: "100%",
@@ -227,6 +221,7 @@ export const createStyles = ({}) =>
     },
     chatInputMainWrapper: {
       width: "100%",
+      paddingBottom: 20,
     },
     chatInputMain: {
       width: "100%",
@@ -238,6 +233,7 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       alignItems: "center",
       gap: verticalScale(12),
+      backgroundColor: "white",
     },
     textInput: {
       width: "100%",

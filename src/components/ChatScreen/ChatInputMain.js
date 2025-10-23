@@ -4,11 +4,14 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather,Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LibraryBig, Mic, Paperclip, Send } from "lucide-react-native";
 import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
+import { useDispatch } from "react-redux";
+import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 
 const ChatInputMain = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.chatInputMainWrapper}>
@@ -26,7 +29,7 @@ const ChatInputMain = () => {
           </View>
           <View style={styles.inputRightActionIcons}>
             <Mic size={30} strokeWidth={1.25} />
-            <Send size={30} strokeWidth={1.25} />
+            <Send onPress={()=> dispatch(setToggleIsChattingWithAI(true))} size={30} strokeWidth={1.25} />
           </View>
         </View>
       </View>

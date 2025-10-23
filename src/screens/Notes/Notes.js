@@ -36,7 +36,7 @@ const Notes = () => {
     <SafeAreaView style={styles.notesMainWrapper}>
       {/* header */}
       <View style={styles.notesHeader}>
-        <TouchableOpacity style={styles.backBtn}>
+        <TouchableOpacity onPress={()=>navigation.navigate("chat")} style={styles.backBtn}>
           <ArrowLeft size={25} strokeWidth={1.5} />
         </TouchableOpacity>
         <View style={styles.rightOptionsMain}>
