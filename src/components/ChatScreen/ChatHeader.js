@@ -28,16 +28,16 @@ const ChatHeader = () => {
           size={24}
           color="black"
         />
-        <Text>Upgrade Plan</Text>
+        <Text>Upgrade Plan</Text> 
       </TouchableOpacity>
       <View style={styles.rightChatHeaderIcons}>
       <TouchableOpacity onPress={()=>navigation.navigate("notes")}>
         <MessageCirclePlus size={30} strokeWidth={1.25} />
       </TouchableOpacity>
-       <TouchableOpacity style={{position:"relative",backgroundColor:toggleStates.toggleChatMenuPopup?"#E7ECF5":"white",zIndex:9,borderRadius:5}} onPress={()=>dispatch(setToggleChatMenuPopup(!toggleStates.toggleChatMenuPopup))}>
-        {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup/> }
+       <TouchableOpacity style={{backgroundColor:toggleStates.toggleChatMenuPopup?"#E7ECF5":"transparent",zIndex:9,borderRadius:5}} onPress={()=>dispatch(setToggleChatMenuPopup(!toggleStates.toggleChatMenuPopup))}>
         <EllipsisVertical strokeWidth={1.25} size={30}/>
       </TouchableOpacity>
+        
       </View>
 
     </View>

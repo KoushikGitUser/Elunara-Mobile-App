@@ -4,14 +4,16 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather,Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LibraryBig, Mic, Paperclip, Send } from "lucide-react-native";
 import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
-import { useDispatch } from "react-redux";
-import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleAddItemsToInputPopup, setToggleIsChattingWithAI, setToggleToolsPopup, } from "../../redux/slices/toggleSlice";
+import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
 
 const ChatInputMain = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { toggleStates } = useSelector((state) => state.Toggle);
 
   return (
     <View style={styles.chatInputMainWrapper}>
@@ -23,9 +25,13 @@ const ChatInputMain = () => {
         />
         <View style={styles.inputActionIconsMainWrapper}>
           <View style={styles.inputLeftActionIcons}>
-            <Paperclip size={30} strokeWidth={1.25} />
-            <LibraryBig size={30} strokeWidth={1.25} />
-            <Ionicons name="options-outline" size={30} color="black" />
+            <View style={[styles.parentContainer,{backgroundColor:toggleStates.toggleAddItemsToInputPopup?"#EEF4FF":"transparent",padding:3,borderRadius:8}]}>
+              <Paperclip onPress={()=>dispatch(setToggleAddItemsToInputPopup(true))} size={30} strokeWidth={1.25} />
+              {toggleStates.toggleAddItemsToInputPopup && <AddItemsToInputPopup/>}
+            </View>
+           
+            <LibraryBig  size={30} strokeWidth={1.25} />
+            <Ionicons onPress={()=>dispatch(setToggleToolsPopup(true))} name="options-outline" size={30} color="black" />
           </View>
           <View style={styles.inputRightActionIcons}>
             <Mic size={30} strokeWidth={1.25} />

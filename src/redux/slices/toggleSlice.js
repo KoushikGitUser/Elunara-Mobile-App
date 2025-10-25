@@ -14,6 +14,18 @@ const toggleSlice = createSlice({
     },
     setToggleChatMenuPopup: (state, action) => {
       state.toggleStates.toggleChatMenuPopup = action.payload;
+    },
+    setToggleAddItemsToInputPopup: (state, action) => {
+      state.toggleStates.toggleAddItemsToInputPopup = action.payload;
+    },
+    setToggleTopicsPopup: (state, action) => {
+      state.toggleStates.toggleTopicsPopup = action.payload;
+    },
+    setToggleToolsPopup: (state, action) => {
+      state.toggleStates.toggleToolsPopup = action.payload;
+    },
+    setToggleToolsPopupStates: (state, action) => {
+      state.toggleStates.toggleToolsPopupStates = action.payload;
     }
   },
 });
@@ -21,7 +33,11 @@ const toggleSlice = createSlice({
 export const {
   setToggleChatHistorySidebar,
   setToggleIsChattingWithAI,
-  setToggleChatMenuPopup
+  setToggleChatMenuPopup,
+  setToggleAddItemsToInputPopup,
+  setToggleTopicsPopup,
+  setToggleToolsPopup,
+  setToggleToolsPopupStates
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

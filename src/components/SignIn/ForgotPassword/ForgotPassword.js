@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   closeModalMain: {
-    width: "100%",
+    width: "100%", 
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "flex-end",
