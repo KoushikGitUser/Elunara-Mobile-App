@@ -17,6 +17,9 @@ import { setToggleToolsPopup, setToggleTopicsPopup } from "../../../redux/slices
 import { ChevronRight, GitFork } from "lucide-react-native";
 import ToolsContainers from "./ToolsContainers";
 import LLMState from "./ToolsPopupStates/LLMStates/LLMState";
+import ResponseStyleState from "./ToolsPopupStates/ResponseStyleState/ResponseStyleState";
+import ResponseLangState from "./ToolsPopupStates/ResponseLangState/ResponseLangState";
+import CitationState from "./ToolsPopupStates/CitationState/CitationState";
 
 const ToolsOptionsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -69,7 +72,7 @@ const ToolsOptionsPopup = () => {
             <ToolsContainers/>
             </View>
           </View>
-        </View>:toggleStates.toggleToolsPopupStates == 1?<LLMState/>: toggleStates.toggleToolsPopupStates == 2?<></>:toggleStates.toggleToolsPopupStates == 3?<></>:<></>}
+        </View>:toggleStates.toggleToolsPopupStates == 1?<LLMState/>: toggleStates.toggleToolsPopupStates == 2?<ResponseStyleState/> :toggleStates.toggleToolsPopupStates == 3?<ResponseLangState/> :<CitationState/>}
 
       </View>
     </Modal>

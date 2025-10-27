@@ -18,95 +18,139 @@ import { ArrowLeft } from "lucide-react-native";
 import DropDowns from "../DropDowns";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
 import { useDispatch } from "react-redux";
-import { setToggleToolsPopupStates } from "../../../../../redux/slices/toggleSlice";
+import {
+  setToggleToolsPopup,
+  setToggleToolsPopupStates,
+} from "../../../../../redux/slices/toggleSlice";
+import LLMSavedState from "./LLMSavedState";
 
 const screenHeight = Dimensions.get("window").height;
 
 const LLMState = () => {
-
-    const [selectedCountsArray,setSelectedCountsArray] = useState([]);
-    const dispatch = useDispatch();
+  const [selectedCountsArray, setSelectedCountsArray] = useState([]);
+  const [isLLMSaved, setIsLLMSaved] = useState(false);
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.modalSheet}>
       {/* Content */}
-      <View style={styles.content}>
-        <View style={styles.closeModalMain}>
-          <ArrowLeft onPress={()=>dispatch(setToggleToolsPopupStates(0))} size={30} strokeWidth={2} />
-          <AntDesign
-            onPress={() => dispatch(setToggleTopicsPopup(false))}
-            name="close"
-            size={24}
-            color="black"
-          />
-        </View>
-        {/* Title */}
-        <Text style={styles.title}>Choose LLM</Text>
+      {isLLMSaved ? (
+        <LLMSavedState />
+      ) : (
+        <View style={styles.content}>
+          <View style={styles.closeModalMain}>
+            <ArrowLeft
+              onPress={() => dispatch(setToggleToolsPopupStates(0))}
+              size={30}
+              strokeWidth={2}
+            />
+            <AntDesign
+              onPress={() => dispatch(setToggleToolsPopup(false))}
+              name="close"
+              size={24}
+              color="black"
+            />
+          </View>
+          {/* Title */}
+          <Text style={styles.title}>Choose LLM</Text>
 
-        {/* Description */}
-        <Text style={styles.description}>
-          Receive responses in your preferred LLMs! Pick up to 3 now to easily
-          toggle between them
-        </Text>
-
-        <ScrollView style={{maxHeight:screenHeight*0.6}}>
-        <View style={styles.noteSection}>
-          <Text style={{ fontSize: moderateScale(12), fontWeight: 400 }}>
-            <Text style={{ fontSize: moderateScale(12), fontWeight: 600 }}>
-              Note:
-            </Text>
-            {" "}After selection, you can also integrate your own LLM account for
-            added flexibility
+          {/* Description */}
+          <Text style={styles.description}>
+            Receive responses in your preferred LLMs! Pick up to 3 now to easily
+            toggle between them
           </Text>
-        </View>
 
-        <Text
-          style={{
-            fontSize: moderateScale(10),
-            color: "#5E5E5E",
-            marginTop: 40,
-          }}
-        >
-          LLM 1
-        </Text>
-        <DropDowns selectedCounts={selectedCountsArray} setSelectedCounts={setSelectedCountsArray} selectOptionsArray={LLMOptionsAvailable} />
-        <Text
-          style={{
-            fontSize: moderateScale(10),
-            color: "#5E5E5E",
-            marginTop: 40,
-          }}
-        >
-          LLM 2
-        </Text>
-        <DropDowns selectedCounts={selectedCountsArray} setSelectedCounts={setSelectedCountsArray} selectOptionsArray={LLMOptionsAvailable} />
-        <Text
-          style={{
-            fontSize: moderateScale(10),
-            color: "#5E5E5E",
-            marginTop: 40,
-          }}
-        >
-          LLM 3
-        </Text>
-        <DropDowns selectedCounts={selectedCountsArray} setSelectedCounts={setSelectedCountsArray} selectOptionsArray={LLMOptionsAvailable} />
+          <ScrollView style={{ maxHeight: screenHeight * 0.6 }}>
+            <View style={styles.noteSection}>
+              <Text style={{ fontSize: moderateScale(12), fontWeight: 400 }}>
+                <Text style={{ fontSize: moderateScale(12), fontWeight: 600 }}>
+                  Note:
+                </Text>{" "}
+                After selection, you can also integrate your own LLM account for
+                added flexibility
+              </Text>
+            </View>
 
-        {/* Button */}
-        <TouchableOpacity
-          style={[styles.button,{backgroundColor:selectedCountsArray?.length >= 3?"#081A35":"#CDD5DC"}]}
-          onPress={() => dispatch(setToggleTopicsPopup(false))}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Save LLM Preferences</Text>
-        </TouchableOpacity>
-        <Text style={{ fontSize: moderateScale(11), fontWeight: 600,textDecorationLine:"underline",textAlign:"center" }}>
-            <Text style={{ fontSize: moderateScale(11), fontWeight: 400,paddingRight:5,textDecorationLine:"none" }}>
-              More LLMS? Update your list in {" "}
+            <Text
+              style={{
+                fontSize: moderateScale(10),
+                color: "#5E5E5E",
+                marginTop: 40,
+              }}
+            >
+              LLM 1
             </Text>
-            Settings
-          </Text>
+            <DropDowns
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
+            />
+            <Text
+              style={{
+                fontSize: moderateScale(10),
+                color: "#5E5E5E",
+                marginTop: 40,
+              }}
+            >
+              LLM 2
+            </Text>
+            <DropDowns
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
+            />
+            <Text
+              style={{
+                fontSize: moderateScale(10),
+                color: "#5E5E5E",
+                marginTop: 40,
+              }}
+            >
+              LLM 3
+            </Text>
+            <DropDowns
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
+            />
+
+            {/* Button */}
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {
+                  backgroundColor:
+                    selectedCountsArray?.length >= 3 ? "#081A35" : "#CDD5DC",
+                },
+              ]}
+              onPress={() => setIsLLMSaved(true)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>Save LLM Preferences</Text>
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: moderateScale(11),
+                fontWeight: 600,
+                textDecorationLine: "underline",
+                textAlign: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: moderateScale(11),
+                  fontWeight: 400,
+                  paddingRight: 5,
+                  textDecorationLine: "none",
+                }}
+              >
+                More LLMS? Update your list in{" "}
+              </Text>
+              Settings
+            </Text>
           </ScrollView>
-      </View>
+        </View>
+      )}
     </View>
   );
 };

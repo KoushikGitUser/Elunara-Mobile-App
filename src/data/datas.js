@@ -8,12 +8,20 @@ import {
   Pin,
   Trash,
   Image,
+  Lightbulb,
+  FileSliders,
+  MessageCircleMore,
+  Files,
+  Brush,
+  PenTool,
+  GraduationCap,
 } from "lucide-react-native";
-import gemini from '../assets/images/gemini.png';
-import anthropic from '../assets/images/antropic.png'
-import mistral from '../assets/images/mistral.png';
-import meta from '../assets/images/meta.png';
-
+import gemini from "../assets/images/gemini.png";
+import anthropic from "../assets/images/antropic.png";
+import mistral from "../assets/images/mistral.png";
+import meta from "../assets/images/meta.png";
+import chatgpt from '../assets/images/chatgpt.png';
+import chakraLogo from '../assets/images/chakraFull.png';
 
 export const slides = [
   {
@@ -170,8 +178,7 @@ export const addItemsOptions = [
   },
 ];
 
-
-export const  LLMOptionsAvailable = [
+export const LLMOptionsAvailable = [
   {
     id: "1",
     icon: gemini,
@@ -201,3 +208,130 @@ export const  LLMOptionsAvailable = [
     description: "Use for: Complex Calculations & Logic Tasks",
   },
 ];
+
+export const responseStyles = [
+  {
+    id: 0,
+    icon: <Lightbulb color="#888888" strokeWidth={1.25} />,
+    title: "Auto",
+    description:
+      "Elunara adjusts tone and style based on your query — from formal to friendly.",
+  },
+  {
+    id: 1,
+    icon: <Lightbulb color="#888888" strokeWidth={1.25} />,
+    title: "Concise",
+    description: "Direct and efficient — best for quick answers and summaries.",
+  },
+  {
+    id: 2,
+    icon: <FileSliders color="#888888" strokeWidth={1.25} />,
+    title: "Formal",
+    description:
+      "Professional and neutral — ideal for research or formal writing.",
+  },
+  {
+    id: 3,
+    icon: <MessageCircleMore color="#888888" strokeWidth={1.25} />,
+    title: "Conversational",
+    description:
+      "Friendly and relaxed — great for casual questions and everyday explanations.",
+  },
+  {
+    id: 4,
+    icon: <Files color="#888888" strokeWidth={1.25} />,
+    title: "Detailed",
+    description: "Thorough and structured — ideal for deep dives and learning.",
+  },
+  {
+    id: 5,
+    icon: <Brush color="#888888" strokeWidth={1.25} />,
+    title: "Creative",
+    description:
+      "Expressive and playful — perfect for storytelling and idea generation.",
+  },
+];
+
+export const languages = [
+  {
+    lang: "English",
+    nativeCharacter: "",
+  },
+  {
+    lang: "Bengali",
+    nativeCharacter: "বাংলা",
+  },
+  {
+    lang: "Gujarati",
+    nativeCharacter: "ગુજરાતી",
+  },
+  {
+    lang: "Hindi",
+    nativeCharacter: "हिन्दी",
+  },
+  {
+    lang: "Kannada",
+    nativeCharacter: "ಕನ್ನಡ",
+  },
+  {
+    lang: "Malayalam",
+    nativeCharacter: "മലയാളം",
+  },
+];
+
+export const setLanguages = [
+  {
+    id:0,
+    lang:"English"
+  },
+  {
+    id:1,
+    lang:"Hindi — हिन्दी"
+  },
+  {
+    id:2,
+    lang:"Bengali — বাংলা"
+  }
+]
+
+export const citationStyles = [
+  {
+    id:0,
+    icon:<PenTool strokeWidth={1.25} />,
+    style:"APA",
+    description:"Standard style for social sciences and academic writing."
+  },
+  {
+    id:1,
+    icon:<GraduationCap strokeWidth={1.25} />,
+    style:"Harvard",
+    description:"Popular author-date style for research and reports."
+  }
+]
+
+export const savedLLMOptions = [
+  {
+   icon:chakraLogo,
+   title:"Auto",
+   desc:"Elunara adjusts tone and style based on your query — from formal to friendly.",
+   buttonText:""
+  },
+  {
+   icon:gemini,
+   title:"Google Gemini",
+   desc:"Use for: Research and analysis",
+   buttonText:"The Knowledge Engine"
+  },
+    {
+   icon:chatgpt,
+   title:"OpenAI",
+   desc:"Use for: Content and research",
+   buttonText:"The Idea Engine"
+  },
+    {
+   icon:anthropic,
+   title:"Anthropic",
+   desc:"Use for: Reasoning and analysis",
+   buttonText:"The Thoughful Engine"
+  },
+]

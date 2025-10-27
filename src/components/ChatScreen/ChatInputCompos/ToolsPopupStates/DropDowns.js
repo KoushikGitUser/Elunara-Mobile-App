@@ -29,7 +29,6 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
         const spaceBelow = screenHeight - pageY - height;
         const spaceAbove = pageY;
         const openUp = spaceBelow < 240 && spaceAbove > spaceBelow;
-
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setVisible((prev) => !prev);
       });

@@ -42,7 +42,7 @@ const Notes = () => {
         <View style={styles.rightOptionsMain}>
           <Undo size={25} strokeWidth={1.5} />
           <Redo size={25} strokeWidth={1.5} />
-          <Download size={25} strokeWidth={1.5} />
+          <Download size={25} strokeWidth={1.5} /> 
           <TouchableOpacity style={styles.menuDots}>
           <EllipsisVertical size={25} strokeWidth={1.5} />
           {/* <NotesOptions/> */}
