@@ -8,8 +8,8 @@ import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png'
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('chat');
-    }, 500); // 2.5 seconds
+      navigation.replace('welcome');
+    }, 200); // 2.5 seconds
 
     return () => clearTimeout(timer);   
   }, [navigation]);

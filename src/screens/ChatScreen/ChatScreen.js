@@ -10,6 +10,7 @@ import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/C
 import { useSelector } from "react-redux";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
+import TopicsCompo from "../../components/ChatScreen/ChatInputCompos/TopicsCompo";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -22,6 +23,7 @@ const ChatScreen = () => {
       <View style={styles.chatMainWrapper}>
         {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup/> }
         {toggleStates.toggleToolsPopup && <ToolsOptionsPopup/>}
+        {toggleStates.toggleTopicsPopup && <TopicsCompo  />}
         {/* Header section */}
          <ChatHeader/>
         {/* Header section */}

@@ -20,8 +20,8 @@ import gemini from "../assets/images/gemini.png";
 import anthropic from "../assets/images/antropic.png";
 import mistral from "../assets/images/mistral.png";
 import meta from "../assets/images/meta.png";
-import chatgpt from '../assets/images/chatgpt.png';
-import chakraLogo from '../assets/images/chakraFull.png';
+import chatgpt from "../assets/images/chatgpt.png";
+import chakraLogo from "../assets/images/chakraFull.png";
 
 export const slides = [
   {
@@ -281,57 +281,197 @@ export const languages = [
 
 export const setLanguages = [
   {
-    id:0,
-    lang:"English"
+    id: 0,
+    lang: "English",
   },
   {
-    id:1,
-    lang:"Hindi — हिन्दी"
+    id: 1,
+    lang: "Hindi — हिन्दी",
   },
   {
-    id:2,
-    lang:"Bengali — বাংলা"
-  }
-]
+    id: 2,
+    lang: "Bengali — বাংলা",
+  },
+];
 
 export const citationStyles = [
   {
-    id:0,
-    icon:<PenTool strokeWidth={1.25} />,
-    style:"APA",
-    description:"Standard style for social sciences and academic writing."
+    id: 0,
+    icon: <PenTool strokeWidth={1.25} />,
+    style: "APA",
+    description: "Standard style for social sciences and academic writing.",
   },
   {
-    id:1,
-    icon:<GraduationCap strokeWidth={1.25} />,
-    style:"Harvard",
-    description:"Popular author-date style for research and reports."
-  }
-]
+    id: 1,
+    icon: <GraduationCap strokeWidth={1.25} />,
+    style: "Harvard",
+    description: "Popular author-date style for research and reports.",
+  },
+];
 
 export const savedLLMOptions = [
   {
-   icon:chakraLogo,
-   title:"Auto",
-   desc:"Elunara adjusts tone and style based on your query — from formal to friendly.",
-   buttonText:""
+    icon: chakraLogo,
+    title: "Auto",
+    desc: "Elunara adjusts tone and style based on your query — from formal to friendly.",
+    buttonText: "",
   },
   {
-   icon:gemini,
-   title:"Google Gemini",
-   desc:"Use for: Research and analysis",
-   buttonText:"The Knowledge Engine"
+    icon: gemini,
+    title: "Google Gemini",
+    desc: "Use for: Research and analysis",
+    buttonText: "The Knowledge Engine",
   },
-    {
-   icon:chatgpt,
-   title:"OpenAI",
-   desc:"Use for: Content and research",
-   buttonText:"The Idea Engine"
+  {
+    icon: chatgpt,
+    title: "OpenAI",
+    desc: "Use for: Content and research",
+    buttonText: "The Idea Engine",
   },
-    {
-   icon:anthropic,
-   title:"Anthropic",
-   desc:"Use for: Reasoning and analysis",
-   buttonText:"The Thoughful Engine"
+  {
+    icon: anthropic,
+    title: "Anthropic",
+    desc: "Use for: Reasoning and analysis",
+    buttonText: "The Thoughful Engine",
+  },
+];
+
+export const findApiKeyNotices = [
+  {
+    id: 1,
+    icon: chatgpt,
+    title: "OpenAI",
+    subtitle: "To get your OpenAI API key:",
+    steps: [
+      "Sign up or log into your OpenAI account at platform.openai.com",
+      'Go to your profile icon at the top right and select "View API keys."',
+      'Click on "Create new secret key," name it, and create it.',
+      "Copy the key now - this is the only time you'll see it!",
+      "Save it securely for use in Elunara integration.",
+    ],
+  },
+  {
+    id: 2,
+    icon: gemini,
+    title: "Google Gemini",
+    subtitle: 'To create your Gemini API key:',
+    steps: [
+      'Sign in to Google Cloud Console with your developer account.',
+      'Enable the Gemini API for your project.',
+      'Navigate to the "Credentials" section and create an API key.',
+      'Restrict the key as needed and copy it for Elunara integration.',
+    ],
+  },
+  {
+    id: 3,
+    icon: meta,
+    title: "Meta AI(Liama)",
+    subtitle: 'To create your Meta API key:',
+    steps: [
+      'Sign in to Google Cloud Console with your developer account.',
+      'Enable the Gemini API for your project.',
+      'Navigate to the "Credentials" section and create an API key.',
+      'Restrict the key as needed and copy it for Elunara integration.',
+    ],
+  },
+  {
+    id: 4,
+    icon: mistral,
+    title: "Mistral",
+    subtitle: 'To get your Mistral AI API key:',
+    steps: [
+      'Create or log into your Mistral AI developer account.',
+      'Navigate to the API key section in your dashboard.',
+      'Click "Create API key," name it, then generate it.',
+      'Copy and save your key securely for Elunara.',
+    ],
+  },
+  {
+    id: 5,
+    icon: anthropic,
+    title: "Anthropic",
+    subtitle: 'To find your Anthropic API key:',
+    steps: [
+      'Log into your Anthropic developer console.',
+      'Visit the API keys area under your account settings.',
+      'Click "Create new API key," provide a name, and create it.',
+      'Copy and securely store the key for Elunara integration.',
+    ],
+  },
+];
+
+
+export const topicsSheet = [
+  {
+    id: 1,
+    icon: '₹',
+    iconBg: '#E0F7FA',
+    iconColor: '#00BCD4',
+    title: 'Finance',
+    description: 'Budgets, returns, and risk',
+    popularTopics: 14,
+  },
+  {
+    id: 2,
+    icon: '📈',
+    iconBg: '#F3E5F5',
+    iconColor: '#9C27B0',
+    title: 'Marketing',
+    description: 'Brands, strategy & consumer insight',
+    popularTopics: 26,
+  },
+  {
+    id: 3,
+    icon: '🎯',
+    iconBg: '#FFF3E0',
+    iconColor: '#FF9800',
+    title: 'Human Resource',
+    description: 'People, performance, culture',
+    popularTopics: 11,
+  },
+  {
+    id: 4,
+    icon: '💻',
+    iconBg: '#F5F5F5',
+    iconColor: '#757575',
+    title: 'Information System',
+    description: 'Tech behind business"',
+    popularTopics: 8,
+  },
+  {
+    id: 5,
+    icon: '⚙️',
+    iconBg: '#E8EAF6',
+    iconColor: '#5C6BC0',
+    title: 'Operations',
+    description: 'Processes, flow, efficiency.',
+    popularTopics: 10,
+  },
+  {
+    id: 6,
+    icon: '📊',
+    iconBg: '#F3E5F5',
+    iconColor: '#9C27B0',
+    title: 'Business Analytics',
+    description: 'Data, decisions, and impact',
+    popularTopics: 32,
+  },
+  {
+    id: 7,
+    icon: '🌐',
+    iconBg: '#E8F5E9',
+    iconColor: '#4CAF50',
+    title: 'Economics & Quantitative Methods',
+    description: 'Budgets, returns, and risk',
+    popularTopics: 14,
+  },
+  {
+    id: 8,
+    icon: '📖',
+    iconBg: '#FFF3E0',
+    iconColor: '#FF9800',
+    title: 'Others',
+    description: 'Tech, ethics, change & communication',
+    popularTopics: 14,
   },
 ]

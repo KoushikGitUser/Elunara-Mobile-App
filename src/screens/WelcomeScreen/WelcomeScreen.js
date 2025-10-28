@@ -36,9 +36,7 @@ const WelcomeScreen = () => {
             <Image source={chakraLogo} style={styles.chakraLogo}  />
           </View>
         </View>
-
         <SignInSlider/>
-
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
           {/* Google Button */}

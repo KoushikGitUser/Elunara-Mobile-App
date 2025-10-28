@@ -58,12 +58,11 @@ const TopicsCompo = () => {
               />
             </View>
             {/* Title */}
-            <Text style={styles.title}>Choose Tools</Text>
+            <Text style={styles.title}>Explore Subjects</Text>
 
             {/* Description */}
             <Text style={styles.description}>
-              Customise how Elunara responds - choose your model, tone,
-              language, and citations
+              Choose a topic to get started - browse subtopics or jump right in
             </Text>
             <View style={styles.mainOptionsContainer}>
               <TouchableOpacity style={styles.optionsMain}>

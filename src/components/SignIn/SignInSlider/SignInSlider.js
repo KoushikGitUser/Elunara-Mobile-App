@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { scaleFont, verticalScale } from "../../../utils/responsive";
+import GradientText from "../../common/GradientText";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const SignInSlider = () => {
@@ -17,17 +18,17 @@ const SignInSlider = () => {
 
   const slides = [
     {
-      heading: "Learning,\nReimagined.\nEthically.",
+      heading: ["Learning,", "Reimagined", "Ethically."],
       description:
         "Designed to combine transparency, privacy, and empathy to support your learning journey.",
     },
     {
-      heading: "Smarter Answers,\nSharper Goals",
+      heading: ["Smarter Answers", "Sharper Goals"],
       description:
         "Tap into multiple powerful AI models for nuanced answers, create dynamic learning goals. Always in your control.",
     },
     {
-      heading: "Your Learning\nUniverse,Lynk-ed.",
+      heading: [" Your Learning", "Universe, Lynk-ed."],
       description:
         "Save insights from Lynk AI chat, write rich notes, and organize everything in one seamless space.",
     },
@@ -55,9 +56,11 @@ const SignInSlider = () => {
             <View style={styles.contentContainer}>
               {/* Gradient Heading */}
               <View style={styles.headingContainer}>
-
-                  <Text style={styles.heading}>{slide.heading}</Text>
-
+                {slide.heading?.map((heads, headIndex) => {
+                  return (
+                    <GradientText key={headIndex} fontSize={scaleFont(40)} children={heads} />
+                  );
+                })}
               </View>
 
               {/* Description */}
@@ -92,19 +95,22 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: SCREEN_WIDTH,
-    flexDirection:"column",
-    justifyContent:"flex-end",
-    marginBottom:15
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    marginBottom: 15,
   },
   contentContainer: {
-    flexDirection:"column",
+    flexDirection: "column",
     paddingHorizontal: 20,
     justifyContent: "flex-end",
-    marginTop:40,
-    paddingVertical:10,
+    marginTop: 40,
+    paddingVertical: 10,
   },
   headingContainer: {
     marginBottom: 10,
+    flexDirection:"column",
+    justifyContent:"space-between",
+    alignItems:"flex-start",
   },
   gradientWrapper: {
     alignSelf: "flex-start",
@@ -128,7 +134,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     paddingHorizontal: 20,
-    marginBottom:10
+    marginBottom: 10,
   },
   dot: {
     height: 5,

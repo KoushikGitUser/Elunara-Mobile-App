@@ -23,19 +23,22 @@ import {
   setToggleToolsPopupStates,
 } from "../../../../../redux/slices/toggleSlice";
 import LLMSavedState from "./LLMSavedState";
+import IntegrateAIAccState from "./IntegrateAIAccState";
 
 const screenHeight = Dimensions.get("window").height;
 
 const LLMState = () => {
   const [selectedCountsArray, setSelectedCountsArray] = useState([]);
   const [isLLMSaved, setIsLLMSaved] = useState(false);
+  const [toggleIntegrateAi,setToggleIntegrateAi] = useState(false);
   const dispatch = useDispatch();
 
   return (
     <View style={styles.modalSheet}>
       {/* Content */}
       {isLLMSaved ? (
-        <LLMSavedState />
+        toggleIntegrateAi?<IntegrateAIAccState/>:
+        <LLMSavedState setToggleIntegrateAi={setToggleIntegrateAi} />
       ) : (
         <View style={styles.content}>
           <View style={styles.closeModalMain}>

@@ -25,7 +25,7 @@ import { savedLLMOptions } from "../../../../../data/datas";
 
 const screenHeight = Dimensions.get("window").height;
 
-const LLMSavedState = () => {
+const LLMSavedState = ({setToggleIntegrateAi}) => {
   const [selectedStyle, setSelectedStyle] = useState(0);
 
   const RadioButton = ({ selected }) => (
@@ -58,7 +58,7 @@ const LLMSavedState = () => {
         Select the AI model for your responses - choose based on speed or depth.
       </Text>
 
-      <ScrollView style={{ maxHeight: screenHeight * 0.7 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: screenHeight * 0.7 }}>
         <View style={styles.optionsMain}>
           {savedLLMOptions?.map((option, optionsIndex) => {
             return (
@@ -141,13 +141,14 @@ const LLMSavedState = () => {
         </View>
 
         <TouchableOpacity
+        onPress={()=>setToggleIntegrateAi(true)}
           style={[
             styles.card,
             {
               flexDirection: "column",
               justifyContent: "flex-start",
               alignItems: "flex-start",
-              gap: 20,
+              gap: 15,
               marginTop:25,
               marginBottom:25,
               backgroundColor:"#F3F3F3"
@@ -178,7 +179,7 @@ const LLMSavedState = () => {
                     Integrate Your AI account
                 </Text>
             </View>
-            <ChevronRight strokeWidth={1.25} />
+            <ChevronRight size={30} strokeWidth={1.25} />
           </View>
           <Text style={{fontSize:scaleFont(12),color:"#757575"}}>
             Link your account to tailor responses and enjoy the benefits of your subscription.
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   iconContainer: {
-    marginBottom: 24,
+    marginTop:5
   },
   closeModalMain: {
     width: "100%",
@@ -264,6 +265,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginTop:5,
   },
   button: {
     backgroundColor: "#081A35",

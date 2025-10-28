@@ -47,7 +47,7 @@ export const createStyles = (props = {}) =>
       marginTop: 10,
     },
     headTitle: {
-      fontSize: scaleFont(30),
+      fontSize: scaleFont(28),
       fontWeight: "700",
       color: "#4D5F75",
       letterSpacing: -0.8,
@@ -224,7 +224,7 @@ export const createStyles = (props = {}) =>
       width: "48%",
     },
     label: {
-      fontSize: scaleFont(10),
+      fontSize: scaleFont(11),
       color: "#4E4E4E",
       fontWeight: "500",
       marginBottom: 8,
@@ -236,7 +236,7 @@ export const createStyles = (props = {}) =>
       borderRadius: 15,
       paddingHorizontal: 20,
       paddingVertical: 14,
-      fontSize: scaleFont(10),
+      fontSize: scaleFont(12),
       color: "#0F1419",
       backgroundColor: "white",
       width: "100%",
@@ -253,7 +253,7 @@ export const createStyles = (props = {}) =>
     },
     passwordInput: {
       flex: 1,
-      fontSize: scaleFont(10),
+      fontSize: scaleFont(12),
       color: "#0F1419",
       paddingVertical: 14,
     },

@@ -26,11 +26,12 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [otp, setOtp] = useState(["0", "0", "0", "0"]);
   const inputRefs = useRef([]);
-  const animatedValue = useState(new Animated.Value(0))[0];
+  const animatedValue = useState(new Animated.Value(0))[0]; 
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
       const height = e.endCoordinates.height;
+      setKeyboardVisible(true);
       setKeyboardHeight(height);
       Animated.timing(animatedValue, {
         toValue: height / 2.5, // pushes up slightly, not fully
@@ -40,6 +41,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
     });
 
     const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
       Animated.timing(animatedValue, {
         toValue: 0,
         duration: 250,
@@ -96,7 +98,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
           reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
         />
         <View style={styles.androidBlur} />
-        <View style={styles.gapFiller} />
+        <View style={[styles.gapFiller, { height: isKeyboardVisible ? '50%' : '30%' }]} />
 
         <TouchableOpacity
           style={styles.backdrop}
@@ -259,7 +261,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "40%",
     backgroundColor: "white",
   },
   backdrop: {

@@ -18,14 +18,15 @@ import { createStyles } from "./SignUp.styles";
 import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
 import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
 import { scaleFont } from "../../../utils/responsive";
+import GradientText from "../../../components/common/GradientText";
 
 const SignUp = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isChecked,setIsChecked] = useState(false);
-  const [verificationMailSent,setVerificationMailSent] = useState(false);
-  const [mobileVerificationPopup,setMobileVerificationPopup] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const [verificationMailSent, setVerificationMailSent] = useState(false);
+  const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
 
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
@@ -42,8 +43,18 @@ const SignUp = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      {verificationMailSent && <VerificationMailPopup close={setVerificationMailSent} verificationMailSent={verificationMailSent}/>}
-      {mobileVerificationPopup && <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} />}
+      {verificationMailSent && (
+        <VerificationMailPopup
+          close={setVerificationMailSent}
+          verificationMailSent={verificationMailSent}
+        />
+      )}
+      {mobileVerificationPopup && (
+        <MobileVerificationPopup
+          close={setMobileVerificationPopup}
+          mobileVerificationPopup={mobileVerificationPopup}
+        />
+      )}
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -54,17 +65,30 @@ const SignUp = () => {
               size={30}
               color="black"
             />
-            <Text style={styles.headTitle}>
-              Join Elunara{" "}
+            {/* <View
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                marginTop: 20,
+                width: "auto",
+              }}
+            > */}
+             
               <Text
                 style={[
-                  styles.headTitle,
-                  { fontWeight: "400", color: "black", fontSize: scaleFont(22) },
+                  {
+                    fontWeight: "400",
+                    color: "black",
+                    fontSize: scaleFont(22),
+                    flexDirection:"row"
+                  },
                 ]}
               >
+                 <GradientText children="Join Elunara" fontSize={scaleFont(28)} />
                 - Your AI
               </Text>
-            </Text>
+            {/* </View> */}
+
             <Text
               style={[
                 styles.headTitle,
@@ -99,8 +123,8 @@ const SignUp = () => {
                 style={styles.input}
                 placeholder="Your First Name"
                 placeholderTextColor="#B0B7C3"
-                value={email}
-                onChangeText={setEmail}
+                value={firstName}
+                onChangeText={setFirstName}
               />
             </View>
             <View style={styles.nameInput}>
@@ -109,8 +133,8 @@ const SignUp = () => {
                 style={styles.input}
                 placeholder="Your Last Name"
                 placeholderTextColor="#B0B7C3"
-                value={email}
-                onChangeText={setEmail}
+                value={lastName}
+                onChangeText={setLastName}
               />
             </View>
           </View>
@@ -122,21 +146,28 @@ const SignUp = () => {
               style={styles.passwordInput}
               placeholder="Enter your Email ID"
               placeholderTextColor="#B0B7C3"
-              secureTextEntry={!showPassword}
-              value={password}
-              onChangeText={setPassword}
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
 
           {/* Forgot Password */}
           <View style={styles.forgotPasswordMain} activeOpacity={0.6}>
-            <TouchableOpacity onPress={()=>setIsChecked(!isChecked)} style={styles.checkbox}>
-              {isChecked &&  <Ionicons name="checkmark-outline" size={16} color="black" />}
+            <TouchableOpacity
+              onPress={() => setIsChecked(!isChecked)}
+              style={styles.checkbox}
+            >
+              {isChecked && (
+                <Ionicons name="checkmark-outline" size={16} color="black" />
+              )}
             </TouchableOpacity>
 
             <View style={styles.textContainer}>
               <Text style={styles.text}>I agree to the </Text>
-              <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={() => setMobileVerificationPopup(true)}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
@@ -146,7 +177,11 @@ const SignUp = () => {
             </View>
           </View>
           {/* Email Button */}
-          <TouchableOpacity onPress={()=>setVerificationMailSent(true)} style={styles.emailButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            onPress={() => setVerificationMailSent(true)}
+            style={styles.emailButton}
+            activeOpacity={0.8}
+          >
             <Text style={styles.emailButtonText}>Verify Email</Text>
           </TouchableOpacity>
 

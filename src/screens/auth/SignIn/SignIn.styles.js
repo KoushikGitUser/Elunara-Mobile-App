@@ -211,7 +211,7 @@ customUnderline: {
    width:"90%",
   },
   label: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(11),
     color: "#4E4E4E",
     fontWeight: "500",
     marginBottom: 8,
@@ -223,7 +223,7 @@ customUnderline: {
     borderRadius: 15,
     paddingHorizontal: 20,
     height:50,
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(12),
     color: "#0F1419",
     backgroundColor:"white"
   },
@@ -240,7 +240,7 @@ customUnderline: {
   },
   passwordInput: {
     flex: 1,
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(12),
     color: "#0F1419",
     paddingVertical: 14,
   },
@@ -250,7 +250,7 @@ customUnderline: {
   forgotPassword: {
     alignSelf: "flex-end",
     marginTop: verticalScale(10),
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(12),
     color: "#0F1419",
     fontWeight: "600",
   },

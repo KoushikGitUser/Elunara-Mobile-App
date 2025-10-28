@@ -5,7 +5,7 @@ import { Feather,Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LibraryBig, Mic, Paperclip, Send } from "lucide-react-native";
 import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleAddItemsToInputPopup, setToggleIsChattingWithAI, setToggleToolsPopup, } from "../../redux/slices/toggleSlice";
+import { setToggleAddItemsToInputPopup, setToggleIsChattingWithAI, setToggleToolsPopup, setToggleTopicsPopup, } from "../../redux/slices/toggleSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
 
 const ChatInputMain = () => {
@@ -30,7 +30,7 @@ const ChatInputMain = () => {
               {toggleStates.toggleAddItemsToInputPopup && <AddItemsToInputPopup/>}
             </View>
            
-            <LibraryBig  size={30} strokeWidth={1.25} />
+            <LibraryBig onPress={()=>dispatch(setToggleTopicsPopup(true))} size={30} strokeWidth={1.25} />
             <Ionicons onPress={()=>dispatch(setToggleToolsPopup(true))} name="options-outline" size={30} color="black" />
           </View>
           <View style={styles.inputRightActionIcons}>

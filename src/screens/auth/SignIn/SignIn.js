@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -19,6 +20,8 @@ import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
+import GradientText from "../../../components/common/GradientText";
+import { scaleFont } from "../../../utils/responsive";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -46,7 +49,7 @@ const SignIn = () => {
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={24} color="black" />
-            <Text style={styles.headTitle}>Welcome back</Text>
+              {<GradientText marginBottom={0} marginTop={20} children=" Welcome back" fontSize={scaleFont(24)} />}
             <Text style={styles.headDesc}>Pick up right where you left off</Text>
             <Text style={[styles.headDesc,{marginTop:0}]}>—smarter learning awaits.</Text>
           </View>
@@ -95,7 +98,7 @@ const SignIn = () => {
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
           {/* Email Button */}
-        <TouchableOpacity onPress={()=>navigation.navigate("chat")} style={styles.emailButton} activeOpacity={0.8}>
+        <TouchableOpacity onPress={()=> navigation.navigate("chat")} style={styles.emailButton} activeOpacity={0.8}>
           <Text style={styles.emailButtonText}>Login</Text>
         </TouchableOpacity>
 
