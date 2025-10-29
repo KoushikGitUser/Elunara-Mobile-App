@@ -22,10 +22,19 @@ export const createStyles = ({}) =>
     },
     chatHeader: {
       width: "100%",
-      height: verticalScale(64),
+      position:"absolute",
+      top:0,
+      left:0,
+      zIndex:9,
+      minHeight: verticalScale(64),
       flexDirection: "row",
       justifyContent: "space-between",
+      paddingHorizontal:20,
+      paddingTop:60,
+      paddingBottom:25,
       alignItems: "center",
+      backgroundColor: "#FAFAFA",
+      borderColor:"#D3DAE5"
     },
     upgradeButton: {
       flexDirection: "row",
@@ -43,19 +52,19 @@ export const createStyles = ({}) =>
     rightChatHeaderIcons: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems:"center",
-      gap:10
+      alignItems: "center",
+      gap: 10,
     },
     chatMiddleSectionWrapper: {
       width: "100%",
       flex: 1,
       justifyContent: "flex-end",
     },
-    messagesContainer:{
-      width:"100%",
-      flex:1,
-      flexDirection:"column",
-
+    messagesContainer: {
+      width: "100%",
+      flex: 1,
+      flexDirection: "column",
+      marginTop:80,
     },
     topicsMainWrapper: {
       width: "100%",

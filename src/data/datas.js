@@ -15,6 +15,8 @@ import {
   Brush,
   PenTool,
   GraduationCap,
+  File,
+  ArrowUpRight,
 } from "lucide-react-native";
 import gemini from "../assets/images/gemini.png";
 import anthropic from "../assets/images/antropic.png";
@@ -22,6 +24,15 @@ import mistral from "../assets/images/mistral.png";
 import meta from "../assets/images/meta.png";
 import chatgpt from "../assets/images/chatgpt.png";
 import chakraLogo from "../assets/images/chakraFull.png";
+
+import finance from "../assets/images/finance.png";
+import marketing from "../assets/images/marketing.png";
+import HR from "../assets/images/HR.png";
+import IT from "../assets/images/IT.png";
+import operations from "../assets/images/operation.png";
+import business from "../assets/images/business.png";
+import economics from "../assets/images/economics.png";
+import others from "../assets/images/others.png";
 
 export const slides = [
   {
@@ -38,51 +49,6 @@ export const slides = [
     heading: ["Your Learning", "Universe, Lynk-ed."],
     description:
       "Save insights from Lynk AI chat, write rich notes, and organize everything in one seamless space.",
-  },
-];
-
-export const topicsUnopened = [
-  {
-    title: "Finance",
-    desc: "Budgets, returns, \nand  risk",
-    bgColor: "#ECFEFF",
-    borderColor: "#CCF0F2",
-    iconColor: "#2FC3EC",
-  },
-  {
-    title: "Marketing",
-    desc: "Brands, strategy & \nconsumer insight",
-    bgColor: "#F3ECFF",
-    borderColor: "#DFD8EB",
-    iconColor: "#7D1DE4",
-  },
-  {
-    title: "Human Resource",
-    desc: "People, performance, \nculture",
-    bgColor: "#FFF6E8",
-    borderColor: "#F9DDB1",
-    iconColor: "#FF9D00",
-  },
-  {
-    title: "Information System",
-    desc: "Tech behind business",
-    bgColor: "#F0F0F0",
-    borderColor: "#D1D1D1",
-    iconColor: "#7B7979",
-  },
-  {
-    title: "Operations",
-    desc: "Processes, flow, \nefficiency.",
-    bgColor: "#E9F2FF",
-    borderColor: "#CCDAEE",
-    iconColor: "#406DD8",
-  },
-  {
-    title: "All Subjects",
-    desc: "8 vast topics",
-    bgColor: "#F5EEE2",
-    borderColor: "#EAD8B9",
-    iconColor: "#92470A",
   },
 ];
 
@@ -354,124 +320,235 @@ export const findApiKeyNotices = [
     id: 2,
     icon: gemini,
     title: "Google Gemini",
-    subtitle: 'To create your Gemini API key:',
+    subtitle: "To create your Gemini API key:",
     steps: [
-      'Sign in to Google Cloud Console with your developer account.',
-      'Enable the Gemini API for your project.',
+      "Sign in to Google Cloud Console with your developer account.",
+      "Enable the Gemini API for your project.",
       'Navigate to the "Credentials" section and create an API key.',
-      'Restrict the key as needed and copy it for Elunara integration.',
+      "Restrict the key as needed and copy it for Elunara integration.",
     ],
   },
   {
     id: 3,
     icon: meta,
     title: "Meta AI(Liama)",
-    subtitle: 'To create your Meta API key:',
+    subtitle: "To create your Meta API key:",
     steps: [
-      'Sign in to Google Cloud Console with your developer account.',
-      'Enable the Gemini API for your project.',
+      "Sign in to Google Cloud Console with your developer account.",
+      "Enable the Gemini API for your project.",
       'Navigate to the "Credentials" section and create an API key.',
-      'Restrict the key as needed and copy it for Elunara integration.',
+      "Restrict the key as needed and copy it for Elunara integration.",
     ],
   },
   {
     id: 4,
     icon: mistral,
     title: "Mistral",
-    subtitle: 'To get your Mistral AI API key:',
+    subtitle: "To get your Mistral AI API key:",
     steps: [
-      'Create or log into your Mistral AI developer account.',
-      'Navigate to the API key section in your dashboard.',
+      "Create or log into your Mistral AI developer account.",
+      "Navigate to the API key section in your dashboard.",
       'Click "Create API key," name it, then generate it.',
-      'Copy and save your key securely for Elunara.',
+      "Copy and save your key securely for Elunara.",
     ],
   },
   {
     id: 5,
     icon: anthropic,
     title: "Anthropic",
-    subtitle: 'To find your Anthropic API key:',
+    subtitle: "To find your Anthropic API key:",
     steps: [
-      'Log into your Anthropic developer console.',
-      'Visit the API keys area under your account settings.',
+      "Log into your Anthropic developer console.",
+      "Visit the API keys area under your account settings.",
       'Click "Create new API key," provide a name, and create it.',
-      'Copy and securely store the key for Elunara integration.',
+      "Copy and securely store the key for Elunara integration.",
     ],
   },
 ];
 
-
 export const topicsSheet = [
   {
     id: 1,
-    icon: '₹',
-    iconBg: '#E0F7FA',
-    iconColor: '#00BCD4',
-    title: 'Finance',
-    description: 'Budgets, returns, and risk',
+    icon: finance,
+    iconBg: "#E0F7FA",
+    borderColor: "#CCF0F2",
+    iconColor: "#00BCD4",
+    title: "Finance",
+    description: "Budgets, returns, and risk",
     popularTopics: 14,
   },
   {
     id: 2,
-    icon: '📈',
-    iconBg: '#F3E5F5',
-    iconColor: '#9C27B0',
-    title: 'Marketing',
-    description: 'Brands, strategy & consumer insight',
+    icon: marketing,
+    iconBg: "#F3E5F5",
+    borderColor: "#DFD8EB",
+    iconColor: "#9C27B0",
+    title: "Marketing",
+    description: "Brands, strategy & consumer insight",
     popularTopics: 26,
   },
   {
     id: 3,
-    icon: '🎯',
-    iconBg: '#FFF3E0',
-    iconColor: '#FF9800',
-    title: 'Human Resource',
-    description: 'People, performance, culture',
+    icon: HR,
+    iconBg: "#FFF3E0",
+    borderColor: "#F9DDB1",
+    iconColor: "#FF9800",
+    title: "Human Resource",
+    description: "People, performance, culture",
     popularTopics: 11,
   },
   {
     id: 4,
-    icon: '💻',
-    iconBg: '#F5F5F5',
-    iconColor: '#757575',
-    title: 'Information System',
+    icon: IT,
+    iconBg: "#F5F5F5",
+    borderColor: "#D1D1D1",
+    iconColor: "#757575",
+    title: "Information System",
     description: 'Tech behind business"',
     popularTopics: 8,
   },
   {
     id: 5,
-    icon: '⚙️',
-    iconBg: '#E8EAF6',
-    iconColor: '#5C6BC0',
-    title: 'Operations',
-    description: 'Processes, flow, efficiency.',
+    icon: operations,
+    iconBg: "#E8EAF6",
+    borderColor: "#CCDAEE",
+    iconColor: "#5C6BC0",
+    title: "Operations",
+    description: "Processes, flow, efficiency.",
     popularTopics: 10,
   },
   {
     id: 6,
-    icon: '📊',
-    iconBg: '#F3E5F5',
-    iconColor: '#9C27B0',
-    title: 'Business Analytics',
-    description: 'Data, decisions, and impact',
+    icon: business,
+    iconBg: "#F3E5F5",
+    borderColor: "#FAC8FF",
+    iconColor: "#9C27B0",
+    title: "Business Analytics",
+    description: "Data, decisions, and impact",
     popularTopics: 32,
   },
   {
     id: 7,
-    icon: '🌐',
-    iconBg: '#E8F5E9',
-    iconColor: '#4CAF50',
-    title: 'Economics & Quantitative Methods',
-    description: 'Budgets, returns, and risk',
+    icon: economics,
+    iconBg: "#E8F5E9",
+    borderColor: "#CCF2CD",
+    iconColor: "#4CAF50",
+    title: "Economics & Quantitative Methods",
+    description: "Budgets, returns, and risk",
     popularTopics: 14,
   },
   {
     id: 8,
-    icon: '📖',
-    iconBg: '#FFF3E0',
-    iconColor: '#FF9800',
-    title: 'Others',
-    description: 'Tech, ethics, change & communication',
+    icon: others,
+    iconBg: "#FFF3E0",
+    borderColor: "#EAD8B9",
+    iconColor: "#FF9800",
+    title: "Others",
+    description: "Tech, ethics, change & communication",
     popularTopics: 14,
   },
-]
+];
+
+export const topicsUnopened = [
+  {
+    title: "Finance",
+    desc: "Budgets, returns, \nand  risk",
+    bgColor: "#ECFEFF",
+    borderColor: "#CCF0F2",
+    iconColor: "#2FC3EC",
+  },
+  {
+    title: "Marketing",
+    desc: "Brands, strategy & \nconsumer insight",
+    bgColor: "#F3ECFF",
+    borderColor: "#DFD8EB",
+    iconColor: "#7D1DE4",
+  },
+  {
+    title: "Human Resource",
+    desc: "People, performance, \nculture",
+    bgColor: "#FFF6E8",
+    borderColor: "#F9DDB1",
+    iconColor: "#FF9D00",
+  },
+  {
+    title: "Information System",
+    desc: "Tech behind business",
+    bgColor: "#F0F0F0",
+    borderColor: "#D1D1D1",
+    iconColor: "#7B7979",
+  },
+  {
+    title: "Operations",
+    desc: "Processes, flow, \nefficiency.",
+    bgColor: "#E9F2FF",
+    borderColor: "#CCDAEE",
+    iconColor: "#406DD8",
+  },
+  {
+    title: "All Subjects",
+    desc: "8 vast topics",
+    bgColor: "#F5EEE2",
+    borderColor: "#EAD8B9",
+    iconColor: "#92470A",
+  },
+];
+
+export const subTopics = [
+  {
+    id: 1,
+    title: "Advanced Accounting & Taxation",
+  },
+  {
+    id: 2,
+    title: "Banking & Insurance Management",
+  },
+  {
+    id: 3,
+    title: "Investment Banking & Financial Services",
+  },
+  {
+    id: 4,
+    title: "Risk Management",
+  },
+  {
+    id: 5,
+    title: "Global Finance",
+  },
+  {
+    id: 6,
+    title: "Pricing",
+  },
+  {
+    id: 7,
+    title: "Security Analysis & Portfolio Management",
+  },
+  {
+    id: 8,
+    title: "Financial Statement Analysis",
+  },
+  {
+    id: 9,
+    title: "Mergers & Acquisitions",
+  },
+  {
+    id: 10,
+    title: "Rural Banking & Micro Finance",
+  },
+  {
+    id: 11,
+    title: "Behavioural Finance",
+  },
+  {
+    id: 12,
+    title: "Treasury Management",
+  },
+  {
+    id: 13,
+    title: "Valuation",
+  },
+  {
+    id: 14,
+    title: "Dissertation for Finance School of Excellence",
+  },
+];

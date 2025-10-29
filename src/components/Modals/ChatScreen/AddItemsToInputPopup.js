@@ -5,14 +5,19 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 import React, { useMemo } from "react";
 import { createStyles } from "./chatModals.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddItemsToInputPopup } from "../../../redux/slices/toggleSlice";
+import { setSelecetdFiles } from "../../../redux/slices/globalDataSlice";
 import { addItemsOptions } from "../../../data/datas";
 import { Camera, File, Image } from "lucide-react-native";
+import { scaleFont } from "../../../utils/responsive";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 
 const AddItemsToInputPopup = () => {
   const styleProps = {};
@@ -21,6 +26,88 @@ const AddItemsToInputPopup = () => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { width, height } = Dimensions.get("window");
+  const { globalDataStates } = useSelector((state) => state.Global);
+
+  const commonFunction = async (type) => {
+    if(type=="Camera"){
+      // Open camera functionality
+      try {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Camera permission is required to take photos.");
+          return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          quality: 1,
+        });
+
+        if (!result.canceled) {
+          console.log("Camera photo:", result.assets[0]);
+          // Add captured photo to Redux
+          const currentFiles = globalDataStates.selectedFiles || [];
+          dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
+          dispatch(setToggleAddItemsToInputPopup(false));
+        }
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        Alert.alert("Error", "Failed to open camera.");
+      }
+    }
+    else if(type=="Files"){
+      // Open file picker functionality
+      try {
+        // Request media library permission for file access (especially on Android)
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Storage permission is required to access files.");
+          return;
+        }
+
+        const result = await DocumentPicker.getDocumentAsync({
+          type: "*/*",
+          copyToCacheDirectory: true,
+        });
+
+        if (!result.canceled) {
+          console.log("Selected file:", result.assets[0]);
+          // Add selected file to Redux
+          const currentFiles = globalDataStates.selectedFiles || [];
+          dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
+          dispatch(setToggleAddItemsToInputPopup(false));
+        }
+      } catch (error) {
+        console.error("Error picking document:", error);
+        Alert.alert("Error", "Failed to pick document.");
+      }
+    }
+    else if(type=="Photos"){
+      // Open image gallery functionality
+      try {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Gallery permission is required to select photos.");
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          quality: 1,
+        });
+
+        if (!result.canceled) {
+          // Add selected photo to Redux
+          const currentFiles = globalDataStates.selectedFiles || [];
+          dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
+          dispatch(setToggleAddItemsToInputPopup(false));
+        }
+      } catch (error) {
+        console.error("Error picking image:", error);
+        Alert.alert("Error", "Failed to pick image.");
+      }
+    }
+  };
 
   return (
     <>
@@ -32,7 +119,9 @@ const AddItemsToInputPopup = () => {
         {addItemsOptions.map((items, itemIndex) => {
           return (
             <Pressable
-              onPress={() => {}}
+              onPress={() => {
+                commonFunction(items.text);
+              }}
               key={itemIndex}
               style={({ pressed }) => [
                 {
@@ -41,14 +130,18 @@ const AddItemsToInputPopup = () => {
                 styles.menuOptionsMain,
               ]}
             >
-              {items.text == "Camera" ? (
-                <Camera size={22} strokeWidth={1.25} />
-              ) : items.text == "Files" ? (
-                <File strokeWidth={1.25} size={22} />
-              ) : (
-                <Image size={22} strokeWidth={1.25} />
+              {({ pressed }) => (
+                <>
+                  {items.text == "Camera" ? (
+                    <Camera size={22} strokeWidth={1.25} />
+                  ) : items.text == "Files" ? (
+                    <File strokeWidth={1.25} size={22} />
+                  ) : (
+                    <Image size={22} strokeWidth={1.25}  />
+                  )}
+                  <Text style={{fontSize:scaleFont(13), fontWeight: pressed ? 600 : 400}}>{items?.text}</Text>
+                </>
               )}
-              <Text>{items?.text}</Text>
             </Pressable>
           );
         })}

@@ -2,6 +2,6 @@ export const globalDataStates = {
   chatMessagesArray: [],
   userMessagePrompt: "",
   allMessagesForAChat: null,
-  selectedFiles: [],
+  selectedFiles: [], 
   noteForIndividualChat: null,
 };

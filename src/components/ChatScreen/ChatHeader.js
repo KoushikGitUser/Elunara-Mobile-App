@@ -17,7 +17,7 @@ const ChatHeader = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   
   return (
-    <View style={styles.chatHeader}>
+    <View style={[styles.chatHeader,{borderWidth:toggleStates.toggleKeyboardVisibilityOnChatScreen?1:0}]}>
       <TouchableOpacity onPress={() => dispatch(setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar))}>
       <Feather  name="menu" size={30} color="black" />
       </TouchableOpacity>

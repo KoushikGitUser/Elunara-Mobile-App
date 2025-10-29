@@ -226,7 +226,7 @@ export const createStyles = ({}) =>
     chatInputMain: {
       width: "100%",
       paddingHorizontal: 15,
-      paddingVertical: 15,
+      paddingBottom: 15,
       borderWidth: 1,
       borderColor: "#ABB8CC",
       borderRadius: 24,
@@ -234,6 +234,14 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: verticalScale(12),
       backgroundColor: "white",
+    },
+    filesContainerMain:{
+      width:"95%",
+      paddingVertical:5,
+      flexDirection:"row",
+      paddingTop:25,
+      paddingRight:20,
+      paddingLeft:3
     },
     textInput: {
       width: "100%",

@@ -26,7 +26,10 @@ const toggleSlice = createSlice({
     },
     setToggleToolsPopupStates: (state, action) => {
       state.toggleStates.toggleToolsPopupStates = action.payload;
-    }
+    },
+    setToggleKeyboardVisibilityOnChatScreen: (state, action) => {
+      state.toggleStates.toggleKeyboardVisibilityOnChatScreen = action.payload;
+    },
   },
 });
 
@@ -37,7 +40,8 @@ export const {
   setToggleAddItemsToInputPopup,
   setToggleTopicsPopup,
   setToggleToolsPopup,
-  setToggleToolsPopupStates
+  setToggleToolsPopupStates,
+  setToggleKeyboardVisibilityOnChatScreen
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

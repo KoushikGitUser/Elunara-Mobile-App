@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, TextInput, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+} from "react-native";
 import React, { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -11,6 +17,7 @@ import { useSelector } from "react-redux";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import TopicsCompo from "../../components/ChatScreen/ChatInputCompos/TopicsCompo";
+import { StatusBar } from "expo-status-bar";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -19,29 +26,30 @@ const ChatScreen = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
 
   return (
-    <SafeAreaView>
-      <View style={styles.chatMainWrapper}>
-        {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup/> }
-        {toggleStates.toggleToolsPopup && <ToolsOptionsPopup/>}
-        {toggleStates.toggleTopicsPopup && <TopicsCompo  />}
-        {/* Header section */}
-         <ChatHeader/>
-        {/* Header section */}
+      <SafeAreaView style={{flex:1,width:"100%",}}>
+        <StatusBar backgroundColor="black" style="dark" />
+        <ChatHeader />
+        <View style={styles.chatMainWrapper}>
+          {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
+          {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
+          {toggleStates.toggleTopicsPopup && <TopicsCompo />}
+          {/* Header section */}
 
-        {/* chatsidebar section */}
-        { toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar/>}
-         {/* chatsidebar section */}
+          {/* Header section */}
+          {/* chatsidebar section */}
+          {toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar />}
+          {/* chatsidebar section */}
 
-        {/* middle section */}
-        <ChatMiddleWrapper/>
-        {/* middle section */}
+          {/* middle section */}
+          <ChatMiddleWrapper />
+          {/* middle section */}
 
-        {/* chatInput section */}
-         <ChatInputMain/> 
-        {/* chatInput section */}
+          {/* chatInput section */}
+          <ChatInputMain />
+          {/* chatInput section */}
+        </View>
+      </SafeAreaView>
 
-      </View>
-    </SafeAreaView>
   );
 };
 

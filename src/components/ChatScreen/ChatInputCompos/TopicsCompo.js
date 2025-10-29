@@ -6,8 +6,10 @@ import {
   Image,
   StyleSheet,
   Platform,
+  ScrollView,
+  Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,11 +17,17 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
 import { ChevronRight, GitFork } from "lucide-react-native";
+import { topicsSheet } from "../../../data/datas";
+import TopicsCards from "./TopicsCards";
+import SubTopicsCompo from "./SubTopicsCompo";
 
+const screenHeight = Dimensions.get("window").height;
 const TopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [toggleSubTopics, setToggleSubTopics] = useState(false);
+  const [currentSubTopic,setCurrentSubTopic] = useState("Finance");
 
   return (
     <Modal
@@ -48,49 +56,40 @@ const TopicsCompo = () => {
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
           {/* Content */}
-          <View style={styles.content}>
-            <View style={styles.closeModalMain}>
-              <AntDesign
-                onPress={() => dispatch(setToggleTopicsPopup(false))}
-                name="close"
-                size={24}
-                color="black"
-              />
-            </View>
-            {/* Title */}
-            <Text style={styles.title}>Explore Subjects</Text>
+          {toggleSubTopics ? (
+            <SubTopicsCompo setToggleSubTopics={setToggleSubTopics} currentSubTopic={currentSubTopic} />
+          ) : (
+            <View style={styles.content}>
+              <View style={styles.closeModalMain}>
+                <AntDesign
+                  onPress={() => dispatch(setToggleTopicsPopup(false))}
+                  name="close"
+                  size={24}
+                  color="black"
+                />
+              </View>
+              {/* Title */}
+              <Text style={styles.title}>Explore Subjects</Text>
 
-            {/* Description */}
-            <Text style={styles.description}>
-              Choose a topic to get started - browse subtopics or jump right in
-            </Text>
-            <View style={styles.mainOptionsContainer}>
-              <TouchableOpacity style={styles.optionsMain}>
-                <View style={{flexDirection:"row",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                    gap:15
-                }}>
-                    <GitFork color="#888888" strokeWidth={1.25} />
-                    <Text>
-                        LLM
-                    </Text>
+              {/* Description */}
+              <Text style={styles.description}>
+                Choose a topic to get started - browse subtopics or jump right
+                in
+              </Text>
+
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={styles.optionsContainer}
+                contentContainerStyle={styles.scrollContent}
+              >
+                <View style={styles.grid}>
+                  {topicsSheet.map((topics, topicIndex) => {
+                    return <TopicsCards setCurrentSubTopic={setCurrentSubTopic} setToggleSubTopics={setToggleSubTopics} key={topicIndex} item={topics} />;
+                  })}
                 </View>
-                <View style={{flexDirection:"row",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                    gap:15
-                }}>
-                    <View style={styles.selectedOption}>
-                        <Text>
-                            Auto
-                        </Text>
-                    </View>
-                    <ChevronRight size={30} strokeWidth={1.5} />
-                </View>
-              </TouchableOpacity>
+              </ScrollView>
             </View>
-          </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -117,6 +116,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.18)",
   },
+  optionsContainer: {
+    maxHeight: screenHeight * 0.6,
+    flexDirection: "column",
+  },
   backdrop: {
     position: "absolute",
     top: 0,
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   modalSheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FAFAFA",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
@@ -179,18 +182,18 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   optionsMain: {
-    width:"100%",
+    width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  selectedOption:{
-   backgroundColor:"#FAFAFA",
-   borderWidth:1,
-   borderColor:"#D3DAE5",
-   borderRadius:50,
-   paddingHorizontal:12,
-   paddingVertical:8
+  selectedOption: {
+    backgroundColor: "#FAFAFA",
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    borderRadius: 50,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   button: {
     backgroundColor: "#081A35",
@@ -205,6 +208,17 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(11),
     fontWeight: "500",
     letterSpacing: 0.3,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
 });
 

@@ -20,7 +20,7 @@ const ChatMiddleWrapper = () => {
     <View style={styles.chatMiddleSectionWrapper}>
       {!toggleStates.toggleIsChattingWithAI && <GreetingsHeader />}
       {toggleStates.toggleIsChattingWithAI ? 
-      <ScrollView contentContainerStyle={{
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
         justifyContent:"flex-end",
         gap:25,
         alignItems:"center",

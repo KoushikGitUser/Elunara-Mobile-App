@@ -6,14 +6,22 @@ import {
   verticalScale,
 } from "../../utils/responsive";
 
+const screenHeight = Dimensions.get("window").height;
+
 export const createStyles = (props = {}) =>
   StyleSheet.create({
     chatMainWrapper: {
-      height: "100%",
+      flex:1,
       width: "100%",
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingHorizontal: 20,
+      backgroundColor: "#FAFAFA",
+    },
+    middleAndChatInputWrapper: {
+      width: "100%",
+      flexDirection: "column",
       paddingHorizontal: 20,
       backgroundColor: "#FAFAFA",
     },

@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { allInitialStates } from "../allInitialStates";
+import { setUser } from "./authSlice";
 
 const globalDataSlice = createSlice({
   name: 'globalDatas',
@@ -8,15 +9,15 @@ const globalDataSlice = createSlice({
     setSelecetdFiles: (state, action) => {
       state.globalDataStates.selectedFiles = action.payload;
     },
-
+    setUserMessagePrompt: (state, action) => {
+      state.globalDataStates.userMessagePrompt = action.payload;
+    }
   },
 });
 
 export const {
-  setToggleChatHistorySidebar,
-  setToggleIsChattingWithAI,
-  setToggleChatMenuPopup,
-  setToggleAddItemsToInputPopup,
+  setSelecetdFiles,
+  setUserMessagePrompt
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

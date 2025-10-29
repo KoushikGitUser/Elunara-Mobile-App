@@ -9,7 +9,7 @@ const Topics = ({ title, desc,bgColor,borderColor,iconColor}) => {
     borderColor:"abcd",
     backgroundColor:"white"
   };
-  const styles = useMemo(() => createStyles(styleProps), []);
+  const styles = useMemo(() => createStyles(styleProps), []); 
   const navigation = useNavigation();
   return (
     <TouchableOpacity style={styles.topicsMain}>
