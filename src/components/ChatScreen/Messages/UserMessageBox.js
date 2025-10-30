@@ -22,11 +22,11 @@ const styles = StyleSheet.create({
     },
     messageBox:{
         minHeight:verticalScale(45),
-        maxWidth:"60%",
+        maxWidth:"80%",
         backgroundColor:"#EBF1FB",
         borderWidth:1,
         borderColor:"#D3DAE5",
-        borderRadius:16,
+        borderRadius:20,
         borderTopRightRadius:0,
         paddingHorizontal:20,
         paddingVertical:13,

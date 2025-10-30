@@ -77,6 +77,7 @@ const AddItemsToInputPopup = () => {
           const currentFiles = globalDataStates.selectedFiles || [];
           dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
           dispatch(setToggleAddItemsToInputPopup(false));
+          navigation.navigate("chat");
         }
       } catch (error) {
         console.error("Error picking document:", error);
@@ -97,10 +98,18 @@ const AddItemsToInputPopup = () => {
         });
 
         if (!result.canceled) {
+          if(result.assets[0].mimeType == "image/png" || result.assets[0].mimeType == "image/jpg" || result.assets[0].mimeType == "image/jpeg"){
           // Add selected photo to Redux
           const currentFiles = globalDataStates.selectedFiles || [];
           dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
           dispatch(setToggleAddItemsToInputPopup(false));
+          console.log(result.assets[0].mimeType,"fileinfo");
+          
+          }
+          else{
+            Alert.alert("Invalid type","The type of image you selected is not supported.")
+          }
+
         }
       } catch (error) {
         console.error("Error picking image:", error);

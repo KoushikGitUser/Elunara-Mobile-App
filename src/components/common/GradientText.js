@@ -12,6 +12,8 @@ const GradientText = ({
   marginTop,
   marginBottom,
   style,
+  fullWidth,
+  widthNumber
 }) => {
   // Calculate the gradient direction
   const x1 = `${start.x * 100}%`;
@@ -27,8 +29,11 @@ const GradientText = ({
   const finalFontSize = flatStyle.fontSize || fontSize;
   const finalFontWeight = flatStyle.fontWeight || fontWeight;
 
+  // Estimate width based on text length and font size
+  const estimatedWidth = children.toString().length * finalFontSize * widthNumber;
+
   return (
-    <Svg style={{marginTop:marginTop,marginBottom:marginBottom}} height={finalFontSize * 1.5} width="100%">
+    <Svg style={{marginTop:marginTop,marginBottom:marginBottom,}} height={finalFontSize * 1.5} width={fullWidth?"100%":estimatedWidth}>
       <Defs>
         <LinearGradient id="grad" x1={x1} y1={y1} x2={x2} y2={y2}>
           {colors.map((color, index) => (

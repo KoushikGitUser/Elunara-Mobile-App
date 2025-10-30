@@ -16,7 +16,6 @@ export const createStyles = (props = {}) =>
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 20,
       backgroundColor: "#FAFAFA",
     },
     middleAndChatInputWrapper: {

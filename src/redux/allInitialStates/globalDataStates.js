@@ -4,4 +4,5 @@ export const globalDataStates = {
   allMessagesForAChat: null,
   selectedFiles: [], 
   noteForIndividualChat: null,
+  chatInputContentLinesNumber:0,
 };

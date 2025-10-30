@@ -9,15 +9,25 @@ const globalDataSlice = createSlice({
     setSelecetdFiles: (state, action) => {
       state.globalDataStates.selectedFiles = action.payload;
     },
+    removeSelectedFile: (state, action) => {
+      state.globalDataStates.selectedFiles = state.globalDataStates.selectedFiles.filter(
+        (_, index) => index !== action.payload
+      );
+    },
     setUserMessagePrompt: (state, action) => {
       state.globalDataStates.userMessagePrompt = action.payload;
-    }
+    },
+    setChatInputContentLinesNumber: (state, action) => {
+      state.globalDataStates.chatInputContentLinesNumber = action.payload;
+    },
   },
 });
 
 export const {
   setSelecetdFiles,
-  setUserMessagePrompt
+  removeSelectedFile,
+  setUserMessagePrompt,
+  setChatInputContentLinesNumber,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

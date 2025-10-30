@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useMemo, useState } from "react";
 import { Folder } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
+import folder from '../../../assets/images/FolderSimple.png'
 
 const IndividualPinnedRoom = ({title}) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -21,7 +22,7 @@ const IndividualPinnedRoom = ({title}) => {
       onLongPress={() => setIsLongPressed(!isLongPressed)}
       style={styles.individualPinnedRooms}
     >
-      <Folder size={25} strokeWidth={1.25} />
+        <Image source={folder} style={{height:22,width:22,objectFit:"contain"}} />
       <Text>{truncateTitle(title)} </Text>
     </TouchableOpacity>
   );

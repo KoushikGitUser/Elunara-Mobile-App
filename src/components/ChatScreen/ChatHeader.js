@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreenCompo.styles";
@@ -7,6 +7,7 @@ import { EllipsisVertical, MessageCirclePlus } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar, setToggleChatMenuPopup } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
+import spark from '../../assets/images/sparking.png'
 
 
 const ChatHeader = () => {
@@ -15,20 +16,17 @@ const ChatHeader = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+   const { globalDataStates } = useSelector((state) => state.Global);
   
   return (
-    <View style={[styles.chatHeader,{borderWidth:toggleStates.toggleKeyboardVisibilityOnChatScreen?1:0}]}>
+    <View style={[styles.chatHeader,{borderWidth:toggleStates.toggleKeyboardVisibilityOnChatScreen == true || globalDataStates.selectedFiles.length > 0 || toggleStates.toggleIsChattingWithAI ?1:0}]}>
       <TouchableOpacity onPress={() => dispatch(setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar))}>
       <Feather  name="menu" size={30} color="black" />
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.upgradeButton}>
-        <MaterialCommunityIcons
-          name="lightning-bolt-outline"
-          size={24}
-          color="black"
-        />
-        <Text>Upgrade Plan</Text> 
+          <Image source={spark} style={{height:22,width:22,objectFit:"contain"}} />
+        <Text style={{fontSize:13,fontWeight:600}}>Upgrade Plan</Text> 
       </TouchableOpacity>
       <View style={styles.rightChatHeaderIcons}>
       <TouchableOpacity onPress={()=>navigation.navigate("notes")}>

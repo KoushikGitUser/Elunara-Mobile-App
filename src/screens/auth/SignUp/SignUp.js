@@ -73,20 +73,38 @@ const SignUp = () => {
                 width: "auto",
               }}
             > */}
-             
+
+            <View
+              style={[
+                {
+                  fontWeight: "400",
+                  color: "black",
+                  fontSize: scaleFont(22),
+                  flexDirection: "row",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <GradientText
+                fullWidth={false}
+                children="Join Elunara"
+                fontSize={scaleFont(28)}
+              />
               <Text
                 style={[
+                  styles.headTitle,
                   {
                     fontWeight: "400",
+                    marginTop: 1,
                     color: "black",
                     fontSize: scaleFont(22),
-                    flexDirection:"row"
+                    paddingLeft:10
                   },
                 ]}
               >
-                 <GradientText children="Join Elunara" fontSize={scaleFont(28)} />
                 - Your AI
               </Text>
+            </View>
             {/* </View> */}
 
             <Text

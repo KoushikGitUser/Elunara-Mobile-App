@@ -33,6 +33,14 @@ import operations from "../assets/images/operation.png";
 import business from "../assets/images/business.png";
 import economics from "../assets/images/economics.png";
 import others from "../assets/images/others.png";
+import bookmark from '../assets/images/BookmarkSimple.png'
+import folderPlus from '../assets/images/FolderNotchPlus.png'
+import edit from '../assets/images/PencilSimple.png'
+import pin from '../assets/images/PushPin.png'
+import archive from '../assets/images/ArchiveBox.png'
+import trash from '../assets/images/Trash.png'
+import books from '../assets/images/Books.png'
+
 
 export const slides = [
   {
@@ -107,27 +115,27 @@ export const chatMessages = [
 
 export const menuOptions = [
   {
-    icon: <Ionicons name="bookmark-outline" size={24} color="black" />,
+    icon: bookmark,
     option: "Open Notes",
   },
   {
-    icon: <FolderPlus strokeWidth={1.25} />,
+    icon: folderPlus,
     option: "Add to Learning Lab",
   },
   {
-    icon: <Pencil strokeWidth={1.25} />,
+    icon: edit,
     option: "Rename",
   },
   {
-    icon: <Pin strokeWidth={1.25} />,
+    icon: pin,
     option: "Pin",
   },
   {
-    icon: <Ionicons name="archive-outline" size={24} color="black" />,
+    icon: archive,
     option: "Archive",
   },
   {
-    icon: <Trash strokeWidth={1.25} />,
+    icon: trash,
     option: "Delete",
   },
 ];
@@ -365,6 +373,71 @@ export const findApiKeyNotices = [
     ],
   },
 ];
+
+export const topicsSheetInitial = [
+  {
+    id: 1,
+    icon: finance,
+    iconBg: "#E0F7FA",
+    borderColor: "#CCF0F2",
+    iconColor: "#00BCD4",
+    title: "Finance",
+    description: "Budgets, returns, and risk",
+    popularTopics: 14,
+  },
+  {
+    id: 2,
+    icon: marketing,
+    iconBg: "#F3E5F5",
+    borderColor: "#DFD8EB",
+    iconColor: "#9C27B0",
+    title: "Marketing",
+    description: "Brands, strategy & consumer insight",
+    popularTopics: 26,
+  },
+  {
+    id: 3,
+    icon: HR,
+    iconBg: "#FFF3E0",
+    borderColor: "#F9DDB1",
+    iconColor: "#FF9800",
+    title: "Human Resource",
+    description: "People, performance, culture",
+    popularTopics: 11,
+  },
+  {
+    id: 4,
+    icon: IT,
+    iconBg: "#F5F5F5",
+    borderColor: "#D1D1D1",
+    iconColor: "#757575",
+    title: "Information System",
+    description: 'Tech behind business"',
+    popularTopics: 8,
+  },
+  {
+    id: 5,
+    icon: operations,
+    iconBg: "#E8EAF6",
+    borderColor: "#CCDAEE",
+    iconColor: "#5C6BC0",
+    title: "Operations",
+    description: "Processes, flow, efficiency.",
+    popularTopics: 10,
+  },
+
+  {
+    id: 8,
+    icon: books,
+    iconBg: "#FFF3E0",
+    borderColor: "#EAD8B9",
+    iconColor: "#FF9800",
+    title: "All Subjects",
+    description: "8 vast topics",
+    popularTopics: 14,
+  },
+];
+
 
 export const topicsSheet = [
   {

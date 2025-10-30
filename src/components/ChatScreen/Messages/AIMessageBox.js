@@ -19,7 +19,6 @@ const AIMessageBox = ({ message }) => {
        <Ionicons name="repeat" size={24} color="black" />
        <ChevronDown strokeWidth={1.25} />
        </View>
-
       </View>
     </View>
   );
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffffff",
     borderWidth: 1,
     borderColor: "#D3DAE5",
-    borderRadius: 16,
+    borderRadius: 20,
     borderTopLeftRadius: 0,
     paddingHorizontal: 20,
     paddingVertical: 16,

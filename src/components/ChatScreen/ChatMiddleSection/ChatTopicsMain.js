@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
-import { topicsUnopened } from "../../../data/datas";
+import { topicsSheet, topicsSheetInitial, topicsUnopened } from "../../../data/datas";
 import Topics from "./Topics";
 
 const ChatTopicsMain = () => {
@@ -12,36 +12,14 @@ const ChatTopicsMain = () => {
 
   return (
     <View style={styles.topicsMainWrapper}>
-      <View style={styles.topicsContainerHalf}>
-        {topicsUnopened?.map((topics, topicsIndex) => {
-          if (topicsIndex % 2 == 0) {
+      <View style={styles.grid}>
+        {topicsSheetInitial.map((topics, topicIndex) => {
             return (
               <Topics
-                desc={topics?.desc}
-                title={topics.title}
-                bgColor={topics.bgColor}
-                borderColor={topics.borderColor}
-                iconColor={topics.iconColor}
-                key={topicsIndex}
+                key={topicIndex}
+                item={topics}
               />
             );
-          }
-        })}
-      </View>
-      <View style={styles.topicsContainerHalf}>
-        {topicsUnopened?.map((topics, topicsIndex) => {
-          if (topicsIndex % 2 !== 0) {
-            return (
-              <Topics
-                desc={topics?.desc}
-                title={topics.title}
-                bgColor={topics.bgColor}
-                borderColor={topics.borderColor}
-                iconColor={topics.iconColor}
-                key={topicsIndex}
-              />
-            );
-          }
         })}
       </View>
     </View>

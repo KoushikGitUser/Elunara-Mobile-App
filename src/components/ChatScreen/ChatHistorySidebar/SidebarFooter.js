@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import profilePic from "../../../assets/images/profilepic.png";
 import { moderateScale } from "../../../utils/responsive";
+import spark from '../../../assets/images/spark.png'
+import GradientText from "../../common/GradientText";
 
 const SidebarFooter = () => {
   const styleProps = {};
@@ -18,11 +20,13 @@ const SidebarFooter = () => {
         <Text style={styles.profileText}>Profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.upgradeBtn}>
-        <Ionicons name="sparkles-outline" size={24} color="#888888" />
+       <Image source={spark} style={{height:25,width:25,objectFit:"contain"}} />
         <View>
-          <Text style={{ fontSize: moderateScale(14), fontWeight: 600 }}>
-            Upgrade plan
-          </Text>
+          <GradientText
+          children="Upgrade plan"
+          fullWidth={true}
+          fontSize={18}
+        />
           <Text style={{ fontSize: moderateScale(10), color: "#757575" }}>
             More access to the best models
           </Text>

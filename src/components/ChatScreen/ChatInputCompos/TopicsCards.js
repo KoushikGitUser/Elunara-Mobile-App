@@ -6,7 +6,7 @@ import {
   verticalScale,
 } from "../../../utils/responsive";
 import { ArrowUpRight, ChevronRight } from "lucide-react-native";
-
+ 
 const TopicsCards = ({ item,setToggleSubTopics,setCurrentSubTopic}) => {
   return (
     <TouchableOpacity onPress={()=> {

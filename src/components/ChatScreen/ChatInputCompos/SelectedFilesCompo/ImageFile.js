@@ -3,11 +3,11 @@ import React from "react";
 import { verticalScale } from "../../../../utils/responsive";
 import { X } from "lucide-react-native";
 
-const ImageFile = ({ file }) => {
+const ImageFile = ({ file, onRemove }) => {
   return (
     <View style={styles.imageFileMain}>
       <Image style={styles.imageFile} source={file} />
-      <TouchableOpacity style={styles.crossBtn}>
+      <TouchableOpacity style={styles.crossBtn} onPress={onRemove}>
         <X size={15} color="white" strokeWidth={1.5} />
       </TouchableOpacity>
     </View>
@@ -16,24 +16,24 @@ const ImageFile = ({ file }) => {
 
 const styles = StyleSheet.create({
   imageFileMain: {
-    borderRadius: 16,
+    borderRadius: 20,
     position:"relative"
   },
   imageFile: {
     height: verticalScale(65),
     width: 100,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth:1,
     borderColor:"#ABB8CC"
   },
   crossBtn:{
     position:"absolute",
-    height:20,
-    width:20,
+    height:24,
+    width:24,
     borderRadius:50,
     backgroundColor:"black",
-    left:"92%",
-    bottom:"86%",
+    left:90,
+    bottom:68,
     flexDirection:"row",
     justifyContent:"center",
     alignItems:"center",

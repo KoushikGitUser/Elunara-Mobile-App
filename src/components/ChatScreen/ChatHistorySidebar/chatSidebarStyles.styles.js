@@ -63,7 +63,7 @@ export const createStyles = ({}) =>
       width: "100%",
       height: verticalScale(40),
       borderWidth: 1,
-      borderRadius: 12,
+      borderRadius: 16,
       borderColor: "#ABB8CC",
       paddingLeft: 40,
     },
@@ -85,7 +85,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 20,
       paddingHorizontal: 20,
-      paddingVertical: 7,
+      paddingVertical: 11,
       backgroundColor: "#EBF1FB",
       borderRadius: 12,
     },
@@ -147,6 +147,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 15,
       paddingVertical: 10,
+      marginLeft:20
     },
     individualPinnedChatsMain: {
       width: "90%",
@@ -222,30 +223,35 @@ export const createStyles = ({}) =>
     chatInputMainWrapper: {
       width: "100%",
       paddingBottom: 20,
+      paddingHorizontal:20,
+      zIndex:2
     },
     chatInputMain: {
       width: "100%",
       paddingHorizontal: 15,
-      paddingBottom: 15,
+      paddingBottom: 20,
       borderWidth: 1,
       borderColor: "#ABB8CC",
-      borderRadius: 24,
+      borderRadius: 28,
       flexDirection: "column",
       alignItems: "center",
       gap: verticalScale(12),
       backgroundColor: "white",
     },
     filesContainerMain:{
-      width:"95%",
+      width:"94%",
       paddingVertical:5,
       flexDirection:"row",
       paddingTop:25,
       paddingRight:20,
-      paddingLeft:3
+      paddingLeft:7
     },
     textInput: {
       width: "100%",
-      height: verticalScale(37),
+      minHeight: verticalScale(37),
+      paddingTop: 8,
+      paddingBottom: 8,
+      lineHeight: 20,
     },
     inputActionIconsMainWrapper: {
       height: verticalScale(32),
@@ -259,14 +265,14 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: scale(12),
+      gap: scale(17),
     },
     inputRightActionIcons: {
       height: "100%",
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: scale(12),
+      gap: scale(17),
     },
     parentContainer: {
       position: "relative", // important: makes children absolute to this view

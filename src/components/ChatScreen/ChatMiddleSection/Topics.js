@@ -1,29 +1,87 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
-import { IndianRupee } from "lucide-react-native";
+import { ArrowUpRight, ChevronRight, IndianRupee } from "lucide-react-native";
+import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
 
-const Topics = ({ title, desc,bgColor,borderColor,iconColor}) => {
+const Topics = ({ item,}) => {
   const styleProps = {
     borderColor:"abcd",
     backgroundColor:"white"
   };
-  const styles = useMemo(() => createStyles(styleProps), []); 
   const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.topicsMain}>
-        <View style={[styles.topicIcon,{backgroundColor:bgColor,borderColor:borderColor,marginBottom:7}]}>
-            <IndianRupee size={15} color={iconColor} strokeWidth={1.25} />
+    <TouchableOpacity  style={styles.topicsMain}>
+      <View style={styles.contentWrapper}>
+        <View style={styles.imageandIcon}>
+          <View
+            style={[
+              styles.topicIcon,
+              {
+                backgroundColor: item?.iconBg,
+                borderColor: item?.borderColor,
+                marginBottom: 7,
+              },
+            ]}
+          >
+            <Image
+              source={item?.icon}
+              style={{ height: 15, width: 15, objectFit: "contain" }}
+            />
+          </View>
+
         </View>
-        <Text style={styles.topicTitle}>
-            {title}
-        </Text>
-        <Text style={styles.topicDesc}>
-            {desc}
-        </Text>
+
+        <Text style={styles.topicTitle}>{item?.title}</Text>
+        <Text style={styles.topicDesc}>{item.description}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  topicsMain: {
+    width: "48%",
+    minHeight: verticalScale(110),
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    borderRadius: 20,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    marginBottom: 20,
+    backgroundColor:"white"
+  },
+  contentWrapper: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flex:1
+  },
+  imageandIcon:{
+    width:"100%",
+    flexDirection:"row",
+    justifyContent:"space-between",
+    alignItems:"flex-start"
+  },
+  topicIcon: {
+    height: 26,
+    width: 26,
+    borderWidth: 1,
+    borderRadius: 50,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  topicTitle: {
+    fontSize: moderateScale(14),
+    fontWeight: 600,
+  },
+  topicDesc: {
+    fontSize: moderateScale(12),
+    fontWeight: 400,
+    color: "#757575",
+  },
+});
 
 export default Topics;

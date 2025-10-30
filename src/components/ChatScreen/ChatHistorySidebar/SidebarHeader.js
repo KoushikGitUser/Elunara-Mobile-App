@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import chakraLogo from "../../../assets/images/chakraFull.png";
 import elunaraLogo from "../../../assets/images/elunaraLogo.png";
+import folderplus from '../../../assets/images/FolderPlus.png'
 
 const SidebarHeader = () => {
   const styleProps = {};
@@ -36,7 +37,7 @@ const SidebarHeader = () => {
           <Text style={styles.btnTexts}>New Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.newLearningTabBtn}>
-          <FolderPlus size={25} strokeWidth={1.25} />
+          <Image source={folderplus} style={{height:25,width:25,objectFit:"contain"}} />
           <Text style={[styles.btnTexts, { fontWeight: 400 }]}>
             New Learning Tab
           </Text>

@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useMemo, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import { MessageCircle } from "lucide-react-native";
+import chat from '../../../assets/images/ChatTeardrop.png'
 
 const IndividualRecentChat = ({ title }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -21,7 +22,7 @@ const IndividualRecentChat = ({ title }) => {
       onLongPress={() => setIsLongPressed(!isLongPressed)}
       style={styles.individualRecentChats}
     >
-      <MessageCircle size={21} strokeWidth={1.25} />
+      <Image source={chat} style={{height:22,width:22,objectFit:"contain"}} />
 
       <Text>{truncateTitle(title)} </Text>
     </TouchableOpacity>

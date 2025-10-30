@@ -5,6 +5,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Pressable,
+  Image,
 } from "react-native";
 import React, { useMemo } from "react";
 import { createStyles } from "./chatModals.styles";
@@ -13,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { menuOptions } from "../../../data/datas";
 import { moderateScale } from "../../../utils/responsive";
 import { setToggleChatMenuPopup } from "../../../redux/slices/toggleSlice";
+
 
 const ChatOptionsPopup = () => {
   const styleProps = {};
@@ -54,7 +56,7 @@ const ChatOptionsPopup = () => {
               }}
               key={optionIndex}
             >
-              {options.icon}
+              <Image source={options.icon} style={{height:25,width:25,objectFit:"contain"}} />
               <Text
                 numberOfLines={1}
                 style={{ fontSize: moderateScale(12), flexShrink: 1 }}

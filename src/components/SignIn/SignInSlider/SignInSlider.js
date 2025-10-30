@@ -58,7 +58,7 @@ const SignInSlider = () => {
               <View style={styles.headingContainer}>
                 {slide.heading?.map((heads, headIndex) => {
                   return (
-                    <GradientText key={headIndex} fontSize={scaleFont(40)} children={heads} />
+                    <GradientText fullWidth={true} key={headIndex} fontSize={scaleFont(36)} children={heads} />
                   );
                 })}
               </View>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(20),
+    fontSize: scaleFont(16),
     color: "#8A8A8A",
     lineHeight: 30,
     fontWeight: "400",
