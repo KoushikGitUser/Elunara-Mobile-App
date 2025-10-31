@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, Image } from "react-native";
-import React, { useMemo } from "react";
+import { View, Text, ScrollView, Image, Keyboard } from "react-native";
+import React, { useMemo, useRef, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
 import ChatTopicsMain from "./ChatTopicsMain";
@@ -9,7 +9,7 @@ import { chatMessages } from "../../../data/datas";
 import UserMessageBox from "../Messages/UserMessageBox";
 import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
-import chatLoader from '../../../assets/images/Loading chat mob.gif'
+import chatLoader from "../../../assets/images/Loading chat mob.gif";
 
 const ChatMiddleWrapper = () => {
   const styleProps = {};
@@ -17,22 +17,52 @@ const ChatMiddleWrapper = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+
+  // Ref for ScrollView to enable auto-scroll
+  const scrollViewRef = useRef(null);
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (scrollViewRef.current && globalDataStates.chatMessagesArray.length > 0) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [globalDataStates.chatMessagesArray]);
+
+  // Auto-scroll to bottom when keyboard opens
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: true });
+        }
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <View style={styles.chatMiddleSectionWrapper}>
-      {toggleStates.toggleIsChattingWithAI &&  <Image source={chakraLogo} style={styles.chakraLogoRight} />}
+      {toggleStates.toggleIsChattingWithAI && (
+        <Image source={chakraLogo} style={styles.chakraLogoRight} />
+      )}
       {!toggleStates.toggleIsChattingWithAI && <GreetingsHeader />}
       {toggleStates.toggleIsChattingWithAI ? (
         <ScrollView
+          ref={scrollViewRef}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             justifyContent: "flex-end",
             gap: 25,
             alignItems: "center",
           }}
-          style={styles.messagesContainer}
+          style={[styles.messagesContainer,{marginTop:toggleStates.toggleIsChattingWithAI?110:80}]}
         >
-          {chatMessages.map((chats, chatsIndex) => {
+          {globalDataStates.chatMessagesArray.map((chats, chatsIndex) => {
             if (chats.role == "user") {
               return (
                 <UserMessageBox message={chats.message} key={chatsIndex} />
@@ -41,7 +71,14 @@ const ChatMiddleWrapper = () => {
               return <AIMessageBox message={chats.message} key={chatsIndex} />;
             }
           })}
-          <Image source={chatLoader} style={{height:70,width:100,objectFit:"contain"}} />
+          {toggleStates.toggleIsWaitingForResponse && (
+            <View style={styles.chatLoaderMain}>
+              <Image
+                source={chatLoader}
+                style={{ height: 70, width: 100, objectFit: "contain" }}
+              />
+            </View>
+          )}
         </ScrollView>
       ) : (
         <ChatTopicsMain />

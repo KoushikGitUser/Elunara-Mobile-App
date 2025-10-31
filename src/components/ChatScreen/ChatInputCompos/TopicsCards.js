@@ -6,12 +6,16 @@ import {
   verticalScale,
 } from "../../../utils/responsive";
 import { ArrowUpRight, ChevronRight } from "lucide-react-native";
- 
-const TopicsCards = ({ item,setToggleSubTopics,setCurrentSubTopic}) => {
+import { useDispatch } from "react-redux";
+import { setToggleSubTopics } from "../../../redux/slices/toggleSlice";
+import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
+
+const TopicsCards = ({ item }) => {
+  const dispatch = useDispatch();
   return (
     <TouchableOpacity onPress={()=> {
-        setToggleSubTopics(true);
-        setCurrentSubTopic(item?.title)
+        dispatch(setToggleSubTopics(true));
+        dispatch(setCurrentSelectedTopic(item?.title));
     }} style={styles.topicsMain}>
       <View style={styles.contentWrapper}>
         <View style={styles.imageandIcon}>

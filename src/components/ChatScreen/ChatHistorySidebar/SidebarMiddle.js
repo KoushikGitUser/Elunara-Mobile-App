@@ -18,6 +18,7 @@ const SidebarMiddle = () => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
   const [pinnedChatsOpened,setPinnedChatsOpened] = useState(false);
   const [pinnedRoomsOpened,setPinnedRoomsOpened] = useState(false);
+  const [roomsOpened,setRoomsOpened] = useState(false);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -30,7 +31,7 @@ const SidebarMiddle = () => {
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Pinned Chats (06)
           </Text>
-          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+          {pinnedChatsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
         </TouchableOpacity>
          {pinnedChatsOpened && (
           <View style={styles.individualPinnedChatsMain}>
@@ -46,7 +47,7 @@ const SidebarMiddle = () => {
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Pinned Learning Labs (10)
           </Text>
-          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+         {pinnedRoomsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
         </TouchableOpacity>
         {pinnedRoomsOpened && (
           <View style={styles.individualPinnedChatsMain}>
@@ -83,13 +84,22 @@ const SidebarMiddle = () => {
         )}
       </View> 
       <View style={styles.pinnedSectionMain}>
-        <TouchableOpacity onPress={()=>navigation.navigate("rooms")} style={[styles.pinnedBtn]}>
+        <TouchableOpacity onPress={() => setRoomsOpened(!roomsOpened)} style={[styles.pinnedBtn]}>
           <Image source={room} style={{height:25,width:25,objectFit:"contain"}} />
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Rooms
           </Text>
-          <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+          {roomsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
         </TouchableOpacity>
+        {roomsOpened && (
+          <View style={styles.individualPinnedChatsMain}>
+            {recentChats.map((chat, chatIndex) => {
+              return (
+                <IndividualPinnedRoom key={chatIndex} title={chat?.title} />
+              );
+            })}
+          </View>
+        )}
       </View>
     </ScrollView>
   );

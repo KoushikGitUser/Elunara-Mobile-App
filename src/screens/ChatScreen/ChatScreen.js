@@ -4,6 +4,9 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Dimensions,
+  Animated,
+  StatusBar,
 } from "react-native";
 import React, { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,18 +20,20 @@ import { useSelector } from "react-redux";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import TopicsCompo from "../../components/ChatScreen/ChatInputCompos/TopicsCompo";
-import { StatusBar } from "expo-status-bar";
 
 const ChatScreen = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const SCREEN_WIDTH = Dimensions.get("window").width;
+  const translateX = React.useRef(new Animated.Value(0)).current;
 
   return (
-      <SafeAreaView style={{flex:1,width:"100%",}}>
-        <StatusBar backgroundColor="black" style="dark" />
-        <ChatHeader />
+    <SafeAreaView style={{ flex: 1, width: "100%" }}>
+      {toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar translateX={translateX} />}
+      <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
+        <ChatHeader translateX={translateX} />
         <View style={styles.chatMainWrapper}>
           {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
           {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
@@ -37,7 +42,7 @@ const ChatScreen = () => {
 
           {/* Header section */}
           {/* chatsidebar section */}
-          {toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar />}
+
           {/* chatsidebar section */}
 
           {/* middle section */}
@@ -48,8 +53,15 @@ const ChatScreen = () => {
           <ChatInputMain />
           {/* chatInput section */}
         </View>
-      </SafeAreaView>
-
+      </Animated.View>
+      <StatusBar
+        backgroundColor="#ff0000ff"
+        barStyle="dark-content"
+        hidden
+        translucent={false}
+        animated
+      />
+    </SafeAreaView>
   );
 };
 

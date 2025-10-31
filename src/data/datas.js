@@ -113,6 +113,9 @@ export const chatMessages = [
   },
 ];
 
+export const demoResponseFromAI =
+  "Hello! 👋 I'm Elunara, your personal AI learning tutor. I'm here to make studying smarter and simpler — whether you're mastering complex math problems, exploring science concepts, or improving your writing. Ask me anything, and I'll explain it step by step, provide examples, and even quiz you for better understanding. \n\n🌟 Learning with Elunara means interactive guidance, instant feedback, and personalized lessons tailored to your goals. Let's begin your journey to knowledge — what topic would you like to learn today?";
+
 export const menuOptions = [
   {
     icon: bookmark,

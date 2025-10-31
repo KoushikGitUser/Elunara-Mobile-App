@@ -30,6 +30,12 @@ const toggleSlice = createSlice({
     setToggleKeyboardVisibilityOnChatScreen: (state, action) => {
       state.toggleStates.toggleKeyboardVisibilityOnChatScreen = action.payload;
     },
+    setToggleIsWaitingForResponse: (state, action) => {
+      state.toggleStates.toggleIsWaitingForResponse = action.payload;
+    },
+    setToggleSubTopics: (state, action) => {
+      state.toggleStates.toggleSubTopics = action.payload;
+    },
   },
 });
 
@@ -41,7 +47,9 @@ export const {
   setToggleTopicsPopup,
   setToggleToolsPopup,
   setToggleToolsPopupStates,
-  setToggleKeyboardVisibilityOnChatScreen
+  setToggleKeyboardVisibilityOnChatScreen,
+  setToggleIsWaitingForResponse,
+  setToggleSubTopics,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

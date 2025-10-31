@@ -2,17 +2,44 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
-import { ArrowUpRight, ChevronRight, IndianRupee } from "lucide-react-native";
-import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
+import {
+  ArrowUpRight,
+  ChevronRight,
+  CircleChevronRight,
+  IndianRupee,
+} from "lucide-react-native";
+import {
+  moderateScale,
+  scaleFont,
+  verticalScale,
+} from "../../../utils/responsive";
+import { useDispatch } from "react-redux";
+import { setToggleSubTopics, setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
+import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
 
-const Topics = ({ item,}) => {
+const Topics = ({ item, index }) => {
+  const dispatch = useDispatch();
   const styleProps = {
-    borderColor:"abcd",
-    backgroundColor:"white"
+    borderColor: "abcd",
+    backgroundColor: "white",
   };
   const navigation = useNavigation();
   return (
-    <TouchableOpacity  style={styles.topicsMain}>
+    <TouchableOpacity
+      onPress={() => {
+        if (index == 5) {
+          dispatch(setToggleTopicsPopup(true));
+          dispatch(setToggleSubTopics(false));
+          dispatch(setCurrentSelectedTopic(null));
+        }
+        else{
+          dispatch(setToggleTopicsPopup(true));
+          dispatch(setCurrentSelectedTopic(item?.title));
+          dispatch(setToggleSubTopics(true));
+        }
+      }}
+      style={styles.topicsMain}
+    >
       <View style={styles.contentWrapper}>
         <View style={styles.imageandIcon}>
           <View
@@ -30,7 +57,7 @@ const Topics = ({ item,}) => {
               style={{ height: 15, width: 15, objectFit: "contain" }}
             />
           </View>
-
+          {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
 
         <Text style={styles.topicTitle}>{item?.title}</Text>
@@ -51,18 +78,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
     marginBottom: 20,
-    backgroundColor:"white"
+    backgroundColor: "white",
   },
   contentWrapper: {
     paddingHorizontal: 12,
     paddingVertical: 10,
-    flex:1
+    flex: 1,
   },
-  imageandIcon:{
-    width:"100%",
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"flex-start"
+  imageandIcon: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   topicIcon: {
     height: 26,

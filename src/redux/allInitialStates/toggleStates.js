@@ -7,4 +7,6 @@ export const toggleStates = {
       toggleToolsPopup:false,
       toggleToolsPopupStates:0,
       toggleKeyboardVisibilityOnChatScreen:false,
+      toggleIsWaitingForResponse:false,
+      toggleSubTopics:false,
 }

@@ -20,6 +20,12 @@ const globalDataSlice = createSlice({
     setChatInputContentLinesNumber: (state, action) => {
       state.globalDataStates.chatInputContentLinesNumber = action.payload;
     },
+    setChatMessagesArray: (state, action) => {
+      state.globalDataStates.chatMessagesArray = action.payload;
+    },
+    setCurrentSelectedTopic: (state, action) => {
+      state.globalDataStates.currentSelectedTopic = action.payload;
+    },
   },
 });
 
@@ -28,6 +34,8 @@ export const {
   removeSelectedFile,
   setUserMessagePrompt,
   setChatInputContentLinesNumber,
+  setChatMessagesArray,
+  setCurrentSelectedTopic,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

@@ -25,7 +25,7 @@ const WelcomeScreen = () => {
   return (
  <SafeAreaView style={styles.safeArea}>
   <ScrollView>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" hidden={false} backgroundColor="#ff0000ff" />
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>

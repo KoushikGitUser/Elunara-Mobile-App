@@ -42,14 +42,13 @@ const SignIn = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {toggleForgotPassword && <ForgotPassword close={setToggleForgotPassword} toggleForgotPassword={toggleForgotPassword} />}
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={24} color="black" />
-              {<GradientText marginBottom={0} marginTop={20} children=" Welcome back" fontSize={scaleFont(24)} />}
+              {<GradientText marginBottom={0} marginTop={20} children=" Welcome back" fullWidth={true} fontSize={scaleFont(25)} />}
             <Text style={styles.headDesc}>Pick up right where you left off</Text>
             <Text style={[styles.headDesc,{marginTop:0}]}>—smarter learning awaits.</Text>
           </View>

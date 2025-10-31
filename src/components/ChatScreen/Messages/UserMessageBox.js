@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         alignItems:"center"
     },
     message:{
-        fontSize:moderateScale(16),
+        fontSize:moderateScale(14),
         fontWeight:400
     }
 })

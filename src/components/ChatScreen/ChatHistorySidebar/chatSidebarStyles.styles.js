@@ -13,7 +13,6 @@ export const createStyles = ({}) =>
     chatHistorySidebarBackgroundWrapper: {
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
-      backgroundColor: "rgba(0, 0, 0, 0.12)",
       position: "absolute",
       left: 0,
       top: 0,
@@ -25,15 +24,19 @@ export const createStyles = ({}) =>
       borderTopRightRadius: 16,
       borderBottomRightRadius: 16,
       backgroundColor: "white",
-      borderWidth: 1,
-      borderColor: "lightgrey",
       position: "absolute",
       left: 0,
       top: 0,
-      zIndex: 20,
+      zIndex: 20, 
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
+      shadowColor: "#000000ff",
+      shadowOffset: { width: 15, height: 0 }, // 👈 horizontal shadow only (to right)
+      shadowOpacity: 1,
+      shadowRadius: 15,
+      elevation:10,
+      paddingTop:40
     },
     chatHistorySidebarHeader: {
       width: "100%",
@@ -147,7 +150,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 15,
       paddingVertical: 10,
-      marginLeft:20
+      marginLeft: 20,
     },
     individualPinnedChatsMain: {
       width: "90%",
@@ -223,8 +226,8 @@ export const createStyles = ({}) =>
     chatInputMainWrapper: {
       width: "100%",
       paddingBottom: 20,
-      paddingHorizontal:20,
-      zIndex:2
+      paddingHorizontal: 20,
+      zIndex: 2,
     },
     chatInputMain: {
       width: "100%",
@@ -238,13 +241,13 @@ export const createStyles = ({}) =>
       gap: verticalScale(12),
       backgroundColor: "white",
     },
-    filesContainerMain:{
-      width:"94%",
-      paddingVertical:5,
-      flexDirection:"row",
-      paddingTop:25,
-      paddingRight:20,
-      paddingLeft:7
+    filesContainerMain: {
+      width: "94%",
+      paddingVertical: 5,
+      flexDirection: "row",
+      paddingTop: 25,
+      paddingRight: 20,
+      paddingLeft: 7,
     },
     textInput: {
       width: "100%",

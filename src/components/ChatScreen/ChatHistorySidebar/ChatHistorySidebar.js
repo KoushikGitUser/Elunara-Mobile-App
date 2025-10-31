@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Animated,
+  Dimensions,
 } from "react-native";
 import React, { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -24,19 +26,32 @@ import { createStyles } from "./chatSidebarStyles.styles";
 import SidebarHeader from "./SidebarHeader";
 import SidebarMiddle from "./SidebarMiddle";
 import SidebarFooter from "./SidebarFooter";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 
-const ChatHistorySidebar = () => {
+const ChatHistorySidebar = ({ translateX }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const SCREEN_WIDTH = Dimensions.get("window").width;
+  const { toggleStates } = useSelector((state) => state.Toggle);
 
   return (
     <>
       <TouchableOpacity
-        onPress={() => dispatch(setToggleChatHistorySidebar(false))}
+        onPress={() => {
+          Animated.timing(translateX, {
+            toValue: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : SCREEN_WIDTH * 0.75,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+          dispatch(
+            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
+          );
+        }}
         style={styles.chatHistorySidebarBackgroundWrapper}
       ></TouchableOpacity>
       <View style={styles.chatHistorySidebarWrapper}>

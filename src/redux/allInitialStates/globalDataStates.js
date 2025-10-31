@@ -5,4 +5,5 @@ export const globalDataStates = {
   selectedFiles: [], 
   noteForIndividualChat: null,
   chatInputContentLinesNumber:0,
+  currentSelectedTopic: null,
 };

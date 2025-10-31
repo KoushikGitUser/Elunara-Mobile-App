@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleAddItemsToInputPopup,
   setToggleIsChattingWithAI,
+  setToggleIsWaitingForResponse,
   setToggleKeyboardVisibilityOnChatScreen,
   setToggleToolsPopup,
   setToggleTopicsPopup,
@@ -32,9 +33,12 @@ import {
   setUserMessagePrompt,
   removeSelectedFile,
   setChatInputContentLinesNumber,
+  setChatMessagesArray,
+  setSelecetdFiles,
 } from "../../redux/slices/globalDataSlice";
 import ImageFile from "./ChatInputCompos/SelectedFilesCompo/ImageFile";
 import PdfFile from "./ChatInputCompos/SelectedFilesCompo/PdfFile";
+import { demoResponseFromAI } from "../../data/datas";
 
 const ChatInputMain = () => {
   const styleProps = {};
@@ -47,7 +51,7 @@ const ChatInputMain = () => {
   const LINE_HEIGHT = 20;
   const PADDING_VERTICAL = 16; // 8 top + 8 bottom
   const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL; // ~36px for 1 line
-  const MAX_HEIGHT = (LINE_HEIGHT * 5) + PADDING_VERTICAL; // ~76px for 3 lines
+  const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL; // ~76px for 3 lines
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
 
   // Initialize line count on mount
@@ -59,7 +63,10 @@ const ChatInputMain = () => {
     const contentHeight = event.nativeEvent.contentSize.height;
 
     // Calculate number of lines
-    const numberOfLines = Math.max(1, Math.ceil((contentHeight - PADDING_VERTICAL) / LINE_HEIGHT));
+    const numberOfLines = Math.max(
+      1,
+      Math.ceil((contentHeight - PADDING_VERTICAL) / LINE_HEIGHT)
+    );
     dispatch(setChatInputContentLinesNumber(numberOfLines));
 
     if (contentHeight < MIN_HEIGHT) {
@@ -92,6 +99,18 @@ const ChatInputMain = () => {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (toggleStates.toggleIsWaitingForResponse) {
+        dispatch(setChatMessagesArray([...globalDataStates.chatMessagesArray, {
+          role: "ai",
+          message: demoResponseFromAI,
+        }]));
+        dispatch(setToggleIsWaitingForResponse(false));
+      }
+    }, 5000);
+  }, [toggleStates.toggleIsWaitingForResponse]);
 
   // Reset input height when text is cleared
   useEffect(() => {
@@ -129,13 +148,15 @@ const ChatInputMain = () => {
                   alignItems: "center",
                   justifyContent: "flex-start",
                   gap: 25,
-                  paddingRight:30
+                  paddingRight: 30,
                 },
               ]}
             >
               {globalDataStates.selectedFiles?.map((files, fileIndex) => {
                 if (
-                  ["image/png", "image/jpeg", "image/jpg"].includes(files.mimeType) 
+                  ["image/png", "image/jpeg", "image/jpg"].includes(
+                    files.mimeType
+                  )
                 ) {
                   return (
                     <ImageFile
@@ -152,9 +173,11 @@ const ChatInputMain = () => {
                       file={files}
                     />
                   );
-                }
-                else{
-                  Alert.alert("Invalid File Type","Selected file type is not supported")
+                } else {
+                  Alert.alert(
+                    "Invalid File Type",
+                    "Selected file type is not supported"
+                  );
                 }
               })}
             </View>
@@ -227,9 +250,25 @@ const ChatInputMain = () => {
                 style={{ height: 27, width: 27, objectFit: "contain" }}
               />
             </TouchableOpacity>
-            {(globalDataStates.userMessagePrompt !== "" || globalDataStates.selectedFiles.length>0) && (
+            {(globalDataStates.userMessagePrompt !== "" ||
+              globalDataStates.selectedFiles.length > 0) && (
               <TouchableOpacity
-                onPress={() => dispatch(setToggleIsChattingWithAI(true))}
+                onPress={() => {
+                  dispatch(
+                    setChatMessagesArray([
+                      ...globalDataStates.chatMessagesArray,
+                      {
+                        role: "user",
+                        message: globalDataStates.userMessagePrompt,
+                      },
+                    ])
+                  );
+                  dispatch(setUserMessagePrompt(""));
+                  dispatch(setSelecetdFiles([]));
+                  dispatch(setChatInputContentLinesNumber(1));
+                  dispatch(setToggleIsChattingWithAI(true));
+                  dispatch(setToggleIsWaitingForResponse(true));
+                }}
               >
                 <Image
                   source={send}

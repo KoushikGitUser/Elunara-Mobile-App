@@ -20,10 +20,11 @@ import { subTopics } from "../../../data/datas";
 import { scaleFont } from "../../../utils/responsive";
 import SubTopicsCard from "./SubTopicsCard";
 import { ArrowLeft, Mic, Search } from "lucide-react-native";
-import { setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleSubTopics, setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
 const screenHeight = Dimensions.get("window").height;
-const SubTopicsCompo = ({ currentSubTopic, setToggleSubTopics }) => {
+const SubTopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
@@ -54,7 +55,7 @@ const SubTopicsCompo = ({ currentSubTopic, setToggleSubTopics }) => {
     <View style={styles.content}>
       <View style={styles.closeModalMain}>
         <ArrowLeft
-          onPress={() => setToggleSubTopics(false)}
+          onPress={() => dispatch(setToggleSubTopics(false))}
           size={30}
           strokeWidth={2}
         />
@@ -66,7 +67,7 @@ const SubTopicsCompo = ({ currentSubTopic, setToggleSubTopics }) => {
         />
       </View>
       {/* Title */}
-      <Text style={styles.title}>{currentSubTopic} </Text>
+      <Text style={styles.title}>{globalDataStates.currentSelectedTopic} </Text>
 
       {/* Description */}
       <Text style={styles.description}>Popular Topics</Text>

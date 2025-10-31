@@ -39,7 +39,7 @@ const SidebarHeader = () => {
         <TouchableOpacity style={styles.newLearningTabBtn}>
           <Image source={folderplus} style={{height:25,width:25,objectFit:"contain"}} />
           <Text style={[styles.btnTexts, { fontWeight: 400 }]}>
-            New Learning Tab
+            New Learning Lab
           </Text>
         </TouchableOpacity>
       </View>

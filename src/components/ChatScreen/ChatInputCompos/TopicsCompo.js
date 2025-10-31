@@ -26,7 +26,6 @@ const TopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [toggleSubTopics, setToggleSubTopics] = useState(false);
   const [currentSubTopic,setCurrentSubTopic] = useState("Finance");
 
   return (
@@ -52,12 +51,12 @@ const TopicsCompo = () => {
           activeOpacity={1}
           onPress={() => dispatch(setToggleTopicsPopup(false))}
         />
-
+ 
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
           {/* Content */}
-          {toggleSubTopics ? (
-            <SubTopicsCompo setToggleSubTopics={setToggleSubTopics} currentSubTopic={currentSubTopic} />
+          {toggleStates.toggleSubTopics ? (
+            <SubTopicsCompo  />
           ) : (
             <View style={styles.content}>
               <View style={styles.closeModalMain}>
@@ -84,7 +83,7 @@ const TopicsCompo = () => {
               >
                 <View style={styles.grid}>
                   {topicsSheet.map((topics, topicIndex) => {
-                    return <TopicsCards setCurrentSubTopic={setCurrentSubTopic} setToggleSubTopics={setToggleSubTopics} key={topicIndex} item={topics} />;
+                    return <TopicsCards  key={topicIndex} item={topics} />;
                   })}
                 </View>
               </ScrollView>

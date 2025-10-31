@@ -49,6 +49,25 @@ export const createStyles = ({}) =>
       fontWeight: 600,
       gap: 5,
     },
+    chatnameAndSection:{
+       flexDirection:"column",
+       justifyContent:"space-between",
+       alignItems:"center",
+       gap:5
+    },
+    topicNamemain:{
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+      paddingVertical: 2,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: "#93BCFD",
+      backgroundColor:"#E9F2FF",
+      borderRadius: 24,
+      fontWeight: 600,
+      gap: 5,
+    },
     rightChatHeaderIcons: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -67,6 +86,14 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       marginTop:80,
       zIndex: 2,
+    },
+    chatLoaderMain:{
+      width:"100%",
+      flexDirection:"row",
+      justifyContent:"flex-start",
+      paddingVertical:10,
+      marginBottom:10
+
     },
     topicsMainWrapper: {
       width: "100%",
