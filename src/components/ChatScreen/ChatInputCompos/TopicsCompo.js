@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.18)",
   },
   optionsContainer: {
-    maxHeight: screenHeight * 0.6,
+    maxHeight: screenHeight * 0.5,
     flexDirection: "column",
   },
   backdrop: {
@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+    maxHeight:screenHeight*0.8
   },
   iconContainer: {
     marginBottom: 24,

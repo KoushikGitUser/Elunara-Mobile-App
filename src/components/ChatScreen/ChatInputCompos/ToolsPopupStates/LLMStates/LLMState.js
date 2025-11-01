@@ -63,7 +63,7 @@ const LLMState = () => {
             toggle between them
           </Text>
 
-          <ScrollView style={{ maxHeight: screenHeight * 0.6 }}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: screenHeight * 0.6 }}>
             <View style={styles.noteSection}>
               <Text style={{ fontSize: moderateScale(12), fontWeight: 400 }}>
                 <Text style={{ fontSize: moderateScale(12), fontWeight: 600 }}>
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+    maxHeight:screenHeight*0.8,
   },
   iconContainer: {
     marginBottom: 24,

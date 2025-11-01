@@ -60,12 +60,13 @@ const ChatMiddleWrapper = () => {
             gap: 25,
             alignItems: "center",
           }}
-          style={[styles.messagesContainer,{marginTop:toggleStates.toggleIsChattingWithAI?110:80}]}
+          style={[styles.messagesContainer,]}
         >
+          <View style={{height:120}}></View>
           {globalDataStates.chatMessagesArray.map((chats, chatsIndex) => {
             if (chats.role == "user") {
               return (
-                <UserMessageBox message={chats.message} key={chatsIndex} />
+                <UserMessageBox chat={chats} key={chatsIndex} />
               );
             } else {
               return <AIMessageBox message={chats.message} key={chatsIndex} />;
@@ -74,11 +75,12 @@ const ChatMiddleWrapper = () => {
           {toggleStates.toggleIsWaitingForResponse && (
             <View style={styles.chatLoaderMain}>
               <Image
-                source={chatLoader}
+                source={chatLoader} 
                 style={{ height: 70, width: 100, objectFit: "contain" }}
               />
             </View>
           )}
+          <View style={{height:5}}></View>
         </ScrollView>
       ) : (
         <ChatTopicsMain />

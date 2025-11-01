@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.18)",
   },
   optionsContainer: {
-    maxHeight: screenHeight * 0.6,
+    maxHeight: screenHeight * 0.45,
     flexDirection: "column",
   },
   backdrop: {

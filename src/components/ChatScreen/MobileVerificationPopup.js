@@ -348,13 +348,12 @@ const styles = StyleSheet.create({
   },
     otpContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     marginBottom: 35,
     marginTop: 15 ,
-    gap: 10,
   },
   otpInput: {
-    width: 57,
+    width: "15%",
     height: 57,
     borderWidth: 1.5,
     borderColor: "#d1d5db",

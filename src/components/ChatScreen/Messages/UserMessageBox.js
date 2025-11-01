@@ -1,43 +1,117 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
-import { moderateScale, verticalScale } from '../../../utils/responsive'
+import { View, Text, StyleSheet, Image } from "react-native";
+import React from "react";
+import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
+import { useSelector } from "react-redux";
+import pdfLogo from "../../../assets/images/pdf.png";
 
-const UserMessageBox = ({message}) => {
+const UserMessageBox = ({ chat }) => {
+  const { globalDataStates } = useSelector((state) => state.Global);
+    const truncateFileName = (fileName) => {
+    if (!fileName) return "";
+
+    // Remove the .pdf extension if it exists
+    const nameWithoutExtension = fileName.replace(/\.pdf$/i, "");
+
+    // If the name is longer than 15 characters, truncate it
+    if (nameWithoutExtension.length > 15) {
+      return nameWithoutExtension.substring(0, 15) + "...pdf";
+    }
+
+    // Return the original name with .pdf extension
+    return nameWithoutExtension + ".pdf";
+  };
+
   return (
     <View style={styles.mainBox}>
-        <View style={styles.messageBox}>
-      <Text style={styles.message}>{message} </Text>
+      {chat.file?.mimeType == "image/png" ||
+      chat.file?.mimeType == "image/jpg" ||
+      chat.file?.mimeType == "image/jpeg" ? (
+        <Image source={chat.file} style={styles.attachedImage} />
+      ) : chat.file?.mimeType == "application/pdf"?(
+        <View style={styles.pdfMain}>
+          <View style={styles.pdfLogoContainer}>
+            <Image
+              source={pdfLogo}
+              style={{ height: 25, width: 25, objectFit: "contain" }}
+            />
+          </View> 
+          <View>
+            <Text style={{ fontSize: scaleFont(12), fontWeight: 600 }}>
+              {truncateFileName(chat.file?.name)}
+            </Text>
+            <Text style={{ fontSize: scaleFont(12), fontWeight: 400 }}>
+              PDF
+            </Text>
+          </View>
         </View>
+      ):null}
+
+      <View style={styles.messageBox}>
+        <Text style={styles.message}>{chat.message} </Text>
+      </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-    mainBox:{
-        width:"100%",
-        flexDirection:"row",
-        justifyContent:"flex-end",
-        alignItems:"center",
-        marginTop:20
-    },
-    messageBox:{
-        minHeight:verticalScale(45),
-        maxWidth:"80%",
-        backgroundColor:"#EBF1FB",
-        borderWidth:1,
-        borderColor:"#D3DAE5",
-        borderRadius:20,
-        borderTopRightRadius:0,
-        paddingHorizontal:20,
-        paddingVertical:13,
-        flexDirection:"row",
-        justifyContent:"center",
-        alignItems:"center"
-    },
-    message:{
-        fontSize:moderateScale(14),
-        fontWeight:400
-    }
-})
+  mainBox: {
+    width: "100%",
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 12,
+    alignItems: "flex-end",
+    marginTop: 20,
+  },
+  messageBox: {
+    minHeight: verticalScale(45),
+    maxWidth: "80%",
+    backgroundColor: "#EBF1FB",
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    borderRadius: 20,
+    borderTopRightRadius: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 13,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  message: {
+    fontSize: moderateScale(14),
+    fontWeight: 400,
+  },
+    pdfMain: {
+    height: verticalScale(65),
+    minWidth: 187,
+    backgroundColor: "#EBF1FB",
+    borderRadius: 20,
+    position: "relative",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingRight: 40,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 17,
+  },
+  pdfLogoContainer: {
+    height: "100%",
+    width: 60,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#c3cddcff",
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  attachedImage:{
+    width:"50%",
+    objectFit:"cover",
+    height:verticalScale(150),
+    borderRadius:20,
+    
+  }
+});
 
-export default UserMessageBox
+export default UserMessageBox;

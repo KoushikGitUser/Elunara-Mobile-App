@@ -52,9 +52,9 @@ const ChatHistorySidebar = ({ translateX }) => {
             setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
           );
         }}
-        style={styles.chatHistorySidebarBackgroundWrapper}
+        style={[styles.chatHistorySidebarBackgroundWrapper,{display:toggleStates.toggleChatHistorySidebar?"flex":"none"}]}
       ></TouchableOpacity>
-      <View style={styles.chatHistorySidebarWrapper}>
+      <View style={[styles.chatHistorySidebarWrapper,{marginLeft:toggleStates.toggleChatHistorySidebar?0:-SCREEN_WIDTH*0.75}]}>
         {/* chat history header */}
         <SidebarHeader />
         {/* chat history header */}

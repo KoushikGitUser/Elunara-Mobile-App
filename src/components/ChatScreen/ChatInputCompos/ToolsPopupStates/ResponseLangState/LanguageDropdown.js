@@ -65,7 +65,7 @@ const LanguageDropdown = ({setSelectedCounts,selectedCounts,selectOptionsArray})
         </TouchableOpacity>
 
         {visible && (
-          <ScrollView style={[styles.dropdown]}>
+          <View style={[styles.dropdown]}>
             {selectOptionsArray?.map((item, itemIndex) => {
               return (
                 <TouchableOpacity
@@ -78,7 +78,7 @@ const LanguageDropdown = ({setSelectedCounts,selectedCounts,selectOptionsArray})
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
         )}
       </View>
     </View>
@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     elevation: 5,
     shadowColor: "#afafafff",
-    maxHeight:200,
 
   },
   option: {

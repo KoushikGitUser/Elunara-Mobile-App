@@ -7,3 +7,16 @@ export const globalDataStates = {
   chatInputContentLinesNumber:0,
   currentSelectedTopic: null,
 };
+
+export const demoChatMessages = [
+  {
+    role:"user",
+    message:"Hello",
+    file:null,//optional
+  },
+    {
+    role:"ai",
+    message:"Hello,How can I help you today?",
+    file:null,//optional
+  },
+]

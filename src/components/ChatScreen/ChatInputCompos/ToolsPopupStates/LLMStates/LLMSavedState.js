@@ -58,7 +58,7 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
         Select the AI model for your responses - choose based on speed or depth.
       </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: screenHeight * 0.7 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: screenHeight * 0.55 }}>
         <View style={styles.optionsMain}>
           {savedLLMOptions?.map((option, optionsIndex) => {
             return (

@@ -66,7 +66,7 @@ const ChatHeader = ({ translateX }) => {
       {toggleStates.toggleIsChattingWithAI ? (
         <View style={styles.chatnameAndSection}>
           <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
-            Initial Greetings
+            First Chat with AI
           </Text>
           <TouchableOpacity style={styles.topicNamemain}>
             <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />

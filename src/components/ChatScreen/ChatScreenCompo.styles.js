@@ -84,7 +84,6 @@ export const createStyles = ({}) =>
       width: "100%",
       flex: 1,
       flexDirection: "column",
-      marginTop:80,
       zIndex: 2,
     },
     chatLoaderMain:{

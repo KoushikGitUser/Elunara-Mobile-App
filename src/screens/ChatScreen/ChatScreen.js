@@ -31,7 +31,7 @@ const ChatScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, width: "100%" }}>
-      {toggleStates.toggleChatHistorySidebar && <ChatHistorySidebar translateX={translateX} />}
+      <ChatHistorySidebar translateX={translateX} />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <ChatHeader translateX={translateX} />
         <View style={styles.chatMainWrapper}>

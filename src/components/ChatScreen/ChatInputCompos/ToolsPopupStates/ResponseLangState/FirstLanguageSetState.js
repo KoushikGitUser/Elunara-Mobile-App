@@ -4,11 +4,14 @@ import {
   StyleSheet,
   Platform,
   TouchableOpacity,
+  ScrollView,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import LanguageDropdown from "./LanguageDropdown";
 import { languages } from "../../../../../data/datas";
+const screenHeight = Dimensions.get("window").height;
 
 const FirstLanguageSetState = ({setIsLanguageSaved}) => {
   const [selectedCounts, setSelectedCounts] = useState([]);
@@ -21,7 +24,7 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
         Choose up to 3 languages to toggle between. Update anytime in Settings.
       </Text>
 
-      <View>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollableContent}>
         <Text
           style={{
             fontSize: moderateScale(10),
@@ -108,7 +111,7 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
           </Text>
           Settings
         </Text>
-      </View>
+      </ScrollView>
     </>
   );
 };
@@ -128,6 +131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+    maxHeight:0.8
   },
   iconContainer: {
     marginTop: 5,
@@ -149,7 +153,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
+    marginBottom: 5,
     letterSpacing: 0.2,
   },
     button: {
@@ -167,6 +171,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 0.3,
   },
+  scrollableContent:{
+    maxHeight:screenHeight*0.55
+  }
 });
 
 export default FirstLanguageSetState;

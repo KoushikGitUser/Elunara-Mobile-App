@@ -260,6 +260,7 @@ const ChatInputMain = () => {
                       {
                         role: "user",
                         message: globalDataStates.userMessagePrompt,
+                        file:globalDataStates.selectedFiles?globalDataStates.selectedFiles[0]:null,
                       },
                     ])
                   );

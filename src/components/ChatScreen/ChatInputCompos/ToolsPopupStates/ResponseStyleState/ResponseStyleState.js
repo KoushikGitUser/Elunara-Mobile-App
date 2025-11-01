@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
+    maxHeight:screenHeight*0.8
   },
   iconContainer: {
     marginTop: 5,
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   optionsContainer: {
-    maxHeight: screenHeight * 0.6,
+    maxHeight: screenHeight * 0.55,
     flexDirection: "column",
   },
   card: {
