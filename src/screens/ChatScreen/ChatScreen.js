@@ -20,6 +20,9 @@ import { useSelector } from "react-redux";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import TopicsCompo from "../../components/ChatScreen/ChatInputCompos/TopicsCompo";
+import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
+import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
+import UserMessageActionPopup from "../../components/ChatScreen/Messages/UserMessageActionPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -38,13 +41,9 @@ const ChatScreen = () => {
           {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
           {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
           {toggleStates.toggleTopicsPopup && <TopicsCompo />}
-          {/* Header section */}
-
-          {/* Header section */}
-          {/* chatsidebar section */}
-
-          {/* chatsidebar section */}
-
+          {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup/>}
+          {toggleStates.toggleRenameChatPopup && <RenameChatPopup/>}
+          {toggleStates.toggleUserMessageActionPopup && <UserMessageActionPopup  />}
           {/* middle section */}
           <ChatMiddleWrapper />
           {/* middle section */}

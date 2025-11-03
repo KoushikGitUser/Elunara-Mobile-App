@@ -68,7 +68,6 @@ const SubTopicsCompo = () => {
       </View>
       {/* Title */}
       <Text style={styles.title}>{globalDataStates.currentSelectedTopic} </Text>
-
       {/* Description */}
       <Text style={styles.description}>Popular Topics</Text>
       <View style={styles.input}>

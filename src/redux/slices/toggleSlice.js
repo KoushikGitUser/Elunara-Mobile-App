@@ -36,6 +36,15 @@ const toggleSlice = createSlice({
     setToggleSubTopics: (state, action) => {
       state.toggleStates.toggleSubTopics = action.payload;
     },
+    setToggleDeleteChatConfirmPopup: (state, action) => {
+      state.toggleStates.toggleDeleteChatConfirmPopup = action.payload;
+    },
+    setToggleRenameChatPopup: (state, action) => {
+      state.toggleStates.toggleRenameChatPopup = action.payload;
+    },
+    setToggleUserMessageActionPopup: (state, action) => {
+      state.toggleStates.toggleUserMessageActionPopup = action.payload;
+    },
   },
 });
 
@@ -50,6 +59,9 @@ export const {
   setToggleKeyboardVisibilityOnChatScreen,
   setToggleIsWaitingForResponse,
   setToggleSubTopics,
+  setToggleDeleteChatConfirmPopup,
+  setToggleRenameChatPopup,
+  setToggleUserMessageActionPopup,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

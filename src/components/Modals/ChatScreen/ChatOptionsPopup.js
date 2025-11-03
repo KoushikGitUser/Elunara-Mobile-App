@@ -13,8 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { menuOptions } from "../../../data/datas";
 import { moderateScale } from "../../../utils/responsive";
-import { setToggleChatMenuPopup } from "../../../redux/slices/toggleSlice";
-
+import { setToggleChatMenuPopup, setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup } from "../../../redux/slices/toggleSlice";
 
 const ChatOptionsPopup = () => {
   const styleProps = {};
@@ -24,6 +23,18 @@ const ChatOptionsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { width, height } = Dimensions.get("window");
 
+  const commonFunctions = (type) => {
+    if (type == "Open Notes") {
+    } else if (type == "Add to Learning Lab") {
+    } else if (type == "Rename") {
+      dispatch(setToggleRenameChatPopup(true));
+    } else if (type == "Pin") {
+    } else if (type == "Archive") {
+    } else if (type == "Delete") {
+      dispatch(setToggleDeleteChatConfirmPopup(true));
+    }
+  };
+
   return (
     <View
       style={{
@@ -31,7 +42,7 @@ const ChatOptionsPopup = () => {
         position: "absolute",
         width,
         height,
-        top: 0,
+        top: 45,
         left: 0,
         zIndex: 99,
       }}
@@ -53,10 +64,14 @@ const ChatOptionsPopup = () => {
               ]}
               onPress={(e) => {
                 e.stopPropagation();
+                commonFunctions(options.option)
               }}
               key={optionIndex}
             >
-              <Image source={options.icon} style={{height:25,width:25,objectFit:"contain"}} />
+              <Image
+                source={options.icon}
+                style={{ height: 25, width: 25, objectFit: "contain" }}
+              />
               <Text
                 numberOfLines={1}
                 style={{ fontSize: moderateScale(12), flexShrink: 1 }}

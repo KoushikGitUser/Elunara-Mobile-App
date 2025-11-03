@@ -9,4 +9,7 @@ export const toggleStates = {
       toggleKeyboardVisibilityOnChatScreen:false,
       toggleIsWaitingForResponse:false,
       toggleSubTopics:false,
+      toggleDeleteChatConfirmPopup:false,
+      toggleRenameChatPopup:false,
+      toggleUserMessageActionPopup:false,
 }

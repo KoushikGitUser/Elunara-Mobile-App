@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Image } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React, { use } from "react";
 import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import pdfLogo from "../../../assets/images/pdf.png";
+import { setToggleUserMessageActionPopup } from "../../../redux/slices/toggleSlice";
 
 const UserMessageBox = ({ chat }) => {
   const { globalDataStates } = useSelector((state) => state.Global);
@@ -20,6 +21,8 @@ const UserMessageBox = ({ chat }) => {
     // Return the original name with .pdf extension
     return nameWithoutExtension + ".pdf";
   };
+
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.mainBox}>
@@ -46,9 +49,11 @@ const UserMessageBox = ({ chat }) => {
         </View>
       ):null}
 
-      <View style={styles.messageBox}>
+      <TouchableOpacity onLongPress={()=>{
+        dispatch(setToggleUserMessageActionPopup(true));
+      }} style={styles.messageBox}>
         <Text style={styles.message}>{chat.message} </Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
