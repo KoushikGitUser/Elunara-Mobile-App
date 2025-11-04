@@ -6,6 +6,7 @@ export const globalDataStates = {
   noteForIndividualChat: null,
   chatInputContentLinesNumber:0,
   currentSelectedTopic: null,
+  chatTitleOnLongPress:null,
 };
 
 export const demoChatMessages = [

@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   Alert,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -27,7 +28,7 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [toggleForgotPassword,setToggleForgotPassword] = useState(false);
+  const [toggleForgotPassword, setToggleForgotPassword] = useState(false);
 
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
@@ -38,19 +39,48 @@ const SignIn = () => {
   const navigation = useNavigation();
 
   const styles = useMemo(() => createStyles(styleProps), []);
-  const subtitle = "Pick up right where you left off  /n—smarter learning awaits."
+  const subtitle =
+    "Pick up right where you left off  /n—smarter learning awaits.";
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {toggleForgotPassword && <ForgotPassword close={setToggleForgotPassword} toggleForgotPassword={toggleForgotPassword} />}
-      <View style={styles.container}>
+      {toggleForgotPassword && (
+        <ForgotPassword
+          close={setToggleForgotPassword}
+          toggleForgotPassword={toggleForgotPassword}
+        />
+      )}
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        style={styles.container}
+      >
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Feather onPress={()=>navigation.navigate("welcome")} name="arrow-left" size={24} color="black" />
-              {<GradientText marginBottom={0} marginTop={20} children=" Welcome back" fullWidth={true} fontSize={scaleFont(25)} />}
-            <Text style={styles.headDesc}>Pick up right where you left off</Text>
-            <Text style={[styles.headDesc,{marginTop:0}]}>—smarter learning awaits.</Text>
+            <Feather
+              onPress={() => navigation.navigate("welcome")}
+              name="arrow-left"
+              size={24}
+              color="black"
+            />
+            {
+              <GradientText
+                marginBottom={0}
+                marginTop={20}
+                children=" Welcome back"
+                fullWidth={true}
+                fontSize={scaleFont(25)}
+              />
+            }
+            <Text style={styles.headDesc}>
+              Pick up right where you left off
+            </Text>
+            <Text style={[styles.headDesc, { marginTop: 0 }]}>
+              —smarter learning awaits.
+            </Text>
           </View>
           <View>
             <Image source={chakraLogo} style={styles.chakraLogo} />
@@ -93,26 +123,33 @@ const SignIn = () => {
           </View>
 
           {/* Forgot Password */}
-          <TouchableOpacity onPress={()=> setToggleForgotPassword(true)} style={styles.forgotPasswordMain} activeOpacity={0.6}>
+          <TouchableOpacity
+            onPress={() => setToggleForgotPassword(true)}
+            style={styles.forgotPasswordMain}
+            activeOpacity={0.6}
+          >
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
           {/* Email Button */}
-        <TouchableOpacity onPress={()=> navigation.navigate("chat")} style={styles.emailButton} activeOpacity={0.8}>
-          <Text style={styles.emailButtonText}>Login</Text>
-        </TouchableOpacity>
-
-        {/* Sign Up Link */}
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={()=> navigation.navigate("signup")} >
-            <Text style={styles.signupLink}>Sign Up</Text>
-            <View style={styles.customUnderline} />
+          <TouchableOpacity
+            onPress={() => navigation.navigate("chat")}
+            style={styles.emailButton}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.emailButtonText}>Login</Text>
           </TouchableOpacity>
-        </View>
-        <Text style={styles.divider}>or</Text>
-        {/* Divider */}
-        </View>
 
+          {/* Sign Up Link */}
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("signup")}>
+              <Text style={styles.signupLink}>Sign Up</Text>
+              <View style={styles.customUnderline} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.divider}>or</Text>
+          {/* Divider */}
+        </View>
 
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
@@ -137,7 +174,7 @@ const SignIn = () => {
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

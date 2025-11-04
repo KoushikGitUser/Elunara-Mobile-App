@@ -20,7 +20,7 @@ export const createStyles = ({}) =>
     },
     chatHistorySidebarWrapper: {
       width: SCREEN_WIDTH * 0.75,
-      height: "100%",
+      height: SCREEN_HEIGHT,
       borderTopRightRadius: 16,
       borderBottomRightRadius: 16,
       backgroundColor: "white",
@@ -192,6 +192,7 @@ export const createStyles = ({}) =>
       borderBottomRightRadius: 16,
       borderTopWidth: 1,
       borderColor: "lightgrey",
+      marginBottom:30
     },
     profileButton: {
       width: "100%",

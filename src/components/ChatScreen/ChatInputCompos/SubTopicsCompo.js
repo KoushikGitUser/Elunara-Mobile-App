@@ -98,7 +98,7 @@ const SubTopicsCompo = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-        style={[styles.keyboardAvoidingView, { bottom: keyboardHeight }]}
+        style={[styles.keyboardAvoidingView, { bottom: keyboardHeight - 10 }]}
       >
         <View style={styles.container}>
           <View style={styles.contents}>

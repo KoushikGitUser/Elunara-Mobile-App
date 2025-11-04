@@ -53,7 +53,7 @@ const FindAPIKeyNoticeState = ({ close }) => {
         the most of your subscription.
       </Text>
 
-      <ScrollView style={{ maxHeight: screenHeight * 0.6 }}>
+      <ScrollView style={{ maxHeight: screenHeight * 0.5 }}>
         {findApiKeyNotices?.map((item, itemIndex) => {
           return (
             <FindAPIKeyAccordian

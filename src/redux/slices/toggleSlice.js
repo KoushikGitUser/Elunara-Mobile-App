@@ -45,6 +45,9 @@ const toggleSlice = createSlice({
     setToggleUserMessageActionPopup: (state, action) => {
       state.toggleStates.toggleUserMessageActionPopup = action.payload;
     },
+    setToggleChatActionsPopupOnLongPress: (state, action) => {
+      state.toggleStates.toggleChatActionsPopupOnLongPress = action.payload;
+    },
   },
 });
 
@@ -62,6 +65,7 @@ export const {
   setToggleDeleteChatConfirmPopup,
   setToggleRenameChatPopup,
   setToggleUserMessageActionPopup,
+  setToggleChatActionsPopupOnLongPress,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

@@ -30,8 +30,8 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "space-between",
       paddingHorizontal:20,
-      paddingTop:60,
-      paddingBottom:25,
+      paddingTop:10,
+      paddingBottom:10,
       alignItems: "center",
       backgroundColor: "#FAFAFA",
       borderColor:"#D3DAE5"

@@ -11,12 +11,11 @@ const screenHeight = Dimensions.get("window").height;
 export const createStyles = (props = {}) =>
   StyleSheet.create({
     chatMainWrapper: {
-      flex:1,
+      height:"100%",
       width: "100%",
       flexDirection: "column",
-      justifyContent: "space-between",
-      alignItems: "center",
       backgroundColor: "#FAFAFA",
+      
     },
     middleAndChatInputWrapper: {
       width: "100%",

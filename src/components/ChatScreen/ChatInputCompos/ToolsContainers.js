@@ -1,118 +1,58 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import React from "react";
-import { ChevronRight, CircleUserRound, GitFork, GraduationCap, Languages } from "lucide-react-native";
+import {
+  ChevronRight,
+  CircleUserRound,
+  GitFork,
+  GraduationCap,
+  Languages,
+} from "lucide-react-native";
 import { moderateScale } from "../../../utils/responsive";
 import { useDispatch } from "react-redux";
 import { setToggleToolsPopupStates } from "../../../redux/slices/toggleSlice";
+import { toolsArrayOptions } from "../../../data/datas";
 
 const ToolsContainers = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   return (
     <View>
-      <TouchableOpacity onPress={()=>dispatch(setToggleToolsPopupStates(1))} style={styles.optionsMain}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <GitFork color="#888888" strokeWidth={1.25} />
-          <Text style={{fontSize:moderateScale(14)}}>LLM</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <View style={styles.selectedOption}>
-            <Text style={{fontSize:moderateScale(11)}}>Auto</Text>
-          </View>
-          <ChevronRight size={30} strokeWidth={1.5} />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=>dispatch(setToggleToolsPopupStates(2))} style={styles.optionsMain}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <CircleUserRound color="#888888" strokeWidth={1.25} />
-          <Text style={{fontSize:moderateScale(14)}}>Response Style</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <View style={styles.selectedOption}>
-            <Text style={{fontSize:moderateScale(11)}}>Auto</Text>
-          </View>
-          <ChevronRight size={30} strokeWidth={1.5} />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=>dispatch(setToggleToolsPopupStates(3))} style={styles.optionsMain}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <Languages color="#888888" strokeWidth={1.25} />
-          <Text style={{fontSize:moderateScale(14)}}>Response Language</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <View style={styles.selectedOption}>
-            <Text style={{fontSize:moderateScale(11)}}>English</Text>
-          </View>
-          <ChevronRight size={30} strokeWidth={1.5} />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=>dispatch(setToggleToolsPopupStates(4))} style={styles.optionsMain}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <GraduationCap color="#888888" strokeWidth={1.25} />
-          <Text style={{fontSize:moderateScale(14)}}>Citation Format</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <View style={styles.selectedOption}>
-            <Text style={{fontSize:moderateScale(11)}}>Havard</Text>
-          </View>
-          <ChevronRight size={30} strokeWidth={1.5} />
-        </View>
-      </TouchableOpacity>
+      {toolsArrayOptions?.map((tools, toolIndex) => {
+        return (
+          <TouchableOpacity
+          key={toolIndex}
+            onPress={() => dispatch(setToggleToolsPopupStates(toolIndex+1))}
+            style={styles.optionsMain}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 15,
+              }}
+            >
+              <Image
+                style={{ height: 25, width: 25, objectFit: "contain" }}
+                source={tools?.icon}
+              />
+              <Text style={{ fontSize: moderateScale(14) }}>{tools.title} </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 15,
+              }}
+            >
+              <View style={styles.selectedOption}>
+                <Text style={{ fontSize: moderateScale(11) }}>{tools.selection} </Text>
+              </View>
+              <ChevronRight size={30} strokeWidth={1.5} />
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -131,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical:15
+    paddingVertical: 15,
   },
   selectedOption: {
     backgroundColor: "#FAFAFA",
@@ -141,8 +81,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
-
 });
-
 
 export default ToolsContainers;

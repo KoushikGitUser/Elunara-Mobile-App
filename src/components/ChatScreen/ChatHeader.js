@@ -40,7 +40,7 @@ const ChatHeader = ({ translateX }) => {
       style={[
         styles.chatHeader,
         {
-          borderWidth:
+          borderBottomWidth:
             toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
             globalDataStates.selectedFiles.length > 0 ||
             toggleStates.toggleIsChattingWithAI
@@ -53,7 +53,7 @@ const ChatHeader = ({ translateX }) => {
         onPress={() => {
           Animated.timing(translateX, {
             toValue: toggleStates.toggleChatHistorySidebar ? 0 : SCREEN_WIDTH * 0.75,
-            duration: 300,
+            duration: 100,
             useNativeDriver: true,
           }).start();
           dispatch(

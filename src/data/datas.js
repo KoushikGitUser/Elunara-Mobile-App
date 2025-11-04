@@ -24,7 +24,6 @@ import mistral from "../assets/images/mistral.png";
 import meta from "../assets/images/meta.png";
 import chatgpt from "../assets/images/chatgpt.png";
 import chakraLogo from "../assets/images/chakraFull.png";
-
 import finance from "../assets/images/finance.png";
 import marketing from "../assets/images/marketing.png";
 import HR from "../assets/images/HR.png";
@@ -33,13 +32,27 @@ import operations from "../assets/images/operation.png";
 import business from "../assets/images/business.png";
 import economics from "../assets/images/economics.png";
 import others from "../assets/images/others.png";
-import bookmark from '../assets/images/BookmarkSimple.png'
-import folderPlus from '../assets/images/FolderNotchPlus.png'
-import edit from '../assets/images/PencilSimple.png'
-import pin from '../assets/images/PushPin.png'
-import archive from '../assets/images/ArchiveBox.png'
-import trash from '../assets/images/Trash.png'
-import books from '../assets/images/Books.png'
+import bookmark from "../assets/images/BookmarkSimple.png";
+import folderPlus from "../assets/images/FolderNotchPlus.png";
+import edit from "../assets/images/PencilSimple.png";
+import pin from "../assets/images/PushPin.png";
+import archive from "../assets/images/ArchiveBox.png";
+import trash from "../assets/images/Trash.png";
+import books from "../assets/images/Books.png";
+import llm from "../assets/images/GitFork.png";
+import responseStyle from "../assets/images/UserSwitch.png";
+import language from "../assets/images/Translate.png";
+import citation from "../assets/images/GraduationCap.png";
+
+import bulb from "../assets/images/LightbulbFilament.png";
+import file from "../assets/images/FileText.png";
+import chatBubble from "../assets/images/ChatCircleDots.png";
+import files from "../assets/images/Files.png";
+import paintBrush from "../assets/images/PaintBrush.png";
+
+import penNib from "../assets/images/PenNib.png";
+
+
 
 
 export const slides = [
@@ -189,40 +202,40 @@ export const LLMOptionsAvailable = [
 export const responseStyles = [
   {
     id: 0,
-    icon: <Lightbulb color="#888888" strokeWidth={1.25} />,
+    icon: chakraLogo,
     title: "Auto",
     description:
       "Elunara adjusts tone and style based on your query — from formal to friendly.",
   },
   {
     id: 1,
-    icon: <Lightbulb color="#888888" strokeWidth={1.25} />,
+    icon: bulb,
     title: "Concise",
     description: "Direct and efficient — best for quick answers and summaries.",
   },
   {
     id: 2,
-    icon: <FileSliders color="#888888" strokeWidth={1.25} />,
+    icon: file,
     title: "Formal",
     description:
       "Professional and neutral — ideal for research or formal writing.",
   },
   {
     id: 3,
-    icon: <MessageCircleMore color="#888888" strokeWidth={1.25} />,
+    icon: chatBubble,
     title: "Conversational",
     description:
       "Friendly and relaxed — great for casual questions and everyday explanations.",
   },
   {
     id: 4,
-    icon: <Files color="#888888" strokeWidth={1.25} />,
+    icon: files,
     title: "Detailed",
     description: "Thorough and structured — ideal for deep dives and learning.",
   },
   {
     id: 5,
-    icon: <Brush color="#888888" strokeWidth={1.25} />,
+    icon: paintBrush,
     title: "Creative",
     description:
       "Expressive and playful — perfect for storytelling and idea generation.",
@@ -274,13 +287,13 @@ export const setLanguages = [
 export const citationStyles = [
   {
     id: 0,
-    icon: <PenTool strokeWidth={1.25} />,
+    icon: penNib,
     style: "APA",
     description: "Standard style for social sciences and academic writing.",
   },
   {
     id: 1,
-    icon: <GraduationCap strokeWidth={1.25} />,
+    icon: citation,
     style: "Harvard",
     description: "Popular author-date style for research and reports.",
   },
@@ -440,7 +453,6 @@ export const topicsSheetInitial = [
     popularTopics: 14,
   },
 ];
-
 
 export const topicsSheet = [
   {
@@ -626,5 +638,28 @@ export const subTopics = [
   {
     id: 14,
     title: "Dissertation for Finance School of Excellence",
+  },
+];
+
+export const toolsArrayOptions = [
+  {
+    icon: llm,
+    title: "LLM",
+    selection:"Auto"
+  },
+  {
+    icon: responseStyle,
+    title: "Response Style",
+    selection:"Auto"
+  },
+  {
+    icon: language,
+    title: "Response Language",
+    selection:"English"
+  },
+  {
+    icon: citation,
+    title: "Citation Format",
+    selection:"Havard"
   },
 ];

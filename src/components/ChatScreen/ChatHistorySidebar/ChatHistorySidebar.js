@@ -45,7 +45,7 @@ const ChatHistorySidebar = ({ translateX }) => {
             toValue: toggleStates.toggleChatHistorySidebar
               ? 0
               : SCREEN_WIDTH * 0.75,
-            duration: 300,
+            duration: 100,
             useNativeDriver: true,
           }).start();
           dispatch(

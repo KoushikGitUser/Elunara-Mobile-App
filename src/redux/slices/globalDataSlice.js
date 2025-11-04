@@ -26,6 +26,9 @@ const globalDataSlice = createSlice({
     setCurrentSelectedTopic: (state, action) => {
       state.globalDataStates.currentSelectedTopic = action.payload;
     },
+    setChatTitleOnLongPress: (state, action) => {
+      state.globalDataStates.chatTitleOnLongPress = action.payload;
+    },
   },
 });
 
@@ -36,6 +39,7 @@ export const {
   setChatInputContentLinesNumber,
   setChatMessagesArray,
   setCurrentSelectedTopic,
+  setChatTitleOnLongPress,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

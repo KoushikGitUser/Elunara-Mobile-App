@@ -4,13 +4,14 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import { MessageCircle } from "lucide-react-native";
 import chat from '../../../assets/images/ChatTeardrop.png'
+import { useDispatch } from "react-redux";
+import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
 
 const IndividualRecentChat = ({ title }) => {
-  const [isLongPressed, setIsLongPressed] = useState(false);
-
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const truncateTitle = (title, limit = 20) => {
     if (title.length <= limit) return title;
@@ -19,7 +20,9 @@ const IndividualRecentChat = ({ title }) => {
 
   return (
     <TouchableOpacity
-      onLongPress={() => setIsLongPressed(!isLongPressed)}
+      onLongPress={()=>{dispatch(setToggleChatActionsPopupOnLongPress(true));
+
+      }}
       style={styles.individualRecentChats}
     >
       <Image source={chat} style={{height:22,width:22,objectFit:"contain"}} />

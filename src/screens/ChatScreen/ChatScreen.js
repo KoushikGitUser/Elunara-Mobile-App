@@ -56,7 +56,7 @@ const ChatScreen = () => {
       <StatusBar
         backgroundColor="#ff0000ff"
         barStyle="dark-content"
-        hidden
+        hidden={false}
         translucent={false}
         animated
       />

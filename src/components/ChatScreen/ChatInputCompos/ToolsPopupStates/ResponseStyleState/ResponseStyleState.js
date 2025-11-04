@@ -18,7 +18,7 @@ import {
   setToggleTopicsPopup,
 } from "../../../../../redux/slices/toggleSlice";
 import { responseStyles } from "../../../../../data/datas";
-import chakraLogo from '../../../../../assets/images/chakraFull.png'
+import chakraLogo from "../../../../../assets/images/chakraFull.png";
 const screenHeight = Dimensions.get("window").height;
 
 const ResponseStyleState = () => {
@@ -85,8 +85,10 @@ const ResponseStyleState = () => {
                   >
                     <View style={styles.contentMain}>
                       <View style={styles.iconContainer}>
-                        {optionsIndex == 0?<Image source={chakraLogo} style={{height:23,width:23}} />:styleOptions.icon}
-                        
+                        <Image
+                          source={styleOptions.icon}
+                          style={{ height: 23, width: 23 }}
+                        />
                       </View>
 
                       <View style={styles.textContainer}>
@@ -115,11 +117,19 @@ const ResponseStyleState = () => {
 
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
-                  {styleOptions.id == 0 && <View style={{width:"100%",}}>
-                     <Text style={{textAlign:"center",color:"#757575",fontSize:scaleFont(14)}}>
+                  {styleOptions.id == 0 && (
+                    <View style={{ width: "100%" }}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          color: "#757575",
+                          fontSize: scaleFont(14),
+                        }}
+                      >
                         Or Select Manually
-                     </Text>
-                    </View>}
+                      </Text>
+                    </View>
+                  )}
                 </>
               );
             })}
@@ -145,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
-    maxHeight:screenHeight*0.8
+    maxHeight: screenHeight * 0.8,
   },
   iconContainer: {
     marginTop: 5,
@@ -217,7 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     width: "85%",
-    alignItems:"flex-start",
+    alignItems: "flex-start",
   },
   textContainer: {
     flexDirection: "column",

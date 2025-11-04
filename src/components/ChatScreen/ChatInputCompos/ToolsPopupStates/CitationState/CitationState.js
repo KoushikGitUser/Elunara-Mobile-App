@@ -17,6 +17,7 @@ import {
   setToggleTopicsPopup,
 } from "../../../../../redux/slices/toggleSlice";
 import { citationStyles } from "../../../../../data/datas";
+import PenNib from '../../../../../assets/images/penNib2.svg'
 
 const CitationState = () => {
   const dispatch = useDispatch();
@@ -69,7 +70,9 @@ const CitationState = () => {
               activeOpacity={0.7}
             >
               <View style={styles.contentMain}>
-                <View style={styles.iconContainer}>{styleOptions.icon}</View>
+                <View style={styles.iconContainer}>
+                  <Image style={{height:25,width:25}} source={styleOptions.icon } />
+                </View>
                 <View style={styles.textContainer}>
                   <Text
                     style={[
