@@ -4,6 +4,7 @@ import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsi
 import { useDispatch, useSelector } from "react-redux";
 import pdfLogo from "../../../assets/images/pdf.png";
 import { setToggleUserMessageActionPopup } from "../../../redux/slices/toggleSlice";
+import { setChatTitleOnLongPress, setUserMessageOnLongPress } from "../../../redux/slices/globalDataSlice";
 
 const UserMessageBox = ({ chat }) => {
   const { globalDataStates } = useSelector((state) => state.Global);
@@ -51,6 +52,7 @@ const UserMessageBox = ({ chat }) => {
 
       <TouchableOpacity onLongPress={()=>{
         dispatch(setToggleUserMessageActionPopup(true));
+        dispatch(setUserMessageOnLongPress(chat.message))
       }} style={styles.messageBox}>
         <Text style={styles.message}>{chat.message} </Text>
       </TouchableOpacity>

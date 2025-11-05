@@ -25,6 +25,7 @@ import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
 import spark from "../../assets/images/sparking.png";
 import { setChatMessagesArray } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
+import SvgIconPen from '../../assets/images/penNib2.svg'
 
 const ChatHeader = ({ translateX }) => {
   const styleProps = {};
@@ -49,7 +50,7 @@ const ChatHeader = ({ translateX }) => {
         },
       ]}
     >
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {
             toValue: toggleStates.toggleChatHistorySidebar ? 0 : SCREEN_WIDTH * 0.75,
@@ -62,7 +63,9 @@ const ChatHeader = ({ translateX }) => {
         }}
       >
         <Feather name="menu" size={30} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      
+
       {toggleStates.toggleIsChattingWithAI ? (
         <View style={styles.chatnameAndSection}>
           <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
@@ -76,7 +79,7 @@ const ChatHeader = ({ translateX }) => {
           </TouchableOpacity>
         </View>
       ) : (
-        <TouchableOpacity style={styles.upgradeButton}>
+        <TouchableOpacity onPress={()=>navigation.navigate("svg")} style={styles.upgradeButton}>
           <Image
             source={spark}
             style={{ height: 22, width: 22, objectFit: "contain" }}

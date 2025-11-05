@@ -29,6 +29,9 @@ const globalDataSlice = createSlice({
     setChatTitleOnLongPress: (state, action) => {
       state.globalDataStates.chatTitleOnLongPress = action.payload;
     },
+    setUserMessageOnLongPress: (state, action) => {
+      state.globalDataStates.userMessageOnLongPress = action.payload;
+    }
   },
 });
 
@@ -40,6 +43,7 @@ export const {
   setChatMessagesArray,
   setCurrentSelectedTopic,
   setChatTitleOnLongPress,
+  setUserMessageOnLongPress
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

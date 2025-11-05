@@ -42,7 +42,7 @@ const ChatOptionsPopup = () => {
         position: "absolute",
         width,
         height,
-        top: 45,
+        top: -5,
         left: 0,
         zIndex: 99,
       }}

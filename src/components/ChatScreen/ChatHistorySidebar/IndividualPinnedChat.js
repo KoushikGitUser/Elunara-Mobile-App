@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import chat from '../../../assets/images/ChatTeardrop.png'
 import { useDispatch } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
+import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
 
 const IndividualPinnedChat = ({ title }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -18,12 +19,12 @@ const IndividualPinnedChat = ({ title }) => {
   const truncateTitle = (title, limit = 20) => {
     if (title.length <= limit) return title;
     return title.slice(0, limit) + "...";
-  };
+  }; 
 
   return (
     <TouchableOpacity
           onLongPress={()=>{dispatch(setToggleChatActionsPopupOnLongPress(true));
-    
+            dispatch(setChatTitleOnLongPress(title));
           }}
       style={styles.individualPinnedChats}
     >

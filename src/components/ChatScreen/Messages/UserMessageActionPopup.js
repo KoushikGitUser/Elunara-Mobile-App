@@ -29,6 +29,7 @@ const UserMessageActionPopup = () => {
     height: 0,
   });
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const dispatch = useDispatch();
 
   return (
@@ -57,7 +58,7 @@ const UserMessageActionPopup = () => {
             },
           ]}
         >
-          <Text style={styles.messageText}>Finance</Text>
+          <Text style={styles.messageText}>{globalDataStates.userMessageOnLongPress} </Text>
         </View>
 
         {/* Action Menu Popup */}

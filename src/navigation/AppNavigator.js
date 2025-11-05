@@ -80,14 +80,13 @@ const AppNavigator = () => {
           }}
         />
 
-          <Stack.Screen
+        <Stack.Screen
           name="rooms"
           component={Rooms}
           options={{
             headerShown: false,
           }}
         />
-
       </Stack.Navigator>
     </NavigationContainer>
   );

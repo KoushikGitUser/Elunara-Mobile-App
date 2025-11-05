@@ -31,6 +31,8 @@ const ChatLongPressPopup = () => {
   ];
 
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+  
   const dispatch = useDispatch();
   return (
     <Modal
@@ -64,7 +66,7 @@ const ChatLongPressPopup = () => {
             style={{ height: 20, width: 20, resizeMode: "contain" }}
             source={chat}
           />
-          <Text style={styles.messageText}>Finance</Text>
+          <Text style={styles.messageText}> {globalDataStates.chatTitleOnLongPress} </Text>
           <View
             style={[
               styles.modalSheet,

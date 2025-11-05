@@ -32,10 +32,20 @@ const AddItemsToInputPopup = () => {
     if(type=="Camera"){
       // Open camera functionality
       try {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", "Camera permission is required to take photos.");
-          return;
+        // First check current permission status
+        const permissionResult = await ImagePicker.getCameraPermissionsAsync();
+
+        if (permissionResult.status !== "granted") {
+          // Request permission if not granted
+          const requestResult = await ImagePicker.requestCameraPermissionsAsync();
+
+          if (requestResult.status !== "granted") {
+            Alert.alert(
+              "Permission Denied",
+              "Camera permission is required to take photos. Please enable it in your device settings."
+            );
+            return;
+          }
         }
 
         const result = await ImagePicker.launchCameraAsync({
@@ -59,11 +69,20 @@ const AddItemsToInputPopup = () => {
     else if(type=="Files"){
       // Open file picker functionality
       try {
-        // Request media library permission for file access (especially on Android)
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", "Storage permission is required to access files.");
-          return;
+        // First check current permission status
+        const permissionResult = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+        if (permissionResult.status !== "granted") {
+          // Request permission if not granted
+          const requestResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+          if (requestResult.status !== "granted") {
+            Alert.alert(
+              "Permission Denied",
+              "Storage permission is required to access files. Please enable it in your device settings."
+            );
+            return;
+          }
         }
 
         const result = await DocumentPicker.getDocumentAsync({
@@ -87,11 +106,22 @@ const AddItemsToInputPopup = () => {
     else if(type=="Photos"){
       // Open image gallery functionality
       try {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", "Gallery permission is required to select photos.");
-          return;
+        // First check current permission status
+        const permissionResult = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+        if (permissionResult.status !== "granted") {
+          // Request permission if not granted
+          const requestResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+          if (requestResult.status !== "granted") {
+            Alert.alert(
+              "Permission Denied",
+              "Gallery permission is required to select photos. Please enable it in your device settings."
+            );
+            return;
+          }
         }
+
         const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],
           quality: 1,
@@ -104,7 +134,7 @@ const AddItemsToInputPopup = () => {
           dispatch(setSelecetdFiles([...currentFiles, result.assets[0]]));
           dispatch(setToggleAddItemsToInputPopup(false));
           console.log(result.assets[0].mimeType,"fileinfo");
-          
+
           }
           else{
             Alert.alert("Invalid type","The type of image you selected is not supported.")
