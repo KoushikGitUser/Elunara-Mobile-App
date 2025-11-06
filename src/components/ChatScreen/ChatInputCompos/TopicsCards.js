@@ -29,10 +29,7 @@ const TopicsCards = ({ item }) => {
               },
             ]}
           >
-            <Image
-              source={item?.icon}
-              style={{ height: 15, width: 15, objectFit: "contain" }}
-            />
+            <View style={styles.iconWrapper}>{item?.icon}</View>
           </View>
           <ArrowUpRight strokeWidth={1.5} />
         </View>

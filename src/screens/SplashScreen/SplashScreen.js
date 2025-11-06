@@ -9,7 +9,7 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace('chat');
-    }, 2000); // 2.5 seconds
+    }, 200); // 2.5 seconds
 
     return () => clearTimeout(timer);   
   }, [navigation]);

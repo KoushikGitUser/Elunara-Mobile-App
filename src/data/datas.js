@@ -51,6 +51,18 @@ import files from "../assets/images/Files.png";
 import paintBrush from "../assets/images/PaintBrush.png";
 
 import penNib from "../assets/images/PenNib.png";
+import RupeeIcon from "../../assets/SvgIconsComponent/TopicsIcons/RupeeIcon";
+import MarketingIcon from "../../assets/SvgIconsComponent/TopicsIcons/MarketingIcon";
+import HRIcon from "../../assets/SvgIconsComponent/TopicsIcons/HRIcon";
+import ITIcon from "../../assets/SvgIconsComponent/TopicsIcons/ITIcon";
+import OperationIcon from "../../assets/SvgIconsComponent/TopicsIcons/OperationIcon";
+import OtherIcon from "../../assets/SvgIconsComponent/TopicsIcons/OtherIcon";
+import BusinessIcon from "../../assets/SvgIconsComponent/TopicsIcons/BusinessIcon";
+import EconomicsIcon from "../../assets/SvgIconsComponent/TopicsIcons/EconomicsIcon";
+import LLMIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/LLMIcon";
+import ResStyleIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
+import ResLangIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
+import CitationIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/CitationIcon";
 
 
 
@@ -393,7 +405,7 @@ export const findApiKeyNotices = [
 export const topicsSheetInitial = [
   {
     id: 1,
-    icon: finance,
+    icon: <RupeeIcon/>,
     iconBg: "#E0F7FA",
     borderColor: "#CCF0F2",
     iconColor: "#00BCD4",
@@ -403,7 +415,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 2,
-    icon: marketing,
+    icon: <MarketingIcon/>,
     iconBg: "#F3E5F5",
     borderColor: "#DFD8EB",
     iconColor: "#9C27B0",
@@ -413,7 +425,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 3,
-    icon: HR,
+    icon: <HRIcon/>,
     iconBg: "#FFF3E0",
     borderColor: "#F9DDB1",
     iconColor: "#FF9800",
@@ -423,7 +435,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 4,
-    icon: IT,
+    icon: <ITIcon/>,
     iconBg: "#F5F5F5",
     borderColor: "#D1D1D1",
     iconColor: "#757575",
@@ -433,7 +445,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 5,
-    icon: operations,
+    icon: <OperationIcon/>,
     iconBg: "#E8EAF6",
     borderColor: "#CCDAEE",
     iconColor: "#5C6BC0",
@@ -444,7 +456,7 @@ export const topicsSheetInitial = [
 
   {
     id: 8,
-    icon: books,
+    icon: <OtherIcon/>,
     iconBg: "#FFF3E0",
     borderColor: "#EAD8B9",
     iconColor: "#FF9800",
@@ -457,7 +469,7 @@ export const topicsSheetInitial = [
 export const topicsSheet = [
   {
     id: 1,
-    icon: finance,
+    icon: <RupeeIcon/>,
     iconBg: "#E0F7FA",
     borderColor: "#CCF0F2",
     iconColor: "#00BCD4",
@@ -467,7 +479,7 @@ export const topicsSheet = [
   },
   {
     id: 2,
-    icon: marketing,
+    icon: <MarketingIcon/>,
     iconBg: "#F3E5F5",
     borderColor: "#DFD8EB",
     iconColor: "#9C27B0",
@@ -477,7 +489,7 @@ export const topicsSheet = [
   },
   {
     id: 3,
-    icon: HR,
+    icon: <HRIcon/>,
     iconBg: "#FFF3E0",
     borderColor: "#F9DDB1",
     iconColor: "#FF9800",
@@ -487,7 +499,7 @@ export const topicsSheet = [
   },
   {
     id: 4,
-    icon: IT,
+    icon: <ITIcon/>,
     iconBg: "#F5F5F5",
     borderColor: "#D1D1D1",
     iconColor: "#757575",
@@ -497,7 +509,7 @@ export const topicsSheet = [
   },
   {
     id: 5,
-    icon: operations,
+    icon: <OperationIcon/>,
     iconBg: "#E8EAF6",
     borderColor: "#CCDAEE",
     iconColor: "#5C6BC0",
@@ -507,7 +519,7 @@ export const topicsSheet = [
   },
   {
     id: 6,
-    icon: business,
+    icon: <BusinessIcon/>,
     iconBg: "#F3E5F5",
     borderColor: "#FAC8FF",
     iconColor: "#9C27B0",
@@ -517,7 +529,7 @@ export const topicsSheet = [
   },
   {
     id: 7,
-    icon: economics,
+    icon: <EconomicsIcon/>,
     iconBg: "#E8F5E9",
     borderColor: "#CCF2CD",
     iconColor: "#4CAF50",
@@ -527,7 +539,7 @@ export const topicsSheet = [
   },
   {
     id: 8,
-    icon: others,
+    icon: <OtherIcon/>,
     iconBg: "#FFF3E0",
     borderColor: "#EAD8B9",
     iconColor: "#FF9800",
@@ -643,22 +655,22 @@ export const subTopics = [
 
 export const toolsArrayOptions = [
   {
-    icon: llm,
+    icon: <LLMIcon/>,
     title: "LLM",
     selection:"Auto"
   },
   {
-    icon: responseStyle,
+    icon: <ResStyleIcon/>,
     title: "Response Style",
     selection:"Auto"
   },
   {
-    icon: language,
+    icon: <ResLangIcon/>,
     title: "Response Language",
     selection:"English"
   },
   {
-    icon: citation,
+    icon: <CitationIcon/>,
     title: "Citation Format",
     selection:"Havard"
   },

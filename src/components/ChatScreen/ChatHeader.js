@@ -22,10 +22,11 @@ import {
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
-import spark from "../../assets/images/sparking.png";
 import { setChatMessagesArray } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
-import SvgIconPen from '../../assets/images/penNib2.svg'
+import PenNib from "../../../assets/SvgIconsComponent/PenNib";
+import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
+import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
 
 const ChatHeader = ({ translateX }) => {
   const styleProps = {};
@@ -50,7 +51,7 @@ const ChatHeader = ({ translateX }) => {
         },
       ]}
     >
-      {/* <TouchableOpacity
+      <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {
             toValue: toggleStates.toggleChatHistorySidebar ? 0 : SCREEN_WIDTH * 0.75,
@@ -63,8 +64,7 @@ const ChatHeader = ({ translateX }) => {
         }}
       >
         <Feather name="menu" size={30} color="black" />
-      </TouchableOpacity> */}
-      
+      </TouchableOpacity>
 
       {toggleStates.toggleIsChattingWithAI ? (
         <View style={styles.chatnameAndSection}>
@@ -80,10 +80,7 @@ const ChatHeader = ({ translateX }) => {
         </View>
       ) : (
         <TouchableOpacity onPress={()=>navigation.navigate("svg")} style={styles.upgradeButton}>
-          <Image
-            source={spark}
-            style={{ height: 22, width: 22, objectFit: "contain" }}
-          />
+          <SparkleIcon/>
           <Text style={{ fontSize: 13, fontWeight: 600 }}>Upgrade Plan</Text>
         </TouchableOpacity>
       )}

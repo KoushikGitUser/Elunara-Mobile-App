@@ -30,11 +30,9 @@ const ToolsContainers = () => {
                 alignItems: "center",
                 gap: 15,
               }}
-            >
-              <Image
-                style={{ height: 25, width: 25, objectFit: "contain" }}
-                source={tools?.icon}
-              />
+            > 
+            {tools.icon}
+              
               <Text style={{ fontSize: moderateScale(14) }}>{tools.title} </Text>
             </View>
             <View

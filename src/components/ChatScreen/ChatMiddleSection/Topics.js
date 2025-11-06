@@ -14,16 +14,14 @@ import {
   verticalScale,
 } from "../../../utils/responsive";
 import { useDispatch } from "react-redux";
-import { setToggleSubTopics, setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleSubTopics,
+  setToggleTopicsPopup,
+} from "../../../redux/slices/toggleSlice";
 import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
 
 const Topics = ({ item, index }) => {
   const dispatch = useDispatch();
-  const styleProps = {
-    borderColor: "abcd",
-    backgroundColor: "white",
-  };
-  const navigation = useNavigation();
   return (
     <TouchableOpacity
       onPress={() => {
@@ -31,8 +29,7 @@ const Topics = ({ item, index }) => {
           dispatch(setToggleTopicsPopup(true));
           dispatch(setToggleSubTopics(false));
           dispatch(setCurrentSelectedTopic(null));
-        }
-        else{
+        } else {
           dispatch(setToggleTopicsPopup(true));
           dispatch(setCurrentSelectedTopic(item?.title));
           dispatch(setToggleSubTopics(true));
@@ -52,10 +49,7 @@ const Topics = ({ item, index }) => {
               },
             ]}
           >
-            <Image
-              source={item?.icon}
-              style={{ height: 15, width: 15, objectFit: "contain" }}
-            />
+            <View style={styles.iconWrapper}>{item?.icon}</View>
           </View>
           {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
@@ -96,7 +90,11 @@ const styles = StyleSheet.create({
     width: 26,
     borderWidth: 1,
     borderRadius: 50,
-    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  iconWrapper: {
     justifyContent: "center",
     alignItems: "center",
   },
