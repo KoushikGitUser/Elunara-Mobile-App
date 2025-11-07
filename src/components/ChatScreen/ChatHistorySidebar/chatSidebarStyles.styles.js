@@ -269,7 +269,7 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: scale(17),
+      gap: scale(8),
     },
     inputRightActionIcons: {
       height: "100%",

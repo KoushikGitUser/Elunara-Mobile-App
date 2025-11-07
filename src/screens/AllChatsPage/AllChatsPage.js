@@ -1,0 +1,70 @@
+import {
+  View,
+  Text,
+  StatusBar,
+  Dimensions,
+  ScrollView,
+  FlatList,
+} from "react-native";
+import React, { useMemo, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AllChatsHeader from "../../components/AllChatsPage/AllChatsHeader";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { createStyles } from "./AllChatsPageStyles.style";
+import SearchAndIcons from "../../components/AllChatsPage/SearchAndIcons";
+import { allChatsData } from "../../data/datas";
+import ChatsComponent from "../../components/AllChatsPage/ChatsComponent";
+import OptionsPopup from "../../components/AllChatsPage/OptionsPopup";
+
+const AllChatsPage = () => {
+  const styleProps = {};
+  const styles = useMemo(() => createStyles(styleProps), []);
+  const navigation = useNavigation();
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleChatPress = (item) => {
+    console.log("Chat pressed:", item.title);
+  };
+
+  const handleMenuPress = (item) => {
+    console.log("Menu pressed for:", item.title);
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
+      <AllChatsHeader
+        isSearching={isSearching}
+        setIsSearching={setIsSearching}
+      />
+      <SearchAndIcons
+        isSearching={isSearching}
+        setIsSearching={setIsSearching}
+      />
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        style={styles.allChatsScrollMain}
+      >
+        {allChatsData.map((chat, chatsIndex) => {
+          return (
+            <ChatsComponent
+            key={chatsIndex}
+              index={chat.id}
+              title={chat.title}
+              subject={chat.subject}
+              roomName={chat.roomName}
+            />
+          );
+        })}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default AllChatsPage;

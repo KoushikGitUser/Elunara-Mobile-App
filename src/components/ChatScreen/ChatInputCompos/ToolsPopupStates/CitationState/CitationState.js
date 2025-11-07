@@ -56,7 +56,7 @@ const CitationState = () => {
         <View style={{ flexDirection: "column", gap: 25 }}>
           {citationStyles.map((styleOptions, optionsIndex) => (
             <TouchableOpacity
-              key={optionsIndex}
+              key={optionsIndex} 
               style={[
                 styles.card,
                 {
@@ -71,7 +71,7 @@ const CitationState = () => {
             >
               <View style={styles.contentMain}>
                 <View style={styles.iconContainer}>
-                  <Image style={{height:25,width:25}} source={styleOptions.icon } />
+                  {styleOptions.icon}
                 </View>
                 <View style={styles.textContainer}>
                   <Text

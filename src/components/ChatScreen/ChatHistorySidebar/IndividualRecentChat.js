@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react-native";
 import chat from '../../../assets/images/ChatTeardrop.png'
 import { useDispatch } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
+import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 
 const IndividualRecentChat = ({ title }) => {
   const styleProps = {};
@@ -25,7 +26,7 @@ const IndividualRecentChat = ({ title }) => {
       }}
       style={styles.individualRecentChats}
     >
-      <Image source={chat} style={{height:22,width:22,objectFit:"contain"}} />
+     <ChatIcon/>
 
       <Text>{truncateTitle(title)} </Text>
     </TouchableOpacity>

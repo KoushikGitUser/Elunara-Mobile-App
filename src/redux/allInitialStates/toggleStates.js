@@ -13,4 +13,5 @@ export const toggleStates = {
       toggleRenameChatPopup:false,
       toggleUserMessageActionPopup:false,
       toggleChatActionsPopupOnLongPress:false,
+      toggleAllChatsOptionsPopup:false,
 }

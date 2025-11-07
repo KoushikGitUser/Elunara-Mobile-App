@@ -1,21 +1,19 @@
 import {
   View,
   Text,
-  TouchableOpacity,
-  Dimensions,
   TouchableWithoutFeedback,
   Pressable,
-  Image,
+  Dimensions,
 } from "react-native";
 import React, { useMemo } from "react";
-import { createStyles } from "./chatModals.styles";
+import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { menuOptions } from "../../../data/datas";
-import { moderateScale } from "../../../utils/responsive";
-import { setToggleChatMenuPopup, setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleAllChatsOptionsPopup, setToggleChatMenuPopup } from "../../redux/slices/toggleSlice";
+import { allChatsOptionsPopupData } from "../../data/datas";
+import { moderateScale } from "../../utils/responsive";
 
-const ChatOptionsPopup = () => {
+const OptionsPopup = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -40,20 +38,20 @@ const ChatOptionsPopup = () => {
       style={{
         backgroundColor: "transparent",
         position: "absolute",
-        width, 
+        width,
         height,
-        top: -5,
-        left: 0,
-        zIndex: 99,
+        top: 0,
+        right: 0,
+        zIndex: 9999,
       }}
     >
       <TouchableWithoutFeedback
-        onPress={() => dispatch(setToggleChatMenuPopup(false))}
+        onPress={() => dispatch(setToggleAllChatsOptionsPopup(false))}
       >
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
       <View style={styles.menuModalMain}>
-        {menuOptions.map((options, optionIndex) => {
+        {allChatsOptionsPopupData.map((options, optionIndex) => {
           return (
             <Pressable
               style={({ pressed }) => [
@@ -64,7 +62,7 @@ const ChatOptionsPopup = () => {
               ]}
               onPress={(e) => {
                 e.stopPropagation();
-                commonFunctions(options.option)
+                commonFunctions(options.option);
               }}
               key={optionIndex}
             >
@@ -73,7 +71,7 @@ const ChatOptionsPopup = () => {
                 numberOfLines={1}
                 style={{ fontSize: moderateScale(13), flexShrink: 1 }}
               >
-                {options?.option}
+                {options?.title}
               </Text>
             </Pressable>
           );
@@ -83,4 +81,4 @@ const ChatOptionsPopup = () => {
   );
 };
 
-export default ChatOptionsPopup;
+export default OptionsPopup;

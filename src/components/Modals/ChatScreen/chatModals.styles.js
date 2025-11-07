@@ -10,9 +10,9 @@ export const createStyles = ({}) =>
       minHeight: verticalScale(250),
       minWidth: 240,
       paddingHorizontal: 8,
-      paddingVertical: 10,
+      paddingVertical: 15,
       backgroundColor: "white",
-      borderRadius: 16,
+      borderRadius: 20,
       borderWidth: 1,
       borderColor: "#D3DAE5",
       flexDirection: "column",
@@ -31,6 +31,7 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 10,
       paddingLeft: 5,
+      paddingVertical:7,
       borderRadius:10
     },
     backdrop: {

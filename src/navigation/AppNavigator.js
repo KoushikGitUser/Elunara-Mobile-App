@@ -9,6 +9,7 @@ import ChangePassword from "../screens/auth/ChangePassword/ChangePassword";
 import ChatScreen from "../screens/ChatScreen/ChatScreen";
 import Notes from "../screens/Notes/Notes";
 import Rooms from "../screens/Rooms/Rooms";
+import AllChatsPage from "../screens/AllChatsPage/AllChatsPage";
 
 // Screens
 
@@ -69,7 +70,7 @@ const AppNavigator = () => {
           component={ChatScreen}
           options={{
             headerShown: false,
-          }}
+          }} 
         />
 
         <Stack.Screen
@@ -83,6 +84,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="rooms"
           component={Rooms}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="allchats"
+          component={AllChatsPage}
           options={{
             headerShown: false,
           }}

@@ -4,6 +4,7 @@ import { Folder } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import folder from '../../../assets/images/FolderSimple.png'
+import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 
 const IndividualPinnedRoom = ({title}) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -22,7 +23,7 @@ const IndividualPinnedRoom = ({title}) => {
       onLongPress={() => setIsLongPressed(!isLongPressed)}
       style={styles.individualPinnedRooms}
     >
-        <Image source={folder} style={{height:22,width:22,objectFit:"contain"}} />
+       <FolderIcon/>
       <Text>{truncateTitle(title)} </Text>
     </TouchableOpacity>
   );

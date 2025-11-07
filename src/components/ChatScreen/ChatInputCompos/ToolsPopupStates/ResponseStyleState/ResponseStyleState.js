@@ -85,10 +85,7 @@ const ResponseStyleState = () => {
                   >
                     <View style={styles.contentMain}>
                       <View style={styles.iconContainer}>
-                        <Image
-                          source={styleOptions.icon}
-                          style={{ height: 23, width: 23 }}
-                        />
+                        {styleOptions.icon}
                       </View>
 
                       <View style={styles.textContainer}>

@@ -11,6 +11,9 @@ import IndividualPinnedRoom from "./IndividualPinnedRoom";
 import pin from '../../../assets/images/pinGrey.png'
 import room from '../../../assets/images/FolderSimple.png'
 import chat from '../../../assets/images/ChatsTeardrop.png'
+import PinIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
+import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
+import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
 
 
 
@@ -27,7 +30,7 @@ const SidebarMiddle = () => {
     <ScrollView style={styles.chatHistorySidebarMiddle}>
       <View style={styles.pinnedSectionMain}>
         <TouchableOpacity onPress={()=>setPinnedChatsOpened(!pinnedChatsOpened)} style={styles.pinnedBtn}>
-         <Image source={pin} style={{height:25,width:25,objectFit:"contain"}} />
+         <PinIcon/>
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Pinned Chats (06)
           </Text>
@@ -43,7 +46,7 @@ const SidebarMiddle = () => {
           </View>
         )}
         <TouchableOpacity onPress={()=>setPinnedRoomsOpened(!pinnedRoomsOpened)} style={styles.pinnedBtn}>
-           <Image source={pin} style={{height:25,width:25,objectFit:"contain"}} />
+          <PinIcon/>
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Pinned Learning Labs (10)
           </Text>
@@ -73,8 +76,8 @@ const SidebarMiddle = () => {
                 <IndividualRecentChat key={chatIndex} title={chat?.title} />
               );
             })}
-            <TouchableOpacity  style={[styles.pinnedBtn,{paddingLeft:0,width:"90%"}]}>
-         <Image source={chat} style={{height:25,width:25,objectFit:"contain"}} />
+            <TouchableOpacity onPress={()=>navigation.navigate("allchats")} style={[styles.pinnedBtn,{paddingLeft:0,width:"90%"}]}>
+           <ChatsIcon/>
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             View all Chats
           </Text>
@@ -85,7 +88,7 @@ const SidebarMiddle = () => {
       </View> 
       <View style={styles.pinnedSectionMain}>
         <TouchableOpacity onPress={() => setRoomsOpened(!roomsOpened)} style={[styles.pinnedBtn]}>
-          <Image source={room} style={{height:25,width:25,objectFit:"contain"}} />
+          <FolderIcon/>
           <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
             Rooms
           </Text>

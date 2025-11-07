@@ -9,6 +9,12 @@ import bookmark from "../../../assets/images/Bookmarks.png";
 import feedback from "../../../assets/images/Feedback.png";
 import repeat from "../../../assets/images/Repeat.png";
 import Clipboard from "@react-native-clipboard/clipboard";
+import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
+import ShareIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/ShareIcon";
+import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
+import BookMarkIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookMarkIcon";
+import FeedbackIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/FeedbackIcon";
+import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
 
 const AIMessageBox = ({ message }) => {
   
@@ -24,39 +30,24 @@ const AIMessageBox = ({ message }) => {
 
       <View style={styles.messageActions}>
         <TouchableOpacity onPress={handleCopy}>
-          <Image
-            style={{ height: 20, width: 20, objectFit: "contain" }}
-            source={copy}
-          />
+          <CopyIcon/>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => console.log("Share pressed")}>
-          <Image
-            style={{ height: 20, width: 20, objectFit: "contain" }}
-            source={share}
-          />
+          <ShareIcon/>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => console.log("Bookmark pressed")}>
-          <Image
-            style={{ height: 20, width: 20, objectFit: "contain" }}
-            source={bookmark}
-          />
+          <BookMarkIcon/>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => console.log("Feedback pressed")}>
-          <Image
-            style={{ height: 20, width: 20, objectFit: "contain" }}
-            source={feedback}
-          />
+          <FeedbackIcon/>
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity onPress={() => console.log("Repeat pressed")}>
-            <Image
-              style={{ height: 20, width: 20, objectFit: "contain" }}
-              source={repeat}
-            />
+            <SwitchIcon/>
           </TouchableOpacity>
           <ChevronDown strokeWidth={1.25} />
         </View>

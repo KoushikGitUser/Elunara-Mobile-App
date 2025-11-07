@@ -39,6 +39,11 @@ import {
 import ImageFile from "./ChatInputCompos/SelectedFilesCompo/ImageFile";
 import PdfFile from "./ChatInputCompos/SelectedFilesCompo/PdfFile";
 import { demoResponseFromAI } from "../../data/datas";
+import ClipIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ClipIcon";
+import TopicsBooksIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/TopicsBooksIcon";
+import ToolsIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ToolsIcon";
+import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
+import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 
 const ChatInputMain = () => {
   const styleProps = {};
@@ -213,10 +218,7 @@ const ChatInputMain = () => {
               <TouchableOpacity
                 onPress={() => dispatch(setToggleAddItemsToInputPopup(true))}
               >
-                <Image
-                  source={clipIcon}
-                  style={{ height: 27, width: 27, objectFit: "contain" }}
-                />
+                <ClipIcon/>
               </TouchableOpacity>
               {toggleStates.toggleAddItemsToInputPopup && (
                 <AddItemsToInputPopup />
@@ -226,29 +228,21 @@ const ChatInputMain = () => {
             <TouchableOpacity
               onPress={() => dispatch(setToggleTopicsPopup(true))}
             >
-              <Image
-                source={topicsIcon}
-                style={{ height: 27, width: 27, objectFit: "contain" }}
-              />
+              <TopicsBooksIcon/>
             </TouchableOpacity>
 
             <TouchableOpacity
+            style={{marginLeft:5}}
               onPress={() => dispatch(setToggleToolsPopup(true))}
             >
-              <Image
-                source={toolsIcon}
-                style={{ height: 27, width: 27, objectFit: "contain" }}
-              />
+             <ToolsIcon/>
             </TouchableOpacity>
           </View>
           <View style={styles.inputRightActionIcons}>
             <TouchableOpacity
               onPress={() => dispatch(setToggleToolsPopup(true))}
             >
-              <Image
-                source={mic}
-                style={{ height: 27, width: 27, objectFit: "contain" }}
-              />
+             <MicIcon/>
             </TouchableOpacity>
             {(globalDataStates.userMessagePrompt !== "" ||
               globalDataStates.selectedFiles.length > 0) && (
@@ -271,10 +265,7 @@ const ChatInputMain = () => {
                   dispatch(setToggleIsWaitingForResponse(true));
                 }}
               >
-                <Image
-                  source={send}
-                  style={{ height: 41, width: 41, objectFit: "contain" }}
-                />
+                <SendIcon/>
               </TouchableOpacity>
             )}
           </View>

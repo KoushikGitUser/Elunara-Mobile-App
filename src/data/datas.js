@@ -63,9 +63,20 @@ import LLMIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/LLMIcon";
 import ResStyleIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
 import ResLangIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import CitationIcon from "../../assets/SvgIconsComponent/ToolsOptionsIcons/CitationIcon";
-
-
-
+import ChakraIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import ConversationalIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
+import DetailedIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+import APAIcon from "../../assets/SvgIconsComponent/CitationFormatIcons/APAIcon";
+import NotesIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon";
+import FolderPlusIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon";
+import RenameIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
+import PinIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon";
+import ArchiveIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
+import TrashIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
+import FolderIconDark from "../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
 
 export const slides = [
   {
@@ -143,27 +154,27 @@ export const demoResponseFromAI =
 
 export const menuOptions = [
   {
-    icon: bookmark,
+    icon: <NotesIcon />,
     option: "Open Notes",
   },
   {
-    icon: folderPlus,
+    icon: <FolderPlusIcon />,
     option: "Add to Learning Lab",
   },
   {
-    icon: edit,
+    icon: <RenameIcon />,
     option: "Rename",
   },
   {
-    icon: pin,
+    icon: <PinIcon />,
     option: "Pin",
   },
   {
-    icon: archive,
+    icon: <ArchiveIcon />,
     option: "Archive",
   },
   {
-    icon: trash,
+    icon: <TrashIcon />,
     option: "Delete",
   },
 ];
@@ -214,40 +225,40 @@ export const LLMOptionsAvailable = [
 export const responseStyles = [
   {
     id: 0,
-    icon: chakraLogo,
+    icon: <ChakraIcon />,
     title: "Auto",
     description:
       "Elunara adjusts tone and style based on your query — from formal to friendly.",
   },
   {
     id: 1,
-    icon: bulb,
+    icon: <ConciseIcon />,
     title: "Concise",
     description: "Direct and efficient — best for quick answers and summaries.",
   },
   {
     id: 2,
-    icon: file,
+    icon: <FormalIcon />,
     title: "Formal",
     description:
       "Professional and neutral — ideal for research or formal writing.",
   },
   {
     id: 3,
-    icon: chatBubble,
+    icon: <ConversationalIcon />,
     title: "Conversational",
     description:
       "Friendly and relaxed — great for casual questions and everyday explanations.",
   },
   {
     id: 4,
-    icon: files,
+    icon: <DetailedIcon />,
     title: "Detailed",
     description: "Thorough and structured — ideal for deep dives and learning.",
   },
   {
     id: 5,
-    icon: paintBrush,
+    icon: <CreativeIcon />,
     title: "Creative",
     description:
       "Expressive and playful — perfect for storytelling and idea generation.",
@@ -299,13 +310,13 @@ export const setLanguages = [
 export const citationStyles = [
   {
     id: 0,
-    icon: penNib,
+    icon: <APAIcon />,
     style: "APA",
     description: "Standard style for social sciences and academic writing.",
   },
   {
     id: 1,
-    icon: citation,
+    icon: <CitationIcon />,
     style: "Harvard",
     description: "Popular author-date style for research and reports.",
   },
@@ -405,7 +416,7 @@ export const findApiKeyNotices = [
 export const topicsSheetInitial = [
   {
     id: 1,
-    icon: <RupeeIcon/>,
+    icon: <RupeeIcon />,
     iconBg: "#E0F7FA",
     borderColor: "#CCF0F2",
     iconColor: "#00BCD4",
@@ -415,7 +426,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 2,
-    icon: <MarketingIcon/>,
+    icon: <MarketingIcon />,
     iconBg: "#F3E5F5",
     borderColor: "#DFD8EB",
     iconColor: "#9C27B0",
@@ -425,7 +436,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 3,
-    icon: <HRIcon/>,
+    icon: <HRIcon />,
     iconBg: "#FFF3E0",
     borderColor: "#F9DDB1",
     iconColor: "#FF9800",
@@ -435,7 +446,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 4,
-    icon: <ITIcon/>,
+    icon: <ITIcon />,
     iconBg: "#F5F5F5",
     borderColor: "#D1D1D1",
     iconColor: "#757575",
@@ -445,7 +456,7 @@ export const topicsSheetInitial = [
   },
   {
     id: 5,
-    icon: <OperationIcon/>,
+    icon: <OperationIcon />,
     iconBg: "#E8EAF6",
     borderColor: "#CCDAEE",
     iconColor: "#5C6BC0",
@@ -456,7 +467,7 @@ export const topicsSheetInitial = [
 
   {
     id: 8,
-    icon: <OtherIcon/>,
+    icon: <OtherIcon />,
     iconBg: "#FFF3E0",
     borderColor: "#EAD8B9",
     iconColor: "#FF9800",
@@ -469,7 +480,7 @@ export const topicsSheetInitial = [
 export const topicsSheet = [
   {
     id: 1,
-    icon: <RupeeIcon/>,
+    icon: <RupeeIcon />,
     iconBg: "#E0F7FA",
     borderColor: "#CCF0F2",
     iconColor: "#00BCD4",
@@ -479,7 +490,7 @@ export const topicsSheet = [
   },
   {
     id: 2,
-    icon: <MarketingIcon/>,
+    icon: <MarketingIcon />,
     iconBg: "#F3E5F5",
     borderColor: "#DFD8EB",
     iconColor: "#9C27B0",
@@ -489,7 +500,7 @@ export const topicsSheet = [
   },
   {
     id: 3,
-    icon: <HRIcon/>,
+    icon: <HRIcon />,
     iconBg: "#FFF3E0",
     borderColor: "#F9DDB1",
     iconColor: "#FF9800",
@@ -499,7 +510,7 @@ export const topicsSheet = [
   },
   {
     id: 4,
-    icon: <ITIcon/>,
+    icon: <ITIcon />,
     iconBg: "#F5F5F5",
     borderColor: "#D1D1D1",
     iconColor: "#757575",
@@ -509,7 +520,7 @@ export const topicsSheet = [
   },
   {
     id: 5,
-    icon: <OperationIcon/>,
+    icon: <OperationIcon />,
     iconBg: "#E8EAF6",
     borderColor: "#CCDAEE",
     iconColor: "#5C6BC0",
@@ -519,7 +530,7 @@ export const topicsSheet = [
   },
   {
     id: 6,
-    icon: <BusinessIcon/>,
+    icon: <BusinessIcon />,
     iconBg: "#F3E5F5",
     borderColor: "#FAC8FF",
     iconColor: "#9C27B0",
@@ -529,7 +540,7 @@ export const topicsSheet = [
   },
   {
     id: 7,
-    icon: <EconomicsIcon/>,
+    icon: <EconomicsIcon />,
     iconBg: "#E8F5E9",
     borderColor: "#CCF2CD",
     iconColor: "#4CAF50",
@@ -539,7 +550,7 @@ export const topicsSheet = [
   },
   {
     id: 8,
-    icon: <OtherIcon/>,
+    icon: <OtherIcon />,
     iconBg: "#FFF3E0",
     borderColor: "#EAD8B9",
     iconColor: "#FF9800",
@@ -655,23 +666,163 @@ export const subTopics = [
 
 export const toolsArrayOptions = [
   {
-    icon: <LLMIcon/>,
+    icon: <LLMIcon />,
     title: "LLM",
-    selection:"Auto"
+    selection: "Auto",
   },
   {
-    icon: <ResStyleIcon/>,
+    icon: <ResStyleIcon />,
     title: "Response Style",
-    selection:"Auto"
+    selection: "Auto",
   },
   {
-    icon: <ResLangIcon/>,
+    icon: <ResLangIcon />,
     title: "Response Language",
-    selection:"English"
+    selection: "English",
   },
   {
-    icon: <CitationIcon/>,
+    icon: <CitationIcon />,
     title: "Citation Format",
-    selection:"Havard"
+    selection: "Havard",
+  },
+];
+
+export const allChatsData = [
+    {
+    id: "0",
+    title: "Marketing Material",
+    subject: "Marketing",
+    roomName: "Exam Prep",
+  },
+  {
+    id: "1",
+    title: "Marketing Material",
+    subject: "Marketing",
+    roomName: "Exam Prep",
+  },
+  {
+    id: "2",
+    title: "Chat Name",
+    subject: "General",
+    roomName: "Exam Prep",
+  },
+  {
+    id: "3",
+    title: "Overview Resource Guide",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "4",
+    title: "Chat Name",
+    subject: "Marketing",
+    roomName: "Room Name",
+  },
+  {
+    id: "5",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: "Room Name",
+  },
+  {
+    id: "6",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "7",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "8",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: "Room Name",
+  },
+  {
+    id: "9",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "10",
+    title: "Marketing Material",
+    subject: "Marketing",
+    roomName: "Exam Prep",
+  },
+  {
+    id: "11",
+    title: "Chat Name",
+    subject: "General",
+    roomName: "Exam Prep",
+  },
+  {
+    id: "12",
+    title: "Overview Resource Guide",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "13",
+    title: "Chat Name",
+    subject: "Marketing",
+    roomName: "Room Name",
+  },
+  {
+    id: "14",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: "Room Name",
+  },
+  {
+    id: "15",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "16",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+  {
+    id: "17",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: "Room Name",
+  },
+  {
+    id: "18",
+    title: "Chat Name",
+    subject: "Subject",
+    roomName: null,
+  },
+];
+
+export const allChatsOptionsPopupData = [
+  {
+    title: "Add to Room",
+    icon: <FolderIconDark />,
+  },
+  {
+    title: "Rename",
+    icon: <RenameIcon />,
+  },
+  {
+    title: "Pin",
+    icon: <PinIcon />,
+  },
+  {
+    title: "Archive",
+    icon: <ArchiveIcon />,
+  },
+  {
+    title: "Delete",
+    icon: <TrashIcon />,
   },
 ];

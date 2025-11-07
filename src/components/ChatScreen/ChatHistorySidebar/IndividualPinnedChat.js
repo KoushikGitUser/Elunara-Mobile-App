@@ -7,6 +7,7 @@ import chat from '../../../assets/images/ChatTeardrop.png'
 import { useDispatch } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
 import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
+import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 
 const IndividualPinnedChat = ({ title }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -28,7 +29,7 @@ const IndividualPinnedChat = ({ title }) => {
           }}
       style={styles.individualPinnedChats}
     >
-      <Image source={chat} style={{height:22,width:22,objectFit:"contain"}} />
+      <ChatIcon/>
       <Text>{truncateTitle(title)}</Text>
     </TouchableOpacity>
   );

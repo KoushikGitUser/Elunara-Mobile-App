@@ -9,6 +9,7 @@ import spark from "../../../assets/images/spark.png";
 import GradientText from "../../common/GradientText";
 import { useDispatch } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 
 const SidebarFooter = () => {
   const styleProps = {};
@@ -40,10 +41,7 @@ const SidebarFooter = () => {
         <Text style={styles.profileText}>Profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.upgradeBtn}>
-        <Image
-          source={spark}
-          style={{ height: 25, width: 25, objectFit: "contain" }}
-        />
+       <SparkleIcon/>
         <View>
           <GradientText
             children="Upgrade plan"
