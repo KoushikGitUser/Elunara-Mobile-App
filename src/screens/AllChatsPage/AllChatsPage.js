@@ -5,6 +5,7 @@ import {
   Dimensions,
   ScrollView,
   FlatList,
+  Animated,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +17,7 @@ import SearchAndIcons from "../../components/AllChatsPage/SearchAndIcons";
 import { allChatsData } from "../../data/datas";
 import ChatsComponent from "../../components/AllChatsPage/ChatsComponent";
 import OptionsPopup from "../../components/AllChatsPage/OptionsPopup";
+import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 
 const AllChatsPage = () => {
   const styleProps = {};
@@ -23,6 +25,7 @@ const AllChatsPage = () => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+  const translateX = React.useRef(new Animated.Value(0)).current;
 
   const [isSearching, setIsSearching] = useState(false);
 
@@ -36,7 +39,10 @@ const AllChatsPage = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
+      <ChatHistorySidebar translateX={translateX} />
+      <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
       <AllChatsHeader
+      translateX={translateX}
         isSearching={isSearching}
         setIsSearching={setIsSearching}
       />
@@ -54,7 +60,7 @@ const AllChatsPage = () => {
         {allChatsData.map((chat, chatsIndex) => {
           return (
             <ChatsComponent
-            key={chatsIndex}
+              key={chatsIndex}
               index={chat.id}
               title={chat.title}
               subject={chat.subject}
@@ -63,6 +69,7 @@ const AllChatsPage = () => {
           );
         })}
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

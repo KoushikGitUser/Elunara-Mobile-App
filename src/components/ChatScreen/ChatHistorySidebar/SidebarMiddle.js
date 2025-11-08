@@ -17,7 +17,7 @@ import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIc
 
 
 
-const SidebarMiddle = () => {
+const SidebarMiddle = ({translateX}) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
   const [pinnedChatsOpened,setPinnedChatsOpened] = useState(false);
   const [pinnedRoomsOpened,setPinnedRoomsOpened] = useState(false);
@@ -40,7 +40,7 @@ const SidebarMiddle = () => {
           <View style={styles.individualPinnedChatsMain}>
             {recentChats.map((chat, chatIndex) => {
               return (
-                <IndividualPinnedChat key={chatIndex} title={chat?.title} />
+                <IndividualPinnedChat translateX={translateX} key={chatIndex} title={chat?.title} />
               );
             })}
           </View>

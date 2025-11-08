@@ -10,6 +10,7 @@ import ChatScreen from "../screens/ChatScreen/ChatScreen";
 import Notes from "../screens/Notes/Notes";
 import Rooms from "../screens/Rooms/Rooms";
 import AllChatsPage from "../screens/AllChatsPage/AllChatsPage";
+import ProfileAndSettings from "../screens/ProfileAndSettings/ProfileAndSettings";
 
 // Screens
 
@@ -92,6 +93,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="allchats"
           component={AllChatsPage}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="profile"
+          component={ProfileAndSettings}
           options={{
             headerShown: false,
           }}

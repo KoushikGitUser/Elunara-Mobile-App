@@ -78,6 +78,18 @@ import ArchiveIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/Arc
 import TrashIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
 import FolderIconDark from "../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
 
+import SettingsIcon from '../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SettingsIcon'
+import PersonIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PersonIcon";
+import ChartLineIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/ChartLineIcon";
+import MoneyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/MoneyIcon";
+import GradCapIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/GradCapIcon";
+import InfoIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
+import HelpIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/HelpIcon";
+import FilesIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/FilesIcon";
+import PrivacyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PrivacyIcon";
+import SignOutIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SignOutIcon";
+
+
 export const slides = [
   {
     heading: ["Learning,", "Reimagined.", "Ethically."],
@@ -688,7 +700,7 @@ export const toolsArrayOptions = [
 ];
 
 export const allChatsData = [
-    {
+  {
     id: "0",
     title: "Marketing Material",
     subject: "Marketing",
@@ -825,4 +837,18 @@ export const allChatsOptionsPopupData = [
     title: "Delete",
     icon: <TrashIcon />,
   },
+];
+
+// settingsData.js
+export const profileAndSettingsOptions = [
+  { id: 1, title: "General Settings", icon:<SettingsIcon/> },
+  { id: 2, title: "Personalisation", icon: <PersonIcon/> },
+  { id: 3, title: "Analytics Dashboard", icon: <ChartLineIcon/> },
+  { id: 4, title: "Payment & Billings", icon: <MoneyIcon/> },
+  { id: 5, title: "Academic Links", icon: <GradCapIcon/> },
+  { id: 6, title: "About", icon: <InfoIcon/> },
+  { id: 7, title: "Help Center", icon: <HelpIcon/> },
+  { id: 8, title: "Terms of Use", icon: <FilesIcon/> },
+  { id: 9, title: "Privacy Policy", icon: <PrivacyIcon/> },
+  { id: 10, title: "Log Out", icon: <SignOutIcon/>},
 ];

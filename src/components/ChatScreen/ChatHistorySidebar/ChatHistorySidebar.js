@@ -45,7 +45,7 @@ const ChatHistorySidebar = ({ translateX }) => {
             toValue: toggleStates.toggleChatHistorySidebar
               ? 0
               : SCREEN_WIDTH * 0.75,
-            duration: 100,
+            duration: 300,
             useNativeDriver: true,
           }).start();
           dispatch(
@@ -56,11 +56,11 @@ const ChatHistorySidebar = ({ translateX }) => {
       ></TouchableOpacity>
       <View style={[styles.chatHistorySidebarWrapper,{marginLeft:toggleStates.toggleChatHistorySidebar?0:-SCREEN_WIDTH*0.75}]}>
         {/* chat history header */}
-        <SidebarHeader />
+        <SidebarHeader translateX={translateX} />
         {/* chat history header */}
 
         {/* chat history middle */}
-        <SidebarMiddle />
+        <SidebarMiddle translateX={translateX}  />
         {/* chat history middle */}
 
         {/* chat history footer */}

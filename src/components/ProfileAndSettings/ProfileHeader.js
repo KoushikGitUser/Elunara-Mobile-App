@@ -1,20 +1,18 @@
 import {
   View,
   Text,
-  Dimensions,
-  Animated,
   TouchableOpacity,
+  Animated,
+  Dimensions,
 } from "react-native";
 import React, { useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { createStyles } from "../../screens/ProfileAndSettings/ProfileAndSettings.style";
 import { useNavigation } from "@react-navigation/native";
-import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
-import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { Feather } from "@expo/vector-icons";
 import { scaleFont } from "../../utils/responsive";
-import { ArrowLeft } from "lucide-react-native";
 
-const AllChatsHeader = ({ isSearching,setIsSearching,translateX }) => {
+const ProfileHeader = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -38,17 +36,13 @@ const AllChatsHeader = ({ isSearching,setIsSearching,translateX }) => {
           );
         }}
       >
-        {isSearching ? (
-          <ArrowLeft onPress={()=>setIsSearching(false)} strokeWidth={1.25} />
-        ) : (
-          <Feather name="menu" size={30} color="black" />
-        )}
+        <Feather name="menu" size={30} color="black" />
       </TouchableOpacity>
       <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
-        {isSearching?"Search":"All Chats"}
+        Profile
       </Text>
     </View>
   );
 };
 
-export default AllChatsHeader;
+export default ProfileHeader;

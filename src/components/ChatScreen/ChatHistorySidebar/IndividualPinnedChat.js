@@ -1,35 +1,50 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Animated } from "react-native";
 import React, { useMemo, useState } from "react";
 import { MessageCircle } from "lucide-react-native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import { useNavigation } from "@react-navigation/native";
-import chat from '../../../assets/images/ChatTeardrop.png'
-import { useDispatch } from "react-redux";
-import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
+import chat from "../../../assets/images/ChatTeardrop.png";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleChatActionsPopupOnLongPress, setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 
-const IndividualPinnedChat = ({ title }) => {
+const IndividualPinnedChat = ({ title, translateX }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
 
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { toggleStates } = useSelector((state) => state.Toggle);
 
   const truncateTitle = (title, limit = 20) => {
     if (title.length <= limit) return title;
     return title.slice(0, limit) + "...";
-  }; 
+  };
 
   return (
     <TouchableOpacity
-          onLongPress={()=>{dispatch(setToggleChatActionsPopupOnLongPress(true));
-            dispatch(setChatTitleOnLongPress(title));
-          }}
+      onPress={() => {
+        Animated.timing(translateX, {
+          toValue: toggleStates.toggleChatHistorySidebar
+            ? 0
+            : SCREEN_WIDTH * 0.75, 
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+        dispatch(
+          setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
+        );
+        navigation.navigate("chat");
+      }}
+      onLongPress={() => {
+        dispatch(setToggleChatActionsPopupOnLongPress(true));
+        dispatch(setChatTitleOnLongPress(title));
+      }}
       style={styles.individualPinnedChats}
     >
-      <ChatIcon/>
+      <ChatIcon />
       <Text>{truncateTitle(title)}</Text>
     </TouchableOpacity>
   );
