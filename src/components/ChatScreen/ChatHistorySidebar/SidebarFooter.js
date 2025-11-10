@@ -1,4 +1,12 @@
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Animated,
+  Dimensions,
+} from "react-native";
 import React, { useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -7,20 +15,33 @@ import profilePic from "../../../assets/images/profilepic.png";
 import { moderateScale } from "../../../utils/responsive";
 import spark from "../../../assets/images/spark.png";
 import GradientText from "../../common/GradientText";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 
-const SidebarFooter = () => {
+const SidebarFooter = ({translateX}) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const SCREEN_WIDTH = Dimensions.get("window").width;
 
   return (
     <View style={styles.chatHistorySidebarFooter}>
       <TouchableOpacity
-        onPress={() => { navigation.navigate("profile")
+        onPress={() => {
+          navigation.navigate("profile");
+          Animated.timing(translateX, {
+            toValue: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : SCREEN_WIDTH * 0.75,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+          dispatch(
+            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
+          );
         }}
         style={styles.profileButton}
       >
@@ -28,7 +49,7 @@ const SidebarFooter = () => {
         <Text style={styles.profileText}>Profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.upgradeBtn}>
-       <SparkleIcon/>
+        <SparkleIcon />
         <View>
           <GradientText
             children="Upgrade plan"

@@ -26,8 +26,8 @@ const GradientText = ({
     ? Object.assign({}, ...style)
     : style || {};
 
-  const finalFontSize = flatStyle.fontSize || fontSize;
-  const finalFontWeight = flatStyle.fontWeight || fontWeight;
+  const finalFontSize =  fontSize;
+  const finalFontWeight =  fontWeight;
 
   // Estimate width based on text length and font size
   const estimatedWidth = children.toString().length * finalFontSize * widthNumber;

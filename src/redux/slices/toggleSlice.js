@@ -51,6 +51,12 @@ const toggleSlice = createSlice({
     setToggleAllChatsOptionsPopup: (state, action) => {
       state.toggleStates.toggleAllChatsOptionsPopup = action.payload;
     },
+    setToggleUnlockPremiumPopup: (state, action) => {
+      state.toggleStates.toggleUnlockPremiumPopup = action.payload;
+    },
+    setToggleResetSettingsPopup: (state, action) => {
+      state.toggleStates.toggleResetSettingsPopup = action.payload;
+    },
   },
 });
 
@@ -70,6 +76,8 @@ export const {
   setToggleUserMessageActionPopup,
   setToggleChatActionsPopupOnLongPress,
   setToggleAllChatsOptionsPopup,
+  setToggleUnlockPremiumPopup,
+  setToggleResetSettingsPopup,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

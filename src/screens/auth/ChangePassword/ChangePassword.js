@@ -28,7 +28,6 @@ const ChangePassword = () => {
   };
 
   const navigation = useNavigation();
-
   const styles = useMemo(() => createStyles(styleProps), []);
 
   return (

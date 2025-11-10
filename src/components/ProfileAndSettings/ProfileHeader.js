@@ -11,8 +11,9 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Feather } from "@expo/vector-icons";
 import { scaleFont } from "../../utils/responsive";
+import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
 
-const ProfileHeader = () => {
+const ProfileHeader = ({translateX}) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();

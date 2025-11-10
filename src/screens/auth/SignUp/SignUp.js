@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useMemo, useState } from "react";
@@ -55,7 +56,13 @@ const SignUp = () => {
           mobileVerificationPopup={mobileVerificationPopup}
         />
       )}
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        style={styles.container}
+      >
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
@@ -86,19 +93,22 @@ const SignUp = () => {
               ]}
             >
               <GradientText
-                fullWidth={false}
+                marginBottom={0}
+                marginTop={20}
                 children="Join Elunara"
-                fontSize={scaleFont(28)}
+                fullWidth={false}
+                widthNumber={0.5}
+                fontSize={scaleFont(25)}
               />
               <Text
                 style={[
                   styles.headTitle,
                   {
                     fontWeight: "400",
-                    marginTop: 1,
+                    marginTop: 15,
                     color: "black",
                     fontSize: scaleFont(22),
-                    paddingLeft:10
+                    paddingLeft: 10,
                   },
                 ]}
               >
@@ -189,7 +199,7 @@ const SignUp = () => {
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity onPress={()=>navigation.navigate("changepass")} activeOpacity={0.7}>
                 <Text style={styles.link}>Privacy Policy</Text>
               </TouchableOpacity>
             </View>
@@ -241,7 +251,7 @@ const SignUp = () => {
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

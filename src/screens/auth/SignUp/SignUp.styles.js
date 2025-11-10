@@ -17,8 +17,6 @@ export const createStyles = (props = {}) =>
     },
     container: {
       flexDirection: "column",
-      justifyContent: "space-between",
-      alignItems: "center",
       backgroundColor: "#FAFAFA",
       gap: 30,
     },

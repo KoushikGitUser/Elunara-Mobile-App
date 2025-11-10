@@ -64,7 +64,7 @@ const ChatHistorySidebar = ({ translateX }) => {
         {/* chat history middle */}
 
         {/* chat history footer */}
-        <SidebarFooter />
+        <SidebarFooter translateX={translateX} />
         {/* chat history footer */}
       </View>
     </>

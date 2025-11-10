@@ -11,6 +11,7 @@ import Notes from "../screens/Notes/Notes";
 import Rooms from "../screens/Rooms/Rooms";
 import AllChatsPage from "../screens/AllChatsPage/AllChatsPage";
 import ProfileAndSettings from "../screens/ProfileAndSettings/ProfileAndSettings";
+import SettingsProfileInnerPage from "../screens/SettingsProfileInnerPages/SettingsProfileInnerPage";
 
 // Screens
 
@@ -105,7 +106,18 @@ const AppNavigator = () => {
             headerShown: false,
           }}
         />
+
+         <Stack.Screen
+          name="settingsInnerPages"
+          component={SettingsProfileInnerPage}
+          options={{
+            headerShown: false,
+          }}
+        />
+
       </Stack.Navigator>
+
+      
     </NavigationContainer>
   );
 };

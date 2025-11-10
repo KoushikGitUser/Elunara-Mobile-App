@@ -10,24 +10,42 @@ import { profileAndSettingsOptions } from "../../data/datas";
 import SparkleIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 import GradientText from "../common/GradientText";
 import { moderateScale, verticalScale } from "../../utils/responsive";
+import { useNavigation } from "@react-navigation/native";
 
 const ProfileOptionsContainer = () => {
+  const navigation = useNavigation();
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         justifyContent: "flex-start",
         alignItems: "flex-start",
       }}
       style={styles.container}
     >
+      {/* Options */}
       {profileAndSettingsOptions?.map((option, optionIndex) => {
         return (
-          <TouchableOpacity style={styles.itemContainer}>
+          <TouchableOpacity
+            onPress={() =>{
+              if(optionIndex == 9){
+                navigation.navigate("welcome")
+              }
+              else{
+                navigation.navigate("settingsInnerPages", { page: optionIndex })
+              }
+            }
+            }
+            key={optionIndex}
+            style={styles.itemContainer}
+          >
             {option.icon}
             <Text style={styles.title}>{option.title}</Text>
           </TouchableOpacity>
         );
       })}
+
+      {/* Upgrade button */}
       <TouchableOpacity style={styles.upgradeBtn}>
         <SparkleIcon />
         <View>
@@ -50,7 +68,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     flexDirection: "column",
-    marginTop:20
+    marginTop: 20,
   },
   itemContainer: {
     width: "100%",
@@ -78,8 +96,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    marginTop:20,
-    marginBottom:30
+    marginTop: 20,
+    marginBottom: 30,
   },
 });
 
