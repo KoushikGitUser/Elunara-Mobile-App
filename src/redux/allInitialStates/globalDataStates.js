@@ -8,6 +8,8 @@ export const globalDataStates = {
   currentSelectedTopic: null,
   chatTitleOnLongPress:null,
   userMessageOnLongPress:null,
+  settingsInnerPageHeaderTitle:"",
+  settingsInnerPageComponentToRender:"General Settings",
 };
 
 export const demoChatMessages = [

@@ -3,8 +3,13 @@ import React from "react";
 import userImg from "../../assets/images/profilepic.png";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
+import { useDispatch } from "react-redux";
+import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const UserSection = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   return (
     <View style={styles.upgradeBtn}>
       <View style={styles.upper}>
@@ -17,7 +22,11 @@ const UserSection = () => {
             neha@gmail.com
           </Text>
         </View>
-        <TouchableOpacity style={{marginLeft:"auto",alignSelf:"flex-end"}}>
+        <TouchableOpacity onPress={()=>{
+          dispatch(setSettingsInnerPageHeaderTitle("Profile Information"));
+          dispatch(setSettingsInnerPageComponentToRender("Edit Profile"))
+           navigation.navigate("settingsInnerPages");
+        }} style={{marginLeft:"auto",alignSelf:"flex-end"}}>
           <PencilIcon />
         </TouchableOpacity>
       </View>

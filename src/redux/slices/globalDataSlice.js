@@ -31,6 +31,12 @@ const globalDataSlice = createSlice({
     },
     setUserMessageOnLongPress: (state, action) => {
       state.globalDataStates.userMessageOnLongPress = action.payload;
+    },
+    setSettingsInnerPageHeaderTitle: (state, action) => {
+      state.globalDataStates.settingsInnerPageHeaderTitle = action.payload;
+    },
+    setSettingsInnerPageComponentToRender: (state, action) => {
+      state.globalDataStates.settingsInnerPageComponentToRender = action.payload;
     }
   },
 });
@@ -43,7 +49,9 @@ export const {
   setChatMessagesArray,
   setCurrentSelectedTopic,
   setChatTitleOnLongPress,
-  setUserMessageOnLongPress
+  setUserMessageOnLongPress,
+  setSettingsInnerPageHeaderTitle,
+  setSettingsInnerPageComponentToRender
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import React from "react";
 import { profileAndSettingsOptions } from "../../data/datas";
@@ -11,9 +12,20 @@ import SparkleIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIco
 import GradientText from "../common/GradientText";
 import { moderateScale, verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import {
+  setSettingsInnerPageComponentToRender,
+  setSettingsInnerPageHeaderTitle,
+} from "../../redux/slices/globalDataSlice";
+import GeneralSettings from "../../screens/SettingsPages/GeneralSettings";
+import Personalisation from "../../screens/SettingsPages/Personalisation";
+import Analytics from "../../screens/SettingsPages/Analytics";
+import PaymentBilling from "../../screens/SettingsPages/PaymentBilling";
+import adImg from "../../assets/images/Upgrade.jpg";
 
 const ProfileOptionsContainer = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -26,22 +38,37 @@ const ProfileOptionsContainer = () => {
       {/* Options */}
       {profileAndSettingsOptions?.map((option, optionIndex) => {
         return (
-          <TouchableOpacity
-            onPress={() =>{
-              if(optionIndex == 9){
-                navigation.navigate("welcome")
-              }
-              else{
-                navigation.navigate("settingsInnerPages", { page: optionIndex })
-              }
-            }
-            }
-            key={optionIndex}
-            style={styles.itemContainer}
-          >
-            {option.icon}
-            <Text style={styles.title}>{option.title}</Text>
-          </TouchableOpacity>
+          <React.Fragment key={optionIndex}>
+            <TouchableOpacity
+              onPress={() => {
+                if (optionIndex == 9) {
+                  navigation.navigate("welcome");
+                } else {
+                  navigation.navigate("settingsInnerPages");
+                  dispatch(setSettingsInnerPageHeaderTitle(option.title));
+                  dispatch(setSettingsInnerPageComponentToRender(option.title));
+                }
+              }}
+              style={styles.itemContainer}
+            >
+              {option.icon}
+              <Text style={styles.title}>{option.title}</Text>
+            </TouchableOpacity>
+            {optionIndex == 5 && (
+              <View style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
+                <Image
+                  style={{
+                    width: "100%",
+                    height: 100,
+                    borderWidth: 1,
+                    borderColor: "lightgrey",
+                    borderRadius: 18,
+                  }}
+                  source={adImg}
+                />
+              </View>
+            )}
+          </React.Fragment>
         );
       })}
 

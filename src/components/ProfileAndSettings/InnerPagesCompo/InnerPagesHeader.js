@@ -3,8 +3,10 @@ import React from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { scaleFont, verticalScale } from "../../../utils/responsive";
+import { useSelector } from "react-redux";
 
-const InnerPagesHeader = ({ page, scrollY }) => {
+const InnerPagesHeader = ({ scrollY }) => {
+  const {globalDataStates} = useSelector((state) => state.Global);
   const navigation = useNavigation();
   const headerTitleArray = [
     "General Settings",
@@ -33,7 +35,7 @@ const InnerPagesHeader = ({ page, scrollY }) => {
           <ArrowLeft strokeWidth={2} />
         </TouchableOpacity>
         <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
-          {headerTitleArray[page]}{" "}
+          {globalDataStates.settingsInnerPageHeaderTitle}
         </Text>
       </View>
       

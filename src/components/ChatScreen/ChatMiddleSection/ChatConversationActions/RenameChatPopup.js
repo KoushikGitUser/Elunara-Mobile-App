@@ -125,7 +125,7 @@ const RenameChatPopup = () => {
                         style={styles.inputText}
                         placeholder="Enter your mobile number"
                         placeholderTextColor="#9CA3AF"
-                        value={chatName}
+                        value={chatName} 
                         onChangeText={(text) => setChatName(text)}
                         returnKeyType="done"
                       />
