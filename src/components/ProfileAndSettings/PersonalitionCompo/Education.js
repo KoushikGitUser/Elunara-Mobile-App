@@ -1,12 +1,254 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
+import { scaleFont } from "../../../utils/responsive";
+import { ChevronDown, UserRound } from "lucide-react-native";
+import BriefCaseIcon from "../../../../assets/SvgIconsComponent/PersonalisationIcons/BriefCaseIcon";
 
 const Education = () => {
-  return (
-    <View>
-      <Text>Education</Text>
-    </View>
-  )
-}
+  const [selectedOption, setSelectedOption] = useState("No");
+  const RadioButton = ({ label, selected, onPress }) => {
+    return (
+      <TouchableOpacity
+        style={styles.radioContainer}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        <View
+          style={[styles.radioCircle, selected && styles.radioCircleSelected]}
+        >
+          {selected && <View style={styles.radioInnerCircle} />}
+        </View>
+        <Text style={styles.radioLabel}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
 
-export default Education
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <View style={styles.headerTitleContainer}>
+          <BriefCaseIcon />
+          <Text style={styles.title}>Academic & Career Details</Text>
+        </View>
+        <Text style={styles.subtitle}>
+          Highlight your academic and career background to receive tailored
+          resources and opportunities
+        </Text>
+      </View>
+      <View style={[styles.inputSection, { width: "100%", marginTop: 30 }]}>
+        <Text style={styles.inputLabel}>Current University</Text>
+        <View style={styles.input}>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Select current university"
+            placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
+          />
+          <TouchableOpacity>
+            <ChevronDown size={30} strokeWidth={1.25} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.fullnameInput}>
+        <View style={styles.inputSection}>
+          <Text style={styles.inputLabel}>Degree Program</Text>
+          <View style={styles.input}>
+            <TextInput
+              style={styles.inputText}
+              placeholder="Select Degree"
+              placeholderTextColor="#9CA3AF"
+              returnKeyType="done"
+            />
+            <TouchableOpacity>
+              <ChevronDown size={30} strokeWidth={1.25} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.inputSection}>
+          <Text style={styles.inputLabel}>Semester</Text>
+          <View style={styles.input}>
+            <TextInput
+              style={styles.inputText}
+              placeholder="Select Semester"
+              placeholderTextColor="#9CA3AF"
+              returnKeyType="done"
+            />
+            <TouchableOpacity>
+              <ChevronDown size={30} strokeWidth={1.25} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      <View style={[styles.inputSection, { width: "100%", marginTop: 15 }]}>
+        <Text style={styles.inputLabel}>Specialisation</Text>
+        <View style={styles.input}>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Select specialisation..."
+            placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
+          />
+          <TouchableOpacity>
+            <ChevronDown size={30} strokeWidth={1.25} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{marginTop:10,marginBottom:20}}>
+        <Text style={styles.question}>
+          Are you currently working alongside your studies?
+        </Text>
+
+        <View style={styles.optionsContainer}>
+          <RadioButton
+            label="Yes"
+            selected={selectedOption === "Yes"}
+            onPress={() => setSelectedOption("Yes")}
+          />
+          <RadioButton
+            label="No"
+            selected={selectedOption === "No"}
+            onPress={() => setSelectedOption("No")}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.inputSection, { width: "100%", marginTop: 15 }]}>
+        <Text style={styles.inputLabel}>
+          Key Skill Gaps You Want to Address
+        </Text>
+        <View style={styles.input}>
+          <TextInput
+            style={styles.inputText}
+            placeholder="e.g., Data analysis, public speaking, coding..."
+            placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  headerTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: scaleFont(17),
+    fontWeight: "600",
+    color: "#1F2937",
+    letterSpacing: -0.5,
+    paddingLeft: 10,
+  },
+  subtitle: {
+    fontSize: scaleFont(13),
+    color: "#6B7280",
+    marginTop: 10,
+  },
+  fullnameInput: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  inputSection: {
+    marginBottom: 15,
+    marginTop: 10,
+    width: "48%",
+  },
+  inputLabel: {
+    fontSize: scaleFont(10),
+    fontWeight: "400",
+    color: "#5E5E5E",
+    marginBottom: 8,
+    letterSpacing: 0.1,
+  },
+  input: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#D1D5DB",
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    color: "#1F2937",
+    letterSpacing: 0.2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  inputLarge: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#D1D5DB",
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    color: "#1F2937",
+    letterSpacing: 0.2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    width: "100%",
+    height: 150,
+  },
+  inputText: {
+    backgroundColor: "#FFFFFF",
+    fontSize: scaleFont(10),
+    color: "#1F2937",
+    letterSpacing: 0.2,
+  },
+    question: {
+    fontSize: scaleFont(14),
+    fontWeight: '600',
+    color: '#1A1A1A',
+    lineHeight: 42,
+    marginBottom: 20,
+    letterSpacing: -0.5,
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    gap: 60,
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#B8C1D9',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  radioCircleSelected: {
+    borderColor: '#000000ff',
+    borderWidth: 2,
+    backgroundColor: '#ffffffff',
+  },
+  radioInnerCircle: {
+    width: 14,
+    height: 14,
+    borderRadius: 10,
+    backgroundColor: '#000000ff',
+  },
+  radioLabel: {
+    fontSize: scaleFont(14),
+    fontWeight: '400',
+    color: '#1A1A1A',
+    letterSpacing: -0.3,
+  },
+});
+
+export default Education;

@@ -23,7 +23,7 @@ import Analytics from "../../screens/SettingsPages/Analytics";
 import PaymentBilling from "../../screens/SettingsPages/PaymentBilling";
 import adImg from "../../assets/images/Upgrade.jpg";
 
-const ProfileOptionsContainer = () => {
+const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   return (
@@ -42,11 +42,10 @@ const ProfileOptionsContainer = () => {
             <TouchableOpacity
               onPress={() => {
                 if (optionIndex == 9) {
-                  navigation.navigate("welcome");
+                  setToggleLogOutConfirmPopup(true)
                 } else {
-                  navigation.navigate("settingsInnerPages");
+                  navigation.navigate("settingsInnerPages",{page:optionIndex});
                   dispatch(setSettingsInnerPageHeaderTitle(option.title));
-                  dispatch(setSettingsInnerPageComponentToRender(option.title));
                 }
               }}
               style={styles.itemContainer}

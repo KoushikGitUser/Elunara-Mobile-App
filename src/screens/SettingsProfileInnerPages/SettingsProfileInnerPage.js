@@ -10,34 +10,40 @@ import { useSelector } from "react-redux";
 import UnlockPremiumPopup from "../../components/ProfileAndSettings/GeneralSettingsCompo/UnlockPremiumPopup";
 import ResetSettingsPopup from "../../components/ProfileAndSettings/GeneralSettingsCompo/ResetSettingsPopup";
 import EditProfile from "../SettingsPages/EditProfile";
+import HelpCenter from "../SettingsPages/HelpCenter";
+import AcademicLinks from "../SettingsPages/AcademicLinks";
+import AboutPage from "../SettingsPages/AboutPage";
+import TermsOfUse from "../SettingsPages/TermsOfUse";
+import PrivacyPolicy from "../SettingsPages/PrivacyPolicy";
 
-const SettingsProfileInnerPage = ({ navigation }) => {
+const SettingsProfileInnerPage = ({ route, navigation }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const {globalDataStates} = useSelector((state) => state.Global);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const scrollY = useRef(new Animated.Value(0)).current;
-
+  const { page } = route.params;
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false }
   );
 
+  const pagesArray = [
+    <GeneralSettings handleScroll={handleScroll} />,
+    <Personalisation />,
+    <Analytics />,
+    <PaymentBilling />,
+    <AcademicLinks />,
+    <AboutPage />,
+    <HelpCenter />,
+    <TermsOfUse />,
+    <PrivacyPolicy />,
+  ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
-        {toggleStates.toggleUnlockPremiumPopup && <UnlockPremiumPopup/>}
-        {toggleStates.toggleResetSettingsPopup && <ResetSettingsPopup/>}
+      {toggleStates.toggleUnlockPremiumPopup && <UnlockPremiumPopup />}
+      {toggleStates.toggleResetSettingsPopup && <ResetSettingsPopup />}
       <InnerPagesHeader scrollY={scrollY} />
-      {globalDataStates.settingsInnerPageComponentToRender == "General Settings" ? (
-        <GeneralSettings/>
-      ) : globalDataStates.settingsInnerPageComponentToRender == "Personalisation" ? (
-        <Personalisation/>
-      ) : globalDataStates.settingsInnerPageComponentToRender == "Analytics Dashboard" ? (
-        <Analytics/>
-      ) : globalDataStates.settingsInnerPageComponentToRender == "Payment & Billings" ? (
-        <PaymentBilling/>
-      ) : globalDataStates.settingsInnerPageComponentToRender == "Edit Profile" ?(
-        <EditProfile/>
-      ): null}
+      {pagesArray[page]}
     </SafeAreaView>
   );
 };
