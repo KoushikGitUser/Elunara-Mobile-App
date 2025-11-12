@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,

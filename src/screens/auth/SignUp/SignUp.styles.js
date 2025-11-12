@@ -31,6 +31,7 @@ export const createStyles = (props = {}) =>
     logoContainer: {
       flexDirection: "column",
       alignItems: "flex-start",
+      marginBottom:25
     },
     mainLogo: {
       height: 40,
@@ -52,7 +53,7 @@ export const createStyles = (props = {}) =>
       marginTop: 15,
     },
     headDesc: {
-      fontSize: scaleFont(10.5),
+      fontSize: scaleFont(13),
       color: "#939FA9",
       fontWeight: "400",
       marginTop: 15,
@@ -141,8 +142,8 @@ export const createStyles = (props = {}) =>
       marginBottom: 15,
     },
     socialButtonText: {
-      fontSize: scaleFont(11),
-      fontWeight: "700",
+      fontSize: scaleFont(13),
+      fontWeight: "600",
       color: props.socialButtonTextColor || "#1E2329",
       letterSpacing: -0.1,
       marginLeft: scale(12),
@@ -153,10 +154,11 @@ export const createStyles = (props = {}) =>
     },
     divider: {
       textAlign: "center",
-      fontSize: scaleFont(12),
+      fontSize: scaleFont(13),
       color: "#8A97A3",
       fontWeight: "400",
       marginTop: 20,
+      marginBottom:25
     },
     emailButton: {
       backgroundColor: "#162845ff",
@@ -167,7 +169,7 @@ export const createStyles = (props = {}) =>
       width: "100%",
     },
     emailButtonText: {
-      fontSize: scaleFont(11),
+      fontSize: scaleFont(13),
       fontWeight: "600",
       color: props.emailButtonTextColor || "#FFFFFF",
       letterSpacing: -0.2,
@@ -179,12 +181,12 @@ export const createStyles = (props = {}) =>
       marginTop: 20,
     },
     signupText: {
-      fontSize: scaleFont(10),
+      fontSize: scaleFont(13),
       color: props.signupTextColor || "#5A6B7D",
       fontWeight: "400",
     },
     signupLink: {
-      fontSize: scaleFont(10),
+      fontSize: scaleFont(13),
       color: "#0F1419",
       fontWeight: "600",
       // remove textDecorationLine for manual underline
@@ -222,9 +224,9 @@ export const createStyles = (props = {}) =>
       width: "48%",
     },
     label: {
-      fontSize: scaleFont(11),
+      fontSize: scaleFont(12),
       color: "#4E4E4E",
-      fontWeight: "500",
+      fontWeight: "400",
       marginBottom: 8,
       textAlign: "left",
     },
@@ -234,7 +236,7 @@ export const createStyles = (props = {}) =>
       borderRadius: 15,
       paddingHorizontal: 20,
       paddingVertical: 14,
-      fontSize: scaleFont(12),
+      fontSize: scaleFont(13),
       color: "#0F1419",
       backgroundColor: "white",
       width: "100%",
@@ -251,7 +253,7 @@ export const createStyles = (props = {}) =>
     },
     passwordInput: {
       flex: 1,
-      fontSize: scaleFont(12),
+      fontSize: scaleFont(13),
       color: "#0F1419",
       paddingVertical: 14,
     },
@@ -281,11 +283,11 @@ export const createStyles = (props = {}) =>
     alignItems: 'center',
   },
   text: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     color: '#5A5A5A',
   },
   link: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     color: '#2C3E50',
     fontWeight: '600',
   },

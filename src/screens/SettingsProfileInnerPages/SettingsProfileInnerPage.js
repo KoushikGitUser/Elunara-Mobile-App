@@ -15,6 +15,8 @@ import AcademicLinks from "../SettingsPages/AcademicLinks";
 import AboutPage from "../SettingsPages/AboutPage";
 import TermsOfUse from "../SettingsPages/TermsOfUse";
 import PrivacyPolicy from "../SettingsPages/PrivacyPolicy";
+import ContactPage from "../SettingsPages/ContactPage";
+import HelpCenterSearch from "../SettingsPages/HelpCenterSearch";
 
 const SettingsProfileInnerPage = ({ route, navigation }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -33,9 +35,11 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
     <PaymentBilling />,
     <AcademicLinks />,
     <AboutPage />,
-    <HelpCenter />,
-    <TermsOfUse />,
-    <PrivacyPolicy />,
+    <HelpCenter handleScroll={handleScroll} />,
+    <TermsOfUse handleScroll={handleScroll} />,
+    <PrivacyPolicy handleScroll={handleScroll} />,
+    <ContactPage/>,
+    <HelpCenterSearch/>
   ];
 
   return (

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     flexDirection: "column",
     justifyContent: "flex-end",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   contentContainer: {
     flexDirection: "column",
@@ -127,12 +127,11 @@ const styles = StyleSheet.create({
     color: "#8A8A8A",
     lineHeight: 30,
     fontWeight: "400",
-    maxWidth: SCREEN_WIDTH,
+    maxWidth: SCREEN_WIDTH * 0.8,
   },
   paginationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
     paddingHorizontal: 20,
     marginBottom: 10,
   },

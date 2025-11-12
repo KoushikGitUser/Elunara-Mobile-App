@@ -24,7 +24,7 @@ const CustomSwitch = ({ value, onValueChange,skipAd }) => {
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [3, 30], // Adjusted for proper thumb movement
+    outputRange: [3, 31], // Adjusted for proper thumb movement
   });
 
   const trackBackgroundColor = animatedValue.interpolate({
@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
     borderColor:"#B5BECE"
   },
   thumb: {
-    width: 21,
-    height: 21,
-    borderRadius: 17,
+    width: 18,
+    height: 18,
+    borderRadius: 45,
     backgroundColor: '#B5BECE',
   },
 });

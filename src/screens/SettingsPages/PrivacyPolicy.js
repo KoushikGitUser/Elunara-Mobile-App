@@ -2,11 +2,12 @@ import React from "react";
 import { View, Text, ScrollView, StyleSheet, StatusBar } from "react-native";
 import { scaleFont } from "../../utils/responsive";
 
-const PrivacyPolicy = () => {
+const PrivacyPolicy = ({handleScroll}) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView
+      onScroll={handleScroll}
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -29,7 +30,7 @@ const PrivacyPolicy = () => {
         </View>
 
         {/* What information do we collect */}
-        <View style={{ padding: 20, paddingTop: 5 }}>
+        <View style={{ padding: 20, marginTop: 5 }}>
           <Text style={styles.sectionTitle}>
             What information do we collect?
           </Text>
@@ -122,11 +123,11 @@ const PrivacyPolicy = () => {
 
         {/* Cookies section */}
         <View style={{padding:20}}>
-          <View >
+          <View   >
             <Text style={styles.sectionTitle}>
               Do we use cookies and other Letter spacing technologies?
             </Text>
-            <Text style={styles.bodyText}>
+            <Text style={[styles.bodyText,{paddingBottom:20}]}>
               Pharetra morbi libero id aliquam elit massa integer tellus. Quis
               felis aliquam ullamcorper porttitor. Pulvinar ullamcorper sit
               dictumst ut eget a, elementum eu. Maecenas est morbi mattis id in
@@ -137,7 +138,7 @@ const PrivacyPolicy = () => {
             <Text style={styles.sectionTitle}>
               How long do we keep your information?
             </Text>
-            <Text style={styles.bodyText}>
+            <Text style={[styles.bodyText,{paddingBottom:20}]}>
               We use encryption, access controls, and secure storage practices
               to protect your data. While we strive to ensure security, no
               method of transmission is 100% secure.
@@ -175,7 +176,7 @@ const PrivacyPolicy = () => {
           </View>
 
           {/* What are your privacy rights */}
-          <Text style={styles.sectionTitle}>What are your privacy rights?</Text>
+          <Text style={[styles.sectionTitle,{paddingTop:40}]}>What are your privacy rights?</Text>
           <Text style={styles.bodyText}>
             We use encryption, access controls, and secure storage practices to
             protect your data. While we strive to ensure security, no method of
@@ -183,7 +184,7 @@ const PrivacyPolicy = () => {
           </Text>
 
           {/* Contact section */}
-          <Text style={styles.sectionTitle}>
+          <Text style={[styles.sectionTitle,{paddingTop:20}]}>
             How can you contact us about this policy?
           </Text>
           <Text style={styles.bodyText}>
@@ -198,7 +199,7 @@ const PrivacyPolicy = () => {
           </Text>
 
           <View style={styles.emailContainer}>
-            <Text style={styles.emailIcon}>✉</Text>
+            <Text style={styles.emailIcon}>📧</Text>
             <Text style={styles.emailText}>privacy@elunara.com</Text>
           </View>
         </View>
@@ -213,13 +214,12 @@ const PrivacyPolicy = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FAFAFA",
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 16,
     paddingBottom: 40,
   },
   headerLabel: {
@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: scaleFont(18),
+    fontWeight: "600",
     color: "#1A1A1A",
     marginBottom: 12,
   },
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   bulletTextBold: {
-    fontSize: 15,
+    fontSize: scaleFont(14),
     fontWeight: "600",
     color: "#1A1A1A",
     lineHeight: 24,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bulletTextSimple: {
-    fontSize: 15,
+    fontSize: scaleFont(14),
     color: "#666666",
     lineHeight: 24,
     flex: 1,
@@ -289,8 +289,6 @@ const styles = StyleSheet.create({
   emailContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    marginBottom: 16,
   },
   emailIcon: {
     fontSize: 16,

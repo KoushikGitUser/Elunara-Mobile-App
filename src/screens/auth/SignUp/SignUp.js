@@ -91,7 +91,7 @@ const SignUp = () => {
                   alignItems: "center",
                 },
               ]}
-            >
+            > 
               <GradientText
                 marginBottom={0}
                 marginTop={20}

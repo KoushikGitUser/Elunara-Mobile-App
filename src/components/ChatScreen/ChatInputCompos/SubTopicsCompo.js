@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   belowInput: {
     flex: 1,
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(12),
     color: "#1A1A1A",
     paddingVertical: 0,
     backgroundColor: "white",

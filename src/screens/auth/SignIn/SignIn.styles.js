@@ -25,6 +25,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
   logoContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
+    marginBottom:30
   },
   mainLogo:{
     height:40,
@@ -136,8 +137,8 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginBottom: 15,
   },
   socialButtonText: {
-    fontSize: scaleFont(11),
-    fontWeight: '700',
+    fontSize: scaleFont(13),
+    fontWeight: '600',
     color: props.socialButtonTextColor || '#1E2329',
     letterSpacing: -0.1,
     marginLeft: scale(12),
@@ -148,10 +149,11 @@ export const createStyles = (props = {}) => StyleSheet.create({
   },
   divider: {
     textAlign: 'center',
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     color: '#8A97A3',
     fontWeight: '400',
-    marginTop:20
+    marginTop:15,
+    marginBottom:20
   },
   emailButton: {
     backgroundColor: "#162845ff",
@@ -175,12 +177,12 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginTop:20
   },
   signupText: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(13),
     color: props.signupTextColor || '#5A6B7D',
     fontWeight: '400',
   },
   signupLink: {
-  fontSize: scaleFont(10),
+  fontSize: scaleFont(13),
   color: '#0F1419',
   fontWeight: '600',
   // remove textDecorationLine for manual underline
@@ -209,9 +211,9 @@ customUnderline: {
    width:"90%",
   },
   label: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(12),
     color: "#4E4E4E",
-    fontWeight: "500",
+    fontWeight: "400",
     marginBottom: 8,
     textAlign:'left'
   },
@@ -221,7 +223,7 @@ customUnderline: {
     borderRadius: 15,
     paddingHorizontal: 20,
     height:50,
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     color: "#0F1419",
     backgroundColor:"white"
   },
@@ -238,7 +240,7 @@ customUnderline: {
   },
   passwordInput: {
     flex: 1,
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     color: "#0F1419",
     paddingVertical: 14,
   },
@@ -248,7 +250,7 @@ customUnderline: {
   forgotPassword: {
     alignSelf: "flex-end",
     marginTop: verticalScale(10),
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     color: "#0F1419",
     fontWeight: "600",
   },

@@ -72,7 +72,7 @@ const SignIn = () => {
                 marginTop={20}
                 children=" Welcome back"
                 fullWidth={true}
-                fontSize={scaleFont(25)}
+                fontSize={scaleFont(24)}
               />
             }
             <Text style={styles.headDesc}>

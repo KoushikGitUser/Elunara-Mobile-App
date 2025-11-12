@@ -78,7 +78,7 @@ import ArchiveIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/Arc
 import TrashIcon from "../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
 import FolderIconDark from "../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
 
-import SettingsIcon from '../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SettingsIcon'
+import SettingsIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SettingsIcon";
 import PersonIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PersonIcon";
 import ChartLineIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/ChartLineIcon";
 import MoneyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/MoneyIcon";
@@ -88,7 +88,6 @@ import HelpIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/Hel
 import FilesIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/FilesIcon";
 import PrivacyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PrivacyIcon";
 import SignOutIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SignOutIcon";
-
 
 export const slides = [
   {
@@ -841,14 +840,134 @@ export const allChatsOptionsPopupData = [
 
 // settingsData.js
 export const profileAndSettingsOptions = [
-  { id: 1, title: "General Settings", icon:<SettingsIcon/> },
-  { id: 2, title: "Personalisation", icon: <PersonIcon/> },
-  { id: 3, title: "Analytics Dashboard", icon: <ChartLineIcon/> },
-  { id: 4, title: "Payment & Billings", icon: <MoneyIcon/> },
-  { id: 5, title: "Academic Links", icon: <GradCapIcon/> },
-  { id: 6, title: "About", icon: <InfoIcon/> },
-  { id: 7, title: "Help Center", icon: <HelpIcon/> },
-  { id: 8, title: "Terms of Use", icon: <FilesIcon/> },
-  { id: 9, title: "Privacy Policy", icon: <PrivacyIcon/> },
-  { id: 10, title: "Log Out", icon: <SignOutIcon/>},
+  { id: 1, title: "General Settings", icon: <SettingsIcon /> },
+  { id: 2, title: "Personalisation", icon: <PersonIcon /> },
+  { id: 3, title: "Analytics Dashboard", icon: <ChartLineIcon /> },
+  { id: 4, title: "Payment & Billings", icon: <MoneyIcon /> },
+  { id: 5, title: "Academic Links", icon: <GradCapIcon /> },
+  { id: 6, title: "About", icon: <InfoIcon /> },
+  { id: 7, title: "Help Center", icon: <HelpIcon /> },
+  { id: 8, title: "Terms of Use", icon: <FilesIcon /> },
+  { id: 9, title: "Privacy Policy", icon: <PrivacyIcon /> },
+  { id: 10, title: "Log Out", icon: <SignOutIcon /> },
+];
+
+export const faqData = [
+  {
+    questionTitle: "Is there a free plan available?",
+    answer:
+      "Yes, there is a free plan available with basic features and certain limitations. You can start using Elunara at no cost, but some advanced capabilities and higher usage limits are reserved for Pro users.",
+  },
+  {
+    questionTitle: "Can I change my plan later?",
+    answer:
+      "Yes, you can upgrade or downgrade your plan at any time. Changes to your plan will be reflected in your next billing cycle.",
+  },
+  {
+    questionTitle: "Can I create multiple Rooms in Elunara?",
+    answer:
+      "Yes, you can create multiple Rooms in Elunara. Each Room can have its own settings and configurations to help you organize your workspace.",
+  },
+  {
+    questionTitle: "How do I customize my AI interaction settings?",
+    answer:
+      "You can customize your AI interaction settings by going to the Settings menu and selecting AI Preferences. From there, you can adjust various parameters to suit your needs.",
+  },
+  {
+    questionTitle: "How do I recover deleted chats or notes?",
+    answer:
+      "Deleted chats and notes can be recovered from the Trash folder within 30 days of deletion. After 30 days, they will be permanently removed.",
+  },
+  {
+    questionTitle: "How do I change my account email?",
+    answer:
+      "To change your account email, go to Account Settings, click on Email, and follow the verification process to update your email address.",
+  },
+  {
+    questionTitle: "Can I create multiple Rooms in Elunara?",
+    answer:
+      "Yes, you can create multiple Rooms in Elunara. Each Room can have its own settings and configurations to help you organize your workspace.",
+  },
+  {
+    questionTitle: "How do I customize my AI interaction settings?",
+    answer:
+      "You can customize your AI interaction settings by going to the Settings menu and selecting AI Preferences. From there, you can adjust various parameters to suit your needs.",
+  },
+  {
+    questionTitle: "How do I recover deleted chats or notes?",
+    answer:
+      "Deleted chats and notes can be recovered from the Trash folder within 30 days of deletion. After 30 days, they will be permanently removed.",
+  },
+  {
+    questionTitle: "How do I change my account email?",
+    answer:
+      "To change your account email, go to Account Settings, click on Email, and follow the verification process to update your email address.",
+  },
+];
+
+export const previouslySearchedTopicsForHelp = [
+  {
+    id: 1,
+    title: "Free Plan",
+  },
+  {
+    id: 2,
+    title: "Pro Plans",
+  },
+  {
+    id: 3,
+    title: "Rooms",
+  },
+  {
+    id: 4,
+    title: "How to Use Elunara",
+  },
+  {
+    id: 5,
+    title: "Rooms",
+  },
+  {
+    id: 6,
+    title: "How to Use Elunara",
+  },
+  {
+    id: 7,
+    title: "Rooms",
+  },
+  {
+    id: 8,
+    title: "How to Use Elunara",
+  },
+    {
+    id: 1,
+    title: "Free Plan",
+  },
+  {
+    id: 2,
+    title: "Pro Plans",
+  },
+  {
+    id: 3,
+    title: "Rooms",
+  },
+  {
+    id: 4,
+    title: "How to Use Elunara",
+  },
+  {
+    id: 5,
+    title: "Rooms",
+  },
+  {
+    id: 6,
+    title: "How to Use Elunara",
+  },
+  {
+    id: 7,
+    title: "Rooms",
+  },
+  {
+    id: 8,
+    title: "How to Use Elunara",
+  },
 ];

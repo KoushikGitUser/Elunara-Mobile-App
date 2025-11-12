@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E8E8E8",
-    marginBottom: 20,
+    marginBottom: 15,
     overflow: "hidden",
   },
   cardContent: {

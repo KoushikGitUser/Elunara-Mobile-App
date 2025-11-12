@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     fontWeight: 600,
   },
   topicDesc: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(13),
     fontWeight: 400,
     color: "#757575",
   },

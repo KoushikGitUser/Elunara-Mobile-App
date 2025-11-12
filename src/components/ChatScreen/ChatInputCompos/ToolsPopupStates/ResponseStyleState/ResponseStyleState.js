@@ -64,9 +64,8 @@ const ResponseStyleState = () => {
           <View style={{ flexDirection: "column", gap: 25 }}>
             {responseStyles.map((styleOptions, optionsIndex) => {
               return (
-                <>
-                  <TouchableOpacity
-                    key={optionsIndex}
+                <React.Fragment key={optionsIndex}>
+                  <TouchableOpacity  
                     style={[
                       styles.card,
                       {
@@ -127,7 +126,7 @@ const ResponseStyleState = () => {
                       </Text>
                     </View>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </View>
