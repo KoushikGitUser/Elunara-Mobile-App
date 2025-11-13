@@ -20,10 +20,12 @@ import { faqData } from "../../data/datas";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import ValueFeedbackCompo from "../../components/ProfileAndSettings/HelpCenterCompo/ValueFeedbackCompo";
 
 const HelpCenter = ({ handleScroll }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [moreAccordions, setMoreAccordions] = useState(false);
+  const [toggleFeedbackPopup,setToggleFeedbackPopup] = useState(false);
   const navigation = useNavigation();
   const toggleAccordion = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -34,12 +36,13 @@ const HelpCenter = ({ handleScroll }) => {
   };
 
   const handleFeedbackPress = () => {
-    console.log("Send Feedback pressed");
+    setToggleFeedbackPopup(true)
   };
   const dispatch = useDispatch();
 
   return (
     <View style={styles.container}>
+      <ValueFeedbackCompo popupState={toggleFeedbackPopup} setPopupState={setToggleFeedbackPopup} />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView
         onScroll={handleScroll}

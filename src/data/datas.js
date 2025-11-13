@@ -89,6 +89,10 @@ import FilesIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/Fi
 import PrivacyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PrivacyIcon";
 import SignOutIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SignOutIcon";
 
+import FileTextIcon from '../../assets/SvgIconsComponent/HelpCenterIcons/FileTextIcon'
+import ShootingStarIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/ShootingStarIcon";
+import FeedBackIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/FeedBackIcon";
+
 export const slides = [
   {
     heading: ["Learning,", "Reimagined.", "Ethically."],
@@ -971,3 +975,22 @@ export const previouslySearchedTopicsForHelp = [
     title: "How to Use Elunara",
   },
 ];
+
+
+export const feedbackOptions = [
+  {
+    title:"Report a Bug",
+    desc:"Found something not working right? Let us know so we can fix it quickly.",
+    icon:<FileTextIcon/>
+  },
+    {
+    title:"Suggest a Feature",
+    desc:"Have an idea to improve your AI learning experience? Share your suggestions with us.",
+    icon:<ShootingStarIcon/>
+  },
+    {
+    title:"General Feedback",
+    desc:"Tell us what you like or what could be better — we're all ears!",
+    icon:<FeedBackIcon/>
+  },
+]

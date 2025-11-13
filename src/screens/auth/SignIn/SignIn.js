@@ -105,7 +105,6 @@ const SignIn = () => {
               style={styles.passwordInput}
               placeholder="Enter your password"
               placeholderTextColor="#B0B7C3"
-              secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />

@@ -39,7 +39,8 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
     <TermsOfUse handleScroll={handleScroll} />,
     <PrivacyPolicy handleScroll={handleScroll} />,
     <ContactPage/>,
-    <HelpCenterSearch/>
+    <HelpCenterSearch/>,
+    <EditProfile/>
   ];
 
   return (

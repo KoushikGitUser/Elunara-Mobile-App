@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: moderateScale(14),
     fontWeight: 400,
+    color:"#3A3A3A"
   },
     pdfMain: {
     height: verticalScale(65),

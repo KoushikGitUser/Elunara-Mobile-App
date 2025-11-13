@@ -227,7 +227,6 @@ export const createStyles = ({}) =>
     chatInputMainWrapper: {
       width: "100%",
       paddingBottom: 20,
-      paddingHorizontal: 20,
       zIndex: 2,
     },
     chatInputMain: {

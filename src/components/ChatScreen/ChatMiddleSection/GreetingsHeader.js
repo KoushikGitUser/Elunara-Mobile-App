@@ -11,9 +11,9 @@ const GreetingsHeader = () => {
       <View>
       <View style={styles.greetingPlusname}>
         <GradientText
-          children="Good Morning,"
+          children="Good Morning,   "
           fullWidth={false}
-          widthNumber={0.57}
+          widthNumber={0.45}
           fontSize={25}
         />
         <Text style={{ fontSize: 20, fontWeight: 600 }}>Koushik!</Text>

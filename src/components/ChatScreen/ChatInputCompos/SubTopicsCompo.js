@@ -20,7 +20,11 @@ import { subTopics } from "../../../data/datas";
 import { scaleFont } from "../../../utils/responsive";
 import SubTopicsCard from "./SubTopicsCard";
 import { ArrowLeft, Mic, Search } from "lucide-react-native";
-import { setToggleSubTopics, setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleSubTopics,
+  setToggleTopicsPopup,
+} from "../../../redux/slices/toggleSlice";
+import SendIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -30,6 +34,7 @@ const SubTopicsCompo = () => {
   const [searchText, setSearchText] = useState("");
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [expandTextInput, setExpandTextInput] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -98,21 +103,57 @@ const SubTopicsCompo = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-        style={[styles.keyboardAvoidingView, { bottom: keyboardHeight - 10 }]}
+        style={[styles.keyboardAvoidingView, { bottom: keyboardHeight }]}
       >
         <View style={styles.container}>
           <View style={styles.contents}>
-            <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  height: expandTextInput?110:"50",
+                  flexDirection: expandTextInput ? "column" : "row",
+                  paddingTop:expandTextInput?0:10,
+                  paddingBottom:10 
+                },
+              ]}
+            >
               <TextInput
-                style={styles.belowInput}
+                style={[
+                  styles.belowInput,
+                  { alignSelf: expandTextInput ? "flex-start" : "center",},
+                ]}
+                onFocus={() => setExpandTextInput(true)}
+                onBlur={() => setExpandTextInput(false)}
                 placeholder="Can't find a topic? Just type it,I've got you"
                 placeholderTextColor="#B5BECE"
                 value={belowSearchText}
                 onChangeText={setBelowSearchText}
               />
-              <TouchableOpacity style={styles.micButton} activeOpacity={0.7}>
-                <Mic size={25} color="#1A1A1A" strokeWidth={1.5} />
-              </TouchableOpacity>
+              <View
+                style={{ flexDirection: "row",alignSelf: expandTextInput ? "flex-end" : "center", gap: 0,alignSelf:"flex-end", }}
+              >
+                <TouchableOpacity
+                  style={[
+                    styles.micButton,
+                    { alignSelf: expandTextInput ? "flex-end" : "center" },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Mic size={25} color="#1A1A1A" strokeWidth={1.5} />
+                </TouchableOpacity>
+                {belowSearchText !== "" && (
+                  <TouchableOpacity
+                    style={[
+                      styles.micButton,
+                      { alignSelf: expandTextInput ? "flex-end" : "center" },
+                    ]}
+                    activeOpacity={0.7}
+                  >
+                    <SendIcon/>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -277,12 +318,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#F8F9FA",
-    borderRadius: 17,
+    borderRadius: 19,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingTop: 0,
     borderWidth: 1,
     borderColor: "#ABB8CC",
     marginBottom: 12,

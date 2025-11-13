@@ -42,7 +42,7 @@ const AboutPage = ({ handleScroll }) => {
 
         {/* Cookies section */}
 
-        <View style={{ padding: 20, paddingBottom: 5 }}>
+        <View style={{ padding: 20, paddingBottom: 5,marginTop:20 }}>
           <Text style={styles.sectionTitle}>Who are we</Text>
           <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
             Elunara is your smart learning companion, here to make education more affordable, personalized, and accessible—no matter the infrastructure.
@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: scaleFont(14),
     fontWeight:600,
-    color: "#666666",
     lineHeight: 24,
     marginBottom: 16,
   },

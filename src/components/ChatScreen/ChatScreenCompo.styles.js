@@ -78,7 +78,6 @@ export const createStyles = ({}) =>
       width: "100%",
       flex: 1,
       justifyContent: "flex-end",
-      paddingHorizontal:20,
     },
     messagesContainer: {
       width: "100%",
@@ -115,7 +114,7 @@ export const createStyles = ({}) =>
       height: 142,
       width: 100,
       position: "absolute",
-      right: -5,
+      right: -20,
       top:180,
       zIndex: 1,
       marginTop: 10,

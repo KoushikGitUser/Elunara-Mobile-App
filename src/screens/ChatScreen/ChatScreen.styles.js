@@ -15,7 +15,7 @@ export const createStyles = (props = {}) =>
       width: "100%",
       flexDirection: "column",
       backgroundColor: "#FAFAFA",
-      
+      paddingHorizontal:20
     },
     middleAndChatInputWrapper: {
       width: "100%",

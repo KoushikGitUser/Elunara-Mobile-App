@@ -42,12 +42,7 @@ const ChatHeader = ({ translateX }) => {
       style={[
         styles.chatHeader,
         {
-          borderBottomWidth:
-            toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
-            globalDataStates.selectedFiles.length > 0 ||
-            toggleStates.toggleIsChattingWithAI
-              ? 1
-              : 0,
+
         },
       ]}
     >

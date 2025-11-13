@@ -240,7 +240,7 @@ const ChatInputMain = () => {
           </View>
           <View style={styles.inputRightActionIcons}>
             <TouchableOpacity
-              onPress={() => dispatch(setToggleToolsPopup(true))}
+              
             >
              <MicIcon/>
             </TouchableOpacity>

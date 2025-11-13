@@ -25,7 +25,7 @@ const UserSection = () => {
         <TouchableOpacity onPress={()=>{
           dispatch(setSettingsInnerPageHeaderTitle("Profile Information"));
           dispatch(setSettingsInnerPageComponentToRender("Edit Profile"))
-           navigation.navigate("settingsInnerPages");
+           navigation.navigate("settingsInnerPages",{page:11});
         }} style={{marginLeft:"auto",alignSelf:"flex-end"}}>
           <PencilIcon />
         </TouchableOpacity>

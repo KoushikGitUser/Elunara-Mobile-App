@@ -25,7 +25,9 @@ const ChatOptionsPopup = () => {
 
   const commonFunctions = (type) => {
     if (type == "Open Notes") {
+      navigation.navigate("notes")
     } else if (type == "Add to Learning Lab") {
+      navigation.navigate("rooms")
     } else if (type == "Rename") {
       dispatch(setToggleRenameChatPopup(true));
     } else if (type == "Pin") {

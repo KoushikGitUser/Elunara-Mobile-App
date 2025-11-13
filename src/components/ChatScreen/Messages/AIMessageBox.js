@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: moderateScale(14),
     fontWeight: 400,
+    color:"#5E5E5E"
   },
   messageActions: {
     width: "auto",
