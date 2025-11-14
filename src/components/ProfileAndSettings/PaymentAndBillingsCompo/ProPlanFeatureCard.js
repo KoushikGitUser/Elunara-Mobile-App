@@ -1,0 +1,115 @@
+import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import { proPlanFeature } from "../../../data/datas";
+import { Check } from "lucide-react-native";
+import BigChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/BigChakraIcon";
+import { scaleFont } from "../../../utils/responsive";
+import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient";
+import GradientText from '../../common/GradientText'
+
+const ProPlanFeatureCard = () => {
+  return (
+    <View style={styles.cardWrapper}>
+      <View style={styles.gradientWrapper}>
+        <ExpoLinearGradient
+          colors={["#1B365D", "#A5C0E7"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientBackground}
+        />
+      </View>
+      <View style={styles.card}>
+        {/* Header */}
+        <View style={styles.header}>
+          <BigChakraIcon />
+          <GradientText children="Pro Plan" fontSize={32} fullWidth={true}  />
+        </View>
+        {/* Subtitle */}
+        <Text style={styles.subtitle}>
+          Unlock smarter learning — go Pro and power up your progress
+        </Text>
+
+        {/* Features List */}
+        <View style={styles.featuresList}>
+          {proPlanFeature.map((feature, index) => (
+            <View key={index} style={styles.featureItem}>
+              <Check size={24} color="#10B981" strokeWidth={1.7} />
+              <Text style={styles.featureText}>{feature}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  gradientWrapper: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  gradientBackground: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 24,
+    marginRight: 4,
+    marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  cardWrapper: {
+    position: "relative",
+    width: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#3B5580",
+  },
+  subtitle: {
+    fontSize: scaleFont(15),
+    lineHeight: 24,
+    color: "#6B7280",
+    fontWeight: "400",
+    marginBottom: 24,
+  },
+  featuresList: {
+    gap: 16,
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 12,
+  },
+  featureText: {
+    fontSize: scaleFont(14),
+    lineHeight: 24,
+    color: "#1F2937",
+    fontWeight: "400",
+    flex: 1,
+    paddingTop: 1,
+  },
+});
+
+export default ProPlanFeatureCard;

@@ -34,7 +34,7 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
     <Analytics />,
     <PaymentBilling />,
     <AcademicLinks />,
-    <AboutPage />,
+    <AboutPage handleScroll={handleScroll} />,
     <HelpCenter handleScroll={handleScroll} />,
     <TermsOfUse handleScroll={handleScroll} />,
     <PrivacyPolicy handleScroll={handleScroll} />,

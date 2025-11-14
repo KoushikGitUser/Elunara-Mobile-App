@@ -89,7 +89,7 @@ import FilesIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/Fi
 import PrivacyIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PrivacyIcon";
 import SignOutIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/SignOutIcon";
 
-import FileTextIcon from '../../assets/SvgIconsComponent/HelpCenterIcons/FileTextIcon'
+import FileTextIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/FileTextIcon";
 import ShootingStarIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/ShootingStarIcon";
 import FeedBackIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/FeedBackIcon";
 
@@ -942,7 +942,7 @@ export const previouslySearchedTopicsForHelp = [
     id: 8,
     title: "How to Use Elunara",
   },
-    {
+  {
     id: 1,
     title: "Free Plan",
   },
@@ -976,21 +976,50 @@ export const previouslySearchedTopicsForHelp = [
   },
 ];
 
-
 export const feedbackOptions = [
   {
-    title:"Report a Bug",
-    desc:"Found something not working right? Let us know so we can fix it quickly.",
-    icon:<FileTextIcon/>
+    title: "Report a Bug",
+    desc: "Found something not working right? Let us know so we can fix it quickly.",
+    icon: <FileTextIcon />,
   },
-    {
-    title:"Suggest a Feature",
-    desc:"Have an idea to improve your AI learning experience? Share your suggestions with us.",
-    icon:<ShootingStarIcon/>
+  {
+    title: "Suggest a Feature",
+    desc: "Have an idea to improve your AI learning experience? Share your suggestions with us.",
+    icon: <ShootingStarIcon />,
   },
-    {
-    title:"General Feedback",
-    desc:"Tell us what you like or what could be better — we're all ears!",
-    icon:<FeedBackIcon/>
+  {
+    title: "General Feedback",
+    desc: "Tell us what you like or what could be better — we're all ears!",
+    icon: <FeedBackIcon />,
   },
-]
+];
+
+export const academicLinks = [
+  {
+    id: 1,
+    link: "<Link1@link.com>",
+    linkDesc: "<link preview description>",
+  },
+  {
+    id: 1,
+    link: "<Link2@link.com>",
+    linkDesc: "<link preview description>",
+  },
+];
+
+export const proPlanFeature = [
+  "Everything in free",
+  "Unlimited file and photo uploads",
+  "Room-based learning: create and manage focused Rooms",
+  "Unlimited Custom AI interaction: pick model, style, language, and citations.",
+  "Increased limits: more chats and longer conversations.",
+  "Opportunities to test new features",
+];
+
+export const freePlanFeature = [
+  "Basic AI chat interactions",
+  "Access to curated subject library",
+  "Limited daily attachment uploads\n(up to <x> files per day)",
+  "Limited number of changes to AI response style and language (up to <x> changes per day)",
+  "Limited number of changes to resources citations (up to <x> changes per day)",
+];

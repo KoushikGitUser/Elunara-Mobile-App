@@ -10,6 +10,11 @@ import { scaleFont } from "../../utils/responsive";
 import React from "react";
 import GradientText from "../../components/common/GradientText";
 import chakraLogo from "../../assets/images/Knowledge Chakra 2.png";
+import ElunaraRepresentsCompo from "../../components/ProfileAndSettings/AboutPageCompo/ElunaraRepresentsCompo";
+import GraphIcon from "../../../assets/SvgIconsComponent/AboutIcons/GraphIcon";
+import SettingsIcon from "../../../assets/SvgIconsComponent/AboutIcons/SettingsIcon";
+import BooksIcon from "../../../assets/SvgIconsComponent/AboutIcons/BooksIcon";
+import OurValuesCompo from "../../components/ProfileAndSettings/AboutPageCompo/OurValuesCompo";
 
 const AboutPage = ({ handleScroll }) => {
   return (
@@ -37,89 +42,94 @@ const AboutPage = ({ handleScroll }) => {
             fontSize={scaleFont(35)}
           />
           <Text style={styles.mainTitle}>Companion for Lifelong Learning</Text>
-            <Image source={chakraLogo} style={styles.chakraLogo} />
+          <Image source={chakraLogo} style={styles.chakraLogo} />
         </View>
 
         {/* Cookies section */}
 
-        <View style={{ padding: 20, paddingBottom: 5,marginTop:20 }}>
+        <View style={{ padding: 20, paddingBottom: 0, marginTop: 20 }}>
           <Text style={styles.sectionTitle}>Who are we</Text>
           <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            Elunara is your smart learning companion, here to make education more affordable, personalized, and accessible—no matter the infrastructure.
-          </Text>
-
-          {/* How long do we keep your information */}
-          <Text style={styles.sectionTitle}>Use of the Service</Text>
-          <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            Elunara provides personalized learning experiences using AI. You
-            agree to use the app only for lawful and educational purposes, and
-            not to misuse or exploit the platform in any way.
+            Elunara is your smart learning companion, here to make education
+            more affordable, personalized, and accessible—no matter the
+            infrastructure.
           </Text>
         </View>
 
-        <View style={{ padding: 20, paddingTop: 5 }}>
-          <Text style={styles.sectionTitle}>User Responsibilities</Text>
-          <View style={styles.bulletPoint}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.bulletTextSimple}>
-              Provide accurate and complete information.
-            </Text>
-          </View>
+        <ElunaraRepresentsCompo />
 
-          <View style={styles.bulletPoint}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.bulletTextSimple}>
-              Keep your login credentials secure.
-            </Text>
-          </View>
-
-          <View style={styles.bulletPoint}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.bulletTextSimple}>
-              Respect the platform, other users, and all applicable laws.
-            </Text>
-          </View>
-
-          <View style={styles.bulletPoint}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.bulletTextSimple}>
-              Do not attempt to reverse-engineer, copy, or misuse the AI or app
-              content.
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ padding: 20, paddingBottom: 5 }}>
-          <Text style={styles.sectionTitle}>Intellectual Property</Text>
-          <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            All content, features, and technology in Elunara are the property of
-            Elunara or its licensors. You may not reproduce, distribute, or
-            modify any part of the platform without explicit permission.
-          </Text>
-
-          {/* How long do we keep your information */}
-          <Text style={styles.sectionTitle}>Data & Privacy</Text>
-          <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            Your data is handled in accordance with our [Privacy Policy]. By
-            using Elunara, you consent to the collection and use of your data
-            for personalization and service improvement.
+        <View style={{ padding: 20, paddingBottom: 0, marginTop: 20 }}>
+          <Text style={styles.sectionTitle}>Our USPs</Text>
+          <Text style={styles.mainTitle}>Why Elunara?</Text>
+          <Text
+            style={[
+              styles.bodyText,
+              { paddingBottom: 20, fontWeight: 400, color: "#757575" },
+            ]}
+          >
+            Elunara is your smart learning companion, here to make education
+            more affordable, personalized, and accessible—no matter the
+            infrastructure.
           </Text>
         </View>
-        <View style={{ padding: 20, paddingTop: 5 }}>
-          <Text style={styles.sectionTitle}>Limitations of AI</Text>
-          <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            Elunara uses AI to provide guidance and content. While we strive for
-            accuracy, the AI may occasionally provide incorrect or incomplete
-            responses. Always use your judgment and consult trusted sources when
-            needed.
-          </Text>
 
-          {/* How long do we keep your information */}
-          <Text style={styles.sectionTitle}>Service Availability</Text>
-          <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            We aim to provide continuous service but do not guarantee
-            uninterrupted access. We may suspend, update, or discontinue
-            features at any time, with or without notice.
+        <View style={{ padding: 20, paddingBottom: 0, paddingTop: 5 }}>
+          <View style={styles.graphIcon}>
+            <GraphIcon />
+          </View>
+          <Text style={styles.mainTitle}>Personalised Knowledge Linking</Text>
+          <Text
+            style={[
+              styles.bodyText,
+              { paddingBottom: 20, fontWeight: 400, color: "#757575" },
+            ]}
+          >
+            Connects with the right content, mentors, and peers for a meaningful
+            learning journey.
+          </Text>
+        </View>
+
+        <View style={{ padding: 20, paddingBottom: 0, paddingTop: 5 }}>
+          <View style={styles.settingsIcon}>
+            <SettingsIcon />
+          </View>
+          <Text style={styles.mainTitle}>Global Education Access</Text>
+          <Text
+            style={[
+              styles.bodyText,
+              { paddingBottom: 20, fontWeight: 400, color: "#757575" },
+            ]}
+          >
+            Avails high-quality, personalised education accessible to every
+            learner, everywhere.
+          </Text>
+        </View>
+
+        <View style={{ padding: 20, paddingBottom: 0, paddingTop: 5 }}>
+          <View style={styles.booksIcon}>
+            <BooksIcon />
+          </View>
+          <Text style={styles.mainTitle}>Adaptive Learning Agent</Text>
+          <Text
+            style={[
+              styles.bodyText,
+              { paddingBottom: 20, fontWeight: 400, color: "#757575" },
+            ]}
+          >
+            Adapts to your unique learning style to make education more
+            effective and personalised.
+          </Text>
+        </View>
+        <OurValuesCompo />
+        <View style={{ padding: 20, paddingBottom: 0, marginTop: 25 }}>
+          <Text style={styles.mainTitle}>Service Availability</Text>
+          <Text
+            style={[
+              styles.bodyText,
+              { paddingBottom: 20, fontWeight: 400, color: "#757575" },
+            ]}
+          >
+            We aim to provide continuous service but do not guarantee uninterrupted access. We may suspend, update, or discontinue features at any time, with or without notice.
           </Text>
         </View>
       </ScrollView>
@@ -143,7 +153,7 @@ const styles = StyleSheet.create({
     width: 80,
     position: "absolute",
     right: -15,
-    top:20,
+    top: 20,
     zIndex: 99,
   },
   headerLabel: {
@@ -154,7 +164,7 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: scaleFont(18),
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#1A1A1A",
     marginBottom: 12,
     lineHeight: 36,
@@ -172,7 +182,7 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: scaleFont(14),
-    fontWeight:600,
+    fontWeight: 600,
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -226,6 +236,42 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 20,
+  },
+  graphIcon: {
+    height: 40,
+    width: 40,
+    borderRadius: 60,
+    backgroundColor: "#F3ECFF",
+    borderWidth: 1,
+    borderColor: "#DFD8EB",
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  settingsIcon: {
+    height: 40,
+    width: 40,
+    borderRadius: 60,
+    backgroundColor: "#E9F2FF",
+    borderWidth: 1,
+    borderColor: "#CCDAEE",
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  booksIcon: {
+    height: 40,
+    width: 40,
+    borderRadius: 60,
+    backgroundColor: "#F5EEE2",
+    borderWidth: 1,
+    borderColor: "#EAD8B9",
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

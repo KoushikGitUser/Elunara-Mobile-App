@@ -10,7 +10,7 @@ const Personalisation = () => {
   const screen_height = Dimensions.get("window").height;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container}> 
       <Text style={{fontSize:scaleFont(12)}}>Share about yourself for tailored responses!</Text> 
       <View style={styles.categorySections}>
         <TouchableOpacity onPress={()=>setSelectedCategory(1)} style={[styles.sections,{borderColor:selectedCategory == 1?"black":"#E2E2E2"}]}>
