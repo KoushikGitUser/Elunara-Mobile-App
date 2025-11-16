@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { scaleFont } from "../../utils/responsive";
 import ProPlanFeatureCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/ProPlanFeatureCard";
 import FreePlanFeatureCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/FreePlanFeatureCard";
 import { Check } from "lucide-react-native";
+import FreePlanUsageCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/FreePlanUsageCard";
 
 const PaymentBilling = () => {
   const [selectedCategory, setSelectedCategory] = useState(1);
@@ -35,7 +36,7 @@ const PaymentBilling = () => {
             { borderColor: selectedCategory == 2 ? "black" : "#E2E2E2" },
           ]}
         >
-          <Text
+          <Text 
             style={[
               styles.sectionText,
               { color: selectedCategory == 2 ? "black" : "#757575" },
@@ -47,7 +48,7 @@ const PaymentBilling = () => {
       </View>
       <View style={styles.cardsMainContainer}>
         {selectedCategory == 1 ? (
-          <>
+          <React.Fragment >
             <ProPlanFeatureCard />
             <View
               style={{ flexDirection: "column", alignItems: "center", gap: 10,width:"100%" }}
@@ -109,9 +110,13 @@ const PaymentBilling = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-          </>
+          </React.Fragment>
         ) : (
+          <ScrollView style={{flex:1,paddingTop:25}} showsVerticalScrollIndicator={false}>
           <FreePlanFeatureCard />
+          <FreePlanUsageCard/>
+          </ScrollView>
+
         )}
       </View>
     </View>
@@ -129,7 +134,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 15,
   },
   sectionText: {
     color: "#757575",
@@ -149,7 +153,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 25,
   },
   cardsContainer: {
     flexDirection: "row",

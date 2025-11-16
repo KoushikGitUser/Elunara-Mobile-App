@@ -22,7 +22,7 @@ const ProPlanFeatureCard = () => {
         {/* Header */}
         <View style={styles.header}>
           <BigChakraIcon />
-          <GradientText children="Pro Plan" fontSize={32} fullWidth={true}  />
+          <GradientText children="Pro Plan" fontSize={24} fullWidth={true}  />
         </View>
         {/* Subtitle */}
         <Text style={styles.subtitle}>
@@ -63,7 +63,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 24,
-    padding: 24,
+    paddingVertical:13,
+    paddingHorizontal:20,
     marginRight: 4,
     marginBottom: 4,
     shadowColor: '#000',
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
   cardWrapper: {
     position: "relative",
     width: "100%",
+    marginTop:30
   },
   header: {
     flexDirection: "row",
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   featuresList: {
-    gap: 16,
+    gap: 10,
   },
   featureItem: {
     flexDirection: "row",
@@ -103,10 +105,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#1F2937",
-    fontWeight: "400",
+    fontWeight: "500",
     flex: 1,
     paddingTop: 1,
   },
