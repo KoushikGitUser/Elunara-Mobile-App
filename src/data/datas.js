@@ -1023,3 +1023,77 @@ export const freePlanFeature = [
   "Limited number of changes to AI response style and language (up to <x> changes per day)",
   "Limited number of changes to resources citations (up to <x> changes per day)",
 ];
+
+
+export const billingData = [
+    {
+      id: 1,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 2,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'mastercard',
+      paymentInfo: '**** **** **** 4356',
+    },
+    {
+      id: 3,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 4,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 5,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+        {
+      id: 6,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 7,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'mastercard',
+      paymentInfo: '**** **** **** 4356',
+    },
+    {
+      id: 8,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 9,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+    {
+      id: 10,
+      date: '09/06/2025',
+      amount: '₹1,999',
+      paymentMethod: 'gpay',
+      paymentInfo: 'a****@oksbi',
+    },
+  ];

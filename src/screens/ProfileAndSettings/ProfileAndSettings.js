@@ -1,4 +1,4 @@
-import { View, Text, Animated } from "react-native";
+import { View, Text, Animated, StatusBar } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileHeader from "../../components/ProfileAndSettings/ProfileHeader";
@@ -9,18 +9,30 @@ import ConfirmLogoutPopup from "../../components/ProfileAndSettings/ConfirmLogou
 
 const ProfileAndSettings = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
-  const [toggleLogOutConfirmPopup, setToggleLogOutConfirmPopup] = useState(false);
+  const [toggleLogOutConfirmPopup, setToggleLogOutConfirmPopup] =
+    useState(false);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA",paddingHorizontal:20}}>
-      <ConfirmLogoutPopup toggleLogOutConfirmPopup={toggleLogOutConfirmPopup} setToggleLogOutConfirmPopup={setToggleLogOutConfirmPopup} />
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#FAFAFA", paddingHorizontal: 20 }}
+    >
+      <StatusBar
+        barStyle="dark-content"
+        hidden={false}
+        translucent={false}
+        animated
+      />
+      <ConfirmLogoutPopup
+        toggleLogOutConfirmPopup={toggleLogOutConfirmPopup}
+        setToggleLogOutConfirmPopup={setToggleLogOutConfirmPopup}
+      />
       <ChatHistorySidebar translateX={translateX} />
-      <Animated.View
-        style={{ flex: 1, transform: [{ translateX }] }}
-      >
-        <ProfileHeader translateX={translateX}/>
-        <UserSection/>
-        <ProfileOptionsContainer setToggleLogOutConfirmPopup={setToggleLogOutConfirmPopup} />
+      <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
+        <ProfileHeader translateX={translateX} />
+        <UserSection />
+        <ProfileOptionsContainer
+          setToggleLogOutConfirmPopup={setToggleLogOutConfirmPopup}
+        />
       </Animated.View>
     </SafeAreaView>
   );
