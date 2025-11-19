@@ -1024,76 +1024,112 @@ export const freePlanFeature = [
   "Limited number of changes to resources citations (up to <x> changes per day)",
 ];
 
-
 export const billingData = [
-    {
-      id: 1,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 2,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'mastercard',
-      paymentInfo: '**** **** **** 4356',
-    },
-    {
-      id: 3,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 4,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 5,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-        {
-      id: 6,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 7,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'mastercard',
-      paymentInfo: '**** **** **** 4356',
-    },
-    {
-      id: 8,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 9,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-    {
-      id: 10,
-      date: '09/06/2025',
-      amount: '₹1,999',
-      paymentMethod: 'gpay',
-      paymentInfo: 'a****@oksbi',
-    },
-  ];
+  {
+    id: 1,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 2,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "mastercard",
+    paymentInfo: "**** **** **** 4356",
+  },
+  {
+    id: 3,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 4,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 5,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 6,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 7,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "mastercard",
+    paymentInfo: "**** **** **** 4356",
+  },
+  {
+    id: 8,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 9,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+  {
+    id: 10,
+    date: "09/06/2025",
+    amount: "₹1,999",
+    paymentMethod: "gpay",
+    paymentInfo: "a****@oksbi",
+  },
+];
+
+export const topicsCoveredAnalytics = [
+  {
+    title: "Finance",
+    completed: 12,
+    total: 14,
+    isComplete: false,
+  },
+  {
+    title: "Information System",
+    completed: 8,
+    total: 8,
+    isComplete: true,
+  },
+  {
+    title: "Marketing",
+    completed: 13,
+    total: 27,
+    isComplete: false,
+  },
+  {
+    title: "Business Analytics",
+    completed: 10,
+    total: 33,
+    isComplete: false,
+  },
+];
+
+export const graphData = [
+  { day: "M", hours: 4.0 },
+  { day: "T", hours: 1.8 },
+  { day: "W", hours: 3.5 },
+  { day: "T", hours: 2.8 },
+  { day: "F", hours: 3.8 },
+  { day: "S", hours: 1.5 },
+  { day: "S", hours: 3.7 },
+];

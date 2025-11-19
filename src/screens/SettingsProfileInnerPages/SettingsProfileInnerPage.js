@@ -32,7 +32,7 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
   const pagesArray = [
     <GeneralSettings handleScroll={handleScroll} />,
     <Personalisation />,
-    <Analytics />,
+    <Analytics handleScroll={handleScroll} />,
     <PaymentBilling />,
     <AcademicLinks />,
     <AboutPage handleScroll={handleScroll} />,
