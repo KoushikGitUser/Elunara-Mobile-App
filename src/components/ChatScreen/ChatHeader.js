@@ -38,30 +38,34 @@ const ChatHeader = ({ translateX }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
   return (
-    <View
-      style={[
-        styles.chatHeader,
-        {
+    <View style={[styles.chatHeader, {}]}>
+      <View style={styles.rightChatHeaderIcons}>
+        <TouchableOpacity
+          onPress={() => {
+            Animated.timing(translateX, {
+              toValue: toggleStates.toggleChatHistorySidebar
+                ? 0
+                : SCREEN_WIDTH * 0.75,
+              duration: 100,
+              useNativeDriver: true,
+            }).start();
+            dispatch(
+              setToggleChatHistorySidebar(
+                !toggleStates.toggleChatHistorySidebar
+              )
+            );
+          }}
+        >
+          <Feather name="menu" size={30} color="black" />
+        </TouchableOpacity>
+        {toggleStates.toggleIsChattingWithAI && (
+          <TouchableOpacity style={{}}>
+            <EllipsisVertical color="#FAFAFA" strokeWidth={1.25} size={30} />
+          </TouchableOpacity>
+        )}
+      </View>
 
-        },
-      ]}
-    >
-      <TouchableOpacity
-        onPress={() => {
-          Animated.timing(translateX, {
-            toValue: toggleStates.toggleChatHistorySidebar ? 0 : SCREEN_WIDTH * 0.75,
-            duration: 100,
-            useNativeDriver: true,
-          }).start();
-          dispatch(
-            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
-          );
-        }}
-      >
-        <Feather name="menu" size={30} color="black" />
-      </TouchableOpacity>
-
-      {toggleStates.toggleIsChattingWithAI ? (
+      {toggleStates.toggleIsChattingWithAI ? ( 
         <View style={styles.chatnameAndSection}>
           <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
             First Chat with AI
@@ -74,8 +78,11 @@ const ChatHeader = ({ translateX }) => {
           </TouchableOpacity>
         </View>
       ) : (
-        <TouchableOpacity onPress={()=>navigation.navigate("svg")} style={styles.upgradeButton}>
-          <SparkleIcon/>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("svg")}
+          style={styles.upgradeButton}
+        >
+          <SparkleIcon />
           <Text style={{ fontSize: 13, fontWeight: 600 }}>Upgrade Plan</Text>
         </TouchableOpacity>
       )}

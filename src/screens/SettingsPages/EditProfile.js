@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React from "react";
 import { scaleFont } from "../../utils/responsive";
@@ -13,10 +14,65 @@ import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcon
 import profilePic from "../../assets/images/profilepic.png";
 import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfile = () => {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [selectedImage, setSelectedImage] = React.useState(null);
+  const firstNameInputRef = React.useRef(null);
+  const lastNameInputRef = React.useRef(null);
+  const emailInputRef = React.useRef(null);
+  const passwordInputRef = React.useRef(null);
+
+  const triggerImagePicker = async ()=>{
+          // Open image gallery functionality
+      try {
+        // First check current permission status
+        const permissionResult = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+        if (permissionResult.status !== "granted") {
+          // Request permission if not granted
+          const requestResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+          if (requestResult.status !== "granted") {
+            Alert.alert(
+              "Permission Denied",
+              "Gallery permission is required to select photos. Please enable it in your device settings."
+            );
+            return;
+          }
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          quality: 1,
+        });
+
+        if (!result.canceled) {
+          if(result.assets[0].mimeType == "image/png" || result.assets[0].mimeType == "image/jpg" || result.assets[0].mimeType == "image/jpeg"){
+          // Add selected photo to Redux
+          setSelectedImage(result.assets[0].uri);
+          }
+          else{
+            Alert.alert("Invalid type","The type of image you selected is not supported.")
+          }
+
+        }
+      } catch (error) {
+        console.error("Error picking image:", error);
+        Alert.alert("Error", "Failed to pick image.");
+      }
+  }
+
+  const commonFunctionForFocusingInput = (inputRef) => {
+    if (inputRef && inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   return (
     <ScrollView
@@ -31,10 +87,10 @@ const EditProfile = () => {
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120, position: "relative1" }}>
           <Image
-            source={profilePic}
-            style={{ height: "100%", width: "100%" }}
+            source={selectedImage ? {uri:selectedImage} : profilePic}
+            style={{ height: "100%", width: "100%",borderRadius:20 }}
           />
-          <TouchableOpacity style={styles.editBtnImg}>
+          <TouchableOpacity onPress={triggerImagePicker} style={styles.editBtnImg}>
             <PencilIcon />
           </TouchableOpacity>
         </View>
@@ -44,6 +100,7 @@ const EditProfile = () => {
           <Text style={styles.inputLabel}>First Name</Text>
           <View style={styles.input}>
             <TextInput
+              ref={firstNameInputRef}
               style={styles.inputText}
               placeholder="Your first name"
               placeholderTextColor="#9CA3AF"
@@ -51,7 +108,7 @@ const EditProfile = () => {
               onChangeText={(text) => setFirstName(text)}
               returnKeyType="done"
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => commonFunctionForFocusingInput(firstNameInputRef)}>
               <PencilIcon />
             </TouchableOpacity>
           </View>
@@ -60,6 +117,7 @@ const EditProfile = () => {
           <Text style={styles.inputLabel}>Last Name</Text>
           <View style={styles.input}>
             <TextInput
+              ref={lastNameInputRef}
               style={styles.inputText}
               placeholder="Your last name"
               placeholderTextColor="#9CA3AF"
@@ -67,7 +125,7 @@ const EditProfile = () => {
               onChangeText={(text) => setLastName(text)}
               returnKeyType="done"
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => commonFunctionForFocusingInput(lastNameInputRef)}>
               <PencilIcon />
             </TouchableOpacity>
           </View>
@@ -77,14 +135,15 @@ const EditProfile = () => {
         <Text style={styles.inputLabel}>Email</Text>
         <View style={styles.input}>
           <TextInput
+            ref={emailInputRef}
             style={styles.inputText}
-            placeholder="Your first name"
+            placeholder="Your email"
             placeholderTextColor="#9CA3AF"
-            value={firstName}
-            onChangeText={(text) => setFirstName(text)}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
             returnKeyType="done"
           />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => commonFunctionForFocusingInput(emailInputRef)}>
             <PencilIcon />
           </TouchableOpacity>
         </View>
@@ -93,14 +152,16 @@ const EditProfile = () => {
         <Text style={styles.inputLabel}>Password</Text>
         <View style={styles.input}>
           <TextInput
+            ref={passwordInputRef}
             style={styles.inputText}
-            placeholder="Your first name"
+            placeholder="Your password"
             placeholderTextColor="#9CA3AF"
-            value={firstName}
-            onChangeText={(text) => setFirstName(text)}
+            value={password}
+            secureTextEntry={true}
+            onChangeText={(text) => setPassword(text)}
             returnKeyType="done"
           />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => commonFunctionForFocusingInput(passwordInputRef)}>
             <PencilIcon />
           </TouchableOpacity>
         </View>
