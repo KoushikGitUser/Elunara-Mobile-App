@@ -9,6 +9,8 @@ import React, { useState } from "react";
 import { scaleFont } from "../../../utils/responsive";
 import DeskMobIcon from "../../../../assets/SvgIconsComponent/PersonalisationIcons/DeskMobIcon";
 import { ChevronDown } from "lucide-react-native";
+import EducationDropDowns from "./EducationDropDowns";
+import { internetQuality } from "../../../data/datas";
 
 const Learning = () => {
   const [primaryDevice, setPrimaryDevice] = useState(null);
@@ -46,17 +48,10 @@ const Learning = () => {
 
       <View style={[styles.inputSection, { width: "100%", marginTop: 35 }]}>
         <Text style={styles.inputLabel}>Internet connection Quality</Text>
-        <View style={styles.input}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Select internet quality...."
-            placeholderTextColor="#9CA3AF"
-            returnKeyType="done"
-          />
-          <TouchableOpacity>
-            <ChevronDown size={30} strokeWidth={1.25} />
-          </TouchableOpacity>
-        </View>
+        <EducationDropDowns
+          dataArray={internetQuality}
+          placeholder="Select internet quality...."
+        />
       </View>
       <View style={{ marginTop: 10, marginBottom: 20 }}>
         <Text style={styles.question}>Primary Device used</Text>
@@ -79,7 +74,7 @@ const Learning = () => {
           />
         </View>
       </View>
-            <View style={{ marginTop: 10, marginBottom: 20 }}>
+      <View style={{ marginTop: 10, marginBottom: 20 }}>
         <Text style={styles.question}>Do you prefer group study?</Text>
 
         <View style={styles.optionsContainer}>
@@ -100,7 +95,7 @@ const Learning = () => {
           />
         </View>
       </View>
-            <View style={{ marginTop: 10, marginBottom: 20 }}>
+      <View style={{ marginTop: 10, marginBottom: 20 }}>
         <Text style={styles.question}>Do you have a quiet place to study</Text>
 
         <View style={styles.optionsContainer}>

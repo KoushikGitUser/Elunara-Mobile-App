@@ -9,6 +9,13 @@ import React, { useState } from "react";
 import { scaleFont } from "../../../utils/responsive";
 import { ChevronDown, UserRound } from "lucide-react-native";
 import BriefCaseIcon from "../../../../assets/SvgIconsComponent/PersonalisationIcons/BriefCaseIcon";
+import EducationDropDowns from "./EducationDropDowns";
+import {
+  currentUniversity,
+  degreeProgram,
+  semester,
+  specialization,
+} from "../../../data/datas";
 
 const Education = () => {
   const [selectedOption, setSelectedOption] = useState("No");
@@ -30,7 +37,7 @@ const Education = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1,paddingBottom:100}}>
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
           <BriefCaseIcon />
@@ -43,63 +50,35 @@ const Education = () => {
       </View>
       <View style={[styles.inputSection, { width: "100%", marginTop: 30 }]}>
         <Text style={styles.inputLabel}>Current University</Text>
-        <View style={styles.input}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Select current university"
-            placeholderTextColor="#9CA3AF"
-            returnKeyType="done"
-          />
-          <TouchableOpacity>
-            <ChevronDown size={30} strokeWidth={1.25} />
-          </TouchableOpacity>
-        </View>
+        <EducationDropDowns
+          dataArray={currentUniversity}
+          placeholder="Select current university"
+        />
       </View>
       <View style={styles.fullnameInput}>
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Degree Program</Text>
-          <View style={styles.input}>
-            <TextInput
-              style={styles.inputText}
-              placeholder="Select Degree"
-              placeholderTextColor="#9CA3AF"
-              returnKeyType="done"
-            />
-            <TouchableOpacity>
-              <ChevronDown size={30} strokeWidth={1.25} />
-            </TouchableOpacity>
-          </View>
+          <EducationDropDowns
+            dataArray={degreeProgram}
+            placeholder="Select degree"
+          />
         </View>
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Semester</Text>
-          <View style={styles.input}>
-            <TextInput
-              style={styles.inputText}
-              placeholder="Select Semester"
-              placeholderTextColor="#9CA3AF"
-              returnKeyType="done"
-            />
-            <TouchableOpacity>
-              <ChevronDown size={30} strokeWidth={1.25} />
-            </TouchableOpacity>
-          </View>
+          <EducationDropDowns
+            dataArray={semester}
+            placeholder="Select semester"
+          />
         </View>
       </View>
       <View style={[styles.inputSection, { width: "100%", marginTop: 15 }]}>
         <Text style={styles.inputLabel}>Specialisation</Text>
-        <View style={styles.input}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Select specialisation..."
-            placeholderTextColor="#9CA3AF"
-            returnKeyType="done"
-          />
-          <TouchableOpacity>
-            <ChevronDown size={30} strokeWidth={1.25} />
-          </TouchableOpacity>
-        </View>
+        <EducationDropDowns
+          dataArray={specialization}
+          placeholder="Select specialisation..."
+        />
       </View>
-      <View style={{marginTop:10,marginBottom:20}}>
+      <View style={{ marginTop: 10, marginBottom: 20 }}>
         <Text style={styles.question}>
           Are you currently working alongside your studies?
         </Text>
@@ -155,7 +134,6 @@ const styles = StyleSheet.create({
   fullnameInput: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     width: "100%",
   },
   inputSection: {
@@ -205,48 +183,48 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     letterSpacing: 0.2,
   },
-    question: {
+  question: {
     fontSize: scaleFont(14),
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: "600",
+    color: "#1A1A1A",
     lineHeight: 42,
     marginBottom: 20,
     letterSpacing: -0.5,
   },
   optionsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 60,
   },
   radioContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioCircle: {
     width: 22,
     height: 22,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '#B8C1D9',
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#B8C1D9",
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 16,
   },
   radioCircleSelected: {
-    borderColor: '#000000ff',
+    borderColor: "#000000ff",
     borderWidth: 2,
-    backgroundColor: '#ffffffff',
+    backgroundColor: "#ffffffff",
   },
   radioInnerCircle: {
     width: 14,
     height: 14,
     borderRadius: 10,
-    backgroundColor: '#000000ff',
+    backgroundColor: "#000000ff",
   },
   radioLabel: {
     fontSize: scaleFont(14),
-    fontWeight: '400',
-    color: '#1A1A1A',
+    fontWeight: "400",
+    color: "#1A1A1A",
     letterSpacing: -0.3,
   },
 });

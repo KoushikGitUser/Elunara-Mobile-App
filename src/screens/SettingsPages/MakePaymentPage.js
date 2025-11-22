@@ -7,14 +7,19 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  Keyboard,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
-import chakraLogo from '../../assets/images/BigGrayChakra.png';
+import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import GradientText from "../../components/common/GradientText";
-import paymentSuccessLogo from '../../assets/images/Group.jpg';
-import paymentSuccessText from '../../assets/images/Title.png'
+import paymentSuccessLogo from "../../assets/images/Group.jpg";
+import paymentSuccessText from "../../assets/images/Title.png";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { setToggleIsPaidOrProUser } from "../../redux/slices/toggleSlice";
 
 const MakePaymentPage = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -26,6 +31,28 @@ const MakePaymentPage = () => {
   const [selectedPayment, setSelectedPayment] = useState("");
   const [userUPIID, setUserUPIID] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height); // <-- set height
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? "" : section);
@@ -80,6 +107,17 @@ const MakePaymentPage = () => {
     </TouchableOpacity>
   );
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (paymentSuccess) {
+        navigation.navigate("settingsInnerPages", { page: 3,});
+        dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
+        dispatch(setToggleIsPaidOrProUser(true));
+        setPaymentSuccess(false)
+      }
+    }, 4000);
+  }, [paymentSuccess]);
+
   const toggleAccordion = () => {
     setIsExpanded(!isExpanded);
   };
@@ -89,13 +127,26 @@ const MakePaymentPage = () => {
   return (
     <View style={[styles.container]}>
       {paymentSuccess ? (
-        <View style={{flex:1,width:"100%",justifyContent:"center",alignItems:"center"}}>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <View style={styles.chakraLogo}>
-            <Image source={chakraLogo} style={{height:210,width:130}} />
+            <Image source={chakraLogo} style={{ height: 210, width: 130 }} />
           </View>
           <View style={styles.successfulIconAndText}>
-           <Image source={paymentSuccessLogo} style={{height:80,width:80,objectFit:"contain"}} />
-           <Image source={paymentSuccessText} style={{height:80,width:270,objectFit:"contain"}} />
+            <Image
+              source={paymentSuccessLogo}
+              style={{ height: 80, width: 80, objectFit: "contain" }}
+            />
+            <Image
+              source={paymentSuccessText}
+              style={{ height: 80, width: 270, objectFit: "contain" }}
+            />
           </View>
         </View>
       ) : (
@@ -224,12 +275,18 @@ const MakePaymentPage = () => {
               </View>
             )}
           </View>
+          {keyboardVisible && (
+            <View style={{ height: screenHeight * 0.4 }}></View>
+          )}
         </ScrollView>
       )}
 
       {!paymentSuccess && (
         <View style={styles.primaryButtonMain}>
-          <TouchableOpacity onPress={()=>setPaymentSuccess(true)} style={styles.primaryButton}>
+          <TouchableOpacity
+            onPress={() => setPaymentSuccess(true)}
+            style={styles.primaryButton}
+          >
             <Text style={styles.primaryButtonText}>Make Payment</Text>
           </TouchableOpacity>
         </View>
@@ -265,16 +322,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  chakraLogo:{ 
-    position:"absolute",
-    top:50,
-    right:-20
+  chakraLogo: {
+    position: "absolute",
+    top: 50,
+    right: -20,
   },
-  successfulIconAndText:{
-   width:"100%",
-   flexDirection:"column",
-   alignItems:"center",
-   gap:10
+  successfulIconAndText: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 10,
   },
   accordionTitle: {
     fontSize: scaleFont(16),

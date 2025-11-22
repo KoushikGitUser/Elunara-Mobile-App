@@ -5,8 +5,11 @@ import GradientText from "../../common/GradientText";
 import { scaleFont } from "../../../utils/responsive";
 import ChakraIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
 import PaidPlanChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/PaidPlanChakraIcon";
+import { useDispatch } from "react-redux";
+import { setToggleIsPaidOrProUser } from "../../../redux/slices/toggleSlice";
 
 const PaidPlanCard = ({setIsPaidUser}) => {
+  const dispatch = useDispatch();
   return (
     <View style={styles.content}>
       <Text style={styles.header}>Current Plan:</Text>
@@ -23,7 +26,7 @@ const PaidPlanCard = ({setIsPaidUser}) => {
           <Text style={styles.billingDate}>8 August 2025</Text>
         </Text>
 
-        <TouchableOpacity onPress={()=>setIsPaidUser(false)} style={styles.cancelButton}>
+        <TouchableOpacity onPress={()=> dispatch(setToggleIsPaidOrProUser(false))} style={styles.cancelButton}>
           <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
         </TouchableOpacity>
       </View>

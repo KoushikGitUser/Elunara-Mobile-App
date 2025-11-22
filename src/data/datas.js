@@ -1133,3 +1133,48 @@ export const graphData = [
   { day: "S", hours: 1.5 },
   { day: "S", hours: 3.7 },
 ];
+
+
+export const genderSelection = [
+  "Male",
+  "Female",
+  "Others",
+  "Prefer not to say"
+]
+
+export const currentUniversity = [
+  "IIM A",
+  "IIM B",
+  "ISB",
+  "Globsyn",
+  "Others"
+]
+
+export const degreeProgram = [
+  "BBA",
+  "MBA",
+  "PGDM",
+  "PG Business Analytics",
+]
+
+export const semester = [
+  "1",
+  "2",
+  "3",
+  "4",
+]
+
+export const specialization = [
+  "Marketing",
+  "Finance",
+  "HR",
+  "Research & Analytics",
+]
+
+export const internetQuality = [
+  "Excellent",
+  "Good",
+  "Average",
+  "Poor",
+  "Unstable",
+]

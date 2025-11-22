@@ -44,7 +44,7 @@ const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
                 if (optionIndex == 9) {
                   setToggleLogOutConfirmPopup(true)
                 } else {
-                  navigation.navigate("settingsInnerPages",{page:optionIndex});
+                  navigation.navigate("settingsInnerPages",{page:optionIndex}); 
                   dispatch(setSettingsInnerPageHeaderTitle(option.title));
                 }
               }}

@@ -2,8 +2,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { AlertTriangle } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
+import { useDispatch } from "react-redux";
+import { setToggleIsPaidOrProUser } from "../../../redux/slices/toggleSlice";
 
 const PaymentUpdationAlertCard = () => {
+    const dispatch = useDispatch();
   return (
       <View style={styles.card}>
         <View style={styles.headerContainer}>
@@ -11,7 +14,7 @@ const PaymentUpdationAlertCard = () => {
           <Text style={styles.headerText}>
             Update your payment Information!
           </Text>
-        </View>
+        </View> 
 
         <Text style={styles.descriptionText}>
           Update your info to avoid switching to the Free Plan.
@@ -19,6 +22,7 @@ const PaymentUpdationAlertCard = () => {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
+          onPress={()=>dispatch(setToggleIsPaidOrProUser(false))}
             style={styles.outlineButton}
           >
             <Text style={styles.outlineButtonText}>Switch to free version</Text>

@@ -8,8 +8,9 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
+  Keyboard,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +25,26 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(null);
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+    useEffect(() => {
+      const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+        setKeyboardVisible(true);
+        setKeyboardHeight(e.endCoordinates.height); // <-- set height
+      });
+  
+      const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+        setKeyboardVisible(false);
+        setKeyboardHeight(0);
+      });
+  
+      return () => {
+        showSub.remove();
+        hideSub.remove();
+      };
+    }, []);
+
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -133,6 +154,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                   </React.Fragment>
                 );
               })}
+              {keyboardVisible && <View style={{ height: screenHeight }} />}
             </ScrollView>
           </View>
         </View>

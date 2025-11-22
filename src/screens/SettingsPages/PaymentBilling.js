@@ -19,15 +19,16 @@ import MasterCardIcon from "../../../assets/SvgIconsComponent/PaymentBillingIcon
 import PaymentUpdationAlertCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/PaymentUpdationAlertCard";
 import ShiftedToFreePlanCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/ShiftedToFreePlanCard";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
 
-const PaymentBilling = () => {
+const PaymentBilling = ({handleScroll}) => {
   const [selectedCategory, setSelectedCategory] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   const [isPaidUser, setIsPaidUser] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {toggleStates} = useSelector((state) => state.Toggle);
 
   const PaymentIcon = ({ method }) => {
     if (method === "gpay") {
@@ -60,7 +61,7 @@ const PaymentBilling = () => {
 
   return (
     <View style={styles.container}>
-      {!isPaidUser && (
+      {!toggleStates.toggleIsPaidOrProUser && (
         <View style={styles.categorySections}>
           <TouchableOpacity
             onPress={() => setSelectedCategory(1)}
@@ -100,8 +101,9 @@ const PaymentBilling = () => {
       <View style={styles.cardsMainContainer}>
         {selectedCategory == 1 ? (
           <React.Fragment>
-            {isPaidUser ? (
+            {toggleStates.toggleIsPaidOrProUser ? (
               <ScrollView
+              onScroll={handleScroll}
                 showsVerticalScrollIndicator={false}
                 style={styles.paidPlanMain}
               >

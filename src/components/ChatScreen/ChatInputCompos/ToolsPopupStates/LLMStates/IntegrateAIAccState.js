@@ -9,8 +9,9 @@ import {
   Image,
   TextInput,
   KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   moderateScale,
   scaleFont,
@@ -35,6 +36,26 @@ const IntegrateAIAccState = () => {
   const [selectedCountsArray, setSelectedCountsArray] = useState([]);
   const [toggleFindApiKey, setToggleFindApiKey] = useState(false);
   const [apiKey, setApiKey] = useState("");
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+    useEffect(() => {
+      const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+        setKeyboardVisible(true);
+        setKeyboardHeight(e.endCoordinates.height); // <-- set height
+      });
+  
+      const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+        setKeyboardVisible(false);
+        setKeyboardHeight(0);
+      });
+  
+      return () => {
+        showSub.remove();
+        hideSub.remove();
+      };
+    }, []);
+
   return (
     <>
       {toggleFindApiKey ? (
@@ -63,7 +84,7 @@ const IntegrateAIAccState = () => {
             toggle between them
           </Text>
 
-          <ScrollView style={{ maxHeight: screenHeight * 0.6 }}>
+          <ScrollView showsVerticalScrollIndicator={false } style={{ maxHeight: screenHeight * 0.6 }}>
             <View style={styles.noteSection}>
               <Image
                 source={verifyIcon}
@@ -169,6 +190,7 @@ const IntegrateAIAccState = () => {
               </Text>
               Settings
             </Text>
+            {keyboardVisible && <View style={{height:screenHeight*0.4}} />}
           </ScrollView>
         </View>
       )}

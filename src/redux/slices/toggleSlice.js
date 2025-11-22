@@ -57,6 +57,9 @@ const toggleSlice = createSlice({
     setToggleResetSettingsPopup: (state, action) => {
       state.toggleStates.toggleResetSettingsPopup = action.payload;
     },
+    setToggleIsPaidOrProUser: (state, action) => {
+      state.toggleStates.toggleIsPaidOrProUser = action.payload;
+    },
   },
 });
 
@@ -78,6 +81,7 @@ export const {
   setToggleAllChatsOptionsPopup,
   setToggleUnlockPremiumPopup,
   setToggleResetSettingsPopup,
+  setToggleIsPaidOrProUser,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 
