@@ -28,45 +28,52 @@ const EditProfile = () => {
   const emailInputRef = React.useRef(null);
   const passwordInputRef = React.useRef(null);
 
-  const triggerImagePicker = async ()=>{
-          // Open image gallery functionality
-      try {
-        // First check current permission status
-        const permissionResult = await ImagePicker.getMediaLibraryPermissionsAsync();
+  const triggerImagePicker = async () => {
+    // Open image gallery functionality
+    try {
+      // First check current permission status
+      const permissionResult =
+        await ImagePicker.getMediaLibraryPermissionsAsync();
 
-        if (permissionResult.status !== "granted") {
-          // Request permission if not granted
-          const requestResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.status !== "granted") {
+        // Request permission if not granted
+        const requestResult =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-          if (requestResult.status !== "granted") {
-            Alert.alert(
-              "Permission Denied",
-              "Gallery permission is required to select photos. Please enable it in your device settings."
-            );
-            return;
-          }
+        if (requestResult.status !== "granted") {
+          Alert.alert(
+            "Permission Denied",
+            "Gallery permission is required to select photos. Please enable it in your device settings."
+          );
+          return;
         }
+      }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
-          quality: 1,
-        });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        quality: 1,
+      });
 
-        if (!result.canceled) {
-          if(result.assets[0].mimeType == "image/png" || result.assets[0].mimeType == "image/jpg" || result.assets[0].mimeType == "image/jpeg"){
+      if (!result.canceled) {
+        if (
+          result.assets[0].mimeType == "image/png" ||
+          result.assets[0].mimeType == "image/jpg" ||
+          result.assets[0].mimeType == "image/jpeg"
+        ) {
           // Add selected photo to Redux
           setSelectedImage(result.assets[0].uri);
-          }
-          else{
-            Alert.alert("Invalid type","The type of image you selected is not supported.")
-          }
-
+        } else {
+          Alert.alert(
+            "Invalid type",
+            "The type of image you selected is not supported."
+          );
         }
-      } catch (error) {
-        console.error("Error picking image:", error);
-        Alert.alert("Error", "Failed to pick image.");
       }
-  }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert("Error", "Failed to pick image.");
+    }
+  };
 
   const commonFunctionForFocusingInput = (inputRef) => {
     if (inputRef && inputRef.current) {
@@ -87,10 +94,13 @@ const EditProfile = () => {
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120, position: "relative1" }}>
           <Image
-            source={selectedImage ? {uri:selectedImage} : profilePic}
-            style={{ height: "100%", width: "100%",borderRadius:20 }}
+            source={selectedImage ? { uri: selectedImage } : profilePic}
+            style={{ height: "100%", width: "100%", borderRadius: 20 }}
           />
-          <TouchableOpacity onPress={triggerImagePicker} style={styles.editBtnImg}>
+          <TouchableOpacity
+            onPress={triggerImagePicker}
+            style={styles.editBtnImg}
+          >
             <PencilIcon />
           </TouchableOpacity>
         </View>
@@ -108,7 +118,9 @@ const EditProfile = () => {
               onChangeText={(text) => setFirstName(text)}
               returnKeyType="done"
             />
-            <TouchableOpacity onPress={() => commonFunctionForFocusingInput(firstNameInputRef)}>
+            <TouchableOpacity
+              onPress={() => commonFunctionForFocusingInput(firstNameInputRef)}
+            >
               <PencilIcon />
             </TouchableOpacity>
           </View>
@@ -125,7 +137,9 @@ const EditProfile = () => {
               onChangeText={(text) => setLastName(text)}
               returnKeyType="done"
             />
-            <TouchableOpacity onPress={() => commonFunctionForFocusingInput(lastNameInputRef)}>
+            <TouchableOpacity
+              onPress={() => commonFunctionForFocusingInput(lastNameInputRef)}
+            >
               <PencilIcon />
             </TouchableOpacity>
           </View>
@@ -143,7 +157,9 @@ const EditProfile = () => {
             onChangeText={(text) => setEmail(text)}
             returnKeyType="done"
           />
-          <TouchableOpacity onPress={() => commonFunctionForFocusingInput(emailInputRef)}>
+          <TouchableOpacity
+            onPress={() => commonFunctionForFocusingInput(emailInputRef)}
+          >
             <PencilIcon />
           </TouchableOpacity>
         </View>
@@ -161,11 +177,22 @@ const EditProfile = () => {
             onChangeText={(text) => setPassword(text)}
             returnKeyType="done"
           />
-          <TouchableOpacity onPress={() => commonFunctionForFocusingInput(passwordInputRef)}>
+          <TouchableOpacity
+            onPress={() => commonFunctionForFocusingInput(passwordInputRef)}
+          >
             <PencilIcon />
           </TouchableOpacity>
         </View>
       </View>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          { backgroundColor: "white", borderWidth: 1, borderColor: "black",marginLeft:"auto",marginTop:20 },
+        ]}
+         
+      >
+        <Text style={[styles.buttonText, { color: "black" }]}>Done</Text>
+      </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerTitleContainer}>
@@ -175,15 +202,13 @@ const EditProfile = () => {
             <Text style={styles.title}>Verify Mobile no. in 10 Days</Text>
           </View>
           <Text style={styles.subtitle}>
-            Verifying your mobile no. helps protect your account and enables important notifications.
+            Verifying your mobile no. helps protect your account and enables
+            important notifications.
           </Text>
-          <TouchableOpacity
-            style={[
-              styles.verifyButton,
-            ]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.verifyButtonText}>Verify and Secure Account</Text>
+          <TouchableOpacity style={[styles.verifyButton]} activeOpacity={0.8}>
+            <Text style={styles.verifyButtonText}>
+              Verify and Secure Account
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -236,7 +261,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop:20
+    marginTop: 20,
   },
   verifyButtonText: {
     color: "#FFFFFF",
@@ -299,6 +324,21 @@ const styles = StyleSheet.create({
   settingDescription: {
     fontSize: scaleFont(13),
     color: "#6B7280",
+  },
+    button: {
+    width:"48%",
+    backgroundColor: "#081A35",
+    paddingVertical: 13,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(11),
+    fontWeight: "500",
+    letterSpacing: 0.3,
   },
 });
 

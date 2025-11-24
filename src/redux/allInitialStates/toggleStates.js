@@ -16,5 +16,7 @@ export const toggleStates = {
       toggleAllChatsOptionsPopup:false,
       toggleUnlockPremiumPopup:false,
       toggleResetSettingsPopup:false,
-      toggleIsPaidOrProUser:false
+      toggleIsPaidOrProUser:false,
+      toggleRoomCreationPopup:false,
+      toggleAddedRoomDetails:false,
 }

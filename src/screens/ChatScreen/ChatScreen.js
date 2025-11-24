@@ -24,6 +24,7 @@ import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/Ch
 import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
 import UserMessageActionPopup from "../../components/ChatScreen/Messages/UserMessageActionPopup";
 import ChatLongPressPopup from "../../components/ChatScreen/ChatHistorySidebar/ChatLongPressPopup";
+import RoomCreationPopup from "../../components/Rooms/RoomCreationPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -46,6 +47,7 @@ const ChatScreen = () => {
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup/>}
           {toggleStates.toggleUserMessageActionPopup && <UserMessageActionPopup  />}
           {toggleStates.toggleChatActionsPopupOnLongPress && <ChatLongPressPopup  />}
+          
 
           {/* middle section */}
           <ChatMiddleWrapper />

@@ -14,7 +14,7 @@ import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import GradientText from "../../components/common/GradientText";
-import paymentSuccessLogo from "../../assets/images/Group.jpg";
+import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
 import paymentSuccessText from "../../assets/images/Title.png";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";

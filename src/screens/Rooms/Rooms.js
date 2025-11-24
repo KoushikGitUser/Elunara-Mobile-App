@@ -11,7 +11,8 @@ import RoomsHeader from "../../components/Rooms/RoomsHeader";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import RoomsMiddle from "../../components/Rooms/RoomsMiddle";
 
-const Rooms = () => {
+const Rooms = ({route}) => {
+  const {roomName} = route.params
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -21,7 +22,7 @@ const Rooms = () => {
   return (
     <SafeAreaView style={styles.mainWrapper}>
         <RoomsHeader/>
-        <RoomsMiddle/>
+        <RoomsMiddle roomName={roomName}/>
         <ChatInputMain/>
     </SafeAreaView>
   );
