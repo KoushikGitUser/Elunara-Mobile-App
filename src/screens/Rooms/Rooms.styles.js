@@ -65,6 +65,30 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 20,
     },
+    sources:{
+      width:"100%",
+      flexDirection:"row",
+      justifyContent:"space-between",
+      alignItems:"center",
+
+    },
+    sourcesInn:{
+      flexDirection:"row",
+      justifyContent:"space-between",
+      alignItems:"center",
+      gap:10
+    },
+    sourcesAndInstruction:{
+     backgroundColor:"#F3F3F3",
+     borderWidth:1,
+     borderColor:"#E2E2E2",
+     paddingHorizontal:10,
+     paddingVertical:5,
+     borderRadius:50
+    },
+    editBtn:{
+     borderBottomWidth:1
+    },
     addDetailsOptions: {
       flexDirection: "row",
       justifyContent: "flex-start",

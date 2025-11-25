@@ -12,7 +12,7 @@ const NotificationSettings = () => {
   return (
     <View style={styles.content}>
       {/* Header Section */}
-      <View style={styles.header}>
+      <View >
         <View style={styles.headerTitleContainer}>
           <BellIcon />
           <Text style={styles.title}>Notifications Settings</Text>

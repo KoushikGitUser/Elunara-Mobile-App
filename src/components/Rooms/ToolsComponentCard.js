@@ -1,21 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import {
-  ChevronRight,
-  CircleUserRound,
-  GitFork,
-  GraduationCap,
-  Languages,
-} from "lucide-react-native";
-import { moderateScale } from "../../../utils/responsive";
 import { useDispatch } from "react-redux";
-import {
-  setToggleToolsPopup,
-  setToggleToolsPopupStates,
-} from "../../../redux/slices/toggleSlice";
-import { toolsArrayOptions } from "../../../data/datas";
+import { toolsArrayOptions } from "../../data/datas";
+import { ChevronRight } from "lucide-react-native";
+import { moderateScale } from "../../utils/responsive";
+import { setToggleToolsPopup, setToggleToolsPopupStates } from "../../redux/slices/toggleSlice";
 
-const ToolsContainers = () => {
+const ToolsComponentCard = () => {
   const dispatch = useDispatch();
   return (
     <View>
@@ -23,9 +14,8 @@ const ToolsContainers = () => {
         return (
           <TouchableOpacity
             key={toolIndex}
-            onPress={() => {
-              dispatch(setToggleToolsPopupStates(toolIndex + 1));
-              dispatch(setToggleToolsPopup(true));
+            onPress={() => {dispatch(setToggleToolsPopupStates(toolIndex + 1));
+                dispatch(setToggleToolsPopup(true))
             }}
             style={styles.optionsMain}
           >
@@ -65,6 +55,7 @@ const ToolsContainers = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   mainOptionsContainer: {
     width: "100%",
@@ -91,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ToolsContainers;
+export default ToolsComponentCard;

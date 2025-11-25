@@ -31,11 +31,35 @@ const RoomsMiddle = ({ roomName }) => {
           </Text>
         </View>
       </View>
-      <View>
-        
-      </View>
+      {toggleStates.toggleAddedRoomDetails && (
+        <View style={styles.sources}>
+          <View style={styles.sourcesInn}>
+            <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
+              <Text style={{ fontSize: scaleFont(12), fontWeight: 500 }}>
+                Instructions added
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
+              <Text style={{ fontSize: scaleFont(12), fontWeight: 500 }}>
+                Sources(2)
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.editBtn}>
+            <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
+              Edit
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {toggleStates.toggleAddedRoomDetails ? (
-        <View style={[styles.middleBelowAddSection,{borderWidth:0,backgroundColor:"#FAFAFA"}]}>
+        <View
+          style={[
+            styles.middleBelowAddSection,
+            { borderWidth: 0, backgroundColor: "#FAFAFA" },
+          ]}
+        >
           <View style={styles.noResultMain}>
             <BigSearchIcon />
             <GradientText
@@ -54,7 +78,8 @@ const RoomsMiddle = ({ roomName }) => {
                 color: "#757575",
               }}
             >
-              Create your first chat to dive into personalised AI help. Chats created in this Learning Lab will appear here.
+              Create your first chat to dive into personalised AI help. Chats
+              created in this Learning Lab will appear here.
             </Text>
           </View>
         </View>
@@ -82,9 +107,10 @@ const RoomsMiddle = ({ roomName }) => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity 
-            onPress={() => dispatch(setToggleAddedRoomDetails(true))}
-           style={styles.addDetailsBtn}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("roomDetails")}
+            style={styles.addDetailsBtn}
+          >
             <Text style={{ fontSize: moderateScale(14), fontWeight: 600 }}>
               Add room details
             </Text>

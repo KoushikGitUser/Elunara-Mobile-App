@@ -1,22 +1,19 @@
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { View, Text, TouchableOpacity, Animated, StyleSheet } from "react-native";
 import React from "react";
+import { scaleFont, verticalScale } from "../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { scaleFont, verticalScale } from "../../../utils/responsive";
-import { useSelector } from "react-redux";
 
-const InnerPagesHeader = ({ scrollY }) => {
-  const {globalDataStates} = useSelector((state) => state.Global);
+const AddRoomDetailsHeader = ({ scrollY }) => {
   const navigation = useNavigation();
 
-  // Interpolate border opacity based on scroll position
-  const borderOpacity = scrollY
-    ? scrollY.interpolate({
-        inputRange: [0, 50],
-        outputRange: [0, 1],
-        extrapolate: "clamp",
-      })
-    : new Animated.Value(0);
+    const borderOpacity = scrollY
+      ? scrollY.interpolate({
+          inputRange: [0, 50],
+          outputRange: [0, 1],
+          extrapolate: "clamp",
+        })
+      : new Animated.Value(0);
 
   return (
     <View style={styles.headerWrapper}>
@@ -29,10 +26,10 @@ const InnerPagesHeader = ({ scrollY }) => {
           <ArrowLeft strokeWidth={2} />
         </TouchableOpacity>
         <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
-          {globalDataStates.settingsInnerPageHeaderTitle}
+          Learning Lab details
         </Text>
       </View>
-      
+
       {/* Animated Border */}
       <Animated.View
         style={[
@@ -70,4 +67,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InnerPagesHeader;
+export default AddRoomDetailsHeader;

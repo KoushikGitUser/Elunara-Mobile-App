@@ -20,7 +20,7 @@ const ProfileHeader = ({translateX}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
-
+ 
   return (
     <View style={[styles.chatHeader]}>
       <TouchableOpacity
