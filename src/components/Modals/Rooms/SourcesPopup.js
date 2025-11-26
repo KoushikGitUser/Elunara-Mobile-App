@@ -1,8 +1,10 @@
-import { View, Text, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import { Feather } from '@expo/vector-icons';
 import { scaleFont } from '../../../utils/responsive';
 import { File } from 'lucide-react-native';
+
+const { width,height} = Dimensions.get("window");
 
 const SourcesPopup = ({setSourcesPopup}) => {
   return (
@@ -73,9 +75,12 @@ const styles = StyleSheet.create({
     },
     optionsPopupWrapper: {
       position: "absolute",
-      width: "100%",
-      height: "100%",
-      zIndex: 9,
+      bottom: -50,
+      left: -20,
+      width,
+      height,
+      zIndex: 9999,
+      backgroundColor:"transparent"
     },
 });
 

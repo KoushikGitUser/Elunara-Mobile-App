@@ -65,6 +65,10 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 20,
     },
+    chatsScrollRooms:{
+      width:"100%",
+      maxHeight:SCREEN_HEIGHT*0.4
+    },
     sources:{
       width:"100%",
       flexDirection:"row",

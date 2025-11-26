@@ -19,4 +19,5 @@ export const toggleStates = {
       toggleIsPaidOrProUser:false,
       toggleRoomCreationPopup:false,
       toggleAddedRoomDetails:false,
+      toggleIsRoomEmpty:true,
 }

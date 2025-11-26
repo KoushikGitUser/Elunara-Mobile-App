@@ -6,9 +6,9 @@ const RenameIcon = () => {
   return (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={30}
-    height={30}
-    viewBox='0 0 19 19'
+    width={23}
+    height={23}
+    viewBox='0 0 15 15'
     fill="none"
   >
     <Path

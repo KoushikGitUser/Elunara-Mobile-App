@@ -5,13 +5,15 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { createStyles } from "../../screens/Rooms/Rooms.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
 import { Feather } from "@expo/vector-icons";
 import { EllipsisVertical, Plus } from "lucide-react-native";
+import PlusButtonPopup from "../Modals/Rooms/PlusButtonPopup";
+import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
 
 const RoomsHeader = ({ translateX }) => {
   const styleProps = {};
@@ -20,9 +22,13 @@ const RoomsHeader = ({ translateX }) => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+  const [addOptionsPopup,setAddOptionsPopup] = useState(false);
+  const [roomOptionsPopup,setRoomOptionsPopup] = useState(false);
 
   return (
     <View style={styles.roomsHeader}>
+      {addOptionsPopup && <PlusButtonPopup setAddOptionsPopup={setAddOptionsPopup} />}
+      {roomOptionsPopup && <RoomsOptionsPopup setRoomOptionsPopup={setRoomOptionsPopup} />}
       <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {
@@ -40,10 +46,10 @@ const RoomsHeader = ({ translateX }) => {
         <Feather name="menu" size={30} color="black" />
       </TouchableOpacity>
       <View style={styles.rightHeaderIcons}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>setAddOptionsPopup(true)}>
           <Plus size={35} strokeWidth={1.5} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>setRoomOptionsPopup(true)}>
           <EllipsisVertical strokeWidth={2} size={30} color="black" />
         </TouchableOpacity>
       </View>

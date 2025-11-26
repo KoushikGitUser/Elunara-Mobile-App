@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, Animated } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  StatusBar,
+} from "react-native";
 import React, { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createStyles } from "./Rooms.styles";
@@ -22,8 +28,25 @@ const Rooms = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.mainWrapper}>
+      <StatusBar
+        backgroundColor="#ff0000ff"
+        barStyle="dark-content"
+        hidden={false}
+        translucent={false}
+        animated
+      />
       <ChatHistorySidebar translateX={translateX} />
-      <Animated.View style={[styles.mainWrapper,{ flex: 1, transform: [{ translateX }],width:"100%",paddingHorizontal:0}]}>
+      <Animated.View
+        style={[
+          styles.mainWrapper,
+          {
+            flex: 1,
+            transform: [{ translateX }],
+            width: "100%",
+            paddingHorizontal: 0,
+          },
+        ]}
+      >
         <RoomsHeader translateX={translateX} />
         <RoomsMiddle roomName={roomName} />
         <ChatInputMain />

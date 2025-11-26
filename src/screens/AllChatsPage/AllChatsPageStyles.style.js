@@ -63,10 +63,10 @@ export const createStyles = (props = {}) =>
     allChatsScrollMain: {
       width: "100%",
       marginTop:30,
+      paddingHorizontal:20
     },
     cardContainer: {
       paddingVertical: 16,
-      paddingHorizontal: 20,
       zIndex:5,
       width:"100%",
     },
@@ -75,6 +75,7 @@ export const createStyles = (props = {}) =>
     },
     cardContent: {
       flexDirection: "row",
+      width:"100%",
       alignItems: "center",
       position:"relative",
     },
@@ -124,7 +125,7 @@ export const createStyles = (props = {}) =>
       minWidth: 180,
       paddingHorizontal: 8,
       paddingVertical: 15,
-      backgroundColor: "#b7d2ffff",
+      backgroundColor: "#ffffffff",
       borderRadius: 20,
       borderWidth: 1,
       borderColor: "#D3DAE5",
@@ -132,7 +133,7 @@ export const createStyles = (props = {}) =>
       justifyContent: "space-between",
       alignItems: "center",
       gap: 5,
-      zIndex: 99999,
+      zIndex: 99999999,
       top: 70,
       right: 0,
     },

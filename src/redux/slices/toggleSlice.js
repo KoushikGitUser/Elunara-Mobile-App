@@ -66,6 +66,9 @@ const toggleSlice = createSlice({
     setToggleAddedRoomDetails: (state, action) => {
       state.toggleStates.toggleAddedRoomDetails = action.payload;
     },
+    setToggleIsRoomEmpty: (state, action) => {
+      state.toggleStates.toggleIsRoomEmpty = action.payload;
+    },
   },
 });
 
@@ -89,7 +92,8 @@ export const {
   setToggleResetSettingsPopup,
   setToggleIsPaidOrProUser,
   setToggleRoomCreationPopup,
-  setToggleAddedRoomDetails
+  setToggleAddedRoomDetails,
+  setToggleIsRoomEmpty
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

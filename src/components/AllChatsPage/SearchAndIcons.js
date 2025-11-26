@@ -1,6 +1,6 @@
 import { View, Text, Dimensions, TextInput } from "react-native";
 import React, { useEffect, useMemo, useRef } from "react";
-import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
+import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style"; 
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { MessageCirclePlus, Search } from "lucide-react-native";

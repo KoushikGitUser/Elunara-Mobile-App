@@ -4,12 +4,16 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleAllChatsOptionsPopup, setToggleChatMenuPopup } from "../../redux/slices/toggleSlice";
+import {
+  setToggleAllChatsOptionsPopup,
+  setToggleChatMenuPopup,
+} from "../../redux/slices/toggleSlice";
 import { allChatsOptionsPopupData } from "../../data/datas";
 import { moderateScale } from "../../utils/responsive";
 
@@ -34,22 +38,19 @@ const OptionsPopup = () => {
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: "transparent",
-        position: "absolute",
-        width,
-        height,
-        top: 0,
-        right: 0,
-        zIndex: 9999,
-      }}
-    >
-      <TouchableWithoutFeedback
+    <>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: 0,
+          left: -20,
+          width,
+          height,
+          zIndex: 999999,
+          backgroundColor: "transparent",
+        }}
         onPress={() => dispatch(setToggleAllChatsOptionsPopup(false))}
-      >
-        <View style={styles.backdrop} />
-      </TouchableWithoutFeedback>
+      ></TouchableOpacity>
       <View style={styles.menuModalMain}>
         {allChatsOptionsPopupData.map((options, optionIndex) => {
           return (
@@ -77,7 +78,7 @@ const OptionsPopup = () => {
           );
         })}
       </View>
-    </View>
+    </>
   );
 };
 

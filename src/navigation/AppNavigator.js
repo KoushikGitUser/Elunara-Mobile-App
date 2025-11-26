@@ -13,6 +13,7 @@ import AllChatsPage from "../screens/AllChatsPage/AllChatsPage";
 import ProfileAndSettings from "../screens/ProfileAndSettings/ProfileAndSettings";
 import SettingsProfileInnerPage from "../screens/SettingsProfileInnerPages/SettingsProfileInnerPage";
 import AddRoomDetails from "../screens/Rooms/AddRoomDetails";
+import AllRoomsLandingPage from "../screens/Rooms/AllRoomsLandingPage";
 
 // Screens
 
@@ -79,6 +80,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="notes"
           component={Notes}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+           <Stack.Screen
+          name="allRooms"
+          component={AllRoomsLandingPage}
           options={{
             headerShown: false,
           }}

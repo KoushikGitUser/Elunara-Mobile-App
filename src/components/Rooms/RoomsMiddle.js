@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -9,6 +9,9 @@ import { Brain, Link } from "lucide-react-native";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
 import GradientText from "../common/GradientText";
 import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
+import { allChatsData } from "../../data/datas";
+import ChatsComponent from "../AllChatsPage/ChatsComponent";
+import SearchIconsHeader from "./SearchIconsHeader";
 
 const RoomsMiddle = ({ roomName }) => {
   const styleProps = {};
@@ -52,9 +55,21 @@ const RoomsMiddle = ({ roomName }) => {
           </TouchableOpacity>
         </View>
       )}
-
+      {toggleStates.toggleAddedRoomDetails && !toggleStates.toggleIsRoomEmpty && <SearchIconsHeader/>}
       {toggleStates.toggleAddedRoomDetails ? (
-        <View
+        !toggleStates.toggleIsRoomEmpty?<ScrollView style={[styles.chatsScrollRooms,{zIndex:9}]}>
+        {allChatsData.map((chat, chatsIndex) => {
+          return (
+            <ChatsComponent
+              key={chatsIndex}
+              index={chat.id}
+              title={chat.title}
+              subject={chat.subject}
+              roomName={chat.roomName}
+            />
+          );
+        })}
+        </ScrollView>:<View
           style={[
             styles.middleBelowAddSection,
             { borderWidth: 0, backgroundColor: "#FAFAFA" },

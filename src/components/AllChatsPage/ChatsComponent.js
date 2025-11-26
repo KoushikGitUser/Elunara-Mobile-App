@@ -19,9 +19,9 @@ const ChatsComponent = ({ title, subject, roomName, onPress, index }) => {
   return (
     <TouchableOpacity
       style={styles.cardContainer}
-      onPress={onPress}
+      onPress={onPress} 
     >
-      <View style={styles.cardContent}>
+      <View style={[styles.cardContent,{zIndex:optionsIndex == index?99999:9}]}>
          {(toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index) && <OptionsPopup/>}
         {/* Chat Icon */}
         <View style={styles.iconContainer}>

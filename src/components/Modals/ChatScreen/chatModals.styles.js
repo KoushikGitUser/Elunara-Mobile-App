@@ -29,7 +29,7 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "flex-start",
       alignItems: "center",
-      gap: 10,
+      gap: 15,
       paddingLeft: 5,
       paddingVertical:7,
       borderRadius:10
