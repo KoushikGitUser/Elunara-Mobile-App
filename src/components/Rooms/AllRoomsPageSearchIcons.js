@@ -1,5 +1,12 @@
-import { View, Text, TextInput, StyleSheet, Dimensions } from "react-native";
-import React, { useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import React, { useRef, useState } from "react";
 import { Search } from "lucide-react-native";
 import ArrowUpDownIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/ArrowUpDownIcon";
 import FilterIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FilterIcon";
@@ -7,6 +14,8 @@ import FolderPlusIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIco
 import { verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import RoomsSortingPopup from "../Modals/Rooms/RoomsSortingPopup";
+import RoomsFilterPopup from "../Modals/Rooms/RoomsFilterPopup";
 
 const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
   const navigation = useNavigation();
@@ -14,8 +23,14 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
   const inputRef = useRef();
+  const [toggleSortingPopup, setToggleSortingPopup] = useState(false);
+  const [toggleFilterPopup, setToggleFilterPopup] = useState(false);
   return (
-    <View style={[styles.searchAndIcons,{paddingHorizontal:20,marginTop:15}]}>
+    <View
+      style={[styles.searchAndIcons, { paddingHorizontal: 20, marginTop: 15 }]}
+    >
+      {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} />}
+      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
       <View
         style={[
           styles.searchInputMain,
@@ -39,9 +54,15 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
-        <ArrowUpDownIcon />
-        <FilterIcon />
-        <FolderPlusIcon />
+        <TouchableOpacity onPress={()=>setToggleSortingPopup(true)}>
+          <ArrowUpDownIcon />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={()=>setToggleFilterPopup(true)}>
+          <FilterIcon />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <FolderPlusIcon />
+        </TouchableOpacity>
       </View>
     </View>
   );

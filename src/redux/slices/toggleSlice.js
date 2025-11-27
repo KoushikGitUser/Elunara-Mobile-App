@@ -69,6 +69,9 @@ const toggleSlice = createSlice({
     setToggleIsRoomEmpty: (state, action) => {
       state.toggleStates.toggleIsRoomEmpty = action.payload;
     },
+    setToggleLearningLabUnlockPopup: (state, action) => {
+      state.toggleStates.toggleLearningLabUnlockPopup = action.payload;
+    },
   },
 });
 
@@ -93,7 +96,8 @@ export const {
   setToggleIsPaidOrProUser,
   setToggleRoomCreationPopup,
   setToggleAddedRoomDetails,
-  setToggleIsRoomEmpty
+  setToggleIsRoomEmpty,
+  setToggleLearningLabUnlockPopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

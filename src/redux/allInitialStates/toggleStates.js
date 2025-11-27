@@ -20,4 +20,5 @@ export const toggleStates = {
       toggleRoomCreationPopup:false,
       toggleAddedRoomDetails:false,
       toggleIsRoomEmpty:true,
+      toggleLearningLabUnlockPopup:false,
 }

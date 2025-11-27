@@ -5,7 +5,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";

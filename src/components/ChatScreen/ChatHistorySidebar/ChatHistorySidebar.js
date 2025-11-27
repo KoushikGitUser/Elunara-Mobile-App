@@ -29,6 +29,7 @@ import SidebarFooter from "./SidebarFooter";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import RoomCreationPopup from "../../Rooms/RoomCreationPopup";
+import UnlockLearningLabPopup from "../../Monetisation/UnlockLearningLabPopup";
 
 const ChatHistorySidebar = ({ translateX }) => {
   const styleProps = {};
@@ -56,6 +57,7 @@ const ChatHistorySidebar = ({ translateX }) => {
         style={[styles.chatHistorySidebarBackgroundWrapper,{display:toggleStates.toggleChatHistorySidebar?"flex":"none"}]}
       ></TouchableOpacity>
       {toggleStates.toggleRoomCreationPopup && <RoomCreationPopup/>}
+      {toggleStates.toggleLearningLabUnlockPopup && <UnlockLearningLabPopup/>}
       <View style={[styles.chatHistorySidebarWrapper,{marginLeft:toggleStates.toggleChatHistorySidebar?0:-SCREEN_WIDTH*0.75}]}>
         {/* chat history header */}
         <SidebarHeader translateX={translateX} />

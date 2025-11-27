@@ -7,7 +7,7 @@ import chakraLogo from "../../../assets/images/chakraFull.png";
 import elunaraLogo from "../../../assets/images/elunaraLogo.png";
 import AddFolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/AddFolderIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChatHistorySidebar, setToggleRoomCreationPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleChatHistorySidebar, setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup } from "../../../redux/slices/toggleSlice";
 
 const SidebarHeader = ({ translateX }) => {
   const styleProps = {};
@@ -59,7 +59,7 @@ const SidebarHeader = ({ translateX }) => {
           <Text style={styles.btnTexts}>New Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-        onPress={()=>dispatch(setToggleRoomCreationPopup(true))}
+        onPress={()=>dispatch(setToggleLearningLabUnlockPopup(true))}
         style={styles.newLearningTabBtn}>
           <AddFolderIcon />
           <Text style={[styles.btnTexts, { fontWeight: 400 }]}>

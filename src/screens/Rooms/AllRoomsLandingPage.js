@@ -11,6 +11,8 @@ import ChatsScrollForAllRoomsPage from "../../components/Rooms/ChatsScrollForAll
 const AllRoomsLandingPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedArray, setSelectedArray] = useState([]);
+  const [isSelecting,setIsSelecting] = useState(false);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -36,6 +38,10 @@ const AllRoomsLandingPage = () => {
                 index={chat.id}
                 title={chat.title}
                 subject={chat.subject}
+                isSelecting={isSelecting}
+                selectedArray={selectedArray}
+                setIsSelecting={setIsSelecting}
+                setSelectedArray={setSelectedArray}
               />
             );
           })}
