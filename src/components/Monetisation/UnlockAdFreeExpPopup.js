@@ -1,25 +1,16 @@
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Image,
-  Platform,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-} from "react-native";
+import { View, Text, Platform, StyleSheet, Dimensions, Modal, TouchableOpacity, Image, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import BigChakraIcon from "../../../assets/SvgIconsComponent/PaymentBillingIcons/BigChakraIcon";
+import GradientText from "../common/GradientText";
+import { adFreeProPlan } from "../../data/datas";
+import { Check } from "lucide-react-native";
+import { setToggleAdFreeExpPopup } from "../../redux/slices/toggleSlice";
 
-const UnlockLearningLabPopup = () => {
+const UnlockAdFreeExpPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
@@ -27,10 +18,10 @@ const UnlockLearningLabPopup = () => {
 
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleAdFreeExpPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() => dispatch(setToggleAdFreeExpPopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +37,7 @@ const UnlockLearningLabPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() => dispatch(setToggleAdFreeExpPopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -54,8 +45,8 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() => dispatch(setToggleAdFreeExpPopup(false))}
               name="close"
               size={20}
               color="black"
@@ -67,16 +58,20 @@ const UnlockLearningLabPopup = () => {
             {/* Icon */}
             <View style={styles.iconContainer}>
               {/* icon */}
-              <Image style={{ height: 50, width: 50 }} source={icon} />
+              <BigChakraIcon/>
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
+            <GradientText
+            children="Upgrade to Elunara Pro!"
+            fullWidth={true}
+            fontSize={25}
+
+            />
 
             {/* Description */}
             <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+            Unlock an uninterrupted learning experience and powerful AI features.
             </Text>
 
             <ScrollView
@@ -84,7 +79,7 @@ const UnlockLearningLabPopup = () => {
               style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
             >
               <View style={styles.featuresList}>
-                {proPlanFeature.map((feature, index) => (
+                {adFreeProPlan.map((feature, index) => (
                   <View key={index} style={styles.featureItem}>
                     <Check size={24} color="#10B981" strokeWidth={1.7} />
                     <Text style={styles.featureText}>{feature}</Text>
@@ -145,11 +140,11 @@ const UnlockLearningLabPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() => dispatch(setToggleAdFreeExpPopup(false))}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
+                  Upgrade Now
                 </Text>
               </TouchableOpacity>
             </View>
@@ -218,7 +213,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   iconContainer: {
-    marginBottom: 24,
+    marginBottom: 10,
   },
   title: {
     fontSize: scaleFont(23),
@@ -244,7 +239,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -254,7 +249,7 @@ const styles = StyleSheet.create({
   },
   featureItem: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     gap: 12,
   },
   featureText: {
@@ -328,12 +323,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default UnlockAdFreeExpPopup;

@@ -16,7 +16,7 @@ import { moderateScale } from "../../../utils/responsive";
 import spark from "../../../assets/images/spark.png";
 import GradientText from "../../common/GradientText";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import { setToggleChatHistorySidebar, setToggleProPlanUpgradePopup } from "../../../redux/slices/toggleSlice";
 import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 
 const SidebarFooter = ({translateX}) => {
@@ -48,7 +48,7 @@ const SidebarFooter = ({translateX}) => {
         <Image source={profilePic} style={styles.profilePic} />
         <Text style={styles.profileText}>Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.upgradeBtn}>
+      <TouchableOpacity onPress={()=>dispatch(setToggleProPlanUpgradePopup(true))} style={styles.upgradeBtn}>
         <SparkleIcon />
         <View>
           <GradientText

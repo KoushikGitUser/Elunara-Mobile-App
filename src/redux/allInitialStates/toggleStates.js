@@ -21,4 +21,12 @@ export const toggleStates = {
       toggleAddedRoomDetails:false,
       toggleIsRoomEmpty:true,
       toggleLearningLabUnlockPopup:false,
+      toggleProPlanUpgradePopup:false,
+      toggleUnlockAnalyticsDashboardPopup:false,
+      toggleUnlockMaxUploadLimitPopup:false,
+      toggleUnlockNewChatPopup:false,
+      toggleUnlockArchiveLimitPopup:false,
+      toggleAdFreeExpPopup:false,
+      toggleUnlockPersonalisationLimitPopup:false,
+      toggleElunaraProWelcomePopup:false,
 }

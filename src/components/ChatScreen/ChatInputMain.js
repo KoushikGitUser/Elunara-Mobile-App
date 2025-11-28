@@ -22,6 +22,7 @@ import {
   setToggleKeyboardVisibilityOnChatScreen,
   setToggleToolsPopup,
   setToggleTopicsPopup,
+  setToggleUnlockPersonalisationLimitPopup,
 } from "../../redux/slices/toggleSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
 import topicsIcon from "../../assets/images/TopicsIcon.png";
@@ -44,6 +45,7 @@ import TopicsBooksIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/To
 import ToolsIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ToolsIcon";
 import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
+import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
 
 const ChatInputMain = () => {
   const styleProps = {};
@@ -223,6 +225,7 @@ const ChatInputMain = () => {
               {toggleStates.toggleAddItemsToInputPopup && (
                 <AddItemsToInputPopup />
               )}
+              {toggleStates.toggleUnlockMaxUploadLimitPopup && <UnlockMaxUploadLimitPopup/>}
             </View>
 
             <TouchableOpacity
@@ -240,7 +243,7 @@ const ChatInputMain = () => {
           </View>
           <View style={styles.inputRightActionIcons}>
             <TouchableOpacity
-              
+              onPress={()=>dispatch(setToggleUnlockPersonalisationLimitPopup(true))}
             >
              <MicIcon/>
             </TouchableOpacity>

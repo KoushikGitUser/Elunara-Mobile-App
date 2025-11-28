@@ -1,25 +1,14 @@
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Image,
-  Platform,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-} from "react-native";
+import { View, Text, Dimensions, Platform, StyleSheet, Modal, TouchableOpacity, Image, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
-import { scaleFont } from "../../utils/responsive";
+import icon from "../../assets/images/maxUpload.png";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { scaleFont } from "../../utils/responsive";
+import { setToggleUnlockMaxUploadLimitPopup } from "../../redux/slices/toggleSlice";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { Check } from "lucide-react-native";
 
-const UnlockLearningLabPopup = () => {
+const UnlockMaxUploadLimitPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
@@ -27,10 +16,12 @@ const UnlockLearningLabPopup = () => {
 
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleUnlockMaxUploadLimitPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() =>
+        dispatch(setToggleUnlockMaxUploadLimitPopup(false))
+      }
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +37,9 @@ const UnlockLearningLabPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() =>
+            dispatch(setToggleUnlockMaxUploadLimitPopup(false))
+          }
         />
 
         {/* Modal Sheet */}
@@ -54,8 +47,10 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() =>
+                dispatch(setToggleUnlockMaxUploadLimitPopup(false))
+              }
               name="close"
               size={20}
               color="black"
@@ -67,30 +62,25 @@ const UnlockLearningLabPopup = () => {
             {/* Icon */}
             <View style={styles.iconContainer}>
               {/* icon */}
-              <Image style={{ height: 50, width: 50 }} source={icon} />
+              <Image style={{ height: 50, width: 50,objectFit:"contain" }} source={icon} />
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
+            <Text style={styles.title}>Unlock Your Study Insights</Text>
 
             {/* Description */}
             <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+              You've hit today's upload limit. This will refresh in 10 hours.
             </Text>
 
             <ScrollView
               showsVerticalScrollIndicator={false}
               style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
             >
-              <View style={styles.featuresList}>
-                {proPlanFeature.map((feature, index) => (
-                  <View key={index} style={styles.featureItem}>
-                    <Check size={24} color="#10B981" strokeWidth={1.7} />
-                    <Text style={styles.featureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
+                <Text style={styles.description}>
+             Upgrade to Pro to keep adding attachments without interruptions—perfect for maintaining research momentum.
+            </Text>
+
               <View style={styles.cardsContainer}>
                 {/* Monthly Plan Card */}
                 <TouchableOpacity
@@ -145,12 +135,12 @@ const UnlockLearningLabPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() =>
+                  dispatch(setToggleUnlockMaxUploadLimitPopup(false))
+                }
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
-                </Text>
+                <Text style={styles.buttonText}>Upgrade And  Keep Uploading</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -328,12 +318,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default UnlockMaxUploadLimitPopup;

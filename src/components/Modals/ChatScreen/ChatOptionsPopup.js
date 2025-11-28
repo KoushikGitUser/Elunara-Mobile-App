@@ -13,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { menuOptions } from "../../../data/datas";
 import { moderateScale } from "../../../utils/responsive";
-import { setToggleChatMenuPopup, setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleChatMenuPopup, setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup, setToggleUnlockArchiveLimitPopup } from "../../../redux/slices/toggleSlice";
 
 const ChatOptionsPopup = () => {
   const styleProps = {};
@@ -32,6 +32,7 @@ const ChatOptionsPopup = () => {
       dispatch(setToggleRenameChatPopup(true));
     } else if (type == "Pin") {
     } else if (type == "Archive") {
+      dispatch(setToggleUnlockArchiveLimitPopup(true));
     } else if (type == "Delete") {
       dispatch(setToggleDeleteChatConfirmPopup(true));
     }

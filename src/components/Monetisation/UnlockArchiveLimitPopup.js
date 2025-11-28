@@ -1,25 +1,24 @@
 import {
   View,
   Text,
+  Platform,
+  StyleSheet,
   Modal,
   TouchableOpacity,
   Image,
-  Platform,
-  StyleSheet,
   ScrollView,
   Dimensions,
 } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
-import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { Check } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleUnlockArchiveLimitPopup } from "../../redux/slices/toggleSlice";
+import icon from "../../assets/images/archiveLimit.png";
 
-const UnlockLearningLabPopup = () => {
+const UnlockArchiveLimitPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
@@ -27,10 +26,10 @@ const UnlockLearningLabPopup = () => {
 
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleUnlockArchiveLimitPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +45,7 @@ const UnlockLearningLabPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -54,8 +53,8 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
               name="close"
               size={20}
               color="black"
@@ -69,88 +68,44 @@ const UnlockLearningLabPopup = () => {
               {/* icon */}
               <Image style={{ height: 50, width: 50 }} source={icon} />
             </View>
-
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
-
+            <Text style={styles.title}>Archive limit reached</Text>
             {/* Description */}
-            <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+            <Text style={[styles.description, { marginBottom: 20 }]}>
+              <Text style={{ fontWeight: 800, color: "black" }}>
+                Free plan limit reached: 100 archived chats.
+              </Text>{" "}
+              To archive this conversation, unarchive older chats or upgrade for
+              more archive capacity and advanced organisation.
             </Text>
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
-            >
-              <View style={styles.featuresList}>
-                {proPlanFeature.map((feature, index) => (
-                  <View key={index} style={styles.featureItem}>
-                    <Check size={24} color="#10B981" strokeWidth={1.7} />
-                    <Text style={styles.featureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.cardsContainer}>
-                {/* Monthly Plan Card */}
-                <TouchableOpacity
-                  style={[
-                    styles.priceCard,
-                    styles.monthlyCard,
-                    selectedPlan === "monthly" && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedPlan("monthly")}
-                  activeOpacity={0.8}
-                >
-                  {/* Check Icon for Selected */}
-                  {selectedPlan === "monthly" && (
-                    <View style={styles.checkBadge}>
-                      <Check size={14} color="#ffffff" strokeWidth={2} />
-                    </View>
-                  )}
-
-                  <Text style={styles.priceText}>Upgrade for ₹1,999</Text>
-                  <Text style={styles.periodText}>per month</Text>
-                </TouchableOpacity>
-
-                {/* Yearly Plan Card */}
-                <TouchableOpacity
-                  style={[
-                    styles.priceCard,
-                    styles.yearlyCard,
-                    selectedPlan === "yearly" && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedPlan("yearly")}
-                  activeOpacity={0.8}
-                >
-                  {/* Save Badge */}
-                  <View style={styles.saveBadge}>
-                    <Text style={styles.saveText}>Save ₹14,088</Text>
-                  </View>
-
-                  {/* Check Icon for Selected */}
-                  {selectedPlan === "yearly" && (
-                    <View style={styles.checkBadge}>
-                      <Check size={14} color="#ffffff" strokeWidth={2} />
-                    </View>
-                  )}
-
-                  <Text style={styles.priceText}>Upgrade for ₹19,900</Text>
-                  <Text style={styles.periodText}>per year</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-
+            <Text style={[styles.description]}>
+              Tip: Pin important chats so they're easy to find without
+              archiving. or upgrade to Pro for unlimited chats.
+            </Text>
             {/* Button */}
             <View style={styles.btnsMain}>
               <TouchableOpacity
-                style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                style={[
+                  styles.button,
+                  { backgroundColor: "white", borderWidth: 1 },
+                ]}
+                onPress={() =>
+                  dispatch(setToggleUnlockArchiveLimitPopup(false))
+                }
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
+                <Text style={[styles.buttonText, { color: "black" }]}>
+                  Manage archived chats
                 </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  dispatch(setToggleUnlockArchiveLimitPopup(false))
+                }
+                activeOpacity={0.8}
+              >
+                <Text style={styles.buttonText}>Upgrade more archives</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -203,9 +158,10 @@ const styles = StyleSheet.create({
   },
   btnsMain: {
     width: "100%",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
+    gap:15
   },
   verifiedIcon: {
     height: 55,
@@ -244,7 +200,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -254,7 +210,7 @@ const styles = StyleSheet.create({
   },
   featureItem: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     gap: 12,
   },
   featureText: {
@@ -270,6 +226,7 @@ const styles = StyleSheet.create({
     gap: 12,
     width: "100%",
     marginBottom: 15,
+    marginTop: 20,
   },
   priceCard: {
     flex: 1,
@@ -328,12 +285,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default UnlockArchiveLimitPopup;

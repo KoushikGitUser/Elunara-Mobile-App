@@ -1,36 +1,40 @@
 import {
   View,
   Text,
+  Platform,
+  StyleSheet,
   Modal,
   TouchableOpacity,
   Image,
-  Platform,
-  StyleSheet,
-  ScrollView,
   Dimensions,
 } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
-import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import icon from "../../assets/images/bookBulb.png";
+import { setToggleElunaraProWelcomePopup } from "../../redux/slices/toggleSlice";
+import GradientText from "../common/GradientText";
+import { elunaraProWelcome } from "../../data/datas";
+import { Check } from "lucide-react-native";
 
-const UnlockLearningLabPopup = () => {
+const { height, width } = Dimensions.get("window");
+
+const ElunaraProWelcomePopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [selectedCredit, setSelectedCredit] = useState(null);
   const SCREEN_HEIGHT = Dimensions.get("window").height;
 
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleElunaraProWelcomePopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() => dispatch(setToggleElunaraProWelcomePopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -41,12 +45,12 @@ const UnlockLearningLabPopup = () => {
           blurAmount={7}
           reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.43)"
         />
-        <View style={styles.androidBlur} />
 
+        <View style={styles.androidBlur} />
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() => dispatch(setToggleElunaraProWelcomePopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -54,8 +58,8 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() => dispatch(setToggleElunaraProWelcomePopup(false))}
               name="close"
               size={20}
               color="black"
@@ -67,89 +71,46 @@ const UnlockLearningLabPopup = () => {
             {/* Icon */}
             <View style={styles.iconContainer}>
               {/* icon */}
-              <Image style={{ height: 50, width: 50 }} source={icon} />
+              <Image
+                style={{ height: 50, width: 50, objectFit: "contain" }}
+                source={icon}
+              />
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Text style={styles.title}>Welcome to</Text>
+              <GradientText
+                children="Elunara Pro!"
+                fullWidth={true}
+                fontSize={25}
+                marginTop={3}
+              />
+            </View>
 
             {/* Description */}
             <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+              You've unlocked the full potential of your AI learning companion.
             </Text>
 
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
-            >
-              <View style={styles.featuresList}>
-                {proPlanFeature.map((feature, index) => (
-                  <View key={index} style={styles.featureItem}>
-                    <Check size={24} color="#10B981" strokeWidth={1.7} />
-                    <Text style={styles.featureText}>{feature}</Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.cardsContainer}>
-                {/* Monthly Plan Card */}
-                <TouchableOpacity
-                  style={[
-                    styles.priceCard,
-                    styles.monthlyCard,
-                    selectedPlan === "monthly" && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedPlan("monthly")}
-                  activeOpacity={0.8}
-                >
-                  {/* Check Icon for Selected */}
-                  {selectedPlan === "monthly" && (
-                    <View style={styles.checkBadge}>
-                      <Check size={14} color="#ffffff" strokeWidth={2} />
-                    </View>
-                  )}
-
-                  <Text style={styles.priceText}>Upgrade for ₹1,999</Text>
-                  <Text style={styles.periodText}>per month</Text>
-                </TouchableOpacity>
-
-                {/* Yearly Plan Card */}
-                <TouchableOpacity
-                  style={[
-                    styles.priceCard,
-                    styles.yearlyCard,
-                    selectedPlan === "yearly" && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedPlan("yearly")}
-                  activeOpacity={0.8}
-                >
-                  {/* Save Badge */}
-                  <View style={styles.saveBadge}>
-                    <Text style={styles.saveText}>Save ₹14,088</Text>
-                  </View>
-
-                  {/* Check Icon for Selected */}
-                  {selectedPlan === "yearly" && (
-                    <View style={styles.checkBadge}>
-                      <Check size={14} color="#ffffff" strokeWidth={2} />
-                    </View>
-                  )}
-
-                  <Text style={styles.priceText}>Upgrade for ₹19,900</Text>
-                  <Text style={styles.periodText}>per year</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+            <View style={styles.featuresList}>
+              {elunaraProWelcome.map((feature, index) => (
+                <View key={index} style={styles.featureItem}>
+                  <Check size={24} color="#10B981" strokeWidth={1.7} />
+                  <Text style={styles.featureText}>{feature}</Text>
+                </View>
+              ))}
+            </View>
 
             {/* Button */}
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() => dispatch(setToggleElunaraProWelcomePopup(false))}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
+                 Start Exploring
                 </Text>
               </TouchableOpacity>
             </View>
@@ -163,7 +124,8 @@ const UnlockLearningLabPopup = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
   },
   blurView: {
     position: "absolute",
@@ -189,17 +151,14 @@ const styles = StyleSheet.create({
   },
   modalSheet: {
     backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    borderRadius: 19,
+
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
+    shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 20,
+    width: width - 40,
   },
   btnsMain: {
     width: "100%",
@@ -218,20 +177,20 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   iconContainer: {
-    marginBottom: 24,
+    marginBottom: 10,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(25),
+    fontWeight: "500",
     color: "#1F2937",
-    marginBottom: 16,
+    marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
     fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
+    marginBottom: 18,
     letterSpacing: 0.2,
   },
   button: {
@@ -244,7 +203,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -269,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     width: "100%",
-    marginBottom: 15,
+    marginBottom: 55,
   },
   priceCard: {
     flex: 1,
@@ -328,12 +287,30 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
+  },
+  categorySections: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionText: {
+    color: "#757575",
+  },
+  sections: {
+    width: "50%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderColor: "lightgrey",
+    paddingVertical: 10,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default ElunaraProWelcomePopup;

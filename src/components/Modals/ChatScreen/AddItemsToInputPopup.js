@@ -11,7 +11,7 @@ import React, { useMemo } from "react";
 import { createStyles } from "./chatModals.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleAddItemsToInputPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleAddItemsToInputPopup, setToggleUnlockMaxUploadLimitPopup } from "../../../redux/slices/toggleSlice";
 import { setSelecetdFiles } from "../../../redux/slices/globalDataSlice";
 import { addItemsOptions } from "../../../data/datas";
 import { Camera, File, Image } from "lucide-react-native";
@@ -67,6 +67,7 @@ const AddItemsToInputPopup = () => {
       }
     }
     else if(type=="Files"){
+      dispatch(setToggleUnlockMaxUploadLimitPopup(true))
       // Open file picker functionality
       try {
         // First check current permission status

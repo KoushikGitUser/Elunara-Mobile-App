@@ -22,8 +22,9 @@ import Personalisation from "../../screens/SettingsPages/Personalisation";
 import Analytics from "../../screens/SettingsPages/Analytics";
 import PaymentBilling from "../../screens/SettingsPages/PaymentBilling";
 import adImg from "../../assets/images/Upgrade.jpg";
+import { setToggleAdFreeExpPopup, setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
 
-const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
+const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   return (
@@ -42,9 +43,13 @@ const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
             <TouchableOpacity
               onPress={() => {
                 if (optionIndex == 9) {
-                  setToggleLogOutConfirmPopup(true)
+                  setToggleLogOutConfirmPopup(true);
+                } else if (optionIndex == 2) {
+                  dispatch(setToggleUnlockAnalyticsDashboardPopup(true));
                 } else {
-                  navigation.navigate("settingsInnerPages",{page:optionIndex}); 
+                  navigation.navigate("settingsInnerPages", {
+                    page: optionIndex,
+                  });
                   dispatch(setSettingsInnerPageHeaderTitle(option.title));
                 }
               }}
@@ -54,7 +59,7 @@ const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
               <Text style={styles.title}>{option.title}</Text>
             </TouchableOpacity>
             {optionIndex == 5 && (
-              <View style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
+              <TouchableOpacity onPress={()=>dispatch(setToggleAdFreeExpPopup(true))} style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
                 <Image
                   style={{
                     width: "100%",
@@ -65,7 +70,7 @@ const ProfileOptionsContainer = ({setToggleLogOutConfirmPopup}) => {
                   }}
                   source={adImg}
                 />
-              </View>
+              </TouchableOpacity>
             )}
           </React.Fragment>
         );

@@ -25,6 +25,9 @@ import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatC
 import UserMessageActionPopup from "../../components/ChatScreen/Messages/UserMessageActionPopup";
 import ChatLongPressPopup from "../../components/ChatScreen/ChatHistorySidebar/ChatLongPressPopup";
 import RoomCreationPopup from "../../components/Rooms/RoomCreationPopup";
+import UnlockArchiveLimitPopup from "../../components/Monetisation/UnlockArchiveLimitPopup";
+import UnlockPersonalisationLimitPopup from "../../components/Monetisation/UnlockPersonalisationLimitPopup";
+import ElunaraProWelcomePopup from "../../components/Monetisation/ElunaraProWelcomePopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -47,6 +50,10 @@ const ChatScreen = () => {
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup/>}
           {toggleStates.toggleUserMessageActionPopup && <UserMessageActionPopup  />}
           {toggleStates.toggleChatActionsPopupOnLongPress && <ChatLongPressPopup  />}
+          {toggleStates.toggleUnlockArchiveLimitPopup && <UnlockArchiveLimitPopup  />}
+          {toggleStates.toggleUnlockPersonalisationLimitPopup && <UnlockPersonalisationLimitPopup  />}
+          {toggleStates.toggleElunaraProWelcomePopup && <ElunaraProWelcomePopup  />}
+
           
 
           {/* middle section */}

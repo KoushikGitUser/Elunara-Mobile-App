@@ -7,7 +7,7 @@ import chakraLogo from "../../../assets/images/chakraFull.png";
 import elunaraLogo from "../../../assets/images/elunaraLogo.png";
 import AddFolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/AddFolderIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChatHistorySidebar, setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleChatHistorySidebar, setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup, setToggleUnlockNewChatPopup } from "../../../redux/slices/toggleSlice";
 
 const SidebarHeader = ({ translateX }) => {
   const styleProps = {};
@@ -52,6 +52,7 @@ const SidebarHeader = ({ translateX }) => {
               )
             );
             navigation.navigate("chat");
+            dispatch(setToggleUnlockNewChatPopup(true))
           }}
           style={styles.newChatBtn}
         >

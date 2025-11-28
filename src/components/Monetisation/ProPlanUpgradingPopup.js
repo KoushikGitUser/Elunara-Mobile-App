@@ -1,36 +1,36 @@
 import {
   View,
   Text,
-  Modal,
-  TouchableOpacity,
-  Image,
   Platform,
   StyleSheet,
+  Modal,
+  Image,
   ScrollView,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
-import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { Check } from "lucide-react-native";
+import { proPlanFeature } from "../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleProPlanUpgradePopup } from "../../redux/slices/toggleSlice";
+import GradientText from "../common/GradientText";
+import BigChakraIcon from '../../../assets/SvgIconsComponent/PaymentBillingIcons/BigChakraIcon'
 
-const UnlockLearningLabPopup = () => {
+const ProPlanUpgradingPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   const SCREEN_HEIGHT = Dimensions.get("window").height;
-
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleProPlanUpgradePopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() => dispatch(setToggleProPlanUpgradePopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +46,7 @@ const UnlockLearningLabPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() => dispatch(setToggleProPlanUpgradePopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -54,8 +54,8 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() => dispatch(setToggleProPlanUpgradePopup(false))}
               name="close"
               size={20}
               color="black"
@@ -67,21 +67,25 @@ const UnlockLearningLabPopup = () => {
             {/* Icon */}
             <View style={styles.iconContainer}>
               {/* icon */}
-              <Image style={{ height: 50, width: 50 }} source={icon} />
+              <BigChakraIcon/>
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
+            <GradientText
+            children="Pro Plan"
+            fullWidth={true}
+            fontSize={30}
+
+            />
 
             {/* Description */}
             <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+              Unlock smarter learning — go Pro and power up your progress
             </Text>
 
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
+              style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.5 }}
             >
               <View style={styles.featuresList}>
                 {proPlanFeature.map((feature, index) => (
@@ -145,11 +149,11 @@ const UnlockLearningLabPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() => dispatch(setToggleProPlanUpgradePopup(false))}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
+                  Upgrade to Pro
                 </Text>
               </TouchableOpacity>
             </View>
@@ -218,7 +222,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   iconContainer: {
-    marginBottom: 24,
+    marginBottom: 10,
   },
   title: {
     fontSize: scaleFont(23),
@@ -244,7 +248,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -328,12 +332,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default ProPlanUpgradingPopup;

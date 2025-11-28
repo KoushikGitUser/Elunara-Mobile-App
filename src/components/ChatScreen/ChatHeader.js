@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatHistorySidebar,
   setToggleChatMenuPopup,
+  setToggleElunaraProWelcomePopup,
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
@@ -79,7 +80,7 @@ const ChatHeader = ({ translateX }) => {
         </View>
       ) : (
         <TouchableOpacity
-          onPress={() => navigation.navigate("svg")}
+          onPress={() => dispatch(setToggleElunaraProWelcomePopup(true))}
           style={styles.upgradeButton}
         >
           <SparkleIcon />

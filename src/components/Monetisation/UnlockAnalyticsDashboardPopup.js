@@ -1,25 +1,25 @@
 import {
   View,
   Text,
+  Platform,
+  StyleSheet,
   Modal,
   TouchableOpacity,
   Image,
-  Platform,
-  StyleSheet,
   ScrollView,
   Dimensions,
 } from "react-native";
 import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
-import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
-import { proPlanFeature } from "../../data/datas";
-import { Check } from "lucide-react-native";
-import icon from "../../assets/images/roomUnlock.png";
+import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { Check } from "lucide-react-native";
+import { analyticsFeatures } from "../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import icon from '../../assets/images/bulbUnlock.png';
+import { setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
 
-const UnlockLearningLabPopup = () => {
+const UnlockAnalyticsDashboardPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
@@ -27,10 +27,10 @@ const UnlockLearningLabPopup = () => {
 
   return (
     <Modal
-      visible={toggleStates.toggleLearningLabUnlockPopup}
+      visible={toggleStates.toggleUnlockAnalyticsDashboardPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+      onRequestClose={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +46,7 @@ const UnlockLearningLabPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+          onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -54,8 +54,8 @@ const UnlockLearningLabPopup = () => {
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
-            style={{marginRight:20}}
-              onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+              style={{ marginRight: 20 }}
+              onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
               name="close"
               size={20}
               color="black"
@@ -71,12 +71,11 @@ const UnlockLearningLabPopup = () => {
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Learning Labs</Text>
+            <Text style={styles.title}>Unlock Your Study Insights</Text>
 
             {/* Description */}
             <Text style={styles.description}>
-              Create spaces to keep your research and resources grouped — ideal
-              for focus and collaboration.
+              Stay motivated and make your study sessions count with personalized analytics.
             </Text>
 
             <ScrollView
@@ -84,7 +83,7 @@ const UnlockLearningLabPopup = () => {
               style={{ width: "100%", maxHeight: SCREEN_HEIGHT * 0.4 }}
             >
               <View style={styles.featuresList}>
-                {proPlanFeature.map((feature, index) => (
+                {analyticsFeatures.map((feature, index) => (
                   <View key={index} style={styles.featureItem}>
                     <Check size={24} color="#10B981" strokeWidth={1.7} />
                     <Text style={styles.featureText}>{feature}</Text>
@@ -145,11 +144,11 @@ const UnlockLearningLabPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>
-                  Upgrade & Create Learning Lab
+                 Upgrade & View Dashboard
                 </Text>
               </TouchableOpacity>
             </View>
@@ -328,12 +327,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     textAlign: "center",
   },
-    closeModalMain: {
+  closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop:20
+    marginTop: 20,
   },
 });
 
-export default UnlockLearningLabPopup;
+export default UnlockAnalyticsDashboardPopup;

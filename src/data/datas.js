@@ -1016,6 +1016,16 @@ export const proPlanFeature = [
   "Opportunities to test new features",
 ];
 
+export const adFreeProPlan = [
+  "Ad-free chat sessions for seamless focus",
+  "Everything in free",
+  "Unlimited file and photo uploads",
+  "Room-based learning: create and manage focused Rooms",
+  "Unlimited Custom AI interaction: pick model, style, language, and citations.",
+  "Increased limits: more chats and longer conversations.",
+  "Opportunities to test new features",
+];
+
 export const freePlanFeature = [
   "Basic AI chat interactions",
   "Access to curated subject library",
@@ -1023,6 +1033,63 @@ export const freePlanFeature = [
   "Limited number of changes to AI response style and language (up to <x> changes per day)",
   "Limited number of changes to resources citations (up to <x> changes per day)",
 ];
+
+export const analyticsFeatures = [
+  "Track your learning streaks",
+  "See topics you've completed",
+  "Compare your study time with other learners' average",
+];
+
+export const newChatLimit = [
+  "Unlimited new chats — never wait to start a fresh conversation",
+  "Full personalization - choose AI model, tone, language & citation style",
+  "Rooms - organize multiple topics in dedicated workspaces",
+];
+export const elunaraProWelcome = [
+  "Ad-free chats",
+  "Advanced AI tools",
+  "Unlimited follow-ups and more!",
+];
+
+export const creditPacks = [
+  {
+    id: 1,
+    credits: "500 Credits",
+    title: "Starter Credit Pack",
+    badge: "Ideal for light users",
+    price: "₹10",
+    validity: "Valid for 30 days",
+    selected: false,
+  },
+  {
+    id: 2,
+    credits: "1500 Credits",
+    title: "Basic Credit Pack",
+    badge: "Good for regular users",
+    price: "₹25",
+    validity: "Valid for 45 days",
+    selected: false,
+  },
+  {
+    id: 3,
+    credits: "3000 Credits",
+    title: "Premium Credit Pack",
+    badge: "Best value pack",
+    price: "₹45",
+    validity: "Valid for 60 days",
+    selected: false,
+  },
+  {
+    id: 4,
+    credits: "5000 Credits",
+    title: "Elite Credit Pack",
+    badge: "For power users",
+    price: "₹70",
+    validity: "Valid for 90 days",
+    selected: false,
+  },
+];
+
 
 export const billingData = [
   {

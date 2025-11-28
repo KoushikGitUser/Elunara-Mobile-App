@@ -72,6 +72,30 @@ const toggleSlice = createSlice({
     setToggleLearningLabUnlockPopup: (state, action) => {
       state.toggleStates.toggleLearningLabUnlockPopup = action.payload;
     },
+    setToggleProPlanUpgradePopup: (state, action) => {
+      state.toggleStates.toggleProPlanUpgradePopup = action.payload;
+    },
+    setToggleUnlockAnalyticsDashboardPopup: (state, action) => {
+      state.toggleStates.toggleUnlockAnalyticsDashboardPopup = action.payload;
+    },
+    setToggleUnlockMaxUploadLimitPopup: (state, action) => {
+      state.toggleStates.toggleUnlockMaxUploadLimitPopup = action.payload;
+    },
+    setToggleUnlockNewChatPopup: (state, action) => {
+      state.toggleStates.toggleUnlockNewChatPopup = action.payload;
+    },
+    setToggleUnlockArchiveLimitPopup: (state, action) => {
+      state.toggleStates.toggleUnlockArchiveLimitPopup = action.payload;
+    },
+    setToggleAdFreeExpPopup: (state, action) => {
+      state.toggleStates.toggleAdFreeExpPopup = action.payload;
+    },
+    setToggleUnlockPersonalisationLimitPopup: (state, action) => {
+      state.toggleStates.toggleUnlockPersonalisationLimitPopup = action.payload;
+    },
+    setToggleElunaraProWelcomePopup: (state, action) => {
+      state.toggleStates.toggleElunaraProWelcomePopup = action.payload;
+    },
   },
 });
 
@@ -97,7 +121,15 @@ export const {
   setToggleRoomCreationPopup,
   setToggleAddedRoomDetails,
   setToggleIsRoomEmpty,
-  setToggleLearningLabUnlockPopup
+  setToggleLearningLabUnlockPopup,
+  setToggleProPlanUpgradePopup,
+  setToggleUnlockAnalyticsDashboardPopup,
+  setToggleUnlockMaxUploadLimitPopup,
+  setToggleUnlockNewChatPopup,
+  setToggleUnlockArchiveLimitPopup,
+  setToggleAdFreeExpPopup,
+  setToggleUnlockPersonalisationLimitPopup,
+  setToggleElunaraProWelcomePopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 
