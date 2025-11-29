@@ -235,7 +235,7 @@ const ChatInputMain = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-            style={{marginLeft:5}}
+            style={{marginLeft:10,borderWidth:1,padding:6,borderColor:"#BFD6FE",borderRadius:10,elevation:10,backgroundColor:"white",shadowColor:"#426eb9ff"}}
               onPress={() => dispatch(setToggleToolsPopup(true))}
             >
              <ToolsIcon/>

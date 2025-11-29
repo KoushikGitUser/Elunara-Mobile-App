@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatHistorySidebar,
   setToggleChatMenuPopup,
+  setToggleChatScreenGuideStart,
   setToggleElunaraProWelcomePopup,
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
@@ -29,7 +30,7 @@ import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
 import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
 
-const ChatHeader = ({ translateX }) => {
+const ChatHeader = ({ translateX,triggerToast }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -80,7 +81,7 @@ const ChatHeader = ({ translateX }) => {
         </View>
       ) : (
         <TouchableOpacity
-          onPress={() => dispatch(setToggleElunaraProWelcomePopup(true))}
+          onPress={triggerToast}
           style={styles.upgradeButton}
         >
           <SparkleIcon />
@@ -93,6 +94,7 @@ const ChatHeader = ({ translateX }) => {
           onPress={() => {
             dispatch(setChatMessagesArray([]));
             dispatch(setToggleIsChattingWithAI(false));
+            dispatch(setToggleChatScreenGuideStart(true))
           }}
         >
           <MessageCirclePlus size={30} strokeWidth={1.25} />

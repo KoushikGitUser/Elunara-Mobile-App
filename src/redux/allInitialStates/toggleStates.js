@@ -29,4 +29,5 @@ export const toggleStates = {
       toggleAdFreeExpPopup:false,
       toggleUnlockPersonalisationLimitPopup:false,
       toggleElunaraProWelcomePopup:false,
+      toggleChatScreenGuideStart:false,
 }
