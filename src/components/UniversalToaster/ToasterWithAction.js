@@ -1,21 +1,24 @@
-import { Text, StyleSheet, Animated, Dimensions } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { toastEmitter } from "../../services/toast";
 import {
-  BadgeCheck,
-  CircleX,
-  Info,
-  TriangleAlert,
   View,
-} from "lucide-react-native";
+  Text,
+  Animated,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { BadgeCheck, CircleX, Info, TriangleAlert } from "lucide-react-native";
+import { toastEmitter } from "../../services/toast";
 
-const Toaster = () => {
+const ToasterWithAction = () => {
   const [toast, setToast] = useState({
     visible: false,
     title: "",
     description: "",
     type: "success",
     duration: 3000,
+    actionTitle: "",
+    action: null,
   });
 
   const slideAnim = useRef(new Animated.Value(-150)).current;
@@ -32,6 +35,8 @@ const Toaster = () => {
         description: data.description || "",
         type: data.type || "success",
         duration,
+        actionTitle: data.actionTitle || "Button",
+        action: data.action || null,
       });
       slideAnim.setValue(-150);
 
@@ -57,6 +62,7 @@ const Toaster = () => {
   }, []);
 
   if (!toast.visible) return null;
+
   return (
     <Animated.View
       style={[styles.toast, { transform: [{ translateY: slideAnim }] }]}
@@ -83,9 +89,13 @@ const Toaster = () => {
         <Text style={styles.textTitle}>{toast.title}</Text>
         <Text style={styles.textDesc}>{toast.description}</Text>
       </Animated.View>
+      <TouchableOpacity style={styles.actionBtn} onPress={toast.action}>
+        <Text style={{fontWeight:600,fontSize:14}}>{toast.actionTitle}</Text>
+      </TouchableOpacity>
     </Animated.View>
   );
 };
+
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
@@ -112,6 +122,11 @@ const styles = StyleSheet.create({
     color: "#757575",
     fontSize: 14,
   },
+  actionBtn:{
+    borderBottomWidth:1,
+    borderColor:"black",
+
+  }
 });
 
-export default Toaster;
+export default ToasterWithAction;

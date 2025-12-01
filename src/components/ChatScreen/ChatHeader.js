@@ -29,8 +29,9 @@ import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
 import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
+import { triggerToast, triggerToastWithAction } from "../../services/toast";
 
-const ChatHeader = ({ translateX,triggerToast }) => {
+const ChatHeader = ({ translateX, }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -38,6 +39,10 @@ const ChatHeader = ({ translateX,triggerToast }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+  const action = ()=>{
+    console.log("action");
+    
+  }
 
   return (
     <View style={[styles.chatHeader, {}]}>
@@ -81,7 +86,10 @@ const ChatHeader = ({ translateX,triggerToast }) => {
         </View>
       ) : (
         <TouchableOpacity
-          onPress={triggerToast}
+          onPress={()=>{
+            // triggerToast("Connection Failed","Please check your API key and try again.","alert",1000)
+            triggerToastWithAction("This is toast","This desc of toast","success",3000,"Upgrade",action)
+          }}
           style={styles.upgradeButton}
         >
           <SparkleIcon />

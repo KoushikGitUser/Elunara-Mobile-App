@@ -30,6 +30,7 @@ import UnlockPersonalisationLimitPopup from "../../components/Monetisation/Unloc
 import ElunaraProWelcomePopup from "../../components/Monetisation/ElunaraProWelcomePopup";
 import UniversalTooltip from "../../components/GuidedTourTooltip/UniversalTooltip";
 import Toaster from "../../components/UniversalToaster/Toaster";
+import ToasterWithAction from "../../components/UniversalToaster/ToasterWithAction";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -42,9 +43,8 @@ const ChatScreen = () => {
 
   const triggerToast = () => {
     setShowToast(true);
-
     // hide modal after animation completes
-    setTimeout(() => setShowToast(false), 3500);
+    setTimeout(() => setShowToast(false), 35000);
   };
 
   return (
@@ -86,7 +86,8 @@ const ChatScreen = () => {
               right={20}
             />
           )}
-          <Toaster visible={showToast} message="Upload limit reached!" />
+            <Toaster/>
+            <ToasterWithAction/>
           {/* middle section */}
           <ChatMiddleWrapper />
           {/* middle section */}
