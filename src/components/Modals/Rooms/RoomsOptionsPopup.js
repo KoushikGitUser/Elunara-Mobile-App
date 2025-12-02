@@ -67,7 +67,7 @@ const RoomsOptionsPopup = ({setRoomOptionsPopup}) => {
           ]}
         >
           <TrashIcon/>
-          <Text>Delete</Text>
+          <Text>Delete</Text> 
         </Pressable>
       </View>
     </>

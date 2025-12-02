@@ -681,22 +681,22 @@ export const subTopics = [
 
 export const toolsArrayOptions = [
   {
-    icon: <LLMIcon />,
+    icon: <LLMIcon color="#888888" />,
     title: "LLM",
     selection: "Auto",
   },
   {
-    icon: <ResStyleIcon />,
+    icon: <ResStyleIcon color="#888888" />,
     title: "Response Style",
     selection: "Auto",
   },
   {
-    icon: <ResLangIcon />,
+    icon: <ResLangIcon color="#888888" />,
     title: "Response Language",
     selection: "English",
   },
   {
-    icon: <CitationIcon />,
+    icon: <CitationIcon color="#888888" />,
     title: "Citation Format",
     selection: "Havard",
   },

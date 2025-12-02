@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { moderateScale, verticalScale } from "../../../utils/responsive";
 import { EvilIcons, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ChevronDown } from "lucide-react-native";
@@ -15,11 +15,20 @@ import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons
 import BookMarkIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookMarkIcon";
 import FeedbackIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/FeedbackIcon";
 import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
+import { triggerToast, triggerToastWithAction } from "../../../services/toast";
+import ChangeResponsePopup from "../../Modals/ChatScreen/Messages/ChangeResponsePopup";
+import MessageSharePopup from "../../Modals/ChatScreen/Messages/MessageSharePopup";
+import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookmarkFilledIcon";
+import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
 
 const AIMessageBox = ({ message }) => {
-  
+  const [changeResponsePopup,setChangeResponsePopup] = useState(false);
+  const [sharePopup,setSharePopup] = useState(false);
+  const [feedbackPopup,setFeedbackPopup] = useState(false);
+  const [savedToNotes,setSavedToNotes] = useState(false);
   const handleCopy = () => {
     Clipboard.setString(message);
+    triggerToast("Message copied!","","normal",3000)
   };
 
   return (
@@ -29,24 +38,31 @@ const AIMessageBox = ({ message }) => {
       </View>
 
       <View style={styles.messageActions}>
+       {changeResponsePopup && <ChangeResponsePopup setChangeResponsePopup={setChangeResponsePopup}/>}
+       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup}/>}
+       {feedbackPopup && <FeedbackPopup close={setFeedbackPopup} />}
         <TouchableOpacity onPress={handleCopy}>
           <CopyIcon/>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => console.log("Share pressed")}>
+        <TouchableOpacity onPress={() => setSharePopup(true)}>
           <ShareIcon/>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => console.log("Bookmark pressed")}>
-          <BookMarkIcon/>
+        <TouchableOpacity onPress={() => {
+          setSavedToNotes(!savedToNotes);
+          triggerToastWithAction("Response saved in note","Response saved in note","success",5000,"View",()=>console.log("View")
+          )
+        }}>
+          {savedToNotes?<BookmarkFilledIcon/>:<BookMarkIcon/>}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => console.log("Feedback pressed")}>
+        <TouchableOpacity onPress={() => setFeedbackPopup(true)}>
           <FeedbackIcon/>
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity onPress={() => console.log("Repeat pressed")}>
+          <TouchableOpacity onPress={() => setChangeResponsePopup(true)}>
             <SwitchIcon/>
           </TouchableOpacity>
           <ChevronDown strokeWidth={1.25} />
