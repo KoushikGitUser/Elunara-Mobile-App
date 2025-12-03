@@ -8,7 +8,7 @@ import {
   Animated,
   StatusBar,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
@@ -31,6 +31,7 @@ import ElunaraProWelcomePopup from "../../components/Monetisation/ElunaraProWelc
 import UniversalTooltip from "../../components/GuidedTourTooltip/UniversalTooltip";
 import Toaster from "../../components/UniversalToaster/Toaster";
 import ToasterWithAction from "../../components/UniversalToaster/ToasterWithAction";
+import { useFonts } from "expo-font";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -40,6 +41,21 @@ const ChatScreen = () => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [showToast, setShowToast] = useState(false);
+
+    const [fontsLoaded] = useFonts({
+      "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+      "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+    });
+  
+    useEffect(() => {
+      if (fontsLoaded) {
+      }
+    }, [fontsLoaded]);
+  
+    // Show nothing (or a loader) while fonts are loading
+    if (!fontsLoaded) {
+      return null;
+    }
 
   const triggerToast = () => {
     setShowToast(true);

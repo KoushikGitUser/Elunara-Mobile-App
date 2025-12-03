@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
 import {
@@ -19,8 +19,11 @@ import {
   setToggleTopicsPopup,
 } from "../../../redux/slices/toggleSlice";
 import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
+import { useFonts } from "expo-font";
 
 const Topics = ({ item, index }) => {
+
+
   const dispatch = useDispatch();
   return (
     <TouchableOpacity
@@ -54,8 +57,12 @@ const Topics = ({ item, index }) => {
           {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
 
-        <Text style={styles.topicTitle}>{item?.title}</Text>
-        <Text style={styles.topicDesc}>{item.description}</Text>
+        <Text style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}>
+          {item?.title}
+        </Text>
+        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}>
+          {item.description}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -106,6 +113,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(12),
     fontWeight: 400,
     color: "#757575",
+    lineHeight: 15,
   },
 });
 

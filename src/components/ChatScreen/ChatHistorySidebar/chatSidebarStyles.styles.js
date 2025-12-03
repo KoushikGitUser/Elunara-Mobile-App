@@ -103,6 +103,7 @@ export const createStyles = ({}) =>
     },
     btnTexts: {
       fontWeight: 600,
+      fontSize:scaleFont(15)
     },
     chakraLogoSidebar: {
       height: verticalScale(32),
@@ -111,6 +112,7 @@ export const createStyles = ({}) =>
     elunaraLogoSidebar: {
       height: verticalScale(32),
       width: verticalScale(95),
+      marginLeft:2
     },
     chatHistorySidebarMiddle: {
       width: "100%",

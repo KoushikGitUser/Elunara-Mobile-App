@@ -25,6 +25,7 @@ import {
   setToggleTopicsPopup,
 } from "../../../redux/slices/toggleSlice";
 import SendIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
+import { useFonts } from "expo-font";
 const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -35,6 +36,7 @@ const SubTopicsCompo = () => {
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [expandTextInput, setExpandTextInput] = useState(false);
+
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -72,9 +74,9 @@ const SubTopicsCompo = () => {
         />
       </View>
       {/* Title */}
-      <Text style={styles.title}>{globalDataStates.currentSelectedTopic} </Text>
+      <Text style={[styles.title,{fontFamily:'Mukta-Bold'}]}>{globalDataStates.currentSelectedTopic} </Text>
       {/* Description */}
-      <Text style={styles.description}>Popular Topics</Text>
+      <Text style={[styles.description,{fontFamily:'Mukta-Regular'}]}>Popular Topics</Text>
       <View style={styles.input}>
         <Search color="#B5BECE" strokeWidth={1.5} />
         <TextInput
@@ -111,17 +113,17 @@ const SubTopicsCompo = () => {
               style={[
                 styles.inputContainer,
                 {
-                  height: expandTextInput?110:"50",
+                  height: expandTextInput ? 110 : "50",
                   flexDirection: expandTextInput ? "column" : "row",
-                  paddingTop:expandTextInput?0:10,
-                  paddingBottom:10 
+                  paddingTop: expandTextInput ? 0 : 10,
+                  paddingBottom: 10,
                 },
               ]}
             >
               <TextInput
                 style={[
                   styles.belowInput,
-                  { alignSelf: expandTextInput ? "flex-start" : "center",},
+                  { alignSelf: expandTextInput ? "flex-start" : "center" },
                 ]}
                 onFocus={() => setExpandTextInput(true)}
                 onBlur={() => setExpandTextInput(false)}
@@ -131,7 +133,12 @@ const SubTopicsCompo = () => {
                 onChangeText={setBelowSearchText}
               />
               <View
-                style={{ flexDirection: "row",alignSelf: expandTextInput ? "flex-end" : "center", gap: 0,alignSelf:"flex-end", }}
+                style={{
+                  flexDirection: "row",
+                  alignSelf: expandTextInput ? "flex-end" : "center",
+                  gap: 0,
+                  alignSelf: "flex-end",
+                }}
               >
                 <TouchableOpacity
                   style={[
@@ -150,7 +157,7 @@ const SubTopicsCompo = () => {
                     ]}
                     activeOpacity={0.7}
                   >
-                    <SendIcon/>
+                    <SendIcon />
                   </TouchableOpacity>
                 )}
               </View>
@@ -240,14 +247,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(25),
+    fontWeight: "600",
     color: "#1F2937",
-    marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,

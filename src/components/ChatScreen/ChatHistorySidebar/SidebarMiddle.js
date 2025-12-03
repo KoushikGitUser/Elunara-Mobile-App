@@ -31,7 +31,7 @@ const SidebarMiddle = ({translateX}) => {
       <View style={styles.pinnedSectionMain}>
         <TouchableOpacity onPress={()=>setPinnedChatsOpened(!pinnedChatsOpened)} style={styles.pinnedBtn}>
          <PinIcon/>
-          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+          <Text style={{ fontSize: moderateScale(12.5), marginLeft: 20,fontFamily:'Mukta-Regular' }}>
             Pinned Chats (06)
           </Text>
           {pinnedChatsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
@@ -47,7 +47,7 @@ const SidebarMiddle = ({translateX}) => {
         )}
         <TouchableOpacity onPress={()=>setPinnedRoomsOpened(!pinnedRoomsOpened)} style={styles.pinnedBtn}>
           <PinIcon/>
-          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+          <Text style={{ fontSize: moderateScale(12.5), marginLeft: 20,fontFamily:"Mukta-Regular" }}>
             Pinned Learning Labs (10)
           </Text>
          {pinnedRoomsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}

@@ -1,20 +1,34 @@
-import React from 'react';
-import Svg, { Text, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { scaleFont } from '../../utils/responsive';
+import React, { useEffect } from "react";
+import Svg, { Text, Defs, LinearGradient, Stop } from "react-native-svg";
+import { scaleFont } from "../../utils/responsive";
+import { useFonts } from "expo-font";
 
 const GradientText = ({
   children,
-  colors = ['#1B365D', '#A5C0E7'],
+  colors = ["#1B365D", "#A5C0E7"],
   start = { x: 0, y: 0 },
   end = { x: 1, y: 1 },
-  fontSize ,
-  fontWeight = '600',
+  fontSize,
+  fontWeight = "600",
   marginTop,
   marginBottom,
   style,
   fullWidth,
-  widthNumber
+  widthNumber,
 }) => {
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
   // Calculate the gradient direction
   const x1 = `${start.x * 100}%`;
   const y1 = `${start.y * 100}%`;
@@ -26,14 +40,19 @@ const GradientText = ({
     ? Object.assign({}, ...style)
     : style || {};
 
-  const finalFontSize =  fontSize;
-  const finalFontWeight =  fontWeight;
+  const finalFontSize = fontSize;
+  const finalFontWeight = fontWeight;
 
   // Estimate width based on text length and font size
-  const estimatedWidth = children.toString().length * finalFontSize * widthNumber;
+  const estimatedWidth =
+    children.toString().length * finalFontSize * widthNumber;
 
   return (
-    <Svg style={{marginTop:marginTop,marginBottom:marginBottom,}} height={finalFontSize * 1.5} width={fullWidth?"100%":estimatedWidth}>
+    <Svg
+      style={{ marginTop: marginTop, marginBottom: marginBottom }}
+      height={finalFontSize * 1.5}
+      width={fullWidth ? "100%" : estimatedWidth}
+    >
       <Defs>
         <LinearGradient id="grad" x1={x1} y1={y1} x2={x2} y2={y2}>
           {colors.map((color, index) => (
@@ -50,6 +69,7 @@ const GradientText = ({
         fill="url(#grad)"
         fontSize={finalFontSize}
         fontWeight={finalFontWeight}
+        fontFamily="Mukta-Bold"
         letterSpacing={1}
         x="0"
         y={finalFontSize}

@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,13 +20,15 @@ import { ChevronRight, GitFork } from "lucide-react-native";
 import { topicsSheet } from "../../../data/datas";
 import TopicsCards from "./TopicsCards";
 import SubTopicsCompo from "./SubTopicsCompo";
+import { useFonts } from "expo-font";
 
 const screenHeight = Dimensions.get("window").height;
 const TopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [currentSubTopic,setCurrentSubTopic] = useState("Finance");
+  const [currentSubTopic, setCurrentSubTopic] = useState("Finance");
+
 
   return (
     <Modal
@@ -51,12 +53,12 @@ const TopicsCompo = () => {
           activeOpacity={1}
           onPress={() => dispatch(setToggleTopicsPopup(false))}
         />
- 
+
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
           {/* Content */}
           {toggleStates.toggleSubTopics ? (
-            <SubTopicsCompo  />
+            <SubTopicsCompo />
           ) : (
             <View style={styles.content}>
               <View style={styles.closeModalMain}>
@@ -68,10 +70,10 @@ const TopicsCompo = () => {
                 />
               </View>
               {/* Title */}
-              <Text style={styles.title}>Explore Subjects</Text>
+              <Text style={[styles.title,{fontFamily:'Mukta-Bold'}]}>Explore Subjects</Text>
 
               {/* Description */}
-              <Text style={styles.description}>
+              <Text style={[styles.description,{fontFamily:'Mukta-Regular'}]}>
                 Choose a topic to get started - browse subtopics or jump right
                 in
               </Text>
@@ -83,7 +85,7 @@ const TopicsCompo = () => {
               >
                 <View style={styles.grid}>
                   {topicsSheet.map((topics, topicIndex) => {
-                    return <TopicsCards  key={topicIndex} item={topics} />;
+                    return <TopicsCards key={topicIndex} item={topics} />;
                   })}
                 </View>
               </ScrollView>
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
-    maxHeight:screenHeight*0.8
+    maxHeight: screenHeight * 0.8,
   },
   iconContainer: {
     marginBottom: 24,
@@ -160,14 +162,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(25),
+    fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(15),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,

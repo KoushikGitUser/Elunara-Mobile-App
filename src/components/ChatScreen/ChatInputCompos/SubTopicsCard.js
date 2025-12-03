@@ -1,14 +1,27 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowUpRight, File } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
-import { setChatInputContentLinesNumber, setChatMessagesArray, setSelecetdFiles, setUserMessagePrompt } from "../../../redux/slices/globalDataSlice";
-import { setToggleIsChattingWithAI, setToggleIsWaitingForResponse, setToggleSubTopics, setToggleTopicsPopup } from "../../../redux/slices/toggleSlice";
+import {
+  setChatInputContentLinesNumber,
+  setChatMessagesArray,
+  setSelecetdFiles,
+  setUserMessagePrompt,
+} from "../../../redux/slices/globalDataSlice";
+import {
+  setToggleIsChattingWithAI,
+  setToggleIsWaitingForResponse,
+  setToggleSubTopics,
+  setToggleTopicsPopup,
+} from "../../../redux/slices/toggleSlice";
+import { useFonts } from "expo-font";
 
 const SubTopicsCard = ({ item }) => {
+
+
   const dispatch = useDispatch();
-  const {globalDataStates} = useSelector((state) => state.Global);
+  const { globalDataStates } = useSelector((state) => state.Global);
 
   return (
     <TouchableOpacity
@@ -31,14 +44,14 @@ const SubTopicsCard = ({ item }) => {
         dispatch(setChatInputContentLinesNumber(1));
         dispatch(setToggleIsChattingWithAI(true));
         dispatch(setToggleIsWaitingForResponse(true));
-        dispatch(setToggleTopicsPopup(false))
+        dispatch(setToggleTopicsPopup(false));
       }}
       activeOpacity={0.7}
     >
       <View style={styles.cardContent}>
         <View style={styles.leftContent}>
           <File size={22} strokeWidth={1.5} color="#888888" />
-          <Text style={styles.cardTitle}>{item.title}</Text>
+          <Text style={[styles.cardTitle,{fontFamily:'Mukta-Regular'}]}>{item.title}</Text>
         </View>
         <ArrowUpRight strokeWidth={1.5} />
       </View>
@@ -69,7 +82,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   cardTitle: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: "500",
     color: "#1A1A1A",
     marginLeft: 12,

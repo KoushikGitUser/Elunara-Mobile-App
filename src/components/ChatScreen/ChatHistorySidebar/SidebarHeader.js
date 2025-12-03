@@ -20,7 +20,7 @@ const SidebarHeader = ({ translateX }) => {
   return (
     <View style={styles.chatHistorySidebarHeader}>
       <View style={styles.sidebarTopImageMain}>
-        <Image style={styles.chakraLogoSidebar} source={chakraLogo} />
+
         <Image style={styles.elunaraLogoSidebar} source={elunaraLogo} />
       </View>
       <View style={styles.searchInputMain}>
@@ -57,13 +57,13 @@ const SidebarHeader = ({ translateX }) => {
           style={styles.newChatBtn}
         >
           <MessageCirclePlus size={25} strokeWidth={1.25} />
-          <Text style={styles.btnTexts}>New Chat</Text>
+          <Text style={[styles.btnTexts,{fontFamily:"Mukta-Bold"}]}>New Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity 
         onPress={()=>dispatch(setToggleLearningLabUnlockPopup(true))}
         style={styles.newLearningTabBtn}>
           <AddFolderIcon />
-          <Text style={[styles.btnTexts, { fontWeight: 400 }]}>
+          <Text style={[styles.btnTexts, { fontWeight: 400,fontFamily:"Mukta-Regular" }]}>
             New Learning Lab
           </Text>
         </TouchableOpacity>

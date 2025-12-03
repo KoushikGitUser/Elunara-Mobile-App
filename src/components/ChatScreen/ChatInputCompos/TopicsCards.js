@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   moderateScale,
   scaleFont,
@@ -9,14 +9,19 @@ import { ArrowUpRight, ChevronRight } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { setToggleSubTopics } from "../../../redux/slices/toggleSlice";
 import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
+import { useFonts } from "expo-font";
 
 const TopicsCards = ({ item }) => {
+
   const dispatch = useDispatch();
   return (
-    <TouchableOpacity onPress={()=> {
+    <TouchableOpacity
+      onPress={() => {
         dispatch(setToggleSubTopics(true));
         dispatch(setCurrentSelectedTopic(item?.title));
-    }} style={styles.topicsMain}>
+      }}
+      style={styles.topicsMain}
+    >
       <View style={styles.contentWrapper}>
         <View style={styles.imageandIcon}>
           <View
@@ -34,14 +39,14 @@ const TopicsCards = ({ item }) => {
           <ArrowUpRight strokeWidth={1.5} />
         </View>
 
-        <Text style={styles.topicTitle}>{item?.title}</Text>
-        <Text style={styles.topicDesc}>{item.description}</Text>
+        <Text style={[styles.topicTitle,{fontFamily:'Mukta-Bold'}]}>{item?.title}</Text>
+        <Text style={[styles.topicDesc,{fontFamily:'Mukta-Regular'}]}>{item.description}</Text>
       </View>
       <View style={styles.belowTopics}>
-        <Text style={styles.popularTopics}>
+        <Text style={[styles.popularTopics,{fontFamily:'Mukta-Regular'}]}>
           {item?.popularTopics} Popular Topics
         </Text>
-        <ChevronRight style={{marginBottom:5}} size={22} strokeWidth={1.5} />
+        <ChevronRight style={{ marginBottom: 5 }} size={22} strokeWidth={1.5} />
       </View>
     </TouchableOpacity>
   );
@@ -58,18 +63,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
     marginBottom: 20,
-    backgroundColor:"white"
+    backgroundColor: "white",
   },
   contentWrapper: {
     paddingHorizontal: 12,
     paddingVertical: 10,
-    flex:1
+    flex: 1,
   },
-  imageandIcon:{
-    width:"100%",
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"flex-start"
+  imageandIcon: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   topicIcon: {
     height: 26,
@@ -81,13 +86,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   topicTitle: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(15),
     fontWeight: 600,
+
   },
   topicDesc: {
     fontSize: moderateScale(13),
     fontWeight: 400,
     color: "#757575",
+    lineHeight:18
   },
   belowTopics: {
     backgroundColor: "#F2F7FF",
@@ -101,7 +108,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
   },
   popularTopics: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     color: "#757575",
   },
 });

@@ -9,7 +9,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   ChevronDown,
@@ -32,6 +32,7 @@ import RoomCreationPopup from "../../Rooms/RoomCreationPopup";
 import UnlockLearningLabPopup from "../../Monetisation/UnlockLearningLabPopup";
 import ProPlanUpgradingPopup from "../../Monetisation/ProPlanUpgradingPopup";
 import UnlockNewChatLimitPopup from "../../Monetisation/UnlockNewChatLimitPopup";
+import { useFonts } from "expo-font";
 
 const ChatHistorySidebar = ({ translateX }) => {
   const styleProps = {};
@@ -40,6 +41,21 @@ const ChatHistorySidebar = ({ translateX }) => {
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const { toggleStates } = useSelector((state) => state.Toggle);
+
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <>
@@ -56,19 +72,31 @@ const ChatHistorySidebar = ({ translateX }) => {
             setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
           );
         }}
-        style={[styles.chatHistorySidebarBackgroundWrapper,{display:toggleStates.toggleChatHistorySidebar?"flex":"none"}]}
+        style={[
+          styles.chatHistorySidebarBackgroundWrapper,
+          { display: toggleStates.toggleChatHistorySidebar ? "flex" : "none" },
+        ]}
       ></TouchableOpacity>
-      {toggleStates.toggleRoomCreationPopup && <RoomCreationPopup/>}
-      {toggleStates.toggleLearningLabUnlockPopup && <UnlockLearningLabPopup/>}
-       {toggleStates.toggleProPlanUpgradePopup && <ProPlanUpgradingPopup/>}
-       {toggleStates.toggleUnlockNewChatPopup && <UnlockNewChatLimitPopup/>}
-      <View style={[styles.chatHistorySidebarWrapper,{marginLeft:toggleStates.toggleChatHistorySidebar?0:-SCREEN_WIDTH*0.75}]}>
+      {toggleStates.toggleRoomCreationPopup && <RoomCreationPopup />}
+      {toggleStates.toggleLearningLabUnlockPopup && <UnlockLearningLabPopup />}
+      {toggleStates.toggleProPlanUpgradePopup && <ProPlanUpgradingPopup />}
+      {toggleStates.toggleUnlockNewChatPopup && <UnlockNewChatLimitPopup />}
+      <View
+        style={[
+          styles.chatHistorySidebarWrapper,
+          {
+            marginLeft: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : -SCREEN_WIDTH * 0.75,
+          },
+        ]}
+      >
         {/* chat history header */}
         <SidebarHeader translateX={translateX} />
         {/* chat history header */}
 
         {/* chat history middle */}
-        <SidebarMiddle translateX={translateX}  />
+        <SidebarMiddle translateX={translateX} />
         {/* chat history middle */}
 
         {/* chat history footer */}

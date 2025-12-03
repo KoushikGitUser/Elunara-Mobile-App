@@ -219,7 +219,7 @@ const AnalyticsGraphCompo = ({
                   <Text style={styles.yAxisLabel}>4h</Text>
                   <Text style={styles.yAxisLabel}>avg</Text>
                   <Text style={styles.yAxisLabel}>0h</Text>
-                </View>
+                </View> 
               </View>
 
               {/* Day labels */}

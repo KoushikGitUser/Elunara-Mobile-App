@@ -6,7 +6,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreenCompo.styles";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -30,6 +30,7 @@ import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
 import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
 import { triggerToast, triggerToastWithAction } from "../../services/toast";
+import { useFonts } from "expo-font";
 
 const ChatHeader = ({ translateX, }) => {
   const styleProps = {};
@@ -41,8 +42,8 @@ const ChatHeader = ({ translateX, }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const action = ()=>{
     console.log("action");
-    
   }
+
 
   return (
     <View style={[styles.chatHeader, {}]}>
@@ -93,7 +94,7 @@ const ChatHeader = ({ translateX, }) => {
           style={styles.upgradeButton}
         >
           <SparkleIcon />
-          <Text style={{ fontSize: 13, fontWeight: 600 }}>Upgrade Plan</Text>
+          <Text style={{ fontSize: 14, fontWeight: 600,fontFamily:'Mukta-Bold' }}>Upgrade Plan</Text>
         </TouchableOpacity>
       )}
 
