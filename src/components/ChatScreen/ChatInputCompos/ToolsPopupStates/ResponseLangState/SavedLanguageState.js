@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Platform,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
@@ -21,9 +22,9 @@ const SavedLanguageState = () => {
   return (
     <>
       {/* Title */}
-      <Text style={styles.title}>Response Language</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Language</Text>
       {/* Description */}
-      <Text style={styles.description}>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Choose your response language — ideal for bilinguals or fluent speakers.
       </Text>
 
@@ -34,46 +35,46 @@ const SavedLanguageState = () => {
               onPress={() => setSelectedStyle(langIndex)}
               style={styles.langsMain}
             >
-              <Text>{langs.lang}</Text>
+              <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(15)}}>{langs.lang}</Text>
               <RadioButton selected={selectedStyle === langIndex} />
             </TouchableOpacity>
           );
         })}
       </View>
-      <Text
-        style={{
-          fontSize: moderateScale(11),
-          fontWeight: 600,
-          textDecorationLine: "underline",
-          textAlign: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: moderateScale(11),
-            fontWeight: 400,
-            paddingRight: 5,
-            textDecorationLine: "none",
-          }}
-        >
-          More LLMS? Update your list in{" "}
-        </Text>
-        Settings
-      </Text>
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+              <Text
+                style={{
+                  fontSize: moderateScale(13),
+                  fontWeight: 400,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                More LLMS? Update your list in{" "}
+              </Text>
+              <Pressable style={{borderBottomWidth:2}}>
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
+              </Pressable>
+            </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,

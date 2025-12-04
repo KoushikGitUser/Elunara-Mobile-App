@@ -46,6 +46,7 @@ import TextItalicIcon from "../../../assets/SvgIconsComponent/NotesSectionIcons/
 import TextUnderlineIcon from "../../../assets/SvgIconsComponent/NotesSectionIcons/TextUnderlineIcon";
 import NotesOptions from "../../components/Modals/Notes/NotesOptions";
 import DeleteNoteConfirmPopup from "../../components/Notes/DeleteNoteConfirmPopup";
+import { scaleFont } from "../../utils/responsive";
 
 const Notes = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -155,7 +156,7 @@ const Notes = () => {
             <TextInput
               key={block.id}
               multiline
-              style={{ fontSize: 18, paddingVertical: 10 }}
+              style={{ fontSize: scaleFont(18), paddingVertical: 10,fontFamily:"Mukta-Regular",lineHeight:27}}
               value={block.value}
               onChangeText={(text) => {
                 const updated = [...blocksForRichText];

@@ -46,7 +46,7 @@ const SidebarFooter = ({translateX}) => {
         style={styles.profileButton}
       >
         <Image source={profilePic} style={styles.profilePic} />
-        <Text style={styles.profileText}>Profile</Text>
+        <Text style={[styles.profileText,{fontFamily:"Mukta-Bold",}]}>Profile</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={()=>dispatch(setToggleProPlanUpgradePopup(true))} style={styles.upgradeBtn}>
         <SparkleIcon />
@@ -54,15 +54,15 @@ const SidebarFooter = ({translateX}) => {
           <GradientText
             children="Upgrade plan"
             fullWidth={true}
-            fontSize={18}
+            fontSize={20}
           />
-          <Text style={{ fontSize: moderateScale(10), color: "#757575" }}>
+          <Text style={{ fontSize: moderateScale(11), color: "#757575",fontFamily:'Mukta-Regular' }}>
             More access to the best models
           </Text>
         </View>
       </TouchableOpacity>
       <View style={styles.madeinindia}>
-        <Text style={{ color: "#757575", fontSize: moderateScale(16) }}>
+        <Text style={{ color: "#757575", fontSize: moderateScale(16),fontFamily:'Mukta-Regular' }}>
           Made in India
         </Text>
       </View>

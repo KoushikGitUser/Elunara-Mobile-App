@@ -116,13 +116,13 @@ const RenameChatPopup = () => {
                 <View style={styles.content}>
                   {/* Title */}
 
-                  <Text style={styles.title}>Rename Chat</Text>
+                  <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Rename Chat</Text>
                   <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Rename</Text>
+                    <Text style={[styles.inputLabel,{fontFamily:"Mukta-Regular"}]}>Rename</Text>
                     <View style={styles.input}>
                       <TextInput
                         ref={inputRef}
-                        style={styles.inputText}
+                        style={[styles.inputText,{fontFamily:"Mukta-Regular",fontSize:14}]}
                         placeholder="Enter your mobile number"
                         placeholderTextColor="#9CA3AF"
                         value={chatName} 
@@ -148,7 +148,7 @@ const RenameChatPopup = () => {
                     activeOpacity={0.8}
                     disabled={!chatName}
                   >
-                    <Text style={styles.verifyButtonText}>Done</Text>
+                    <Text style={[styles.verifyButtonText,{fontFamily:"Mukta-Regular"}]}>Done</Text>
                   </TouchableOpacity>
 
                   {/* Skip for now */}
@@ -233,8 +233,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 5,
     marginTop: 10,
@@ -242,7 +241,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
     letterSpacing: 0.2,
@@ -252,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   inputLabel: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     fontWeight: "400",
     color: "#5E5E5E",
     marginBottom: 8,
@@ -322,7 +321,7 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },

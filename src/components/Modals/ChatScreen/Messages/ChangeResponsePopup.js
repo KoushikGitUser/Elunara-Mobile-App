@@ -27,7 +27,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
             }
           ]}
         >
-          <Text style={{fontWeight:600}}>Change Response</Text>
+          <Text style={{fontWeight:600,fontFamily:"Mukta-Bold",fontSize:16}}>Change Response</Text>
         </View>
         <Pressable
           onPress={() => {
@@ -41,7 +41,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
           ]}
         >
           <LLMIcon color="#081A35" />
-          <Text>LLM</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>LLM</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -55,7 +55,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
           ]}
         >
           <ResStyleIcon color="#081A35" />
-          <Text>Style</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Style</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -69,7 +69,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
           ]}
         >
           <ResLangIcon color="#081A35" />
-          <Text>Language</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Language</Text>
         </Pressable>
       </View>
     </>

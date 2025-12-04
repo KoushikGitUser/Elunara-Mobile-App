@@ -59,7 +59,8 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
             <Text
               style={{
                 fontWeight: "400",
-                fontSize: moderateScale(12),
+                fontSize: moderateScale(14),
+                fontFamily:"Mukta-Bold",
                 color: selected ? "black" : "#B5BECE",
               }}
             >
@@ -87,16 +88,16 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
                   <View
                     style={{
                       flexDirection: "row",
-                      gap: 5,
+                      gap: 10,
                       alignItems: "center",
                     }}
                   >
                     <Image style={styles.iconImage} source={item?.icon} />
-                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>{item.title}</Text>
                   </View>
 
                   <View>
-                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={[styles.description,{fontFamily:"Mukta-Regular"}]}>{item.description}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -150,12 +151,12 @@ const styles = StyleSheet.create({
     width: 23,
   },
   title: {
-    fontSize: moderateScale(13),
+    fontSize: moderateScale(14),
     fontWeight: "600",
     color: "#000",
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(12.5),
     color: "#757575",
   },
 });

@@ -75,12 +75,12 @@ const ChatHeader = ({ translateX, }) => {
 
       {toggleStates.toggleIsChattingWithAI ? ( 
         <View style={styles.chatnameAndSection}>
-          <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
+          <Text style={{ fontSize: scaleFont(15), fontWeight: 600,fontFamily:'Mukta-Bold' }}>
             First Chat with AI
           </Text>
           <TouchableOpacity style={styles.topicNamemain}>
             <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />
-            <Text style={{ fontSize: 11, fontWeight: 400, color: "#406DD8" }}>
+            <Text style={{ fontSize: 12, fontWeight: 400, color: "#406DD8",fontFamily:'Mukta-Regular' }}>
               Finance
             </Text>
           </TouchableOpacity>

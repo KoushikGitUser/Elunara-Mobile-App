@@ -49,10 +49,10 @@ const ResponseStyleState = () => {
           />
         </View>
         {/* Title */}
-        <Text style={styles.title}>Response Style</Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>
 
         {/* Description */}
-        <Text style={styles.description}>
+        <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
           Set the tone of your AI companion - whether you need a mentor,
           explainer, or study buddy.
         </Text>
@@ -91,7 +91,7 @@ const ResponseStyleState = () => {
                         <Text
                           style={[
                             styles.optionTitle,
-                            { fontSize: scaleFont(16), fontWeight: 600 },
+                            { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
                           ]}
                         >
                           {styleOptions.title}
@@ -100,9 +100,10 @@ const ResponseStyleState = () => {
                           style={[
                             styles.optionDescription,
                             {
-                              fontSize: scaleFont(12),
+                              fontSize: scaleFont(14),
                               fontWeight: 400,
                               color: "#8F8F8F",
+                              fontFamily:"Mukta-Regular"
                             },
                           ]}
                         >
@@ -119,7 +120,8 @@ const ResponseStyleState = () => {
                         style={{
                           textAlign: "center",
                           color: "#757575",
-                          fontSize: scaleFont(14),
+                          fontSize: scaleFont(15),
+                          fontFamily:"Mukta-Regular"
                         }}
                       >
                         Or Select Manually
@@ -163,14 +165,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -218,6 +219,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 18,
     backgroundColor: "white",
+    marginBottom:20
   },
   contentMain: {
     flexDirection: "row",

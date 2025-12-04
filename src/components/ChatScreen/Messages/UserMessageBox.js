@@ -54,7 +54,7 @@ const UserMessageBox = ({ chat }) => {
         dispatch(setToggleUserMessageActionPopup(true));
         dispatch(setUserMessageOnLongPress(chat.message))
       }} style={styles.messageBox}>
-        <Text style={styles.message}>{chat.message} </Text>
+        <Text style={[styles.message,{fontFamily:'Mukta-Regular'}]}>{chat.message} </Text>
       </TouchableOpacity>
     </View>
   );
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   message: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(15),
     fontWeight: 400,
     color:"#3A3A3A"
   },

@@ -9,6 +9,8 @@ import { useFonts } from 'expo-font';
 export default function App() {
   const [fontsLoaded] = useFonts({
   'Mukta-Regular': require('./assets/fonts/Mukta-Regular.ttf'),
+  'Mukta-Bold': require('./assets/fonts/Mukta-Bold.ttf'),
+
 });
 
   useEffect(() => {

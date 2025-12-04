@@ -34,7 +34,7 @@ const AIMessageBox = ({ message }) => {
   return (
     <View style={styles.mainBox}>
       <View style={styles.messageBox}>
-        <Text style={styles.message}>{message}</Text>
+        <Text style={[styles.message,{fontFamily:'Mukta-Regular'}]}>{message}</Text>
       </View>
 
       <View style={styles.messageActions}>
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   message: {
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(15),
     fontWeight: 400,
     color:"#5E5E5E"
   },

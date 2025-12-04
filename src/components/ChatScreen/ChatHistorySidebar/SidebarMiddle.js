@@ -64,7 +64,7 @@ const SidebarMiddle = ({translateX}) => {
       </View>
       <View style={styles.pinnedSectionMain}>
         <TouchableOpacity onPress={()=>setRecentChatsOpened(!recentChatsOpened)} style={[styles.pinnedBtn, { paddingLeft: 0 }]}>
-          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+          <Text style={{ fontSize: moderateScale(13), marginLeft: 20,fontFamily:"Mukta-Regular" }}>
             Recent chats
           </Text>
           {recentChatsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}
@@ -78,7 +78,7 @@ const SidebarMiddle = ({translateX}) => {
             })}
             <TouchableOpacity onPress={()=>navigation.navigate("allchats")} style={[styles.pinnedBtn,{paddingLeft:0,width:"90%"}]}>
            <ChatsIcon/>
-          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+          <Text style={{ fontSize: moderateScale(13), marginLeft: 20,fontFamily:"Mukta-Regular"}}>
             View all Chats
           </Text>
           <ChevronRight style={{ marginLeft: "auto" }} strokeWidth={1.25} />
@@ -89,7 +89,7 @@ const SidebarMiddle = ({translateX}) => {
       <View style={styles.pinnedSectionMain}>
         <TouchableOpacity onPress={() => setRoomsOpened(!roomsOpened)} style={[styles.pinnedBtn]}>
           <FolderIcon/>
-          <Text style={{ fontSize: moderateScale(11), marginLeft: 20 }}>
+          <Text style={{ fontSize: moderateScale(13), marginLeft: 20,fontFamily:"Mukta-Regular" }}>
             Rooms
           </Text>
           {roomsOpened? <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />:<ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />}

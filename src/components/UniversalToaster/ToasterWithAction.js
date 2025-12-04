@@ -10,8 +10,24 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { BadgeCheck, CircleX, Info, TriangleAlert } from "lucide-react-native";
 import { toastEmitter } from "../../services/toast";
+import { useFonts } from "expo-font";
 
 const ToasterWithAction = () => {
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
+
   const [toast, setToast] = useState({
     visible: false,
     title: "",
@@ -102,9 +118,17 @@ const ToasterWithAction = () => {
       style={[styles.toast, { transform: [{ translateY: slideAnim }] }]}
     >
       {toast.type == "success" ? (
-        <BadgeCheck style={{ marginTop: 5 }} color="#03B32F" strokeWidth={1.25} />
+        <BadgeCheck
+          style={{ marginTop: 5 }}
+          color="#03B32F"
+          strokeWidth={1.25}
+        />
       ) : toast.type == "alert" ? (
-        <TriangleAlert style={{ marginTop: 5 }} color="#FFA412" strokeWidth={1.25} />
+        <TriangleAlert
+          style={{ marginTop: 5 }}
+          color="#FFA412"
+          strokeWidth={1.25}
+        />
       ) : toast.type == "info" ? (
         <Info style={{ marginTop: 5 }} color="#D00B0B" strokeWidth={1.25} />
       ) : (
@@ -112,12 +136,12 @@ const ToasterWithAction = () => {
       )}
 
       <Animated.View>
-        <Text style={styles.textTitle}>{toast.title}</Text>
-        <Text style={styles.textDesc}>{toast.description}</Text>
+        <Text style={[styles.textTitle,{fontFamily:'Mukta-Bold'}]}>{toast.title}</Text>
+        <Text style={[styles.textDesc,{fontFamily:'Mukta-Regular'}]}>{toast.description}</Text>
       </Animated.View>
 
       <TouchableOpacity style={styles.actionBtn} onPress={toast.action}>
-        <Text style={{ fontWeight: 600, fontSize: 14 }}>
+        <Text style={{ fontWeight: 600, fontSize: 16,fontFamily:'Mukta-Bold'}}>
           {toast.actionTitle}
         </Text>
       </TouchableOpacity>
@@ -129,8 +153,8 @@ const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   toast: {
-    position:"absolute",
-    left:20,
+    position: "absolute",
+    left: 20,
     width: width - 40,
     paddingVertical: 14,
     paddingHorizontal: 20,
@@ -148,11 +172,11 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     fontWeight: 600,
-    fontSize: 16,
+    fontSize: 17,
   },
   textDesc: {
     color: "#757575",
-    fontSize: 14,
+    fontSize: 15,
   },
   actionBtn: {
     borderBottomWidth: 1,

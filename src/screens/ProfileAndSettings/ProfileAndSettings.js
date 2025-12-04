@@ -1,5 +1,5 @@
 import { View, Text, Animated, StatusBar } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileHeader from "../../components/ProfileAndSettings/ProfileHeader";
 import UserSection from "../../components/ProfileAndSettings/UserSection";
@@ -9,6 +9,7 @@ import ConfirmLogoutPopup from "../../components/ProfileAndSettings/ConfirmLogou
 import { useSelector } from "react-redux";
 import UnlockAnalyticsDashboardPopup from "../../components/Monetisation/UnlockAnalyticsDashboardPopup";
 import UnlockAdFreeExpPopup from "../../components/Monetisation/UnlockAdFreeExpPopup";
+import { useFonts } from "expo-font";
 
 const ProfileAndSettings = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
@@ -16,12 +17,29 @@ const ProfileAndSettings = () => {
   const [toggleLogOutConfirmPopup, setToggleLogOutConfirmPopup] =
     useState(false);
 
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "#FAFAFA", paddingHorizontal: 20 }}
     >
-      {toggleStates.toggleUnlockAnalyticsDashboardPopup && <UnlockAnalyticsDashboardPopup/>}
-      {toggleStates.toggleAdFreeExpPopup && <UnlockAdFreeExpPopup/>}
+      {toggleStates.toggleUnlockAnalyticsDashboardPopup && (
+        <UnlockAnalyticsDashboardPopup />
+      )}
+      {toggleStates.toggleAdFreeExpPopup && <UnlockAdFreeExpPopup />}
       <StatusBar
         barStyle="dark-content"
         hidden={false}

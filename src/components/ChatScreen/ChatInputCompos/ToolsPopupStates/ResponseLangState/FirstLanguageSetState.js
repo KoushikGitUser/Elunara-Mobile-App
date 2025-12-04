@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
@@ -18,18 +19,19 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
   return (
     <>
       {/* Title */}
-      <Text style={styles.title}>Set Response Language</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Set Response Language</Text>
       {/* Description */}
-      <Text style={styles.description}>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Choose up to 3 languages to toggle between. Update anytime in Settings.
       </Text>
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollableContent}>
         <Text
           style={{
-            fontSize: moderateScale(10),
+            fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
+            fontFamily: "Mukta-Regular" 
           }}
         >
           Default Language
@@ -43,17 +45,19 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
           style={{
             textAlign: "center",
             color: "#757575",
-            fontSize: scaleFont(12),
+            fontSize: scaleFont(13),
             paddingTop: 15,
+            fontFamily: "Mukta-Regular" 
           }}
         >
           Select 2 more
         </Text>
         <Text
           style={{
-            fontSize: moderateScale(10),
+            fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
+            fontFamily: "Mukta-Regular" 
           }}
         >
           Language 2
@@ -65,9 +69,10 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
         />
         <Text
           style={{
-            fontSize: moderateScale(10),
+            fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
+            fontFamily: "Mukta-Regular" 
           }}
         >
           Language 3
@@ -89,28 +94,29 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
           onPress={() => setIsLanguageSaved(true)}
           activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>Save LLM Preferences</Text>
+          <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save LLM Preferences</Text>
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: moderateScale(11),
-            fontWeight: 600,
-            textDecorationLine: "underline",
-            textAlign: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: moderateScale(11),
-              fontWeight: 400,
-              paddingRight: 5,
-              textDecorationLine: "none",
-            }}
-          >
-            More LLMS? Update your list in{" "}
-          </Text>
-          Settings
-        </Text>
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+              <Text
+                style={{
+                  fontSize: moderateScale(13),
+                  fontWeight: 400,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                More LLMS? Update your list in{" "}
+              </Text>
+              <Pressable style={{borderBottomWidth:2}}>
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
+              </Pressable>
+            </View>
       </ScrollView>
     </>
   );
@@ -143,14 +149,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 5,
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },

@@ -1,4 +1,10 @@
-import { Text, StyleSheet, Animated, Dimensions, PanResponder } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  PanResponder,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { toastEmitter } from "../../services/toast";
 import {
@@ -8,8 +14,24 @@ import {
   Info,
   TriangleAlert,
 } from "lucide-react-native";
+import { useFonts } from "expo-font";
 
 const Toaster = () => {
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
+
   const [toast, setToast] = useState({
     visible: false,
     title: "",
@@ -100,21 +122,29 @@ const Toaster = () => {
       style={[styles.toast, { transform: [{ translateY: slideAnim }] }]}
     >
       {toast.type == "success" ? (
-        <BadgeCheck style={{ marginTop: 5 }} color="#03B32F" strokeWidth={1.25} />
+        <BadgeCheck
+          style={{ marginTop: 5 }}
+          color="#03B32F"
+          strokeWidth={1.25}
+        />
       ) : toast.type == "alert" ? (
-        <TriangleAlert style={{ marginTop: 5 }} color="#FFA412" strokeWidth={1.25} />
+        <TriangleAlert
+          style={{ marginTop: 5 }}
+          color="#FFA412"
+          strokeWidth={1.25}
+        />
       ) : toast.type == "info" ? (
         <Info style={{ marginTop: 5 }} color="#D00B0B" strokeWidth={1.25} />
       ) : toast.type == "normal" ? (
-        <CircleCheck color="#888888" strokeWidth={1.25} />
+        <CircleCheck style={{ marginTop: 5 }} color="#888888" strokeWidth={1.25} />
       ) : (
         <CircleX style={{ marginTop: 5 }} color="#D00B0B" strokeWidth={1.25} />
       )}
 
       <Animated.View>
-        <Text style={styles.textTitle}>{toast.title}</Text>
+        <Text style={[styles.textTitle,{fontFamily:'Mukta-Bold'}]}>{toast.title}</Text>
         {toast.description !== "" && (
-          <Text style={styles.textDesc}>{toast.description}</Text>
+          <Text style={[styles.textDesc,{fontFamily:'Mukta-Regular'}]}>{toast.description}</Text>
         )}
       </Animated.View>
     </Animated.View>
@@ -143,11 +173,11 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     fontWeight: 600,
-    fontSize: 16,
+    fontSize: 17,
   },
   textDesc: {
     color: "#757575",
-    fontSize: 14,
+    fontSize: 15,
   },
 });
 

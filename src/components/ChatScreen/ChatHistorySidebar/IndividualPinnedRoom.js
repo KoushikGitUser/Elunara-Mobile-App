@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import folder from '../../../assets/images/FolderSimple.png'
 import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
+import { scaleFont } from "../../../utils/responsive";
 
 const IndividualPinnedRoom = ({title}) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -24,7 +25,7 @@ const IndividualPinnedRoom = ({title}) => {
       style={styles.individualPinnedRooms}
     >
        <FolderIcon/>
-      <Text>{truncateTitle(title)} </Text>
+      <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(14)}}>{truncateTitle(title)} </Text>
     </TouchableOpacity>
   );
 };

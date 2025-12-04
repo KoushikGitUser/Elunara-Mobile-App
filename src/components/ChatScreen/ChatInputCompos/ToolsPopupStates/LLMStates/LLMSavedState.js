@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { ArrowLeft, ArrowRightLeft, ChevronRight } from "lucide-react-native";
@@ -25,7 +26,7 @@ import { savedLLMOptions } from "../../../../../data/datas";
 
 const screenHeight = Dimensions.get("window").height;
 
-const LLMSavedState = ({setToggleIntegrateAi}) => {
+const LLMSavedState = ({ setToggleIntegrateAi }) => {
   const [selectedStyle, setSelectedStyle] = useState(0);
 
   const RadioButton = ({ selected }) => (
@@ -51,14 +52,19 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
         />
       </View>
       {/* Title */}
-      <Text style={styles.title}>Choose LLM</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+        Choose LLM
+      </Text>
 
       {/* Description */}
-      <Text style={styles.description}>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Select the AI model for your responses - choose based on speed or depth.
       </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: screenHeight * 0.55 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ maxHeight: screenHeight * 0.55 }}
+      >
         <View style={styles.optionsMain}>
           {savedLLMOptions?.map((option, optionsIndex) => {
             return (
@@ -88,7 +94,7 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
                       <Text
                         style={[
                           styles.optionTitle,
-                          { fontSize: scaleFont(16), fontWeight: 600 },
+                          { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
                         ]}
                       >
                         {option.title}
@@ -97,9 +103,10 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
                         style={[
                           styles.optionDescription,
                           {
-                            fontSize: scaleFont(12),
+                            fontSize: scaleFont(14),
                             fontWeight: 400,
                             color: "#8F8F8F",
+                            fontFamily:"Mukta-Regular"
                           },
                         ]}
                       >
@@ -109,9 +116,10 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
                         <View style={styles.buttonContainer}>
                           <Text
                             style={{
-                              fontSize: scaleFont(12),
+                              fontSize: scaleFont(12.5),
                               fontWeight: 400,
                               color: "#8F8F8F",
+                              fontFamily:"Mukta-Regular"
                             }}
                           >
                             {option.buttonText}
@@ -128,7 +136,8 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
                       style={{
                         textAlign: "center",
                         color: "#757575",
-                        fontSize: scaleFont(14),
+                        fontSize: scaleFont(15),
+                        fontFamily:"Mukta-Regular"
                       }}
                     >
                       Or Select Manually
@@ -141,7 +150,7 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
         </View>
 
         <TouchableOpacity
-        onPress={()=>setToggleIntegrateAi(true)}
+          onPress={() => setToggleIntegrateAi(true)}
           style={[
             styles.card,
             {
@@ -149,9 +158,9 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
               justifyContent: "flex-start",
               alignItems: "flex-start",
               gap: 15,
-              marginTop:25,
-              marginBottom:25,
-              backgroundColor:"#F3F3F3"
+              marginTop: 25,
+              marginBottom: 25,
+              backgroundColor: "#F3F3F3",
             },
           ]}
         >
@@ -160,7 +169,7 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              width:"100%"
+              width: "100%",
             }}
           >
             <View
@@ -168,43 +177,48 @@ const LLMSavedState = ({setToggleIntegrateAi}) => {
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                gap:15
+                gap: 15,
               }}
             >
-                <ArrowRightLeft strokeWidth={1.25} />
-                <Text style={{
-            fontSize: moderateScale(13),
-            fontWeight: 600,
-          }}>
-                    Integrate Your AI account
-                </Text>
+              <ArrowRightLeft strokeWidth={1.25} />
+              <Text
+                style={{
+                  fontSize: moderateScale(15),
+                  fontWeight: 600,
+                  fontFamily:"Mukta-Bold"
+                }}
+              >
+                Integrate Your AI account
+              </Text>
             </View>
             <ChevronRight size={30} strokeWidth={1.25} />
           </View>
-          <Text style={{fontSize:scaleFont(12),color:"#757575"}}>
-            Link your account to tailor responses and enjoy the benefits of your subscription.
+          <Text style={{ fontSize: scaleFont(13), color: "#757575",fontFamily:"Mukta-Regular" }}>
+            Link your account to tailor responses and enjoy the benefits of your
+            subscription.
           </Text>
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: moderateScale(11),
-            fontWeight: 600,
-            textDecorationLine: "underline",
-            textAlign: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: moderateScale(11),
-              fontWeight: 400,
-              paddingRight: 5,
-              textDecorationLine: "none",
-            }}
-          >
-            More LLMS? Update your list in{" "}
-          </Text>
-          Settings
-        </Text>
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+              <Text
+                style={{
+                  fontSize: moderateScale(13),
+                  fontWeight: 400,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                More LLMS? Update your list in{" "}
+              </Text>
+              <Pressable style={{borderBottomWidth:2}}>
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
+              </Pressable>
+            </View>
       </ScrollView>
     </View>
   );
@@ -227,7 +241,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   iconContainer: {
-    marginTop:5
+    marginTop: 5,
   },
   closeModalMain: {
     width: "100%",
@@ -236,14 +250,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
+    fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -265,7 +279,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop:5,
+    marginTop: 5,
   },
   button: {
     backgroundColor: "#081A35",

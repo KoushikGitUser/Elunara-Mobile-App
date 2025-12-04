@@ -179,7 +179,7 @@ const AddItemsToInputPopup = () => {
                   ) : (
                     <Image size={22} strokeWidth={1.25}  />
                   )}
-                  <Text style={{fontSize:scaleFont(13), fontWeight: pressed ? 600 : 400}}>{items?.text}</Text>
+                  <Text style={{fontSize:scaleFont(15), fontWeight: pressed ? 600 : 400,fontFamily:pressed?"Mukta-Bold":"Mukta-Regular"}}>{items?.text}</Text>
                 </>
               )}
             </Pressable>

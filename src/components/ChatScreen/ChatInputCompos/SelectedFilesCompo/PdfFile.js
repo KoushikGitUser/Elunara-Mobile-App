@@ -29,10 +29,10 @@ const PdfFile = ({ file, onRemove }) => {
         />
       </View>
       <View>
-        <Text style={{ fontSize: scaleFont(12), fontWeight: 600 }}>
+        <Text style={{ fontSize: scaleFont(13), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
           {truncateFileName(file.name)}
         </Text>
-        <Text style={{ fontSize: scaleFont(12), fontWeight: 400 }}>PDF</Text>
+        <Text style={{ fontSize: scaleFont(12), fontWeight: 400,fontFamily:"Mukta-Regular" }}>PDF</Text>
       </View>
       <TouchableOpacity style={styles.crossBtn} onPress={onRemove}>
         <X size={15} color="white" strokeWidth={1.5} />

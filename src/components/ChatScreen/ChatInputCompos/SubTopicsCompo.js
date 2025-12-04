@@ -88,6 +88,7 @@ const SubTopicsCompo = () => {
           }}
           keyboardType="text"
           returnKeyType="done"
+          style={{fontFamily:"Mukta-Regular",fontSize:17}}
         />
       </View>
 
@@ -123,7 +124,7 @@ const SubTopicsCompo = () => {
               <TextInput
                 style={[
                   styles.belowInput,
-                  { alignSelf: expandTextInput ? "flex-start" : "center" },
+                  { alignSelf: expandTextInput ? "flex-start" : "center",fontFamily:"Mukta-Regular" },
                 ]}
                 onFocus={() => setExpandTextInput(true)}
                 onBlur={() => setExpandTextInput(false)}
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   },
   belowInput: {
     flex: 1,
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     color: "#1A1A1A",
     paddingVertical: 0,
     backgroundColor: "white",

@@ -39,7 +39,7 @@ const ToolsContainers = () => {
             >
               {tools.icon}
 
-              <Text style={{ fontSize: moderateScale(14) }}>
+              <Text style={{ fontSize: moderateScale(16),fontFamily:"Mukta-Regular" }}>
                 {tools.title}{" "}
               </Text>
             </View>
@@ -52,7 +52,7 @@ const ToolsContainers = () => {
               }}
             >
               <View style={styles.selectedOption}>
-                <Text style={{ fontSize: moderateScale(11) }}>
+                <Text style={{ fontSize: moderateScale(12),fontFamily:"Mukta-Regular" }}>
                   {tools.selection}{" "}
                 </Text>
               </View>

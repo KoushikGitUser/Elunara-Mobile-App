@@ -10,7 +10,7 @@ import React from "react";
 import { profileAndSettingsOptions } from "../../data/datas";
 import SparkleIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 import GradientText from "../common/GradientText";
-import { moderateScale, verticalScale } from "../../utils/responsive";
+import { moderateScale, scaleFont, verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import {
@@ -56,7 +56,7 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
               style={styles.itemContainer}
             >
               {option.icon}
-              <Text style={styles.title}>{option.title}</Text>
+              <Text style={[styles.title,{fontFamily:"Mukta-Regular"}]}>{option.title}</Text>
             </TouchableOpacity>
             {optionIndex == 5 && (
               <TouchableOpacity onPress={()=>dispatch(setToggleAdFreeExpPopup(true))} style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
@@ -85,7 +85,7 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
             fullWidth={true}
             fontSize={18}
           />
-          <Text style={{ fontSize: moderateScale(10), color: "#757575" }}>
+          <Text style={{ fontSize: moderateScale(13), color: "#757575",fontFamily:"Mukta-Regular"}}>
             More access to the best models
           </Text>
         </View>
@@ -112,13 +112,13 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   title: {
-    fontSize: 16,
+    fontSize: scaleFont(17),
     color: "#1A202C",
     fontWeight: "500",
   },
   upgradeBtn: {
     width: "100%",
-    height: verticalScale(65),
+    minHeight: verticalScale(65),
     borderWidth: 1,
     borderColor: "#D3DAE5",
     borderRadius: 16,

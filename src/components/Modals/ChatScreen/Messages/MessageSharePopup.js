@@ -26,7 +26,7 @@ const MessageSharePopup = ({setSharePopup}) => {
           ]}
         >
           <Download strokeWidth={1.25} />
-          <Text>Download</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Download</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -40,7 +40,7 @@ const MessageSharePopup = ({setSharePopup}) => {
           ]}
         >
           <WhatsappIcon/>
-          <Text>Whatsapp</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Whatsapp</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -54,7 +54,7 @@ const MessageSharePopup = ({setSharePopup}) => {
           ]}
         >
          <LinkedInIcon/>
-          <Text>LinkedIn</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>LinkedIn</Text>
         </Pressable>
                 <Pressable
           onPress={() => {
@@ -68,7 +68,7 @@ const MessageSharePopup = ({setSharePopup}) => {
           ]}
         >
          <ZoomIcon/>
-          <Text>Zoom</Text>
+          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Zoom</Text>
         </Pressable>
       </View>
     </>

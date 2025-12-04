@@ -8,6 +8,7 @@ import elunaraLogo from "../../../assets/images/elunaraLogo.png";
 import AddFolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/AddFolderIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar, setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup, setToggleUnlockNewChatPopup } from "../../../redux/slices/toggleSlice";
+import { scaleFont } from "../../../utils/responsive";
 
 const SidebarHeader = ({ translateX }) => {
   const styleProps = {};
@@ -33,7 +34,7 @@ const SidebarHeader = ({ translateX }) => {
         <TextInput
           placeholder="Search"
           placeholderTextColor="#B5BECE"
-          style={styles.searchInput}
+          style={[styles.searchInput,{fontFamily:'Mukta-Regular',fontSize:scaleFont(15)}]}
         />
       </View>
       <View style={styles.newButtonsMain}>

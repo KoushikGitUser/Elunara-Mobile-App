@@ -27,7 +27,7 @@ export const createStyles = ({}) =>
       position: "absolute",
       left: 0,
       top: 0,
-      zIndex: 20, 
+      zIndex: 20,
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
@@ -35,8 +35,8 @@ export const createStyles = ({}) =>
       shadowOffset: { width: 15, height: 0 }, // 👈 horizontal shadow only (to right)
       shadowOpacity: 1,
       shadowRadius: 15,
-      elevation:10,
-      paddingTop:40
+      elevation: 10,
+      paddingTop: 40,
     },
     chatHistorySidebarHeader: {
       width: "100%",
@@ -57,18 +57,18 @@ export const createStyles = ({}) =>
       position: "relative",
       flexDirection: "row",
       alignItems: "center",
+      borderWidth: 1,
+      borderRadius: 16,
+      borderColor: "#ABB8CC",
     },
     searchIcon: {
       position: "absolute",
       left: 10,
     },
     searchInput: {
-      width: "100%",
-      height: verticalScale(40),
-      borderWidth: 1,
-      borderRadius: 16,
-      borderColor: "#ABB8CC",
-      paddingLeft: 40,
+      width: "90%",
+      paddingLeft: 15,
+      marginLeft:"auto"
     },
     newButtonsMain: {
       width: "100%",
@@ -103,7 +103,7 @@ export const createStyles = ({}) =>
     },
     btnTexts: {
       fontWeight: 600,
-      fontSize:scaleFont(15)
+      fontSize: scaleFont(15),
     },
     chakraLogoSidebar: {
       height: verticalScale(32),
@@ -112,7 +112,7 @@ export const createStyles = ({}) =>
     elunaraLogoSidebar: {
       height: verticalScale(32),
       width: verticalScale(95),
-      marginLeft:2
+      marginLeft: 2,
     },
     chatHistorySidebarMiddle: {
       width: "100%",
@@ -194,7 +194,7 @@ export const createStyles = ({}) =>
       borderBottomRightRadius: 16,
       borderTopWidth: 1,
       borderColor: "lightgrey",
-      marginBottom:30
+      marginBottom: 30,
     },
     profileButton: {
       width: "100%",
@@ -208,7 +208,7 @@ export const createStyles = ({}) =>
       width: verticalScale(24),
     },
     profileText: {
-      fontSize: moderateScale(14),
+      fontSize: moderateScale(17),
       fontWeight: 600,
     },
     upgradeBtn: {

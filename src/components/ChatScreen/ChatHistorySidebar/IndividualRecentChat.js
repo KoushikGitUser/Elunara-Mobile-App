@@ -7,6 +7,7 @@ import chat from '../../../assets/images/ChatTeardrop.png'
 import { useDispatch } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
+import { scaleFont } from "../../../utils/responsive";
 
 const IndividualRecentChat = ({ title }) => {
   const styleProps = {};
@@ -28,7 +29,7 @@ const IndividualRecentChat = ({ title }) => {
     >
      <ChatIcon/>
 
-      <Text>{truncateTitle(title)} </Text>
+      <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(14)}}>{truncateTitle(title)} </Text>
     </TouchableOpacity>
   );
 };

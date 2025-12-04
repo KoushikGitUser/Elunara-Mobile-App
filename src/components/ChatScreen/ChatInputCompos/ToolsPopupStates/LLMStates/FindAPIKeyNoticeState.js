@@ -44,10 +44,10 @@ const FindAPIKeyNoticeState = ({ close }) => {
         />
       </View>
       {/* Title */}
-      <Text style={styles.title}>Where to find your API Key</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Where to find your API Key</Text>
 
       {/* Description */}
-      <Text style={styles.description}>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         An API key is a unique code that securely links your AI account to
         Elunara. It enables personalized, private responses and helps you make
         the most of your subscription.
@@ -76,7 +76,7 @@ const FindAPIKeyNoticeState = ({ close }) => {
           onPress={() => close(false)}
           activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>Got it</Text>
+          <Text style={[styles.buttonText,{fontFamily:"Mukta-Regular"}]}>Got it</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -109,14 +109,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(25),
+    fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
     letterSpacing: 0.3,
   },

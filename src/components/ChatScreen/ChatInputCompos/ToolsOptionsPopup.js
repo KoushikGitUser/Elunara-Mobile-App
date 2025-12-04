@@ -61,10 +61,10 @@ const ToolsOptionsPopup = () => {
               />
             </View>
             {/* Title */}
-            <Text style={styles.title}>Choose Tools</Text>
+            <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>Choose Tools</Text>
 
             {/* Description */}
-            <Text style={styles.description}>
+            <Text style={[styles.description,{fontFamily:"Mukta-Regular"}]}>
               Customise how Elunara responds - choose your model, tone,
               language, and citations
             </Text>
@@ -131,14 +131,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
+    fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,

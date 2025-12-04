@@ -74,7 +74,7 @@ const ChatOptionsPopup = () => {
               {options.icon}
               <Text
                 numberOfLines={1}
-                style={{ fontSize: moderateScale(13), flexShrink: 1 }}
+                style={{ fontSize: moderateScale(16), flexShrink: 1,fontFamily:'Mukta-Regular' }}
               >
                 {options?.option}
               </Text>

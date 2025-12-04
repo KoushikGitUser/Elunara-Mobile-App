@@ -9,7 +9,7 @@ const GradientText = ({
   start = { x: 0, y: 0 },
   end = { x: 1, y: 1 },
   fontSize,
-  fontWeight = "600",
+  fontWeight = "500",
   marginTop,
   marginBottom,
   style,
@@ -49,7 +49,7 @@ const GradientText = ({
 
   return (
     <Svg
-      style={{ marginTop: marginTop, marginBottom: marginBottom }}
+      style={{ marginTop: marginTop, marginBottom: marginBottom,fontFamily:'Mukta-Bold'}}
       height={finalFontSize * 1.5}
       width={fullWidth ? "100%" : estimatedWidth}
     >
@@ -66,10 +66,10 @@ const GradientText = ({
         </LinearGradient>
       </Defs>
       <Text
+      style={{fontFamily:'Mukta-Bold'}}
         fill="url(#grad)"
         fontSize={finalFontSize}
         fontWeight={finalFontWeight}
-        fontFamily="Mukta-Bold"
         letterSpacing={1}
         x="0"
         y={finalFontSize}

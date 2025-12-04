@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress, setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
+import { scaleFont } from "../../../utils/responsive";
 
 const IndividualPinnedChat = ({ title, translateX }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
@@ -45,7 +46,7 @@ const IndividualPinnedChat = ({ title, translateX }) => {
       style={styles.individualPinnedChats}
     >
       <ChatIcon />
-      <Text>{truncateTitle(title)}</Text>
+      <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(14)}}>{truncateTitle(title)}</Text>
     </TouchableOpacity>
   );
 };

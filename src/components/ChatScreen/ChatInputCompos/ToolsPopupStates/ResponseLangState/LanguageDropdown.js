@@ -49,8 +49,9 @@ const LanguageDropdown = ({setSelectedCounts,selectedCounts,selectOptionsArray})
             <Text
               style={{
                 fontWeight: "400",
-                fontSize: moderateScale(12),
+                fontSize: moderateScale(14),
                 color: selected ? "black" : "#B5BECE",
+                fontFamily: "Mukta-Regular" 
               }}
             >
               {selected ? selected.lang+"  "+selected.nativeCharacter : "Select"}
@@ -74,7 +75,7 @@ const LanguageDropdown = ({setSelectedCounts,selectedCounts,selectOptionsArray})
                   onPress={() => handleSelect(item)}
                   activeOpacity={0.7}
                 >
-                    <Text style={styles.description}>{item.lang}   {item.nativeCharacter} </Text>
+                    <Text style={[styles.description,{fontFamily: "Mukta-Regular" }]}>{item.lang}   {item.nativeCharacter} </Text>
                 </TouchableOpacity>
               );
             })}
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     color: "#757575",
     fontWeight:600
   },

@@ -18,7 +18,7 @@ const UserSection = () => {
       <View style={styles.upper}>
         <Image source={userImg} style={styles.userImg} />
         <View>
-          <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
+          <Text style={{ fontSize: scaleFont(16), fontWeight: 600,fontFamily:"Mukta-Bold"}}>
             Neha Jain
           </Text>
           <Text
@@ -27,6 +27,7 @@ const UserSection = () => {
               fontWeight: 400,
               color: "#757575",
               marginTop: 3,
+              fontFamily:"Mukta-Regular"
             }}
           >
             neha@gmail.com
@@ -47,7 +48,7 @@ const UserSection = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.mobileVerifyButton}>
-        <Text style={{fontSize:scaleFont(12),color:"#3A3A3A",fontWeight:500}}>
+        <Text style={{fontSize:scaleFont(13),color:"#3A3A3A",fontWeight:500,fontFamily:"Mukta-Bold"}}>
           Verify mobile no. — 8 days left
         </Text>
       </TouchableOpacity>

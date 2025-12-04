@@ -39,7 +39,7 @@ const ProfileHeader = ({translateX}) => {
       >
         <Feather name="menu" size={30} color="black" />
       </TouchableOpacity>
-      <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
+      <Text style={{ fontSize: scaleFont(20), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
         Profile
       </Text>
     </View>

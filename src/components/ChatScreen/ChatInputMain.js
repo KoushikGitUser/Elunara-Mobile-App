@@ -196,7 +196,7 @@ const ChatInputMain = () => {
           onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
           placeholder="Ask anything"
           placeholderTextColor="grey"
-          style={[styles.textInput, { height: inputHeight }]}
+          style={[styles.textInput, { height: inputHeight,fontFamily:"Mukta-Regular",fontSize:16 }]}
           multiline
           textAlignVertical="top"
           onContentSizeChange={handleContentSizeChange}
@@ -211,8 +211,9 @@ const ChatInputMain = () => {
                 {
                   backgroundColor: toggleStates.toggleAddItemsToInputPopup
                     ? "#EEF4FF"
-                    : "transparent",
+                    : "",
                   padding: 4,
+                  borderRadius: 8,
                   borderRadius: 8,
                 },
               ]}

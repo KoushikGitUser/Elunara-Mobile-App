@@ -10,7 +10,7 @@ export const createStyles = ({}) =>
       minHeight: verticalScale(250),
       minWidth: 240,
       paddingHorizontal: 8,
-      paddingVertical: 15,
+      paddingVertical: 10,
       backgroundColor: "white",
       borderRadius: 20,
       borderWidth: 1,

@@ -34,7 +34,7 @@ const FeedbackPopup = ({ close }) => {
             { borderBottomWidth: 1, borderColor: "#D3DAE5" },
           ]}
         >
-          <Text style={{ fontWeight: 600,color:"#3A3A3A" }}>This response is</Text>
+          <Text style={{ fontWeight: 600,color:"#3A3A3A",fontFamily:"Mukta-Bold" }}>This response is</Text>
         </View>
         <Pressable
           onPress={() => {
@@ -49,7 +49,7 @@ const FeedbackPopup = ({ close }) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <ThumbsUp strokeWidth={1.25} />
-            <Text>Helpful</Text>
+            <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Helpful</Text>
           </View>
           <RadioButton selected={selectedStyle === 0} />
         </Pressable>
@@ -64,7 +64,7 @@ const FeedbackPopup = ({ close }) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <ThumbsDown strokeWidth={1.25} />
-            <Text>Not Helpful</Text>
+            <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Not Helpful</Text>
           </View>
           <RadioButton selected={selectedStyle === 1} />
         </Pressable>

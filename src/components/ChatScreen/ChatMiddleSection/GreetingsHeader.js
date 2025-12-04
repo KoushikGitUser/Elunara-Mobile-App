@@ -27,10 +27,10 @@ const GreetingsHeader = () => {
       <View>
       <View style={styles.greetingPlusname}>
         <GradientText
-          children="Good Morning,   "
+          children="Good Morning,"
           fullWidth={false}
-          widthNumber={0.45}
-          fontSize={25}
+          widthNumber={0.52}
+          fontSize={29}
         />
         <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>Koushik!</Text>
       </View>

@@ -61,10 +61,10 @@ const DeleteConfirmPopup = () => {
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Delete Chat?</Text>
+            <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Delete Chat?</Text>
 
             {/* Description */}
-            <Text style={styles.description}>
+            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
               Deleting this chat removes it permanently. It cannot be recovered.
             </Text>
 
@@ -75,14 +75,14 @@ const DeleteConfirmPopup = () => {
                 onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.buttonText,{color:"black"}]}>Cancel</Text>
+                <Text style={[styles.buttonText,{color:"black",fontFamily: "Mukta-Regular"}]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Done</Text>
+                <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular"}]}>Done</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -153,14 +153,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },

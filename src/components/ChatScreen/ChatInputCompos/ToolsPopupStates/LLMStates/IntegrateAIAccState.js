@@ -10,6 +10,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Keyboard,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -76,10 +77,10 @@ const IntegrateAIAccState = () => {
             />
           </View>
           {/* Title */}
-          <Text style={styles.title}>Integrate Your AI account</Text>
+          <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Integrate Your AI account</Text>
 
           {/* Description */}
-          <Text style={styles.description}>
+          <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
             Receive responses in your preferred LLMs! Pick up to 3 now to easily
             toggle between them
           </Text>
@@ -92,9 +93,10 @@ const IntegrateAIAccState = () => {
               />
               <Text
                 style={{
-                  fontSize: moderateScale(11),
+                  fontSize: moderateScale(12),
                   fontWeight: 400,
                   width: "90%",
+                  fontFamily: "Mukta-Regular"
                 }}
               >
                 Your API key is used to securely connect your AI account. Keep
@@ -104,9 +106,10 @@ const IntegrateAIAccState = () => {
 
             <Text
               style={{
-                fontSize: moderateScale(10),
+                fontSize: moderateScale(12),
                 color: "#5E5E5E",
                 marginTop: 40,
+                fontFamily: "Mukta-Regular"
               }}
             >
               Select AI Model
@@ -119,17 +122,18 @@ const IntegrateAIAccState = () => {
             <View style={styles.inputSection}>
               <Text
                 style={{
-                  fontSize: moderateScale(10),
+                  fontSize: moderateScale(12),
                   color: "#5E5E5E",
                   marginTop: 10,
                   marginBottom: 10,
+                  fontFamily: "Mukta-Regular"
                 }}
               >
                 {" "}
                 Enter Your API Key
               </Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input,{fontFamily: "Mukta-Regular"}]}
                 placeholder="Paste your API key here"
                 placeholderTextColor="#9CA3AF"
                 value={apiKey}
@@ -144,9 +148,10 @@ const IntegrateAIAccState = () => {
             <TouchableOpacity style={{marginTop:10}} onPress={()=>setToggleFindApiKey(true)}>
               <Text
                 style={{
-                  fontSize: scaleFont(12),
-                  fontWeight: 600,
+                  fontSize: scaleFont(13),
+                  fontWeight: 400,
                   textDecorationLine: "underline",
+                  fontFamily: "Mukta-Bold"
                 }}
               >
                 Where Can I Find My API Key?
@@ -168,28 +173,29 @@ const IntegrateAIAccState = () => {
               onPress={() => setIsLLMSaved(true)}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Connect API Key</Text>
+              <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular"}]}>Connect API Key</Text>
             </TouchableOpacity>
-            <Text
-              style={{
-                fontSize: moderateScale(11),
-                fontWeight: 600,
-                textDecorationLine: "underline",
-                textAlign: "center",
-              }}
-            >
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
               <Text
                 style={{
-                  fontSize: moderateScale(11),
+                  fontSize: moderateScale(13),
                   fontWeight: 400,
-                  paddingRight: 5,
-                  textDecorationLine: "none",
+                  textAlign: "center",
+                  fontFamily: "Mukta-Regular",
                 }}
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              Settings
-            </Text>
+              <Pressable style={{borderBottomWidth:2}}>
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
+              </Pressable>
+            </View>
             {keyboardVisible && <View style={{height:screenHeight*0.4}} />}
           </ScrollView>
         </View>
@@ -224,14 +230,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
+    fontWeight: "600",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -266,7 +272,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
@@ -288,7 +294,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     color: "#1F2937",
     letterSpacing: 0.2,
   },

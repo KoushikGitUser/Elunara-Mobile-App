@@ -20,18 +20,18 @@ const FindAPIKeyAccordian = ({ item, onToggle, isExpanded }) => {
       >
         <View style={styles.headerLeft}>
           <Image style={{ height: 23, width: 23 }} source={item?.icon} />
-          <Text style={styles.accordionTitle}>{item.title}</Text>
+          <Text style={[styles.accordionTitle,{fontFamily:"Mukta-Bold"}]}>{item.title}</Text>
         </View>
         {isExpanded?<ChevronUp size={30} strokeWidth={1.5} />:<ChevronDown size={30} strokeWidth={1.5} />}
       </TouchableOpacity>
 
       {isExpanded && (
         <View style={styles.accordionBody}>
-          <Text style={styles.subtitle}>{item.subtitle}</Text>
+          <Text style={[styles.subtitle,{fontFamily:"Mukta-Bold"}]}>{item.subtitle}</Text>
           {item.steps.map((step, index) => (
             <View key={index} style={styles.stepContainer}>
-              <Text style={styles.stepNumber}>{index + 1}.</Text>
-              <Text style={styles.stepText}>{step}</Text>
+              <Text style={[styles.stepNumber,{fontFamily:"Mukta-Bold"}]}>{index + 1}.</Text>
+              <Text style={[styles.stepText,{fontFamily:"Mukta-Regular"}]}>{step}</Text>
             </View>
           ))}
         </View>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     marginTop:30
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 16,
     color: "#000",
     marginBottom: 16,
     fontWeight: "500",
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   stepText: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: "#000",
     lineHeight: 22,
   },

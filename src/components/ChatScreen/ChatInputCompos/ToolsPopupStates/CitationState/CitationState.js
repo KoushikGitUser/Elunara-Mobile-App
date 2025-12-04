@@ -46,10 +46,10 @@ const CitationState = () => {
             color="black"
           />
         </View>
-        <Text style={styles.title}>Citation Format</Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Citation Format</Text>
 
         {/* Description */}
-        <Text style={styles.description}>
+        <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
           Select your preferred popular citation style — APA or Harvard for your
           submissions.
         </Text>
@@ -77,7 +77,7 @@ const CitationState = () => {
                   <Text
                     style={[
                       styles.optionTitle,
-                      { fontSize: scaleFont(16), fontWeight: 600 },
+                      { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold"},
                     ]}
                   >
                     {styleOptions.style}
@@ -86,9 +86,10 @@ const CitationState = () => {
                     style={[
                       styles.optionDescription,
                       {
-                        fontSize: scaleFont(12),
+                        fontSize: scaleFont(14),
                         fontWeight: 400,
                         color: "#8F8F8F",
+                        fontFamily:"Mukta-Regular"
                       },
                     ]}
                   >
@@ -100,11 +101,11 @@ const CitationState = () => {
             </TouchableOpacity>
           ))}
         </View>
-        <Text style={{ fontSize: moderateScale(11), fontWeight: 400,color:"#3A3A3A",textAlign:"center",marginTop:40,marginBottom:20 }}>
-          <Text style={{ fontSize: moderateScale(11), fontWeight: 600,color:"black" }}>
+        <Text style={{ fontSize: moderateScale(12), fontWeight: 400,color:"#3A3A3A",textAlign:"center",marginTop:40,marginBottom:20,fontFamily:"Mukta-Regular" }}>
+          <Text style={{ fontSize: moderateScale(12), fontWeight: 600,color:"black",fontFamily:"Mukta-Bold" }}>
             Note:
           </Text>{" "}
-          Note: Citations appear only in academic chats. Creative or general chats may not include resources.
+          Citations appear only in academic chats. Creative or general chats may not include resources.
         </Text>
       </View>
     </View>
@@ -174,14 +175,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
