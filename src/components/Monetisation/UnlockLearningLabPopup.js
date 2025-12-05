@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
+import { setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup } from "../../redux/slices/toggleSlice";
 import { proPlanFeature } from "../../data/datas";
 import { Check } from "lucide-react-native";
 import icon from "../../assets/images/roomUnlock.png";
@@ -145,7 +145,9 @@ const UnlockLearningLabPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleLearningLabUnlockPopup(false))}
+                onPress={() => {dispatch(setToggleLearningLabUnlockPopup(false));
+                  dispatch(setToggleRoomCreationPopup(true))
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>

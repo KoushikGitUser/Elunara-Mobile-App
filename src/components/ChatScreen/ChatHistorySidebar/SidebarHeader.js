@@ -61,7 +61,7 @@ const SidebarHeader = ({ translateX }) => {
           <Text style={[styles.btnTexts,{fontFamily:"Mukta-Bold"}]}>New Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-        onPress={()=>dispatch(setToggleLearningLabUnlockPopup(true))}
+        onPress={()=>{dispatch(setToggleLearningLabUnlockPopup(true))}}
         style={styles.newLearningTabBtn}>
           <AddFolderIcon />
           <Text style={[styles.btnTexts, { fontWeight: 400,fontFamily:"Mukta-Regular" }]}>

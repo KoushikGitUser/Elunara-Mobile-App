@@ -21,7 +21,7 @@ const ChatsComponent = ({ title, subject, roomName, onPress, index }) => {
       style={styles.cardContainer}
       onPress={onPress} 
     >
-      <View style={[styles.cardContent,{zIndex:optionsIndex == index?99999:9}]}>
+      <View style={[styles.cardContent,]}>
          {(toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index) && <OptionsPopup/>}
         {/* Chat Icon */}
         <View style={styles.iconContainer}>

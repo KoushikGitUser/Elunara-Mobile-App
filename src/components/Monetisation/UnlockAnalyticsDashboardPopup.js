@@ -16,21 +16,26 @@ import { AntDesign } from "@expo/vector-icons";
 import { Check } from "lucide-react-native";
 import { analyticsFeatures } from "../../data/datas";
 import { useDispatch, useSelector } from "react-redux";
-import icon from '../../assets/images/bulbUnlock.png';
+import icon from "../../assets/images/bulbUnlock.png";
 import { setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
+import { useNavigation } from "@react-navigation/native";
+import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
 
 const UnlockAnalyticsDashboardPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const navigation = useNavigation();
 
   return (
     <Modal
       visible={toggleStates.toggleUnlockAnalyticsDashboardPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
+      onRequestClose={() =>
+        dispatch(setToggleUnlockAnalyticsDashboardPopup(false))
+      }
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -46,7 +51,9 @@ const UnlockAnalyticsDashboardPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
+          onPress={() =>
+            dispatch(setToggleUnlockAnalyticsDashboardPopup(false))
+          }
         />
 
         {/* Modal Sheet */}
@@ -55,7 +62,9 @@ const UnlockAnalyticsDashboardPopup = () => {
           <View style={styles.closeModalMain}>
             <AntDesign
               style={{ marginRight: 20 }}
-              onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
+              onPress={() =>
+                dispatch(setToggleUnlockAnalyticsDashboardPopup(false))
+              }
               name="close"
               size={20}
               color="black"
@@ -75,7 +84,8 @@ const UnlockAnalyticsDashboardPopup = () => {
 
             {/* Description */}
             <Text style={styles.description}>
-              Stay motivated and make your study sessions count with personalized analytics.
+              Stay motivated and make your study sessions count with
+              personalized analytics.
             </Text>
 
             <ScrollView
@@ -144,12 +154,16 @@ const UnlockAnalyticsDashboardPopup = () => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleUnlockAnalyticsDashboardPopup(false))}
+                onPress={() => {
+                  dispatch(setToggleUnlockAnalyticsDashboardPopup(false));
+                  navigation.navigate("settingsInnerPages", {
+                    page: 2,
+                  });
+                  dispatch(setSettingsInnerPageHeaderTitle("Analytics Dashboard"));
+                }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>
-                 Upgrade & View Dashboard
-                </Text>
+                <Text style={styles.buttonText}>Upgrade & View Dashboard</Text>
               </TouchableOpacity>
             </View>
           </View>

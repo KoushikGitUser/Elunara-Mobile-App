@@ -66,7 +66,7 @@ const AllChatsPage = () => {
               subject={chat.subject}
               roomName={chat.roomName}
             />
-          );
+          ) 
         })}
       </ScrollView>
       </Animated.View>

@@ -63,7 +63,9 @@ export const createStyles = (props = {}) =>
     allChatsScrollMain: {
       width: "100%",
       marginTop:30,
-      paddingHorizontal:20
+      paddingHorizontal:20,
+      overflow:"visible",
+      zIndex:99999999
     },
     cardContainer: {
       paddingVertical: 16,
@@ -77,7 +79,6 @@ export const createStyles = (props = {}) =>
       flexDirection: "row",
       width:"100%",
       alignItems: "center",
-      position:"relative",
     },
     iconContainer: {
       alignSelf:"flex-start",
@@ -133,7 +134,6 @@ export const createStyles = (props = {}) =>
       justifyContent: "space-between",
       alignItems: "center",
       gap: 5,
-      zIndex: 99999999,
       top: 70,
       right: 0,
     },

@@ -42,7 +42,7 @@ const ProfileAndSettings = () => {
       {toggleStates.toggleAdFreeExpPopup && <UnlockAdFreeExpPopup />}
       <StatusBar
         barStyle="dark-content"
-        hidden={false}
+        hidden={false} 
         translucent={false}
         animated
       />
