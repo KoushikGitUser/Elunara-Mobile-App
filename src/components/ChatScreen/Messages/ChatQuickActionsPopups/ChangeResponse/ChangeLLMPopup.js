@@ -1,40 +1,39 @@
 import {
   View,
   Text,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
   Platform,
   StyleSheet,
   Dimensions,
-  Modal,
-  TouchableOpacity,
-  Image,
-  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
-import { scaleFont } from "../../utils/responsive";
-import { useDispatch, useSelector } from "react-redux";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
-import { Check } from "lucide-react-native";
-import { creditPacks, proPlanFeature } from "../../data/datas";
-import icon from "../../assets/images/premiumIcon.png";
-import { setToggleUnlockPersonalisationLimitPopup } from "../../redux/slices/toggleSlice";
-import CreditPackCard from "./CreditPackCard";
+import { LLMCardsOptions } from "../../../../../data/datas";
+import LLMCards from "./LLMCards";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleChangeResponseLLMWhileChatPopup } from "../../../../../redux/slices/toggleSlice";
+import { scaleFont } from "../../../../../utils/responsive";
+import CompareLLMCards from "./CompareLLMCards";
+import { ArrowRight } from "lucide-react-native";
 
-const UnlockPersonalisationLimitPopup = () => {
+const ChangeLLMPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
-  const [selectedPlan, setSelectedPlan] = useState("monthly");
   const [selectedCategory, setSelectedCategory] = useState(1);
-  const [selectedCredit, setSelectedCredit] = useState(null);
+  const [selectedLLMForResponse, setSelectedLLMForResponse] = useState(null);
+  const [selectedLLMForCompare, setSelectedLLMForCompare] = useState(null);
   const SCREEN_HEIGHT = Dimensions.get("window").height;
 
   return (
-    <Modal 
-      visible={toggleStates.toggleUnlockPersonalisationLimitPopup}
+    <Modal
+      visible={toggleStates.toggleChangeResponseLLMWhileChatPopup}
       transparent={true}
       animationType="slide"
       onRequestClose={() =>
-        dispatch(setToggleUnlockPersonalisationLimitPopup(false))
+        dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
       }
     >
       <View style={styles.container}>
@@ -52,7 +51,7 @@ const UnlockPersonalisationLimitPopup = () => {
           style={styles.backdrop}
           activeOpacity={1}
           onPress={() =>
-            dispatch(setToggleUnlockPersonalisationLimitPopup(false))
+            dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
           }
         />
 
@@ -63,7 +62,7 @@ const UnlockPersonalisationLimitPopup = () => {
             <AntDesign
               style={{ marginRight: 20 }}
               onPress={() =>
-                dispatch(setToggleUnlockPersonalisationLimitPopup(false))
+                dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
               }
               name="close"
               size={20}
@@ -73,35 +72,14 @@ const UnlockPersonalisationLimitPopup = () => {
 
           {/* Content */}
           <View style={styles.content}>
-            {/* Icon */}
-            <View style={styles.iconContainer}>
-              {/* icon */}
-              <Image
-                style={{ height: 50, width: 50, objectFit: "contain" }}
-                source={icon}
-              />
+            <View style={styles.currentLLMMain}>
+              <Text style={styles.currentResponse}>Current Response LLM</Text>
+
+              <TouchableOpacity style={styles.badge}>
+                <Text style={styles.btnText}>OpenAI</Text>
+              </TouchableOpacity>
             </View>
 
-            {/* Title */}
-            <Text style={styles.title}>
-              Maximum Personalization Limit Reached
-            </Text>
-
-            {/* Description */}
-            <Text style={styles.description}>
-              You've used today's changes for AI model, style, and language.
-              This will refresh in 15 hours.
-            </Text>
-
-            <Text
-              style={{
-                fontWeight: 600,
-                fontSize: scaleFont(13),
-                paddingBottom: 10,
-              }}
-            >
-              UPGRADE TO PRO OR PURCHASE MORE CREDITS
-            </Text>
             <View style={styles.categorySections}>
               <TouchableOpacity
                 onPress={() => setSelectedCategory(1)}
@@ -116,10 +94,11 @@ const UnlockPersonalisationLimitPopup = () => {
                     {
                       color: selectedCategory == 1 ? "black" : "#757575",
                       fontWeight: selectedCategory == 1 ? 600 : 400,
+                      fontSize: scaleFont(13),
                     },
                   ]}
                 >
-                  Upgrade to Pro
+                  Select Another
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -135,13 +114,18 @@ const UnlockPersonalisationLimitPopup = () => {
                     {
                       color: selectedCategory == 2 ? "black" : "#757575",
                       fontWeight: selectedCategory == 2 ? 600 : 400,
+                      fontSize: scaleFont(13),
                     },
                   ]}
                 >
-                  One time credit Packs
+                  Compare Responses
                 </Text>
               </TouchableOpacity>
             </View>
+            {/* Description */}
+            <Text style={styles.description}>
+              Update the current answer by selecting a different LLM
+            </Text>
             {selectedCategory == 1 ? (
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -149,64 +133,21 @@ const UnlockPersonalisationLimitPopup = () => {
                   width: "100%",
                   maxHeight: SCREEN_HEIGHT * 0.35,
                   paddingTop: 20,
+                  marginBottom: 20,
                 }}
               >
-                <View style={styles.featuresList}>
-                  {proPlanFeature.map((feature, index) => (
-                    <View key={index} style={styles.featureItem}>
-                      <Check size={24} color="#10B981" strokeWidth={1.7} />
-                      <Text style={styles.featureText}>{feature}</Text>
-                    </View>
-                  ))}
-                </View>
-                <View style={styles.cardsContainer}>
-                  {/* Monthly Plan Card */}
-                  <TouchableOpacity
-                    style={[
-                      styles.priceCard,
-                      styles.monthlyCard,
-                      selectedPlan === "monthly" && styles.selectedCard,
-                    ]}
-                    onPress={() => setSelectedPlan("monthly")}
-                    activeOpacity={0.8}
-                  >
-                    {/* Check Icon for Selected */}
-                    {selectedPlan === "monthly" && (
-                      <View style={styles.checkBadge}>
-                        <Check size={14} color="#ffffff" strokeWidth={2} />
-                      </View>
-                    )}
-
-                    <Text style={styles.priceText}>Upgrade for ₹1,999</Text>
-                    <Text style={styles.periodText}>per month</Text>
-                  </TouchableOpacity>
-
-                  {/* Yearly Plan Card */}
-                  <TouchableOpacity
-                    style={[
-                      styles.priceCard,
-                      styles.yearlyCard,
-                      selectedPlan === "yearly" && styles.selectedCard,
-                    ]}
-                    onPress={() => setSelectedPlan("yearly")}
-                    activeOpacity={0.8}
-                  >
-                    {/* Save Badge */}
-                    <View style={styles.saveBadge}>
-                      <Text style={styles.saveText}>Save ₹14,088</Text>
-                    </View>
-
-                    {/* Check Icon for Selected */}
-                    {selectedPlan === "yearly" && (
-                      <View style={styles.checkBadge}>
-                        <Check size={14} color="#ffffff" strokeWidth={2} />
-                      </View>
-                    )}
-
-                    <Text style={styles.priceText}>Upgrade for ₹19,900</Text>
-                    <Text style={styles.periodText}>per year</Text>
-                  </TouchableOpacity>
-                </View>
+                {LLMCardsOptions?.map((credits, creditIndex) => {
+                  return (
+                    <LLMCards
+                      icon={credits.icon}
+                      useFor={credits.desc}
+                      badgeText={credits.buttonText}
+                      optionsIndex={creditIndex}
+                      title={credits.title}
+                      key={creditIndex}
+                    />
+                  );
+                })}
               </ScrollView>
             ) : (
               <ScrollView
@@ -217,18 +158,15 @@ const UnlockPersonalisationLimitPopup = () => {
                   paddingTop: 20,
                 }}
               >
-                {creditPacks?.map((credits, creditIndex) => {
+                {LLMCardsOptions?.map((credits, creditIndex) => {
                   return (
-                    <CreditPackCard
+                    <CompareLLMCards
+                      icon={credits.icon}
+                      useFor={credits.desc}
+                      badgeText={credits.buttonText}
+                      optionsIndex={creditIndex}
+                      title={credits.title}
                       key={creditIndex}
-                      badgeText={credits.badge}
-                      credits={credits.credits}
-                      desc={credits.title}
-                      price={credits.price}
-                      validity={credits.validity}
-                      selected={selectedCredit == credits.id}
-                      id={credits.id}
-                      setSelectedCredit={setSelectedCredit}
                     />
                   );
                 })}
@@ -236,19 +174,36 @@ const UnlockPersonalisationLimitPopup = () => {
               </ScrollView>
             )}
 
+            <TouchableOpacity
+              style={{ marginTop: 10,marginBottom:20,width:"auto",alignSelf:"flex-start",flexDirection:"row",alignItems:"center",gap:5 }}
+              onPress={() => setToggleFindApiKey(true)}
+            >
+              <Text
+                style={{
+                  fontSize: scaleFont(13),
+                  fontWeight: 400,
+                  fontFamily: "Mukta-Bold",
+                  borderBottomWidth:1
+                }}
+              >
+               Integrate Your AI account
+              </Text>
+              <ArrowRight strokeWidth={1.25} />
+            </TouchableOpacity>
+
             {/* Button */}
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
-                  dispatch(setToggleUnlockPersonalisationLimitPopup(false))
+                  dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
                 }
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>
                   {selectedCategory == 1
-                    ? "Upgrade And  Customize Without Limits"
-                    : "Buy Credits"}
+                    ? "Update Response LLM"
+                    : "Compare LLMs"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -438,6 +393,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 20,
   },
   sectionText: {
     color: "#757575",
@@ -451,6 +407,39 @@ const styles = StyleSheet.create({
     borderColor: "lightgrey",
     paddingVertical: 10,
   },
+  currentLLMMain: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 22,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#D8DCE4",
+    marginBottom: 20,
+  },
+  currentResponse: {
+    fontSize: scaleFont(16),
+    fontWeight: "600",
+    color: "#1A1A1A",
+    fontFamily: "Mukta-Bold",
+  },
+  badge: {
+    backgroundColor: "#F3F3F3",
+    borderColor: "#D8DCE4",
+    borderWidth: 1,
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+  },
+  btnText: {
+    fontSize: scaleFont(12),
+    fontWeight: "400",
+    color: "#1A1A1A",
+    fontFamily: "Mukta-Regular",
+  },
 });
 
-export default UnlockPersonalisationLimitPopup;
+export default ChangeLLMPopup;

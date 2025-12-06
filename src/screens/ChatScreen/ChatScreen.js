@@ -32,6 +32,7 @@ import UniversalTooltip from "../../components/GuidedTourTooltip/UniversalToolti
 import Toaster from "../../components/UniversalToaster/Toaster";
 import ToasterWithAction from "../../components/UniversalToaster/ToasterWithAction";
 import { useFonts } from "expo-font";
+import ChangeLLMPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeResponse/ChangeLLMPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -42,20 +43,20 @@ const ChatScreen = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [showToast, setShowToast] = useState(false);
 
-    const [fontsLoaded] = useFonts({
-      "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
-      "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
-    });
-  
-    useEffect(() => {
-      if (fontsLoaded) {
-      }
-    }, [fontsLoaded]);
-  
-    // Show nothing (or a loader) while fonts are loading
-    if (!fontsLoaded) {
-      return null;
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
     }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const triggerToast = () => {
     setShowToast(true);
@@ -74,6 +75,7 @@ const ChatScreen = () => {
           {toggleStates.toggleTopicsPopup && <TopicsCompo />}
           {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup />}
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup />}
+          {toggleStates.toggleChangeResponseLLMWhileChatPopup && <ChangeLLMPopup />}
           {toggleStates.toggleUserMessageActionPopup && (
             <UserMessageActionPopup />
           )}
@@ -102,8 +104,8 @@ const ChatScreen = () => {
               right={20}
             />
           )}
-            <Toaster/>
-            <ToasterWithAction/>
+          <Toaster />
+          <ToasterWithAction />
           {/* middle section */}
           <ChatMiddleWrapper />
           {/* middle section */}

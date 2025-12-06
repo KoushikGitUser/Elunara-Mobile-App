@@ -1245,3 +1245,30 @@ export const internetQuality = [
   "Poor",
   "Unstable",
 ]
+
+export const LLMCardsOptions = [
+    {
+    icon: gemini,
+    title: "Google Gemini",
+    desc: "Use for: Research and analysis",
+    buttonText: "The Knowledge Engine",
+  },
+  {
+    icon: chatgpt,
+    title: "OpenAI",
+    desc: "Use for: Content and research",
+    buttonText: "The Idea Engine",
+  },
+  {
+    icon: anthropic,
+    title: "Anthropic",
+    desc: "Use for: Reasoning and analysis",
+    buttonText: "The Thoughful Engine",
+  },
+   {
+    icon: mistral,
+    title: "Mistral",
+    desc: "Use for: Complex Calculations & Logic Tasks",
+    buttonText: "The Logic Engine",
+  },
+]

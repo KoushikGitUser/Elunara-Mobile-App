@@ -99,6 +99,9 @@ const toggleSlice = createSlice({
     setToggleChatScreenGuideStart: (state, action) => {
       state.toggleStates.toggleChatScreenGuideStart = action.payload;
     },
+    setToggleChangeResponseLLMWhileChatPopup: (state, action) => {
+      state.toggleStates.toggleChangeResponseLLMWhileChatPopup = action.payload;
+    },
   },
 });
 
@@ -134,6 +137,7 @@ export const {
   setToggleUnlockPersonalisationLimitPopup,
   setToggleElunaraProWelcomePopup,
   setToggleChatScreenGuideStart,
+  setToggleChangeResponseLLMWhileChatPopup,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

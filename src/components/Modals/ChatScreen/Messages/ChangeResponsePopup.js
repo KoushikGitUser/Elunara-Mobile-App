@@ -6,12 +6,17 @@ import {
   Pressable,
   Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import LLMIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/LLMIcon";
 import ResStyleIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
 import ResLangIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleChangeResponseLLMWhileChatPopup } from "../../../../redux/slices/toggleSlice";
 
 const ChangeResponsePopup = ({setChangeResponsePopup}) => {
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const dispatch = useDispatch();
+
   return (
     <>
       <TouchableOpacity
@@ -31,6 +36,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
         </View>
         <Pressable
           onPress={() => {
+            dispatch(setToggleChangeResponseLLMWhileChatPopup(true))
             setChangeResponsePopup(false);
           }}
           style={({ pressed }) => [
