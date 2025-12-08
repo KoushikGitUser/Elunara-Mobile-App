@@ -37,6 +37,9 @@ const globalDataSlice = createSlice({
     },
     setSettingsInnerPageComponentToRender: (state, action) => {
       state.globalDataStates.settingsInnerPageComponentToRender = action.payload;
+    },
+    setCompareResponseStyleItemsArray: (state, action) => {
+      state.globalDataStates.compareResponseStyleItemsArray = action.payload;
     }
   },
 });
@@ -51,7 +54,8 @@ export const {
   setChatTitleOnLongPress,
   setUserMessageOnLongPress,
   setSettingsInnerPageHeaderTitle,
-  setSettingsInnerPageComponentToRender
+  setSettingsInnerPageComponentToRender,
+  setCompareResponseStyleItemsArray
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

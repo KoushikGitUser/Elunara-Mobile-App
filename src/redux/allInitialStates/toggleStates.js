@@ -31,4 +31,8 @@ export const toggleStates = {
       toggleElunaraProWelcomePopup:false,
       toggleChatScreenGuideStart:false,
       toggleChangeResponseLLMWhileChatPopup:false,
+      toggleChangeLangWhileChatPopup:false,
+      toggleChangeResponseStyleWhileChatPopup:false,
+      toggleCompareLLMState:false,
+      toggleCompareStyleState:false,
 }

@@ -3,12 +3,11 @@ import React, { useState } from "react";
 import { scaleFont } from "../../../../../utils/responsive";
 import { Check } from "lucide-react-native";
 
-const CompareLLMCards = ({icon,title,useFor,badgeText,optionsIndex}) => {
-  const [selectedStyle, setSelectedStyle] = useState(0);
+const CompareLLMCards = ({id,icon,title,useFor,badgeText,optionsIndex,selectedStyleForCompare,setSelectedStyleForCompare}) => {
 
-  const RadioButton = ({ selected }) => (
-    <View style={[styles.radioOuter, { borderColor: selected ? "black" : "",backgroundColor:selected?"black":"transparent" }]}>
-      {selected && <Check color="white" size={20} strokeWidth={1.5} />}
+  const RadioButton = () => (
+    <View style={[styles.radioOuter, { borderColor: selectedStyleForCompare?.includes(id) ? "black" : "",backgroundColor:selectedStyleForCompare?.includes(id)?"black":"transparent" }]}>
+      {selectedStyleForCompare?.includes(id)&& <Check color="white" size={20} strokeWidth={1.5} />}
     </View>
   );
 
@@ -18,11 +17,39 @@ const CompareLLMCards = ({icon,title,useFor,badgeText,optionsIndex}) => {
       style={[
         styles.card,
         {
-          backgroundColor: selectedStyle == optionsIndex ? "#EEF4FF" : "white",
-          borderColor: selectedStyle == optionsIndex ? "black" : "#D3DAE5",
+          backgroundColor:  selectedStyleForCompare?.includes(id)? "#EEF4FF" : "white",
+          borderColor: selectedStyleForCompare?.includes(id) ? "black" : "#D3DAE5",
         },
       ]}
-      onPress={() => setSelectedStyle(optionsIndex)}
+            onPress={() => {
+              if (selectedStyleForCompare?.length == 2) {
+                if (selectedStyleForCompare?.includes(id)) {
+                  const newArr = selectedStyleForCompare.filter((items) => {
+                    return items !== id;
+                  });
+                  setSelectedStyleForCompare(newArr);
+                } else {
+                  triggerToast(
+                    "Error",
+                    "Only two items can be selected, to select another please deselect one of the selected items",
+                    "error",
+                    5000
+                  );
+                }
+              } else {
+                if (selectedStyleForCompare?.includes(id)) {
+                  const newArr = selectedStyleForCompare.filter((items) => {
+                    return items !== id;
+                  });
+                  setSelectedStyleForCompare(newArr);
+                } else {
+                  setSelectedStyleForCompare([...selectedStyleForCompare, id]);
+                  dispatch(setCompareResponseStyleItemsArray([...globalDataStates.compareResponseStyleItemsArray,{
+                      title:title
+                  }]))
+                }
+              }
+            }}
       activeOpacity={0.7}
     >
       <View style={styles.contentMain}>
@@ -69,7 +96,7 @@ const CompareLLMCards = ({icon,title,useFor,badgeText,optionsIndex}) => {
             </View>
         </View>
       </View>
-      <RadioButton selected={selectedStyle === optionsIndex} />
+      <RadioButton  />
     </TouchableOpacity>
   );
 };
@@ -153,7 +180,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     paddingHorizontal: 13,
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 18,
     backgroundColor: "white",
     marginBottom:20

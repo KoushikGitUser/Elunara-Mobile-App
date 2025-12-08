@@ -33,6 +33,8 @@ import Toaster from "../../components/UniversalToaster/Toaster";
 import ToasterWithAction from "../../components/UniversalToaster/ToasterWithAction";
 import { useFonts } from "expo-font";
 import ChangeLLMPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeResponse/ChangeLLMPopup";
+import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeLang/ChangeLangPopup";
+import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -76,6 +78,9 @@ const ChatScreen = () => {
           {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup />}
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup />}
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && <ChangeLLMPopup />}
+          {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
+          {toggleStates.toggleChangeResponseStyleWhileChatPopup && <ChangeResponseStylePopup />}
+
           {toggleStates.toggleUserMessageActionPopup && (
             <UserMessageActionPopup />
           )}

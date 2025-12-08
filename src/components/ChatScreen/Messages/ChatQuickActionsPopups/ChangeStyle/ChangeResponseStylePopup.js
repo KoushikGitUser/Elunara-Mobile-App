@@ -1,45 +1,43 @@
 import {
   View,
   Text,
-  Modal,
-  TouchableOpacity,
-  ScrollView,
   Platform,
   StyleSheet,
+  Modal,
+  TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
+import { scaleFont } from "../../../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
-import { LLMCardsOptions } from "../../../../../data/datas";
-import LLMCards from "./LLMCards";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setToggleChangeResponseLLMWhileChatPopup,
-  setToggleCompareLLMState,
-} from "../../../../../redux/slices/toggleSlice";
-import { scaleFont } from "../../../../../utils/responsive";
-import CompareLLMCards from "./CompareLLMCards";
+import { LLMCardsOptions, responseStyles } from "../../../../../data/datas";
+import ResponseStyleCards from "./ResponseStyleCards";
 import { ArrowRight } from "lucide-react-native";
+import {
+  setToggleChangeResponseStyleWhileChatPopup,
+  setToggleCompareStyleState,
+} from "../../../../../redux/slices/toggleSlice";
+import CompareStyleCards from "./CompareStyleCards";
 import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
 
-const ChangeLLMPopup = () => {
+const ChangeResponseStylePopup = () => {
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const dispatch = useDispatch();
-  const [selectedCategory, setSelectedCategory] = useState(1);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedStyleForCompare, setSelectedStyleForCompare] = useState([]);
-  const [selectedLLMForResponse, setSelectedLLMForResponse] = useState(null);
-  const [selectedLLMForCompare, setSelectedLLMForCompare] = useState(null);
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const dispatch = useDispatch();
+  const [selectedCategory, setSelectedCategory] = useState(1);
 
   return (
     <Modal
-      visible={toggleStates.toggleChangeResponseLLMWhileChatPopup}
+      visible={toggleStates.toggleChangeResponseStyleWhileChatPopup}
       transparent={true}
       animationType="slide"
       onRequestClose={() =>
-        dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
+        dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
       }
     >
       <View style={styles.container}>
@@ -57,11 +55,13 @@ const ChangeLLMPopup = () => {
           style={styles.backdrop}
           activeOpacity={1}
           onPress={() =>
-            dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
+            dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
           }
         />
-        {toggleStates.toggleCompareLLMState ? (
-          <CompareLLMOrStyleState forStyleOrLLM="LLM" />
+
+        {/* Modal Sheet */}
+        {toggleStates.toggleCompareStyleState ? (
+          <CompareLLMOrStyleState forStyleOrLLM="style" />
         ) : (
           <View style={styles.modalSheet}>
             {/* Handle Bar */}
@@ -69,7 +69,7 @@ const ChangeLLMPopup = () => {
               <AntDesign
                 style={{ marginRight: 20 }}
                 onPress={() =>
-                  dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
+                  dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
                 }
                 name="close"
                 size={20}
@@ -80,10 +80,12 @@ const ChangeLLMPopup = () => {
             {/* Content */}
             <View style={styles.content}>
               <View style={styles.currentLLMMain}>
-                <Text style={styles.currentResponse}>Current Response LLM</Text>
+                <Text style={styles.currentResponse}>
+                  Current Response Style
+                </Text>
 
                 <TouchableOpacity style={styles.badge}>
-                  <Text style={styles.btnText}>OpenAI</Text>
+                  <Text style={styles.btnText}>Concise</Text>
                 </TouchableOpacity>
               </View>
 
@@ -135,29 +137,25 @@ const ChangeLLMPopup = () => {
               </View>
               {/* Description */}
               <Text style={styles.description}>
-                Update the current answer by selecting a different LLM
+                Update the current answer by selecting a different style
               </Text>
               {selectedCategory == 1 ? (
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   style={{
                     width: "100%",
-                    maxHeight: SCREEN_HEIGHT * 0.35,
+                    maxHeight: SCREEN_HEIGHT * 0.45,
                     paddingTop: 20,
                     marginBottom: 20,
                   }}
                 >
-                  {LLMCardsOptions?.map((credits, creditIndex) => {
+                  {responseStyles?.map((credits, creditIndex) => {
                     return (
-                      <LLMCards
-                        icon={credits.icon}
-                        useFor={credits.desc}
-                        badgeText={credits.buttonText}
-                        optionsIndex={creditIndex}
-                        title={credits.title}
-                        key={creditIndex}
+                      <ResponseStyleCards
                         selectedStyle={selectedStyle}
                         setSelectedStyle={setSelectedStyle}
+                        item={credits}
+                        key={creditIndex}
                       />
                     );
                   })}
@@ -167,22 +165,18 @@ const ChangeLLMPopup = () => {
                   showsVerticalScrollIndicator={false}
                   style={{
                     width: "100%",
-                    maxHeight: SCREEN_HEIGHT * 0.35,
+                    maxHeight: SCREEN_HEIGHT * 0.45,
                     paddingTop: 20,
+                    marginBottom: 20,
                   }}
                 >
-                  {LLMCardsOptions?.map((credits, creditIndex) => {
+                  {responseStyles?.map((credits, creditIndex) => {
                     return (
-                      <CompareLLMCards
-                        id={credits.id}
-                        icon={credits.icon}
-                        useFor={credits.desc}
-                        badgeText={credits.buttonText}
-                        optionsIndex={creditIndex}
-                        title={credits.title}
-                        key={creditIndex}
+                      <CompareStyleCards
                         selectedStyleForCompare={selectedStyleForCompare}
                         setSelectedStyleForCompare={setSelectedStyleForCompare}
+                        item={credits}
+                        key={creditIndex}
                       />
                     );
                   })}
@@ -190,52 +184,29 @@ const ChangeLLMPopup = () => {
                 </ScrollView>
               )}
 
-              <TouchableOpacity
-                style={{
-                  marginTop: 10,
-                  marginBottom: 20,
-                  width: "auto",
-                  alignSelf: "flex-start",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-                onPress={() => setToggleFindApiKey(true)}
-              >
-                <Text
-                  style={{
-                    fontSize: scaleFont(13),
-                    fontWeight: 400,
-                    fontFamily: "Mukta-Bold",
-                    borderBottomWidth: 1,
-                  }}
-                >
-                  Integrate Your AI account
-                </Text>
-                <ArrowRight strokeWidth={1.25} />
-              </TouchableOpacity>
-
               {/* Button */}
               <View style={styles.btnsMain}>
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => {
-                    dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
-                    dispatch(setToggleCompareLLMState(true));
+                    if (selectedCategory == 1) {
+                      //do something
+                    } else {
+                      dispatch(setToggleCompareStyleState(true));
+                    }
                   }}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.buttonText}>
                     {selectedCategory == 1
-                      ? "Update Response LLM"
-                      : "Compare LLMs"}
+                      ? "Update Response Style"
+                      : "Compare Style"}
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         )}
-        {/* Modal Sheet */}
       </View>
     </Modal>
   );
@@ -312,7 +283,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 18,
+    marginBottom: 10,
     letterSpacing: 0.2,
   },
   button: {
@@ -448,7 +419,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   currentResponse: {
-    fontSize: scaleFont(16),
+    fontSize: scaleFont(17),
     fontWeight: "600",
     color: "#1A1A1A",
     fontFamily: "Mukta-Bold",
@@ -469,4 +440,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChangeLLMPopup;
+export default ChangeResponseStylePopup;

@@ -102,6 +102,18 @@ const toggleSlice = createSlice({
     setToggleChangeResponseLLMWhileChatPopup: (state, action) => {
       state.toggleStates.toggleChangeResponseLLMWhileChatPopup = action.payload;
     },
+    setToggleChangeLangWhileChatPopup: (state, action) => {
+      state.toggleStates.toggleChangeLangWhileChatPopup = action.payload;
+    },
+    setToggleChangeResponseStyleWhileChatPopup: (state, action) => {
+      state.toggleStates.toggleChangeResponseStyleWhileChatPopup = action.payload;
+    },
+    setToggleCompareLLMState: (state, action) => {
+      state.toggleStates.toggleCompareLLMState = action.payload;
+    },
+    setToggleCompareStyleState: (state, action) => {
+      state.toggleStates.toggleCompareStyleState = action.payload;
+    },
   },
 });
 
@@ -138,6 +150,10 @@ export const {
   setToggleElunaraProWelcomePopup,
   setToggleChatScreenGuideStart,
   setToggleChangeResponseLLMWhileChatPopup,
+  setToggleChangeLangWhileChatPopup,
+  setToggleChangeResponseStyleWhileChatPopup,
+  setToggleCompareLLMState,
+  setToggleCompareStyleState,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

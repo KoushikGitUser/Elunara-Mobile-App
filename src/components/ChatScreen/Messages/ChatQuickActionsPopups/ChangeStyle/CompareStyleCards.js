@@ -1,39 +1,94 @@
 import {
   View,
   Text,
+  Dimensions,
   TouchableOpacity,
-  Image,
   Platform,
   StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { scaleFont } from "../../../../../utils/responsive";
+import { Check } from "lucide-react-native";
+import { triggerToast } from "../../../../../services/toast";
+import { setCompareResponseStyleItemsArray } from "../../../../../redux/slices/globalDataSlice";
+const screenHeight = Dimensions.get("window").height;
 
-const LLMCards = ({icon,title,useFor,badgeText,optionsIndex,setSelectedStyle,selectedStyle}) => {
+const CompareStyleCards = ({
+  item,
+  selectedStyleForCompare,
+  setSelectedStyleForCompare,
+}) => {
+  const dispatch = useDispatch();
+  const { globalDataStates } = useSelector((state) => state.Global);
 
-  const RadioButton = ({ selected }) => (
-    <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
-      {selected && <View style={styles.radioInner} />}
+  const RadioButton = () => (
+    <View
+      style={[
+        styles.radioOuter,
+        {
+          borderColor: selectedStyleForCompare?.includes(item?.id)
+            ? "black"
+            : "",
+          backgroundColor: selectedStyleForCompare?.includes(item?.id)
+            ? "black"
+            : "transparent",
+        },
+      ]}
+    >
+      {selectedStyleForCompare?.includes(item?.id) && (
+        <Check color="white" size={20} strokeWidth={1.5} />
+      )}
     </View>
   );
 
   return (
     <TouchableOpacity
-      key={optionsIndex}
       style={[
         styles.card,
         {
-          backgroundColor: selectedStyle == optionsIndex ? "#EEF4FF" : "white",
-          borderColor: selectedStyle == optionsIndex ? "black" : "#D3DAE5",
+          backgroundColor: selectedStyleForCompare?.includes(item?.id)
+            ? "#EEF4FF"
+            : "white",
+          borderColor: selectedStyleForCompare?.includes(item?.id)
+            ? "black"
+            : "#D3DAE5",
         },
       ]}
-      onPress={() => setSelectedStyle(optionsIndex)}
+      onPress={() => {
+        if (selectedStyleForCompare?.length == 2) {
+          if (selectedStyleForCompare?.includes(item?.id)) {
+            const newArr = selectedStyleForCompare.filter((items) => {
+              return items !== item.id;
+            });
+            setSelectedStyleForCompare(newArr);
+          } else {
+            triggerToast(
+              "Error",
+              "Only two items can be selected, to select another please deselect one of the selected items",
+              "error",
+              5000
+            );
+          }
+        } else {
+          if (selectedStyleForCompare?.includes(item?.id)) {
+            const newArr = selectedStyleForCompare.filter((items) => {
+              return items !== item.id;
+            });
+            setSelectedStyleForCompare(newArr);
+          } else {
+            setSelectedStyleForCompare([...selectedStyleForCompare, item.id]);
+            dispatch(setCompareResponseStyleItemsArray([...globalDataStates.compareResponseStyleItemsArray,{
+                title:item?.title
+            }]))
+          }
+        }
+      }}
       activeOpacity={0.7}
     >
       <View style={styles.contentMain}>
-        <View style={styles.iconContainer}>
-          <Image source={icon} style={{ height: 23, width: 23 }} />
-        </View>
+        <View style={styles.iconContainer}>{item.icon}</View>
+
         <View style={styles.textContainer}>
           <Text
             style={[
@@ -42,10 +97,11 @@ const LLMCards = ({icon,title,useFor,badgeText,optionsIndex,setSelectedStyle,sel
                 fontSize: scaleFont(18),
                 fontWeight: 600,
                 fontFamily: "Mukta-Bold",
+                lineHeight: 27,
               },
             ]}
           >
-            {title}
+            {item.title}
           </Text>
           <Text
             style={[
@@ -55,26 +111,16 @@ const LLMCards = ({icon,title,useFor,badgeText,optionsIndex,setSelectedStyle,sel
                 fontWeight: 400,
                 color: "#8F8F8F",
                 fontFamily: "Mukta-Regular",
+                lineHeight: 18,
               },
             ]}
           >
-            {useFor}
+            {item.description}
           </Text>
-            <View style={styles.buttonContainer}>
-              <Text
-                style={{
-                  fontSize: scaleFont(12.5),
-                  fontWeight: 400,
-                  color: "#8F8F8F",
-                  fontFamily: "Mukta-Regular",
-                }}
-              >
-                {badgeText}
-              </Text>
-            </View>
         </View>
       </View>
-      <RadioButton selected={selectedStyle === optionsIndex} />
+
+      <RadioButton />
     </TouchableOpacity>
   );
 };
@@ -158,10 +204,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     paddingHorizontal: 13,
-    paddingVertical: 10,
+    paddingVertical: 13,
     borderRadius: 18,
     backgroundColor: "white",
-    marginBottom:20
+    marginBottom: 20,
   },
   contentMain: {
     flexDirection: "row",
@@ -171,25 +217,19 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: "column",
-    gap: 1,
+    gap: 5,
     alignItems: "flex-start",
   },
   radioOuter: {
     width: 23,
     height: 23,
-    borderRadius: 14,
+    borderRadius: 4,
     borderWidth: 2,
     borderColor: "#D3DAE5",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ffffff",
   },
-  radioInner: {
-    width: "80%",
-    height: "80%",
-    borderRadius: 50,
-    backgroundColor: "#000000ff",
-  },
 });
 
-export default LLMCards;
+export default CompareStyleCards;

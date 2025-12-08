@@ -11,7 +11,7 @@ import LLMIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/L
 import ResStyleIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
 import ResLangIcon from "../../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChangeResponseLLMWhileChatPopup } from "../../../../redux/slices/toggleSlice";
+import { setToggleChangeLangWhileChatPopup, setToggleChangeResponseLLMWhileChatPopup, setToggleChangeResponseStyleWhileChatPopup } from "../../../../redux/slices/toggleSlice";
 
 const ChangeResponsePopup = ({setChangeResponsePopup}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -52,6 +52,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
         <Pressable
           onPress={() => {
             setChangeResponsePopup(false);
+            dispatch(setToggleChangeResponseStyleWhileChatPopup(true))
           }}
           style={({ pressed }) => [
             {
@@ -66,6 +67,7 @@ const ChangeResponsePopup = ({setChangeResponsePopup}) => {
         <Pressable
           onPress={() => {
             setChangeResponsePopup(false);
+            dispatch(setToggleChangeLangWhileChatPopup(true))
           }}
           style={({ pressed }) => [
             {
