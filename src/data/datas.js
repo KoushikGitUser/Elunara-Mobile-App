@@ -1272,3 +1272,15 @@ export const LLMCardsOptions = [
     buttonText: "The Logic Engine",
   },
 ]
+
+export const existingChats = [
+  { id: 1, name: 'Investment Strategies', projectQuantity: 23 },
+  { id: 2, name: 'Market Analysis', projectQuantity: 5 },
+  { id: 3, name: 'Financial Planning', projectQuantity: 12 },
+  { id: 4, name: 'Wealth Management', projectQuantity: 6 },
+  { id: 5, name: 'Risk Assessment', projectQuantity: 10 },
+  { id: 6, name: 'Tax Optimization', projectQuantity: 5 },
+  { id: 7, name: 'Portfolio Diversification', projectQuantity: 2 },
+  { id: 8, name: 'Economic Trends', projectQuantity: 10 },
+  { id: 9, name: 'Budgeting Techniques', projectQuantity: 7 },
+];

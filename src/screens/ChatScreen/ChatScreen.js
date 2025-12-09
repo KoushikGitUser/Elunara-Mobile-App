@@ -35,6 +35,7 @@ import { useFonts } from "expo-font";
 import ChangeLLMPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeResponse/ChangeLLMPopup";
 import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeLang/ChangeLangPopup";
 import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
+import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -80,6 +81,7 @@ const ChatScreen = () => {
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && <ChangeLLMPopup />}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
           {toggleStates.toggleChangeResponseStyleWhileChatPopup && <ChangeResponseStylePopup />}
+          {toggleStates.toggleNotHelpfulFeedbackPopup && <NotHelpfulFeedbackPopup />}
 
           {toggleStates.toggleUserMessageActionPopup && (
             <UserMessageActionPopup />
@@ -109,7 +111,7 @@ const ChatScreen = () => {
               right={20}
             />
           )}
-          <Toaster />
+         
           <ToasterWithAction />
           {/* middle section */}
           <ChatMiddleWrapper />

@@ -26,6 +26,7 @@ const CompareLLMOrStyleState = ({
   icon2,
   title1,
   title2,
+  setCurrentStateOfPopup
 }) => {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
@@ -37,7 +38,14 @@ const CompareLLMOrStyleState = ({
       {/* Handle Bar */}
       <View style={styles.closeModalMain}>
         <ArrowLeft
-          onPress={() => dispatch(setToggleCompareStyleState(false))}
+          onPress={() => {
+            if(forStyleOrLLM == "LLM"){
+              setCurrentStateOfPopup(2)
+            }
+            else{
+              dispatch(setToggleCompareStyleState(false))
+            }
+          }}
           size={30}
           strokeWidth={2}
         />
@@ -217,6 +225,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingLeft: 20,
     paddingVertical: 20,
+    backgroundColor:"white"
   },
   responseBoxScroll: {
     flex: 1,

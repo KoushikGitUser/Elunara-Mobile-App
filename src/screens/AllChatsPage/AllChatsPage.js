@@ -28,6 +28,7 @@ const AllChatsPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
 
   const [isSearching, setIsSearching] = useState(false);
+  const [popupPosition, setPopupPosition] = useState(null);
 
   const handleChatPress = (item) => {
     console.log("Chat pressed:", item.title);
@@ -65,10 +66,16 @@ const AllChatsPage = () => {
               title={chat.title}
               subject={chat.subject}
               roomName={chat.roomName}
+              setPopupPosition={setPopupPosition}
             />
-          ) 
+          )
         })}
       </ScrollView>
+      {toggleStates.toggleAllChatsOptionsPopup && popupPosition && (
+        <View style={{position: 'absolute', top: popupPosition.y, left: popupPosition.x, zIndex: 99999, elevation: 99999}}>
+          <OptionsPopup />
+        </View>
+      )}
       </Animated.View>
     </SafeAreaView>
   );

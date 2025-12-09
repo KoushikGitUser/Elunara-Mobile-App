@@ -79,8 +79,9 @@ const styles = StyleSheet.create({
     padding: 7,
     width: "auto",
     top: 33,
-    left: 27,
-    zIndex: 999,
+    right: 0,
+    zIndex: 9999,
+    elevation: 9999,
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -103,8 +104,9 @@ const styles = StyleSheet.create({
     left: -20,
     width,
     height,
-    zIndex: 99,
-    backgroundColor: "transparent",
+    zIndex: 9998,
+    elevation: 9998,
+    backgroundColor: "red",
   },
 });
 

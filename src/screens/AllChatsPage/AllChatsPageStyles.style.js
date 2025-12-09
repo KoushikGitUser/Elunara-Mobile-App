@@ -14,7 +14,7 @@ export const createStyles = (props = {}) =>
   StyleSheet.create({
     chatHeader: {
       width: "100%",
-      zIndex: 9,
+      zIndex: 99999,
       minHeight: verticalScale(64),
       flexDirection: "row",
       justifyContent: "flex-start",
@@ -34,7 +34,6 @@ export const createStyles = (props = {}) =>
       paddingHorizontal: 20,
       gap: 20,
       marginTop:15,
-      
     },
     searchInputMain: {
       flex: 1,
@@ -64,12 +63,9 @@ export const createStyles = (props = {}) =>
       width: "100%",
       marginTop:30,
       paddingHorizontal:20,
-      overflow:"visible",
-      zIndex:99999999
     },
     cardContainer: {
       paddingVertical: 16,
-      zIndex:5,
       width:"100%",
     },
     cardPressed: {

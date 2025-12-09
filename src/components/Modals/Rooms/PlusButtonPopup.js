@@ -11,7 +11,7 @@ import { MessageCirclePlus } from "lucide-react-native";
 import FilesIcon from "../../../../assets/SvgIconsComponent/RoomsIcons/FilesIcon";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { setToggleIsRoomEmpty } from "../../../redux/slices/toggleSlice";
+import { setToggleAddExistingChatToRoomPopup, setToggleIsRoomEmpty } from "../../../redux/slices/toggleSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,7 +42,9 @@ const PlusButtonPopup = ({ setAddOptionsPopup }) => {
           <Text>New Chat</Text>
         </Pressable>
         <Pressable
-          onPress={() => setAddOptionsPopup(false)}
+          onPress={() => {setAddOptionsPopup(false);
+            dispatch(setToggleAddExistingChatToRoomPopup(true))
+          }}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",

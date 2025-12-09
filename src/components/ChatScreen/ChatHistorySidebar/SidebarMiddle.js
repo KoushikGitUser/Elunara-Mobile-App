@@ -101,6 +101,13 @@ const SidebarMiddle = ({translateX}) => {
                 <IndividualPinnedRoom key={chatIndex} title={chat?.title} />
               );
             })}
+            <TouchableOpacity onPress={()=>navigation.navigate("allRooms")} style={[styles.pinnedBtn,{paddingLeft:0,width:"90%"}]}>
+           <FolderIcon/>
+          <Text style={{ fontSize: moderateScale(13), marginLeft: 20,fontFamily:"Mukta-Regular"}}>
+            View all Rooms
+          </Text>
+          <ChevronRight style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+        </TouchableOpacity>
           </View>
         )}
       </View>

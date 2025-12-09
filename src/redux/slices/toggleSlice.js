@@ -108,11 +108,14 @@ const toggleSlice = createSlice({
     setToggleChangeResponseStyleWhileChatPopup: (state, action) => {
       state.toggleStates.toggleChangeResponseStyleWhileChatPopup = action.payload;
     },
-    setToggleCompareLLMState: (state, action) => {
-      state.toggleStates.toggleCompareLLMState = action.payload;
-    },
     setToggleCompareStyleState: (state, action) => {
       state.toggleStates.toggleCompareStyleState = action.payload;
+    },
+    setToggleNotHelpfulFeedbackPopup: (state, action) => {
+      state.toggleStates.toggleNotHelpfulFeedbackPopup = action.payload;
+    },
+    setToggleAddExistingChatToRoomPopup: (state, action) => {
+      state.toggleStates.toggleAddExistingChatToRoomPopup = action.payload;
     },
   },
 });
@@ -152,8 +155,9 @@ export const {
   setToggleChangeResponseLLMWhileChatPopup,
   setToggleChangeLangWhileChatPopup,
   setToggleChangeResponseStyleWhileChatPopup,
-  setToggleCompareLLMState,
   setToggleCompareStyleState,
+  setToggleNotHelpfulFeedbackPopup,
+  setToggleAddExistingChatToRoomPopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

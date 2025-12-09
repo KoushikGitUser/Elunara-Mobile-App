@@ -22,6 +22,7 @@ import {
 } from "../../../../../redux/slices/toggleSlice";
 import CompareStyleCards from "./CompareStyleCards";
 import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
+import Toaster from "../../../../UniversalToaster/Toaster";
 
 const ChangeResponseStylePopup = () => {
   const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -40,6 +41,7 @@ const ChangeResponseStylePopup = () => {
         dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
       }
     >
+
       <View style={styles.container}>
         {/* Blur Background */}
 
@@ -240,18 +242,13 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   modalSheet: {
+    position: "absolute",
+    bottom: 0,
+    zIndex: 999,
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 20,
   },
   btnsMain: {
     width: "100%",

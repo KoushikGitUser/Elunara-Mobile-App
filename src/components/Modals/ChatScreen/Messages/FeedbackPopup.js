@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { ThumbsDown, ThumbsUp } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
+import { setToggleNotHelpfulFeedbackPopup } from "../../../../redux/slices/toggleSlice";
 
 const FeedbackPopup = ({ close }) => {
   const navigation = useNavigation();
@@ -28,7 +29,7 @@ const FeedbackPopup = ({ close }) => {
         style={styles.optionsPopupWrapper}
       ></TouchableOpacity>
       <View style={styles.notesPopup}>
-        <View
+        <View 
           style={[
             styles.notesPopupOptions,
             { borderBottomWidth: 1, borderColor: "#D3DAE5" },
@@ -39,6 +40,9 @@ const FeedbackPopup = ({ close }) => {
         <Pressable
           onPress={() => {
             setSelectedStyle(0);
+            setTimeout(() => {
+              close(false)
+            }, 200);
           }}
           style={({ pressed }) => [
             {
@@ -54,7 +58,12 @@ const FeedbackPopup = ({ close }) => {
           <RadioButton selected={selectedStyle === 0} />
         </Pressable>
         <Pressable
-          onPress={() => setSelectedStyle(1)}
+          onPress={() => {
+            setSelectedStyle(1);
+            setTimeout(() => {
+              dispatch(setToggleNotHelpfulFeedbackPopup(true))
+            }, 200);
+          }}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",

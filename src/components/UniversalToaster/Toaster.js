@@ -40,7 +40,7 @@ const Toaster = () => {
     duration: 3000,
   });
 
-  const slideAnim = useRef(new Animated.Value(-150)).current;
+  const slideAnim = useRef(new Animated.Value(-170)).current;
   const hideTimer = useRef(null);
 
   // 👉 SWIPE HANDLER
@@ -52,7 +52,7 @@ const Toaster = () => {
 
       onPanResponderMove: (_, gesture) => {
         if (gesture.dy < 0) {
-          slideAnim.setValue(20 + gesture.dy);
+          slideAnim.setValue(55 + gesture.dy);
         }
       },
 
@@ -60,7 +60,7 @@ const Toaster = () => {
         if (gesture.dy < -40) {
           // dismiss
           Animated.timing(slideAnim, {
-            toValue: -150,
+            toValue: -170,
             duration: 200,
             useNativeDriver: true,
           }).start(() => {
@@ -69,7 +69,7 @@ const Toaster = () => {
         } else {
           // snap back
           Animated.spring(slideAnim, {
-            toValue: 20,
+            toValue: 55,
             useNativeDriver: true,
           }).start();
         }
@@ -91,16 +91,16 @@ const Toaster = () => {
         duration,
       });
 
-      slideAnim.setValue(-150);
+      slideAnim.setValue(-170);
 
       Animated.timing(slideAnim, {
-        toValue: 20,
+        toValue: 55,
         duration: 300,
         useNativeDriver: true,
       }).start(() => {
         hideTimer.current = setTimeout(() => {
           Animated.timing(slideAnim, {
-            toValue: -150,
+            toValue: -170,
             duration: 300,
             useNativeDriver: true,
           }).start(() => {
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     elevation: 10,
     shadowColor: "#c5c5c5ff",
-    zIndex: 9999999999,
+    zIndex: 99999999999,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,

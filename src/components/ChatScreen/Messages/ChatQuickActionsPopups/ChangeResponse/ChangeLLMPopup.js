@@ -22,6 +22,9 @@ import { scaleFont } from "../../../../../utils/responsive";
 import CompareLLMCards from "./CompareLLMCards";
 import { ArrowRight } from "lucide-react-native";
 import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
+import SettingLLMState from "./SettingLLMState";
+import IntegtrateAiState from "./IntegtrateAiState";
+import FindAPIKeyState from "./FindAPIKeyState";
 
 const ChangeLLMPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -29,6 +32,7 @@ const ChangeLLMPopup = () => {
   const [selectedCategory, setSelectedCategory] = useState(1);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedStyleForCompare, setSelectedStyleForCompare] = useState([]);
+  const [currentStateOfPopup, setCurrentStateOfPopup] = useState(1);
   const [selectedLLMForResponse, setSelectedLLMForResponse] = useState(null);
   const [selectedLLMForCompare, setSelectedLLMForCompare] = useState(null);
   const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -60,9 +64,9 @@ const ChangeLLMPopup = () => {
             dispatch(setToggleChangeResponseLLMWhileChatPopup(false))
           }
         />
-        {toggleStates.toggleCompareLLMState ? (
-          <CompareLLMOrStyleState forStyleOrLLM="LLM" />
-        ) : (
+        {currentStateOfPopup == 1 ? (
+          <SettingLLMState setCurrentStateOfPopup={setCurrentStateOfPopup} />
+        ) : currentStateOfPopup == 2 ? (
           <View style={styles.modalSheet}>
             {/* Handle Bar */}
             <View style={styles.closeModalMain}>
@@ -189,7 +193,7 @@ const ChangeLLMPopup = () => {
                   <View style={{ height: 50 }} />
                 </ScrollView>
               )}
-
+ 
               <TouchableOpacity
                 style={{
                   marginTop: 10,
@@ -200,7 +204,7 @@ const ChangeLLMPopup = () => {
                   alignItems: "center",
                   gap: 5,
                 }}
-                onPress={() => setToggleFindApiKey(true)}
+                onPress={() => setCurrentStateOfPopup(4)}
               >
                 <Text
                   style={{
@@ -220,8 +224,10 @@ const ChangeLLMPopup = () => {
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => {
-                    dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
-                    dispatch(setToggleCompareLLMState(true));
+                    if (selectedCategory == 2) {
+                      setCurrentStateOfPopup(3);
+                    } else {
+                    }
                   }}
                   activeOpacity={0.8}
                 >
@@ -234,6 +240,12 @@ const ChangeLLMPopup = () => {
               </View>
             </View>
           </View>
+        ) : currentStateOfPopup == 3 ? (
+          <CompareLLMOrStyleState setCurrentStateOfPopup={setCurrentStateOfPopup} forStyleOrLLM="LLM" />
+        ) : currentStateOfPopup == 4 ? (
+          <IntegtrateAiState setCurrentStateOfPopup={setCurrentStateOfPopup} />
+        ) : (
+          <FindAPIKeyState setCurrentStateOfPopup={setCurrentStateOfPopup} />
         )}
         {/* Modal Sheet */}
       </View>

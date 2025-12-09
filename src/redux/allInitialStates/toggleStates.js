@@ -33,6 +33,7 @@ export const toggleStates = {
       toggleChangeResponseLLMWhileChatPopup:false,
       toggleChangeLangWhileChatPopup:false,
       toggleChangeResponseStyleWhileChatPopup:false,
-      toggleCompareLLMState:false,
       toggleCompareStyleState:false,
+      toggleNotHelpfulFeedbackPopup:false,
+      toggleAddExistingChatToRoomPopup:false,
 }

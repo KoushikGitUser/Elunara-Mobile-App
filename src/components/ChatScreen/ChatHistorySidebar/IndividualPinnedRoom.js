@@ -21,6 +21,7 @@ const IndividualPinnedRoom = ({title}) => {
 
   return (
     <TouchableOpacity
+    onPress={()=>navigation.navigate("rooms",{roomName:title})}
       onLongPress={() => setIsLongPressed(!isLongPressed)}
       style={styles.individualPinnedRooms}
     >

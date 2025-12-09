@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Image,
+  Dimensions,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import AddRoomDetailsHeader from "../../components/Rooms/AddRoomDetailsHeader";
@@ -15,30 +17,37 @@ import { scaleFont } from "../../utils/responsive";
 import BrainMindIcon from "../../../assets/SvgIconsComponent/RoomsIcons/BrainMindIcon";
 import SlidersToolsIcon from "../../../assets/SvgIconsComponent/RoomsIcons/SlidersToolsIcon";
 import ToolsContainers from "../../components/ChatScreen/ChatInputCompos/ToolsContainers";
-import { Paperclip, Plus } from "lucide-react-native";
+import { MoreVertical, Paperclip, Plus } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
 import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
+import pdfLogo from "../../assets/images/pdf.png";
+const { width } = Dimensions.get("window");
 
 const AddRoomDetails = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [sourcesPopup,setSourcesPopup] = useState(false);
+  const [sourcesPopup, setSourcesPopup] = useState(false);
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false }
   );
-    const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   return (
-    <SafeAreaView style={{ flex: 1,width:"100%", backgroundColor: "#FAFAFA" }}>
-        {/* {sourcesPopup && <TouchableOpacity style={styles.sourcesPopupWrapper} ></TouchableOpacity>} */}
-        {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
+    <SafeAreaView
+      style={{ flex: 1, width: "100%", backgroundColor: "#FAFAFA" }}
+    >
+      {/* {sourcesPopup && <TouchableOpacity style={styles.sourcesPopupWrapper} ></TouchableOpacity>} */}
+      {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
       <AddRoomDetailsHeader scrollY={scrollY} />
-      <ScrollView onScroll={handleScroll} style={{ flex: 1, width: "100%",zIndex:9  }}>
+      <ScrollView
+        onScroll={handleScroll}
+        style={{ flex: 1, width: "100%", zIndex: 9 }}
+      >
         <View style={styles.header}>
           <View style={styles.headerTitleContainer}>
             <ScrollListIcon />
@@ -91,7 +100,7 @@ const AddRoomDetails = () => {
         </View>
         <View style={[styles.card, { marginTop: 10 }]}>
           <View style={styles.contentWrapper}>
-           {sourcesPopup && <SourcesPopup setSourcesPopup={setSourcesPopup} />}
+            {sourcesPopup && <SourcesPopup setSourcesPopup={setSourcesPopup} />}
             {/* Left Content */}
             <View style={styles.leftContent}>
               {/* Header with Icon and Title */}
@@ -114,6 +123,26 @@ const AddRoomDetails = () => {
               <Plus size={28} color="#1F2937" strokeWidth={1.5} />
             </TouchableOpacity>
           </View>
+          <TouchableOpacity style={styles.linksMain}>
+            {/* Link Icon */}
+            <View style={styles.pdfLogoContainer}>
+              <Image
+                source={pdfLogo}
+                style={{ height: 25, width: 25, objectFit: "contain" }}
+              />
+            </View>
+
+            {/* Link Details */}
+            <View style={styles.linkDetails}>
+              <Text style={styles.url}>Finance.pdf </Text>
+              <Text style={styles.description}>PDF </Text>
+            </View>
+
+            {/* More Options Button */}
+            <TouchableOpacity style={styles.moreButton}>
+              <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
+            </TouchableOpacity>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.verifyButton, { marginBottom: 25 }]}
             onPress={() => {
@@ -220,8 +249,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    position:"relative",
-
+    position: "relative",
   },
   leftContent: {
     width: "80%",
@@ -255,7 +283,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     width: "100%",
-    zIndex:9999
+    zIndex: 9999,
   },
   verifyButton: {
     backgroundColor: "#081A35",
@@ -263,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop:70
+    marginTop: 70,
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",
@@ -274,15 +302,61 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 0.3,
   },
-  sourcesPopupWrapper:{
-    position:"absolute",
-    width:"100%",
-    height:"100%",
-    backgroundColor:"red",
-    top:0,
-    left:0,
-    zIndex:99
-  }
+  sourcesPopupWrapper: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "red",
+    top: 0,
+    left: 0,
+    zIndex: 99,
+  },
+  iconContainer: {
+    width: 55,
+    height: 50,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#CDD5DC",
+  },
+  linkDetails: {
+    flex: 1,
+    gap: 4,
+  },
+  url: {
+    fontSize: scaleFont(14),
+    fontWeight: "600",
+    color: "#1F2937",
+    lineHeight: 24,
+  },
+  moreButton: {
+    padding: 4,
+  },
+  linksMain: {
+    backgroundColor: "#EBF1FB",
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 11,
+    flexDirection: "row",
+    alignItems: "center",
+    width: width - 32,
+    gap: 14,
+    alignSelf: "center",
+    marginTop: 20,
+  },
+    pdfLogoContainer: {
+    height: "100%",
+    width: 60,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#c3cddcff",
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default AddRoomDetails;
