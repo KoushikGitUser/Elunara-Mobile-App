@@ -32,7 +32,7 @@ import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
 import { triggerToast, triggerToastWithAction } from "../../services/toast";
 import { useFonts } from "expo-font";
 
-const ChatHeader = ({ translateX, }) => {
+const ChatHeader = ({ translateX }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -40,13 +40,24 @@ const ChatHeader = ({ translateX, }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
-  const action = ()=>{
+  const action = () => {
     console.log("action");
-  }
-
+  };
 
   return (
-    <View style={[styles.chatHeader, {}]}>
+    <View
+      style={[
+        styles.chatHeader,
+        {
+          borderWidth:
+            toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
+            globalDataStates.selectedFiles.length > 0 ||
+            toggleStates.toggleIsChattingWithAI
+              ? 1
+              : 0,
+        },
+      ]}
+    >
       <View style={styles.rightChatHeaderIcons}>
         <TouchableOpacity
           onPress={() => {
@@ -54,7 +65,7 @@ const ChatHeader = ({ translateX, }) => {
               toValue: toggleStates.toggleChatHistorySidebar
                 ? 0
                 : SCREEN_WIDTH * 0.75,
-              duration: 100,
+              duration: 300,
               useNativeDriver: true,
             }).start();
             dispatch(
@@ -73,28 +84,52 @@ const ChatHeader = ({ translateX, }) => {
         )}
       </View>
 
-      {toggleStates.toggleIsChattingWithAI ? ( 
+      {toggleStates.toggleIsChattingWithAI ? (
         <View style={styles.chatnameAndSection}>
-          <Text style={{ fontSize: scaleFont(15), fontWeight: 600,fontFamily:'Mukta-Bold' }}>
+          <Text
+            style={{
+              fontSize: scaleFont(15),
+              fontWeight: 600,
+              fontFamily: "Mukta-Bold",
+            }}
+          >
             First Chat with AI
           </Text>
           <TouchableOpacity style={styles.topicNamemain}>
             <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />
-            <Text style={{ fontSize: 12, fontWeight: 400, color: "#406DD8",fontFamily:'Mukta-Regular' }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                color: "#406DD8",
+                fontFamily: "Mukta-Regular",
+              }}
+            >
               Finance
             </Text>
           </TouchableOpacity>
         </View>
       ) : (
         <TouchableOpacity
-          onPress={()=>{
+          onPress={() => {
             // triggerToast("Connection Failed","Please check your API key and try again.","alert",1000)
-            triggerToastWithAction("This is toast","This desc of toast","success",5000,"Upgrade",action)
+            triggerToastWithAction(
+              "This is toast",
+              "This desc of toast",
+              "success",
+              5000,
+              "Upgrade",
+              action
+            );
           }}
           style={styles.upgradeButton}
         >
           <SparkleIcon />
-          <Text style={{ fontSize: 14, fontWeight: 600,fontFamily:'Mukta-Bold' }}>Upgrade Plan</Text>
+          <Text
+            style={{ fontSize: 14, fontWeight: 600, fontFamily: "Mukta-Bold" }}
+          >
+            Upgrade Plan
+          </Text>
         </TouchableOpacity>
       )}
 
@@ -103,7 +138,7 @@ const ChatHeader = ({ translateX, }) => {
           onPress={() => {
             dispatch(setChatMessagesArray([]));
             dispatch(setToggleIsChattingWithAI(false));
-            dispatch(setToggleChatScreenGuideStart(true))
+            dispatch(setToggleChatScreenGuideStart(true));
           }}
         >
           <MessageCirclePlus size={30} strokeWidth={1.25} />

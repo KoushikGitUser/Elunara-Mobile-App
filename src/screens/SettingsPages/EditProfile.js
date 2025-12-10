@@ -16,6 +16,8 @@ import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { triggerToast } from "../../services/toast";
+import { useNavigation } from "@react-navigation/native";
 
 const EditProfile = () => {
   const [firstName, setFirstName] = React.useState("");
@@ -27,6 +29,7 @@ const EditProfile = () => {
   const lastNameInputRef = React.useRef(null);
   const emailInputRef = React.useRef(null);
   const passwordInputRef = React.useRef(null);
+  const navigation = useNavigation();
 
   const triggerImagePicker = async () => {
     // Open image gallery functionality
@@ -185,6 +188,11 @@ const EditProfile = () => {
         </View>
       </View>
       <TouchableOpacity
+      onPress={()=>{
+        triggerToast("Profile Updated","Your profile has been updated successfully","success",3000);
+          navigation.navigate("profile");
+
+      }}
         style={[
           styles.button,
           { backgroundColor: "white", borderWidth: 1, borderColor: "black",marginLeft:"auto",marginTop:20 },

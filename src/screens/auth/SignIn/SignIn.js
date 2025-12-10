@@ -23,6 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
 import GradientText from "../../../components/common/GradientText";
 import { scaleFont } from "../../../utils/responsive";
+import { triggerToast } from "../../../services/toast";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -131,7 +132,11 @@ const SignIn = () => {
           </TouchableOpacity>
           {/* Email Button */}
           <TouchableOpacity
-            onPress={() => navigation.navigate("chat")}
+            onPress={() => {navigation.navigate("chat");
+              setTimeout(() => {
+                triggerToast("Logged in","You have been logged in successfully","success",3000)
+              }, 300);
+            }}
             style={styles.emailButton}
             activeOpacity={0.8}
           >

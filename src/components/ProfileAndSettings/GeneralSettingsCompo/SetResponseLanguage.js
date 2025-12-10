@@ -12,7 +12,7 @@ const SetResponseLanguage = () => {
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
-          <ResLangIcon />
+          <ResLangIcon color="#888" />
           <Text style={styles.title}>Set Response Language</Text>
         </View>
         <Text style={styles.subtitle}>

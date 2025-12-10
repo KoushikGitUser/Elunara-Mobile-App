@@ -20,6 +20,7 @@ import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleRenameChatPopup } from "../../../../redux/slices/toggleSlice";
 import { Delete } from "lucide-react-native";
+import { triggerToast } from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
 
@@ -141,6 +142,13 @@ const RenameChatPopup = () => {
 
                   {/* Verify Button */}
                   <TouchableOpacity
+                  onPress={()=>{
+                    dispatch(setToggleRenameChatPopup(false));
+                    setTimeout(() => {
+                       triggerToast("Renamed!","Your chat has been successfully renamed","success",3000)
+                    }, 500);
+                   
+                  }}
                     style={[
                       styles.verifyButton,
                       !chatName && styles.verifyButtonDisabled,

@@ -23,15 +23,13 @@ export const createStyles = ({}) =>
     chatHeader: {
       width: "100%",
       position:"absolute",
-      top:0,
+      top:30,
       left:0,
       zIndex:9,
-      minHeight: verticalScale(64),
       flexDirection: "row",
       justifyContent: "space-between",
       paddingHorizontal:20,
-      paddingTop:10,
-      paddingBottom:10,
+      paddingVertical:18,
       alignItems: "center",
       backgroundColor: "#FAFAFA",
       borderColor:"#D3DAE5"
@@ -95,7 +93,7 @@ export const createStyles = ({}) =>
     },
     topicsMainWrapper: {
       width: "100%",
-      paddingVertical: moderateScale(30),
+      paddingVertical: moderateScale(25),
       flexDirection: "row",
       justifyContent: "space-between",
     },

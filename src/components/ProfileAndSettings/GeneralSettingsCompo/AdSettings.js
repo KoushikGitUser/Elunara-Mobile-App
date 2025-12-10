@@ -49,6 +49,7 @@ const AdSettings = () => {
         <CustomSwitch
           value={personalizedAds}
           onValueChange={setPersonalizedAds}
+          action="Personalised Ads"
         />
       </View>
     </View>

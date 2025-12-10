@@ -331,7 +331,7 @@ export const citationStyles = [
   },
   {
     id: 1,
-    icon: <CitationIcon />,
+    icon: <CitationIcon color="#24487C" />,
     style: "Harvard",
     description: "Popular author-date style for research and reports.",
   },
@@ -1283,4 +1283,16 @@ export const existingChats = [
   { id: 7, name: 'Portfolio Diversification', projectQuantity: 2 },
   { id: 8, name: 'Economic Trends', projectQuantity: 10 },
   { id: 9, name: 'Budgeting Techniques', projectQuantity: 7 },
+];
+
+export const existingRooms = [
+  { id: 1, name: 'Investment Strategies', chatsQuantity: 23 },
+  { id: 2, name: 'Market Analysis', chatsQuantity: 5 },
+  { id: 3, name: 'Financial Planning', chatsQuantity: 12 },
+  { id: 4, name: 'Wealth Management', chatsQuantity: 6 },
+  { id: 5, name: 'Risk Assessment', chatsQuantity: 10 },
+  { id: 6, name: 'Tax Optimization', chatsQuantity: 5 },
+  { id: 7, name: 'Portfolio Diversification', chatsQuantity: 2 },
+  { id: 8, name: 'Economic Trends', chatsQuantity: 10 },
+  { id: 9, name: 'Budgeting Techniques', chatsQuantity: 7 },
 ];

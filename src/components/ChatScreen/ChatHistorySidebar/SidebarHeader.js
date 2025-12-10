@@ -1,4 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Animated, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Dimensions,
+} from "react-native";
 import React, { useMemo } from "react";
 import { FolderPlus, MessageCirclePlus, Search } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -7,7 +15,12 @@ import chakraLogo from "../../../assets/images/chakraFull.png";
 import elunaraLogo from "../../../assets/images/elunaraLogo.png";
 import AddFolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/AddFolderIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChatHistorySidebar, setToggleLearningLabUnlockPopup, setToggleRoomCreationPopup, setToggleUnlockNewChatPopup } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleChatHistorySidebar,
+  setToggleLearningLabUnlockPopup,
+  setToggleRoomCreationPopup,
+  setToggleUnlockNewChatPopup,
+} from "../../../redux/slices/toggleSlice";
 import { scaleFont } from "../../../utils/responsive";
 
 const SidebarHeader = ({ translateX }) => {
@@ -15,13 +28,12 @@ const SidebarHeader = ({ translateX }) => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {toggleStates} = useSelector((state) => state.Toggle);
+  const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
   return (
     <View style={styles.chatHistorySidebarHeader}>
       <View style={styles.sidebarTopImageMain}>
-
         <Image style={styles.elunaraLogoSidebar} source={elunaraLogo} />
       </View>
       <View style={styles.searchInputMain}>
@@ -34,7 +46,10 @@ const SidebarHeader = ({ translateX }) => {
         <TextInput
           placeholder="Search"
           placeholderTextColor="#B5BECE"
-          style={[styles.searchInput,{fontFamily:'Mukta-Regular',fontSize:scaleFont(15)}]}
+          style={[
+            styles.searchInput,
+            { fontFamily: "Mukta-Regular", fontSize: scaleFont(15) },
+          ]}
         />
       </View>
       <View style={styles.newButtonsMain}>
@@ -53,18 +68,40 @@ const SidebarHeader = ({ translateX }) => {
               )
             );
             navigation.navigate("chat");
-            dispatch(setToggleUnlockNewChatPopup(true))
+            // dispatch(setToggleUnlockNewChatPopup(true));
           }}
           style={styles.newChatBtn}
         >
           <MessageCirclePlus size={25} strokeWidth={1.25} />
-          <Text style={[styles.btnTexts,{fontFamily:"Mukta-Bold"}]}>New Chat</Text>
+          <Text style={[styles.btnTexts, { fontFamily: "Mukta-Bold" }]}>
+            New Chat
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-        onPress={()=>{dispatch(setToggleLearningLabUnlockPopup(true))}}
-        style={styles.newLearningTabBtn}>
+        <TouchableOpacity
+          onPress={() => {
+            Animated.timing(translateX, {
+              toValue: toggleStates.toggleChatHistorySidebar
+                ? 0
+                : SCREEN_WIDTH * 0.75,
+              duration: 300,
+              useNativeDriver: true,
+            }).start();
+            dispatch(
+              setToggleChatHistorySidebar(
+                !toggleStates.toggleChatHistorySidebar
+              )
+            );
+              dispatch(setToggleLearningLabUnlockPopup(true));
+          }}
+          style={styles.newLearningTabBtn}
+        >
           <AddFolderIcon />
-          <Text style={[styles.btnTexts, { fontWeight: 400,fontFamily:"Mukta-Regular" }]}>
+          <Text
+            style={[
+              styles.btnTexts,
+              { fontWeight: 400, fontFamily: "Mukta-Regular" },
+            ]}
+          >
             New Learning Lab
           </Text>
         </TouchableOpacity>

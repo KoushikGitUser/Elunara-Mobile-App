@@ -34,6 +34,7 @@ const NotificationSettings = () => {
         <CustomSwitch
           value={emailNotifications}
           onValueChange={setEmailNotifications}
+          action="Email Notifications"
         />
       </View>
 
@@ -48,6 +49,7 @@ const NotificationSettings = () => {
         <CustomSwitch
           value={pushNotifications}
           onValueChange={setPushNotifications}
+          action="Push Notifications"
         />
       </View>
     </View>

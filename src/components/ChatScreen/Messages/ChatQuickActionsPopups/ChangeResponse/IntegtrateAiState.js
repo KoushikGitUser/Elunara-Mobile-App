@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux";
 const screenHeight = Dimensions.get("window").height;
 import verifyIcon from "../../../../../assets/images/verifyIcon.png";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
+import { triggerToast } from "../../../../../services/toast";
 
 
 const IntegtrateAiState = ({setCurrentStateOfPopup}) => {
@@ -165,7 +166,7 @@ const IntegtrateAiState = ({setCurrentStateOfPopup}) => {
                     : "#CDD5DC",
               },
             ]}
-            onPress={() => setIsLLMSaved(true)}
+            // onPress={() => triggerToast("API connected","API is connected successfully","success",3000)}
             activeOpacity={0.8}
           >
             <Text style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}>

@@ -2,8 +2,13 @@ import { View, Text, TouchableOpacity, Image, Platform, StyleSheet } from "react
 import React, { useState } from "react";
 import { scaleFont } from "../../../../../utils/responsive";
 import { Check } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { setCompareResponseStyleItemsArray } from "../../../../../redux/slices/globalDataSlice";
 
 const CompareLLMCards = ({id,icon,title,useFor,badgeText,optionsIndex,selectedStyleForCompare,setSelectedStyleForCompare}) => {
+  const dispatch = useDispatch();
+  const { globalDataStates } = useSelector((state) => state.Global);
+
 
   const RadioButton = () => (
     <View style={[styles.radioOuter, { borderColor: selectedStyleForCompare?.includes(id) ? "black" : "",backgroundColor:selectedStyleForCompare?.includes(id)?"black":"transparent" }]}>

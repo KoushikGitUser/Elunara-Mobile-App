@@ -39,43 +39,58 @@ const AllChatsPage = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#FAFAFA",
+        marginTop: -StatusBar.currentHeight,
+      }}
+    >
       <ChatHistorySidebar translateX={translateX} />
+      <StatusBar
+        backgroundColor="#000000ff"
+        barStyle="dark-content"
+        hidden={false}
+        translucent={false}
+        animated
+      />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
-      <AllChatsHeader
-      translateX={translateX}
-        isSearching={isSearching}
-        setIsSearching={setIsSearching}
-      />
-      <SearchAndIcons
-        isSearching={isSearching}
-        setIsSearching={setIsSearching}
-      />
-      <ScrollView
-        contentContainerStyle={{
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-        style={styles.allChatsScrollMain}
-      >
-        {allChatsData.map((chat, chatsIndex) => {
-          return (
-            <ChatsComponent
+        <View
+          style={{
+            height: StatusBar.currentHeight,
+            width: "100%",
+            backgroundColor: "#FAFAFA",
+            zIndex: 9999,
+          }}
+        ></View>
+        <AllChatsHeader
+          translateX={translateX}
+          isSearching={isSearching}
+          setIsSearching={setIsSearching}
+        />
+        <SearchAndIcons
+          isSearching={isSearching}
+          setIsSearching={setIsSearching}
+        />
+        <ScrollView
+          contentContainerStyle={{
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+          style={styles.allChatsScrollMain}
+        >
+          {allChatsData.map((chat, chatsIndex) => {
+            return (
+              <ChatsComponent
               key={chatsIndex}
               index={chat.id}
               title={chat.title}
               subject={chat.subject}
               roomName={chat.roomName}
-              setPopupPosition={setPopupPosition}
             />
-          )
-        })}
-      </ScrollView>
-      {toggleStates.toggleAllChatsOptionsPopup && popupPosition && (
-        <View style={{position: 'absolute', top: popupPosition.y, left: popupPosition.x, zIndex: 99999, elevation: 99999}}>
-          <OptionsPopup />
-        </View>
-      )}
+            );
+          })}
+        </ScrollView>
       </Animated.View>
     </SafeAreaView>
   );

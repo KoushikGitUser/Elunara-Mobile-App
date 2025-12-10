@@ -26,7 +26,6 @@ export const createStyles = ({}) =>
       backgroundColor: "white",
       position: "absolute",
       left: 0,
-      top: 0,
       zIndex: 20,
       flexDirection: "column",
       justifyContent: "space-between",

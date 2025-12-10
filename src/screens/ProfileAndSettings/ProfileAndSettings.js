@@ -34,7 +34,12 @@ const ProfileAndSettings = () => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: "#FAFAFA", paddingHorizontal: 20 }}
+      style={{
+        flex: 1,
+        backgroundColor: "#FAFAFA",
+        paddingHorizontal: 20,
+        marginTop: -StatusBar.currentHeight,
+      }}
     >
       {toggleStates.toggleUnlockAnalyticsDashboardPopup && (
         <UnlockAnalyticsDashboardPopup />
@@ -42,7 +47,7 @@ const ProfileAndSettings = () => {
       {toggleStates.toggleAdFreeExpPopup && <UnlockAdFreeExpPopup />}
       <StatusBar
         barStyle="dark-content"
-        hidden={false} 
+        hidden={false}
         translucent={false}
         animated
       />
@@ -52,6 +57,14 @@ const ProfileAndSettings = () => {
       />
       <ChatHistorySidebar translateX={translateX} />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
+        <View
+          style={{
+            height: StatusBar.currentHeight,
+            width: "100%",
+            backgroundColor: "#FAFAFA",
+            zIndex: 9999,
+          }}
+        ></View>
         <ProfileHeader translateX={translateX} />
         <UserSection />
         <ProfileOptionsContainer

@@ -14,6 +14,7 @@ import { setToggleNotHelpfulFeedbackPopup } from "../../../../../redux/slices/to
 import { BlurView } from "@react-native-community/blur";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { triggerToast } from "../../../../../services/toast";
 
 const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
   const navigation = useNavigation();
@@ -120,7 +121,17 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
             <View style={styles.btnsMain}>
               <TouchableOpacity
                 style={styles.button}
-              onPress={() => dispatch(setToggleNotHelpfulFeedbackPopup(false))}
+                onPress={() => {
+                  dispatch(setToggleNotHelpfulFeedbackPopup(false));
+                  setTimeout(() => {
+                    triggerToast(
+                      "Submitted",
+                      "Your feedback has been successfully submitted",
+                      "success",
+                      3000
+                    );
+                  }, 200);
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>Submit Feedback</Text>

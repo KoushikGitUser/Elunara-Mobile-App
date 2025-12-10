@@ -2,23 +2,27 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import React from "react";
-import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
-import { scaleFont } from "../../utils/responsive";
+import FolderIcon from "../../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import { CirclePlus } from "lucide-react-native";
+import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch } from "react-redux";
-import { setToggleAddExistingChatToRoomPopup } from "../../redux/slices/toggleSlice";
-import { triggerToast } from "../../services/toast";
+import { setToggleAddChatToLearningLabPopup } from "../../../../redux/slices/toggleSlice";
+import {  triggerToastWithAction } from "../../../../services/toast";
 
-const ExistingChatsCards = ({ chatName, projects }) => {
+const ExistingRoomsCards = ({ roomName, chats }) => {
   const dispatch = useDispatch();
 
   return (
-    <TouchableOpacity onPress={()=> { dispatch(setToggleAddExistingChatToRoomPopup(false));
-      triggerToast("Chat added","Chat has been added to Room successfully","success",3000);
+    <TouchableOpacity onPress={() => {
+        dispatch(setToggleAddChatToLearningLabPopup(false));
+        setTimeout(() => {
+            triggerToastWithAction("Successfully added!","Your chat has been added to <Learning lab Name>","success",5000,"Undo",()=>{})
+        }, 500);
+        
     }} style={styles.cardContainer}>
       <View style={[styles.cardContent]}>
         {/* Chat Icon */}
@@ -28,9 +32,9 @@ const ExistingChatsCards = ({ chatName, projects }) => {
 
         {/* Text Content */}
         <View style={styles.textContainer}>
-          <Text style={styles.titleText}>{chatName}</Text>
+          <Text style={styles.titleText}>{roomName}</Text>
           <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitleText}>{projects} Projects</Text>
+            <Text style={styles.subtitleText}>{chats} Chats</Text>
           </View>
         </View>
 
@@ -105,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExistingChatsCards;
+export default ExistingRoomsCards;

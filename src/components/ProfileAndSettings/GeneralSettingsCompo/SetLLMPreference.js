@@ -13,7 +13,7 @@ const SetLLMPreference = () => {
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
-          <ResLangIcon />
+          <ResLangIcon color="#888" />
           <Text style={styles.title}>Set preferred LLMS</Text>
         </View>
         <Text style={styles.subtitle}>

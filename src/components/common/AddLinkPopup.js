@@ -13,14 +13,19 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
-import { scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
+import { scaleFont } from "../../utils/responsive";
+import { triggerToast } from "../../services/toast";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
 
-const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
+const AddLinkPopup = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [link, setLink] = useState("");
-  const animatedValue = useState(new Animated.Value(0))[0]; 
+  const animatedValue = useState(new Animated.Value(0))[0];
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -51,10 +56,10 @@ const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
 
   return (
     <Modal
-      visible={toggleAddLinkPopup}
+      visible={toggleStates.toggleAddLinkPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => setToggleAddLinkPopup(false)}
+      onRequestClose={() => dispatch(setToggleAddLinkPopup(false))}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -79,7 +84,7 @@ const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
           style={styles.backdrop}
           activeOpacity={0.5}
           onPress={() => {
-            setToggleAddLinkPopup(false)
+            dispatch(setToggleAddLinkPopup(false))
             Keyboard.dismiss();
           }}
         />
@@ -89,10 +94,7 @@ const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 320], // average keyboard height
-                  outputRange: [
-                    0,
-                     -(keyboardHeight * 2.3),
-                  ],
+                  outputRange: [0, -(keyboardHeight * 2.3)],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -110,7 +112,12 @@ const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
-                  <AntDesign onPress={()=>setToggleAddLinkPopup(false)} name="close" size={24} color="black" />
+                  <AntDesign
+                    onPress={() => dispatch(setToggleAddLinkPopup(false))}
+                    name="close"
+                    size={24}
+                    color="black"
+                  />
                 </View>
                 <Text style={styles.title}>Add Link</Text>
                 <View style={styles.inputSection}>
@@ -129,10 +136,16 @@ const AddLinkPopup = ({ toggleAddLinkPopup, setToggleAddLinkPopup }) => {
                   style={[
                     styles.verifyButton,
                     !link && styles.verifyButtonDisabled,
-                    { marginBottom:85 },
+                    { marginBottom: 85 },
                   ]}
                   onPress={() => {
-                   
+                   dispatch(setToggleAddLinkPopup(false))
+                    triggerToast(
+                      "Link Added",
+                      "Link has been added successfully",
+                      "success",
+                      3000
+                    );
                   }}
                   activeOpacity={0.8}
                   disabled={!link}

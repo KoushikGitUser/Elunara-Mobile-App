@@ -19,6 +19,7 @@ import RoomsMiddle from "../../components/Rooms/RoomsMiddle";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AddChatToRoomPopup from "../../components/Rooms/AddChatToRoomPopup";
 import { useFonts } from "expo-font";
+import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
 
 const Rooms = ({ route }) => {
   const { roomName } = route.params;
@@ -28,33 +29,33 @@ const Rooms = ({ route }) => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const translateX = React.useRef(new Animated.Value(0)).current;
-    const [fontsLoaded] = useFonts({
-      "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
-      "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
-    });
-  
-    useEffect(() => {
-      if (fontsLoaded) {
-      }
-    }, [fontsLoaded]);
-  
-    // Show nothing (or a loader) while fonts are loading
-    if (!fontsLoaded) {
-      return null;
-    }
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+  });
 
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
+  // Show nothing (or a loader) while fonts are loading
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <SafeAreaView style={styles.mainWrapper}>
+    <SafeAreaView style={[styles.mainWrapper,{marginTop: -StatusBar.currentHeight }]}>
       <StatusBar
-        backgroundColor="#ff0000ff"
+        backgroundColor="#000000ff"
         barStyle="dark-content"
         hidden={false}
         translucent={false}
         animated
       />
+       {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup from="rooms" />}
       <ChatHistorySidebar translateX={translateX} />
-          {toggleStates.toggleAddExistingChatToRoomPopup && <AddChatToRoomPopup />}
+      {toggleStates.toggleAddExistingChatToRoomPopup && <AddChatToRoomPopup />}
 
       <Animated.View
         style={[
@@ -67,9 +68,19 @@ const Rooms = ({ route }) => {
           },
         ]}
       >
+        <View
+          style={{
+            height: StatusBar.currentHeight,
+            width: "100%",
+            backgroundColor: "#FAFAFA",
+            zIndex: 9999,
+          }}
+        ></View>
         <RoomsHeader translateX={translateX} />
         <RoomsMiddle roomName={roomName} />
-        <ChatInputMain />
+        <View style={{ width: "100%", paddingHorizontal: 20 }}>
+          <ChatInputMain />
+        </View>
       </Animated.View>
     </SafeAreaView>
   );

@@ -13,11 +13,9 @@ export const createStyles = ({}) =>
     mainWrapper: {
       width: "100%",
       flex: 1,
-      paddingHorizontal: 20,
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
-      gap: 30,
       backgroundColor: "#FAFAFA",
     },
     roomsHeader: {
@@ -25,7 +23,10 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      height: verticalScale(64),
+      backgroundColor:"#FAFAFA",
+      paddingHorizontal:20,
+      paddingVertical:15,
+      zIndex:999
     },
     rightHeaderIcons: {
       flexDirection: "row",
@@ -38,8 +39,10 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       justifyContent: "flex-end",
       alignItems: "center",
+      paddingHorizontal:20,
       width: "100%",
       gap: 25,
+      marginBottom:30
     },
     middleIconAndText: {
       flexDirection: "column",

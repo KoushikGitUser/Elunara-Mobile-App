@@ -17,6 +17,7 @@ import { Check } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUnlockArchiveLimitPopup } from "../../redux/slices/toggleSlice";
 import icon from "../../assets/images/archiveLimit.png";
+import { triggerToast } from "../../services/toast";
 
 const UnlockArchiveLimitPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -100,9 +101,17 @@ const UnlockArchiveLimitPopup = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() =>
-                  dispatch(setToggleUnlockArchiveLimitPopup(false))
-                }
+                onPress={() => {
+                  dispatch(setToggleUnlockArchiveLimitPopup(false));
+                  setTimeout(() => {
+                    triggerToast(
+                      "Chat Archived",
+                      "Your chat has been successfully archived",
+                      "success",
+                      3000
+                    );
+                  }, 500);
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>Upgrade more archives</Text>
@@ -161,7 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    gap:15
+    gap: 15,
   },
   verifiedIcon: {
     height: 55,

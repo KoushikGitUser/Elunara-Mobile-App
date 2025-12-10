@@ -77,6 +77,13 @@ const ChatHistorySidebar = ({ translateX }) => {
           { display: toggleStates.toggleChatHistorySidebar ? "flex" : "none" },
         ]}
       ></TouchableOpacity>
+      <StatusBar
+        backgroundColor="#ff0000ff"
+        barStyle="dark-content"
+        hidden={false}
+        translucent={false}
+        animated
+      />
       {toggleStates.toggleRoomCreationPopup && <RoomCreationPopup />}
       {toggleStates.toggleLearningLabUnlockPopup && <UnlockLearningLabPopup />}
       {toggleStates.toggleProPlanUpgradePopup && <ProPlanUpgradingPopup />}
@@ -88,6 +95,7 @@ const ChatHistorySidebar = ({ translateX }) => {
             marginLeft: toggleStates.toggleChatHistorySidebar
               ? 0
               : -SCREEN_WIDTH * 0.75,
+              top:StatusBar.currentHeight
           },
         ]}
       >

@@ -11,6 +11,7 @@ import React from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
+import { triggerToast } from "../../services/toast";
 
 const ConfirmLogoutPopup = ({
   toggleLogOutConfirmPopup,
@@ -79,7 +80,8 @@ const ConfirmLogoutPopup = ({
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {setToggleLogOutConfirmPopup(false);
-                    navigation.navigate("welcome")
+                    navigation.navigate("welcome");
+                    triggerToast("Logged Out","You have been logged out successfully","success",3000);
                 }}
                 activeOpacity={0.8}
               >

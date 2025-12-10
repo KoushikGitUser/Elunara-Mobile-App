@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  StatusBar,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +24,14 @@ const AllRoomsPageHeader = ({ isSearching, setIsSearching, translateX }) => {
   const dispatch = useDispatch();
 
   return (
-    <View style={[styles.chatHeader]}>
+    <View style={[styles.chatHeader, { marginTop: StatusBar.currentHeight }]}>
+      <StatusBar
+        backgroundColor="#ff0000ff"
+        barStyle="dark-content"
+        hidden={false}
+        translucent={false}
+        animated
+      />
       <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {

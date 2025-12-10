@@ -30,8 +30,8 @@ const OtherStylesPopup = ({setIsExpandedFirst,setIsExpandedSecond,isFirst}) => {
       <View style={styles.notesPopup}>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+           setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {
@@ -54,8 +54,8 @@ const OtherStylesPopup = ({setIsExpandedFirst,setIsExpandedSecond,isFirst}) => {
         </Pressable>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+            setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {
@@ -81,8 +81,8 @@ const OtherStylesPopup = ({setIsExpandedFirst,setIsExpandedSecond,isFirst}) => {
         </Pressable>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+         setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {

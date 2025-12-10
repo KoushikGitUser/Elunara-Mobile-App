@@ -36,4 +36,6 @@ export const toggleStates = {
       toggleCompareStyleState:false,
       toggleNotHelpfulFeedbackPopup:false,
       toggleAddExistingChatToRoomPopup:false,
+      toggleAddChatToLearningLabPopup:false,
+      toggleAddLinkPopup:false,
 }

@@ -15,10 +15,11 @@ import deleteBin from "../../../../assets/images/deleteBin.png";
 import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../../../redux/slices/toggleSlice";
+import { triggerToast } from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
 
-const DeleteConfirmPopup = () => {
+const DeleteConfirmPopup = ({from}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
 
@@ -61,7 +62,10 @@ const DeleteConfirmPopup = () => {
             </View>
 
             {/* Title */}
-            <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Delete Chat?</Text>
+            <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+              {from == "chat"?"Delete Chat?":from == "allChats"?"Delete <10> chats?":from == "rooms"?"Delete room?":"Delete <10> rooms?"}
+              
+            </Text>
 
             {/* Description */}
             <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
@@ -71,18 +75,46 @@ const DeleteConfirmPopup = () => {
             {/* Button */}
             <View style={styles.btnsMain}>
               <TouchableOpacity
-                style={[styles.button,{backgroundColor:"white",borderWidth:1,borderColor:"black",}]}
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: "white",
+                    borderWidth: 1,
+                    borderColor: "black",
+                  },
+                ]}
                 onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.buttonText,{color:"black",fontFamily: "Mukta-Regular"}]}>Cancel</Text>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: "black", fontFamily: "Mukta-Regular" },
+                  ]}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
+                onPress={() => {
+                  dispatch(setToggleDeleteChatConfirmPopup(false));
+                  setTimeout(() => {
+                    triggerToast(
+                      "Chat Deleted",
+                      "Your chat has been successfully deleted",
+                      "success",
+                      3000
+                    );
+                  }, 500);
+                }}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular"}]}>Done</Text>
+                <Text
+                  style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
+                >
+                  Done
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -166,7 +198,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   button: {
-    width:"48%",
+    width: "48%",
     backgroundColor: "#081A35",
     paddingVertical: 13,
     borderRadius: 50,

@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { setToggleUnlockPremiumPopup } from '../../../redux/slices/toggleSlice';
+import { triggerToast } from '../../../services/toast';
 
-const CustomSwitch = ({ value, onValueChange,skipAd }) => {
+const CustomSwitch = ({ value, onValueChange,skipAd,action }) => {
   const animatedValue = React.useRef(new Animated.Value(value ? 1 : 0)).current;
   const dispatch = useDispatch();
 
@@ -33,7 +34,18 @@ const CustomSwitch = ({ value, onValueChange,skipAd }) => {
   });
 
   const handlePress = () => {
-    onValueChange(!value);
+    const newValue = !value;
+    onValueChange(newValue);
+
+    if (action) {
+      const status = newValue ? 'enabled' : 'disabled';
+      triggerToast(
+        `${action} ${status}`,
+        `${action} notifications have been ${status}`,
+        'success',
+        3000
+      );
+    }
   };
 
   return (

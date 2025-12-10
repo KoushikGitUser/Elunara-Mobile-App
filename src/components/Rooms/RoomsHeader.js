@@ -4,8 +4,9 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Keyboard,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { createStyles } from "../../screens/Rooms/Rooms.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,9 +25,24 @@ const RoomsHeader = ({ translateX }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const [addOptionsPopup,setAddOptionsPopup] = useState(false);
   const [roomOptionsPopup,setRoomOptionsPopup] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
-    <View style={styles.roomsHeader}>
+    <View style={[styles.roomsHeader, isKeyboardVisible && { borderBottomWidth: 1, borderBottomColor: '#D3DAE5' }]}>
       {addOptionsPopup && <PlusButtonPopup setAddOptionsPopup={setAddOptionsPopup} />}
       {roomOptionsPopup && <RoomsOptionsPopup setRoomOptionsPopup={setRoomOptionsPopup} />}
       <TouchableOpacity

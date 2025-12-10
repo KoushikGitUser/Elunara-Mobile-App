@@ -117,6 +117,12 @@ const toggleSlice = createSlice({
     setToggleAddExistingChatToRoomPopup: (state, action) => {
       state.toggleStates.toggleAddExistingChatToRoomPopup = action.payload;
     },
+    setToggleAddChatToLearningLabPopup: (state, action) => {
+      state.toggleStates.toggleAddChatToLearningLabPopup = action.payload;
+    },
+    setToggleAddLinkPopup: (state, action) => {
+      state.toggleStates.toggleAddLinkPopup = action.payload;
+    },
   },
 });
 
@@ -157,7 +163,9 @@ export const {
   setToggleChangeResponseStyleWhileChatPopup,
   setToggleCompareStyleState,
   setToggleNotHelpfulFeedbackPopup,
-  setToggleAddExistingChatToRoomPopup
+  setToggleAddExistingChatToRoomPopup,
+  setToggleAddChatToLearningLabPopup,
+  setToggleAddLinkPopup,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

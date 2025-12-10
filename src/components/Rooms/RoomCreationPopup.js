@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToggleRoomCreationPopup } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import { scaleFont } from "../../utils/responsive";
+import { triggerToast } from "../../services/toast";
 
 const RoomCreationPopup = () => {
   const [roomName, setRoomName] = useState("");
@@ -150,7 +151,11 @@ const RoomCreationPopup = () => {
                   ]}
                   onPress={() => {
                     dispatch(setToggleRoomCreationPopup(false));
-                    navigation.navigate("rooms",{roomName})
+                    navigation.navigate("rooms",{roomName});
+                    setTimeout(() => {
+                      triggerToast("Room Added","Room <room name> has been added successfully","success",3000)
+                    }, 500);
+                    
                   }}
                   activeOpacity={0.8}
                   disabled={!roomName}

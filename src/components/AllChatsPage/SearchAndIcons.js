@@ -1,11 +1,13 @@
-import { View, Text, Dimensions, TextInput } from "react-native";
-import React, { useEffect, useMemo, useRef } from "react";
-import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style"; 
+import { View, Text, Dimensions, TextInput, TouchableOpacity } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { MessageCirclePlus, Search } from "lucide-react-native";
 import ArrowUpDownIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/ArrowUpDownIcon";
 import FilterIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FilterIcon";
+import RoomsSortingPopup from "../Modals/Rooms/RoomsSortingPopup";
+import RoomsFilterPopup from "../Modals/Rooms/RoomsFilterPopup";
 
 const SearchAndIcons = ({ isSearching, setIsSearching }) => {
   const styleProps = {};
@@ -15,15 +17,19 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
   const inputRef = useRef();
-  
-  useEffect(()=>{
-    if(!isSearching){
-        inputRef.current.blur();
+  const [toggleSortingPopup, setToggleSortingPopup] = useState(false);
+  const [toggleFilterPopup, setToggleFilterPopup] = useState(false);
+
+  useEffect(() => {
+    if (!isSearching) {
+      inputRef.current.blur();
     }
-  },[isSearching])
+  }, [isSearching]);
 
   return (
     <View style={styles.searchAndIcons}>
+       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} />}
+      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
       <View
         style={[
           styles.searchInputMain,
@@ -41,14 +47,20 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
           onFocus={() => setIsSearching(true)}
           placeholder="Search"
           placeholderTextColor="#B5BECE"
-          style={[styles.searchInput,{outlineWidth:isSearching?1:0}]}
+          style={[styles.searchInput, { outlineWidth: isSearching ? 1 : 0 }]}
         />
       </View>
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
+        <TouchableOpacity onPress={()=>setToggleSortingPopup(true)}>
         <ArrowUpDownIcon />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={()=>setToggleFilterPopup(true)}>
         <FilterIcon />
+        </TouchableOpacity>
+
         <MessageCirclePlus strokeWidth={1.25} />
       </View>
     </View>

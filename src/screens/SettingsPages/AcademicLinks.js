@@ -4,28 +4,46 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import SwayamIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/SwayamIcon";
 import {
   ArrowUpRightIcon,
-  Link2,
   MoreVertical,
   Paperclip,
   Plus,
+  Trash2,
 } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import { academicLinks } from "../../data/datas";
 import LinkIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/LinkIcon";
-import AddLinkPopup from "../../components/ProfileAndSettings/AcademicLinksCompo/AddLinkPopup";
+import { triggerToast } from "../../services/toast";
+import AddLinkPopup from "../../components/common/AddLinkPopup";
+import { useSelector } from "react-redux";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const AcademicLinks = () => {
-  const [toggleAddLinkPopup,setToggleAddLinkPopup] = useState(false);
+  const [toggleAddLinkPopup, setToggleAddLinkPopup] = useState(false);
+  const [activePopupIndex, setActivePopupIndex] = useState(null);
+  const { toggleStates } = useSelector((state) => state.Toggle);
+
+
+  const handleMorePress = (index) => {
+    setActivePopupIndex(activePopupIndex === index ? null : index);
+  };
+
+  const handleDelete = (index) => {
+    // Handle delete logic here
+    console.log("Delete link at index:", index);
+    setActivePopupIndex(null);
+  };
+
   return (
     <View style={styles.container}>
-      <AddLinkPopup setToggleAddLinkPopup={setToggleAddLinkPopup} toggleAddLinkPopup={toggleAddLinkPopup} />
+      {toggleStates.toggleAddLinkPopup && <AddLinkPopup/>}
+
       <View style={styles.card}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -64,7 +82,10 @@ const AcademicLinks = () => {
           </View>
 
           {/* Plus Button - Centered to left content */}
-          <TouchableOpacity onPress={()=> setToggleAddLinkPopup(true)} style={styles.addButton}>
+          <TouchableOpacity
+            onPress={() => setToggleAddLinkPopup(true)}
+            style={styles.addButton}
+          >
             <Plus size={28} color="#1F2937" strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
@@ -74,10 +95,10 @@ const AcademicLinks = () => {
 
       {academicLinks.map((links, linkIndex) => {
         return (
-          <TouchableOpacity  key={linkIndex} style={styles.linksMain}>
+          <View key={linkIndex} style={styles.linksMain}>
             {/* Link Icon */}
             <View style={styles.iconContainer}>
-             <LinkIcon/>
+              <LinkIcon />
             </View>
 
             {/* Link Details */}
@@ -87,10 +108,52 @@ const AcademicLinks = () => {
             </View>
 
             {/* More Options Button */}
-            <TouchableOpacity style={styles.moreButton}>
-              <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
-            </TouchableOpacity>
-          </TouchableOpacity>
+            <View style={styles.moreButtonContainer}>
+              <TouchableOpacity
+                style={styles.moreButton}
+                onPress={() => handleMorePress(linkIndex)}
+              >
+                <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
+              </TouchableOpacity>
+
+              {/* Delete Popup */}
+              {activePopupIndex === linkIndex && (
+                <>
+                  <TouchableOpacity
+                    style={styles.popupOverlay}
+                    onPress={() => {
+                      setActivePopupIndex(null);
+                      triggerToast(
+                        "Link deleted",
+                        "Link has been deleted successfully",
+                        "success",
+                        3000
+                      );
+                    }}
+                  ></TouchableOpacity>
+                  <Pressable style={styles.popup}>
+                    <View style={styles.deletePopup}>
+                      <TouchableOpacity
+                        style={styles.deleteOption}
+                        onPress={() => {
+                          setActivePopupIndex(null);
+                          triggerToast(
+                            "Link deleted",
+                            "Link has been deleted successfully",
+                            "success",
+                            3000
+                          );
+                        }}
+                      >
+                        <Trash2 size={18} color="#3A3A3A" strokeWidth={2} />
+                        <Text style={styles.deleteText}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </View>
         );
       })}
     </View>
@@ -173,8 +236,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth:1,
-    borderColor:"#CDD5DC"
+    borderWidth: 1,
+    borderColor: "#CDD5DC",
   },
   linkDetails: {
     flex: 1,
@@ -186,20 +249,63 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     lineHeight: 24,
   },
+  moreButtonContainer: {
+    position: "relative",
+  },
   moreButton: {
     padding: 4,
+  },
+  popupOverlay: {
+    position: "absolute",
+    bottom: -500,
+    right: -25,
+    zIndex: 100,
+    width,
+    height,
+    backgroundColor: "transparent",
+  },
+  popup: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 100,
+  },
+  deletePopup: {
+    position: "absolute",
+    top: 35,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingRight: 50,
+    minWidth: 100,
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+  },
+  deleteOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  deleteText: {
+    fontSize: scaleFont(14),
+    fontWeight: "500",
+    color: "#3A3A3A",
   },
   linksMain: {
     backgroundColor: "#EBF1FB",
     borderRadius: 16,
     paddingVertical: 10,
-    paddingHorizontal:11,
+    paddingHorizontal: 11,
     flexDirection: "row",
     alignItems: "center",
     width: width - 32,
     gap: 14,
-    alignSelf:"center",
-    marginTop:20
+    alignSelf: "center",
+    marginTop: 20,
   },
 });
 

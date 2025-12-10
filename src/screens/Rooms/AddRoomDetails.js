@@ -24,6 +24,8 @@ import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
 import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
 import pdfLogo from "../../assets/images/pdf.png";
+import AddLinkPopup from "../../components/common/AddLinkPopup";
+import { triggerToast } from "../../services/toast";
 const { width } = Dimensions.get("window");
 
 const AddRoomDetails = () => {
@@ -41,6 +43,7 @@ const AddRoomDetails = () => {
     <SafeAreaView
       style={{ flex: 1, width: "100%", backgroundColor: "#FAFAFA" }}
     >
+      {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
       {/* {sourcesPopup && <TouchableOpacity style={styles.sourcesPopupWrapper} ></TouchableOpacity>} */}
       {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
       <AddRoomDetailsHeader scrollY={scrollY} />
@@ -148,6 +151,10 @@ const AddRoomDetails = () => {
             onPress={() => {
               navigation.navigate("rooms", { roomName: "Room name" });
               dispatch(setToggleAddedRoomDetails(true));
+              setTimeout(() => {
+                 triggerToast("Details saved","Your room details has been saved","success",3000)
+              }, 300);
+             
             }}
             activeOpacity={0.8}
           >
@@ -346,7 +353,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 20,
   },
-    pdfLogoContainer: {
+  pdfLogoContainer: {
     height: "100%",
     width: 60,
     backgroundColor: "white",

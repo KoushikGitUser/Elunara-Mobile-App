@@ -36,6 +36,7 @@ import ChangeLLMPopup from "../../components/ChatScreen/Messages/ChatQuickAction
 import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeLang/ChangeLangPopup";
 import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
+import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -68,9 +69,17 @@ const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, width: "100%" }}>
+    <SafeAreaView style={{ flex: 1, width: "100%", marginTop: -StatusBar.currentHeight }}>
       <ChatHistorySidebar translateX={translateX} />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
+        <View
+          style={{
+            height: StatusBar.currentHeight,
+            width: "100%",
+            backgroundColor: "#FAFAFA",
+            zIndex: 9999,
+          }}
+        ></View>
         <ChatHeader triggerToast={triggerToast} translateX={translateX} />
         <View style={styles.chatMainWrapper}>
           {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
@@ -78,11 +87,19 @@ const ChatScreen = () => {
           {toggleStates.toggleTopicsPopup && <TopicsCompo />}
           {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup />}
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup />}
-          {toggleStates.toggleChangeResponseLLMWhileChatPopup && <ChangeLLMPopup />}
+          {toggleStates.toggleChangeResponseLLMWhileChatPopup && (
+            <ChangeLLMPopup />
+          )}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
-          {toggleStates.toggleChangeResponseStyleWhileChatPopup && <ChangeResponseStylePopup />}
-          {toggleStates.toggleNotHelpfulFeedbackPopup && <NotHelpfulFeedbackPopup />}
-
+          {toggleStates.toggleChangeResponseStyleWhileChatPopup && (
+            <ChangeResponseStylePopup />
+          )}
+          {toggleStates.toggleNotHelpfulFeedbackPopup && (
+            <NotHelpfulFeedbackPopup />
+          )}
+          {toggleStates.toggleAddChatToLearningLabPopup && (
+            <AddChatToLearningLabPopup />
+          )}
           {toggleStates.toggleUserMessageActionPopup && (
             <UserMessageActionPopup />
           )}
@@ -111,14 +128,16 @@ const ChatScreen = () => {
               right={20}
             />
           )}
-         
+
           <ToasterWithAction />
           {/* middle section */}
           <ChatMiddleWrapper />
           {/* middle section */}
 
           {/* chatInput section */}
+          <View style={{ width: "100%",marginBottom:30}}>
           <ChatInputMain />
+          </View>
           {/* chatInput section */}
         </View>
       </Animated.View>

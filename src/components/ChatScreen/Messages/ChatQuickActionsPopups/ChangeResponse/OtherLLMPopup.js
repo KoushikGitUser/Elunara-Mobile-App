@@ -27,8 +27,8 @@ const OtherLLMPopup = ({isFirst,setIsExpandedFirst,setIsExpandedSecond,}) => {
       <View style={styles.notesPopup}>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+           setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {
@@ -51,8 +51,8 @@ const OtherLLMPopup = ({isFirst,setIsExpandedFirst,setIsExpandedSecond,}) => {
         </Pressable>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+           setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {
@@ -78,8 +78,8 @@ const OtherLLMPopup = ({isFirst,setIsExpandedFirst,setIsExpandedSecond,}) => {
         </Pressable>
         <Pressable
           onPress={() => {
-            setAddOptionsPopup(false);
-            dispatch(setToggleIsRoomEmpty(false));
+           setIsExpandedFirst(false);
+            setIsExpandedSecond(false)
           }}
           style={({ pressed }) => [
             {

@@ -42,7 +42,7 @@ const FeedbackPopup = ({ close }) => {
             setSelectedStyle(0);
             setTimeout(() => {
               close(false)
-            }, 200);
+            }, 300);
           }}
           style={({ pressed }) => [
             {
@@ -61,8 +61,9 @@ const FeedbackPopup = ({ close }) => {
           onPress={() => {
             setSelectedStyle(1);
             setTimeout(() => {
+              close(false);
               dispatch(setToggleNotHelpfulFeedbackPopup(true))
-            }, 200);
+            }, 300);
           }}
           style={({ pressed }) => [
             {

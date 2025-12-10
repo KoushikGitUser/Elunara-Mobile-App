@@ -39,7 +39,7 @@ const OptionsPopup = () => {
   return (
     <>
       <TouchableOpacity
-        onPress={() => setSharePopup(false)}
+        onPress={() => dispatch(setToggleAllChatsOptionsPopup(false))}
         style={styles.optionsPopupWrapper}
       ></TouchableOpacity>
       <View style={styles.notesPopup}>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     height,
     zIndex: 9998,
     elevation: 9998,
-    backgroundColor: "red",
+    backgroundColor: "transparent",
   },
 });
 

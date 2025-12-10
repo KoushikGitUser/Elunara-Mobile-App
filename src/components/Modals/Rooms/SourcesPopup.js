@@ -1,12 +1,40 @@
-import { View, Text, TouchableOpacity, Pressable, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, StyleSheet, Dimensions, Alert } from 'react-native'
 import React from 'react'
 import { Feather } from '@expo/vector-icons';
 import { scaleFont } from '../../../utils/responsive';
 import { File } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import { useDispatch } from 'react-redux';
+import { setToggleAddLinkPopup } from '../../../redux/slices/toggleSlice';
 
 const { width,height} = Dimensions.get("window");
 
 const SourcesPopup = ({setSourcesPopup}) => {
+
+  const dispatch = useDispatch();
+  const handleAddFile = async () => {
+    // Request media library permissions
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'Please grant access to your photos and files to add attachments.'
+      );
+      return;
+    }
+
+    // Open document picker
+    await DocumentPicker.getDocumentAsync({
+      type: '*/*',
+      copyToCacheDirectory: true,
+    });
+
+    // Just close the popup regardless of selection
+    setSourcesPopup(false);
+  };
+
   return (
     <>
       <TouchableOpacity
@@ -15,9 +43,7 @@ const SourcesPopup = ({setSourcesPopup}) => {
       ></TouchableOpacity>
       <View style={styles.notesPopup}>
         <Pressable
-          onPress={() => {
-            setSourcesPopup(false);
-          }}
+          onPress={handleAddFile}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",
@@ -29,7 +55,9 @@ const SourcesPopup = ({setSourcesPopup}) => {
           <Text>Add File</Text>
         </Pressable>
         <Pressable
-        onPress={()=>setSourcesPopup(false)}
+        onPress={()=>{setSourcesPopup(false);
+          dispatch(setToggleAddLinkPopup(true))
+        }}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",

@@ -135,7 +135,7 @@ const ToasterWithAction = () => {
         <CircleX style={{ marginTop: 5 }} color="#D00B0B" strokeWidth={1.25} />
       )}
 
-      <Animated.View>
+      <Animated.View style={{flex:1}}>
         <Text style={[styles.textTitle,{fontFamily:'Mukta-Bold'}]}>{toast.title}</Text>
         <Text style={[styles.textDesc,{fontFamily:'Mukta-Regular'}]}>{toast.description}</Text>
       </Animated.View>
