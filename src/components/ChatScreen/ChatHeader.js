@@ -24,13 +24,14 @@ import {
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
-import { setChatMessagesArray } from "../../redux/slices/globalDataSlice";
+import { setChatMessagesArray, setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
 import SparkleIcon from "../../../assets/SvgIconsComponent/SparkleIcon";
 import { triggerToast, triggerToastWithAction } from "../../services/toast";
 import { useFonts } from "expo-font";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ChatHeader = ({ translateX }) => {
   const styleProps = {};
@@ -60,6 +61,7 @@ const ChatHeader = ({ translateX }) => {
     >
       <View style={styles.rightChatHeaderIcons}>
         <TouchableOpacity
+        style={toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2?styles.menuIconGuide:styles.menuIcon}
           onPress={() => {
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
@@ -135,10 +137,12 @@ const ChatHeader = ({ translateX }) => {
 
       <View style={styles.rightChatHeaderIcons}>
         <TouchableOpacity
-          onPress={() => {
+          onPress={async() => {
             dispatch(setChatMessagesArray([]));
             dispatch(setToggleIsChattingWithAI(false));
-            dispatch(setToggleChatScreenGuideStart(true));
+            // dispatch(setToggleChatScreenGuideStart(true));
+            // dispatch(setGuidedTourStepsCount(1))
+            //  await AsyncStorage.setItem("isNewUser", "true");
           }}
         >
           <MessageCirclePlus size={30} strokeWidth={1.25} />

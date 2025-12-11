@@ -25,7 +25,7 @@ const AIMessageBox = ({ message }) => {
   const [changeResponsePopup,setChangeResponsePopup] = useState(false);
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
-  const [savedToNotes,setSavedToNotes] = useState(false);
+  const [savedToNotes,setSavedToNotes] = useState(false); 
   const handleCopy = () => {
     Clipboard.setString(message);
     triggerToast("Message copied!","","normal",3000)

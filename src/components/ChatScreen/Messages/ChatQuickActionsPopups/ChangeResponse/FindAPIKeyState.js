@@ -68,7 +68,7 @@ const FindAPIKeyState = ({setCurrentStateOfPopup}) => {
                 backgroundColor: "#081A35",
               },
             ]}
-            onPress={() => close(false)}
+            onPress={() => setCurrentStateOfPopup(4)}
             activeOpacity={0.8}
           >
             <Text style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}>

@@ -123,6 +123,9 @@ const toggleSlice = createSlice({
     setToggleAddLinkPopup: (state, action) => {
       state.toggleStates.toggleAddLinkPopup = action.payload;
     },
+    setToggleUpdateProfilePicPopup: (state, action) => {
+      state.toggleStates.toggleUpdateProfilePicPopup = action.payload;
+    },
   },
 });
 
@@ -166,6 +169,7 @@ export const {
   setToggleAddExistingChatToRoomPopup,
   setToggleAddChatToLearningLabPopup,
   setToggleAddLinkPopup,
+  setToggleUpdateProfilePicPopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

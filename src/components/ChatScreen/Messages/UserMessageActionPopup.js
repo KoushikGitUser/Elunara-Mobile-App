@@ -18,7 +18,11 @@ import {
   setToggleUserMessageActionPopup,
 } from "../../../redux/slices/toggleSlice";
 import copy from "../../../assets/images/copy.png";
+import Clipboard from "@react-native-clipboard/clipboard";
 import pencil from "../../../assets/images/PencilSimple.png";
+import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
+import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
+import { triggerToast } from "../../../services/toast";
 
 const UserMessageActionPopup = () => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -31,6 +35,16 @@ const UserMessageActionPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const dispatch = useDispatch();
+
+  const handleCopy = () => {
+    Clipboard.setString(globalDataStates.userMessageOnLongPress);
+    triggerToast("Message copied!", "", "normal", 3000);
+  };
+
+  const truncateTitle = (title, limit = 30) => {
+    if (title.length <= limit) return title;
+    return title.slice(0, limit) + "....";
+  };
 
   return (
     <Modal
@@ -58,7 +72,10 @@ const UserMessageActionPopup = () => {
             },
           ]}
         >
-          <Text style={styles.messageText}>{globalDataStates.userMessageOnLongPress} </Text>
+          <Text style={styles.messageText}>
+            {truncateTitle(globalDataStates.userMessageOnLongPress)}
+            
+          </Text>
         </View>
 
         {/* Action Menu Popup */}
@@ -74,22 +91,25 @@ const UserMessageActionPopup = () => {
         >
           {/* Content */}
           <View style={styles.content}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              onPress={() => {
+                handleCopy();
+                dispatch(setToggleUserMessageActionPopup(false));
+              }}
+              style={styles.actionButton}
+            >
               <View style={styles.actionIcon}>
-                <Image
-                  style={{ height: 20, width: 20, objectFit: "contain" }}
-                  source={copy}
-                />
+                <CopyIcon />
               </View>
               <Text style={styles.actionText}>Copy</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              onPress={() => dispatch(setToggleUserMessageActionPopup(false))}
+              style={styles.actionButton}
+            >
               <View style={styles.actionIcon}>
-                <Image
-                  style={{ height: 20, width: 20, objectFit: "contain" }}
-                  source={pencil}
-                />
+                <RenameIcon />
               </View>
               <Text style={styles.actionText}>Edit</Text>
             </TouchableOpacity>

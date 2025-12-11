@@ -19,7 +19,15 @@ import pencil from "../../../assets/images/PencilSimple.png";
 import deleteBin from "../../../assets/images/Trash.png";
 import pin from "../../../assets/images/PushPin.png";
 import chat from "../../../assets/images/ChatTeardrop.png";
-import { setToggleChatActionsPopupOnLongPress } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleAddChatToLearningLabPopup,
+  setToggleChatActionsPopupOnLongPress,
+  setToggleDeleteChatConfirmPopup,
+  setToggleRenameChatPopup,
+} from "../../../redux/slices/toggleSlice";
+import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
+import { triggerToast } from "../../../services/toast";
+import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
 
 const ChatLongPressPopup = () => {
   const actions = [
@@ -32,7 +40,42 @@ const ChatLongPressPopup = () => {
 
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  
+
+  const truncateTitle = (title, limit = 20) => {
+    if (title.length <= limit) return title;
+    return title.slice(0, limit) + "...";
+  };
+
+  const commonFunction = (title) => {
+    if (title == 0) {
+      dispatch(setToggleAddChatToLearningLabPopup(true));
+    } else if (title == 1) {
+      dispatch(setToggleRenameChatPopup(true));
+    } else if (title == 2) {
+      setTimeout(() => {
+        triggerToast(
+          "Chat Pinned",
+          "Your chat has been successfully pinned",
+          "success",
+          3000
+        );
+      }, 300);
+    } else if (title == 3) {
+      setTimeout(() => {
+        triggerToast(
+          "Chat Archived",
+          "Your chat has been successfully archived",
+          "success",
+          3000
+        );
+      }, 300);
+    }
+    else if(title == 4){
+      dispatch(setToggleDeleteChatConfirmPopup(true));
+      dispatch(setDeleteConfirmPopupFrom("chat"))
+    }
+  };
+
   const dispatch = useDispatch();
   return (
     <Modal
@@ -62,11 +105,11 @@ const ChatLongPressPopup = () => {
             },
           ]}
         >
-          <Image
-            style={{ height: 20, width: 20, resizeMode: "contain" }}
-            source={chat}
-          />
-          <Text style={styles.messageText}> {globalDataStates.chatTitleOnLongPress} </Text>
+          <ChatIcon />
+          <Text style={styles.messageText}>
+            {" "}
+            {truncateTitle(globalDataStates.chatTitleOnLongPress)}{" "}
+          </Text>
           <View
             style={[
               styles.modalSheet,
@@ -74,6 +117,7 @@ const ChatLongPressPopup = () => {
                 position: "absolute",
                 right: 0,
                 backgroundColor: "white",
+                top: 60,
               },
             ]}
           >
@@ -86,7 +130,10 @@ const ChatLongPressPopup = () => {
                     styles.actionButton,
                     pressed && styles.actionButtonPressed, // applies background when pressed
                   ]}
-                  onPress={() => console.log(item.title)}
+                  onPress={() => {
+                    dispatch(setToggleChatActionsPopupOnLongPress(false));
+                    commonFunction(index)
+                  }}
                 >
                   <View style={styles.actionIcon}>
                     <Image

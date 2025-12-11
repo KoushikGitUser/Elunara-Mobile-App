@@ -19,8 +19,10 @@ import { triggerToast } from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
 
-const DeleteConfirmPopup = ({from}) => {
+const DeleteConfirmPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+
   const dispatch = useDispatch();
 
   return (
@@ -63,7 +65,7 @@ const DeleteConfirmPopup = ({from}) => {
 
             {/* Title */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-              {from == "chat"?"Delete Chat?":from == "allChats"?"Delete <10> chats?":from == "rooms"?"Delete room?":"Delete <10> rooms?"}
+              {globalDataStates.deleteConfirmPopupFrom == "chat" ?"Delete Chat?":globalDataStates.deleteConfirmPopupFrom == "allChats"?"Delete <10> chats?":globalDataStates.deleteConfirmPopupFrom == "rooms"?"Delete room?":"Delete <10> rooms?"}
               
             </Text>
 

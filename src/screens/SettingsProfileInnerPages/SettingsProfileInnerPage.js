@@ -18,6 +18,7 @@ import PrivacyPolicy from "../SettingsPages/PrivacyPolicy";
 import ContactPage from "../SettingsPages/ContactPage";
 import HelpCenterSearch from "../SettingsPages/HelpCenterSearch";
 import MakePaymentPage from "../SettingsPages/MakePaymentPage";
+import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
 
 const SettingsProfileInnerPage = ({ route, navigation }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);

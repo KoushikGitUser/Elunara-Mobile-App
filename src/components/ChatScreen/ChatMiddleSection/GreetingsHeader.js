@@ -30,7 +30,7 @@ const GreetingsHeader = () => {
           children="Good Morning,"
           fullWidth={false}
           widthNumber={0.52}
-          fontSize={29}
+          fontSize={24}
         />
         <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>Koushik!</Text>
       </View>
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
+
   },
   greetingPlusname: {
     flexDirection: "row",
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
       position: "absolute",
       right: -25,
       zIndex: 1,
-      marginTop: 10,
+      top:-50
   },
 });
 

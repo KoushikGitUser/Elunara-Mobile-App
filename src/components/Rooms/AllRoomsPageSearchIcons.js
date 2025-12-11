@@ -45,7 +45,7 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
         />
         <TextInput
           ref={inputRef}
-          onFocus={() => setIsSearching(true)}
+         
           placeholder="Search"
           placeholderTextColor="#B5BECE"
           style={[styles.searchInput, { outlineWidth: isSearching ? 1 : 0 }]}

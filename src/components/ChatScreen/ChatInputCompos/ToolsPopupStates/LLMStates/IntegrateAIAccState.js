@@ -170,7 +170,7 @@ const IntegrateAIAccState = () => {
                       : "#CDD5DC",
                 },
               ]}
-              onPress={() => setIsLLMSaved(true)}
+              onPress={() => dispatch(setToggleToolsPopupStates(0))}
               activeOpacity={0.8}
             >
               <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular"}]}>Connect API Key</Text>

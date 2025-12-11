@@ -61,7 +61,7 @@ const ResponseStyleState = () => {
           showsVerticalScrollIndicator={false}
           style={styles.optionsContainer}
         >
-          <View style={{ flexDirection: "column", gap: 25 }}>
+          <View style={{ flexDirection: "column",}}>
             {responseStyles.map((styleOptions, optionsIndex) => {
               return (
                 <React.Fragment key={optionsIndex}>
@@ -115,7 +115,7 @@ const ResponseStyleState = () => {
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
                   {styleOptions.id == 0 && (
-                    <View style={{ width: "100%" }}>
+                    <View style={{ width: "100%",marginBottom:20, }}>
                       <Text
                         style={{
                           textAlign: "center",

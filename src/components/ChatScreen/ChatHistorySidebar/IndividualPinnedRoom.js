@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, Image, Animated, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Dimensions,
+} from "react-native";
 import React, { useMemo, useState } from "react";
 import { Folder } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -36,7 +43,17 @@ const IndividualPinnedRoom = ({ title, translateX }) => {
           useNativeDriver: true,
         }).start();
       }}
-      onLongPress={() => setIsLongPressed(!isLongPressed)}
+      onLongPress={() => {
+        setIsLongPressed(!isLongPressed);
+        dispatch(setToggleChatHistorySidebar(false));
+        Animated.timing(translateX, {
+          toValue: toggleStates.toggleChatHistorySidebar
+            ? 0
+            : SCREEN_WIDTH * 0.75,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }}
       style={styles.individualPinnedRooms}
     >
       <FolderIcon />

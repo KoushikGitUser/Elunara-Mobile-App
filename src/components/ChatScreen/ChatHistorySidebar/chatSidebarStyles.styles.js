@@ -67,7 +67,7 @@ export const createStyles = ({}) =>
     searchInput: {
       width: "90%",
       paddingLeft: 15,
-      marginLeft:"auto"
+      marginLeft: "auto",
     },
     newButtonsMain: {
       width: "100%",
@@ -278,10 +278,38 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: scale(17),
     },
+    toolsIconButton: {
+      marginLeft: 10,
+    },
+    toolsIconButtonGuide: {
+      marginLeft: 10,
+      borderWidth: 1,
+      padding: 6,
+      borderColor: "#BFD6FE",
+      borderRadius: 10,
+      elevation: 10,
+      backgroundColor: "white",
+      shadowColor: "#426eb9ff",
+    },
     parentContainer: {
       position: "relative", // important: makes children absolute to this view
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 7,
+    },
+    gettingResponseIndicator: {
+      width: 35,
+      height: 35,
+      backgroundColor: "#081A35",
+      borderRadius: 8,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    innerDotGettingresponse: {
+      height: 10,
+      width: 10,
+      backgroundColor: "white",
+      borderRadius: 1,
     },
   });

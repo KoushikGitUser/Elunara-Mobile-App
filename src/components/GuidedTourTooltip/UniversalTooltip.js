@@ -11,6 +11,8 @@ import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { scaleFont } from "../../utils/responsive";
 import { setToggleChatScreenGuideStart } from "../../redux/slices/toggleSlice";
+import { setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
@@ -21,6 +23,8 @@ const UniversalTooltip = ({
   isCrossPresent,
   pointerPosition,
   pointerAlignment,
+  pointerRight,
+  pointerLeft,
   buttonBgColor,
   isButtonBorder,
   isTextButton,
@@ -31,10 +35,12 @@ const UniversalTooltip = ({
   bottom,
   left,
   right,
+
 }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const dispatch = useDispatch();
-
+ 
   return (
     <Modal
       visible={toggleStates.toggleChatScreenGuideStart}
@@ -47,7 +53,12 @@ const UniversalTooltip = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
+          onPress={async () => {dispatch(setGuidedTourStepsCount(globalDataStates.guidedTourStepsCount + 1));
+            if(globalDataStates.guidedTourStepsCount == 2){
+              dispatch(setToggleChatScreenGuideStart(false));
+              await AsyncStorage.setItem("isNewUser", "false");
+            }
+          }}
         />
 
         {/* Modal Sheet */}
@@ -59,10 +70,10 @@ const UniversalTooltip = ({
               styles.pointer,
               {
                 transform: [{ rotate: "45deg" }],
-                bottom: pointerPosition == "up" ? "" : -8,
-                top: pointerPosition == "up" ? -8 : "",
-                left:pointerAlignment == "left"?63:"",
-                right:pointerAlignment == "right"?50:""
+                bottom: pointerPosition == "up" ? "" : -5,
+                top: pointerPosition == "up" ? -5 : "",
+                left:pointerAlignment == "left"?pointerLeft:"", 
+                right:pointerAlignment == "right"?pointerRight:""
               },
             ]}
           />

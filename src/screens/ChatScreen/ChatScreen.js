@@ -16,7 +16,10 @@ import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import ChatHeader from "../../components/ChatScreen/ChatHeader";
 import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/ChatMiddleWrapper";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setToggleChatScreenGuideStart } from "../../redux/slices/toggleSlice";
+import { setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import TopicsCompo from "../../components/ChatScreen/ChatInputCompos/TopicsCompo";
@@ -42,7 +45,9 @@ const ChatScreen = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [showToast, setShowToast] = useState(false);
@@ -57,6 +62,17 @@ const ChatScreen = () => {
     }
   }, [fontsLoaded]);
 
+  useEffect(() => {
+    const checkNewUser = async () => {
+      const isNewUser = await AsyncStorage.getItem("isNewUser");
+      if (isNewUser === null) {
+        dispatch(setToggleChatScreenGuideStart(true));
+        dispatch(setGuidedTourStepsCount(1));
+      }
+    };
+    checkNewUser();
+  }, []);
+
   // Show nothing (or a loader) while fonts are loading
   if (!fontsLoaded) {
     return null;
@@ -69,7 +85,9 @@ const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, width: "100%", marginTop: -StatusBar.currentHeight }}>
+    <SafeAreaView
+      style={{ flex: 1, width: "100%", marginTop: -StatusBar.currentHeight }}
+    >
       <ChatHistorySidebar translateX={translateX} />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <View
@@ -115,7 +133,7 @@ const ChatScreen = () => {
           {toggleStates.toggleElunaraProWelcomePopup && (
             <ElunaraProWelcomePopup />
           )}
-          {toggleStates.toggleChatScreenGuideStart && (
+          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 1 && (
             <UniversalTooltip
               title="Customise Your AI"
               description="Customize how Elunara responds, choose the AI model, response style, language, and citation format, all tailored to your needs."
@@ -126,17 +144,31 @@ const ChatScreen = () => {
               modalAlignment="right"
               bottom={140}
               right={20}
+              pointerLeft={60} 
             />
           )}
-
+          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2 && (
+            <UniversalTooltip
+              title="Organise your work quickly."
+              description="Start a new learning lab easily from the sidebar to keep everything focused."
+              isBelowButtonPresent={false}
+              pointerPosition="up"
+              pointerAlignment="left"
+              modalPosition="up"
+              modalAlignment="left"
+              top ={105}
+              left={10}
+              pointerLeft={20}
+            />
+          )}
           <ToasterWithAction />
           {/* middle section */}
           <ChatMiddleWrapper />
           {/* middle section */}
 
           {/* chatInput section */}
-          <View style={{ width: "100%",marginBottom:30}}>
-          <ChatInputMain />
+          <View style={{ width: "100%", marginBottom: 30 }}>
+            <ChatInputMain />
           </View>
           {/* chatInput section */}
         </View>

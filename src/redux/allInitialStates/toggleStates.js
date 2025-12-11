@@ -38,4 +38,5 @@ export const toggleStates = {
       toggleAddExistingChatToRoomPopup:false,
       toggleAddChatToLearningLabPopup:false,
       toggleAddLinkPopup:false,
+      toggleUpdateProfilePicPopup:false,
 }

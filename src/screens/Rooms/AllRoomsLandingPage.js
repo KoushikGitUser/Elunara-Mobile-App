@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { scaleFont, verticalScale } from "../../utils/responsive";
 import { allChatsData } from "../../data/datas";
 import ChatsScrollForAllRoomsPage from "../../components/Rooms/ChatsScrollForAllRoomsPage";
-import { Trash2 } from "lucide-react-native";
+import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
@@ -74,10 +74,7 @@ const AllRoomsLandingPage = () => {
                 style={[styles.checkbox, checked && styles.checkboxChecked]}
               >
                 {checked && (
-                  <View style={styles.checkmark}>
-                    <View style={styles.checkmarkStem} />
-                    <View style={styles.checkmarkKick} />
-                  </View>
+                  <Check strokeWidth={2} size={17} color="white" />
                 )}
               </View>
               <Text style={styles.selectAllText}>Select All</Text>

@@ -53,13 +53,13 @@ export const createStyles = ({}) =>
       position: "absolute",
       bottom: 0,
       width: "100%",
-      paddingVertical: 15,
+      paddingVertical: 7,
       paddingHorizontal: 20,
-      paddingBottom: 65,
+      marginBottom: 50,
       backgroundColor: "#E2E2E2",
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "flex-end",
+      alignItems: "center",
       zIndex: 1,
     },
     searchInputMain: {
@@ -76,7 +76,7 @@ export const createStyles = ({}) =>
     },
     searchInput: {
       width:"100%",
-      height: verticalScale(40),
+      height: verticalScale(37),
       borderWidth: 1,
       borderRadius: 16,
       borderColor: "#ABB8CC",
@@ -98,7 +98,7 @@ export const createStyles = ({}) =>
     crossIcon: {
       backgroundColor: "white",
       borderRadius: 50,
-      padding: 3,
+      padding: 4,
       borderWidth: 1,
     },
     menuDots: {

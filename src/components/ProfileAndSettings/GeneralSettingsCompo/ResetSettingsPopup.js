@@ -12,6 +12,7 @@ import { scaleFont } from "../../../utils/responsive";
 import { setToggleResetSettingsPopup } from "../../../redux/slices/toggleSlice";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
+import { triggerToast } from "../../../services/toast";
 
 const ResetSettingsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -78,7 +79,12 @@ const ResetSettingsPopup = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => dispatch(setToggleResetSettingsPopup(false))}
+                onPress={() => {dispatch(setToggleResetSettingsPopup(false));
+                  setTimeout(() => {
+                     triggerToast("Settings Restored","Your general settings restored successfully","success",3000);   
+                  }, 300);
+                 
+                }}
                 activeOpacity={0.8}
               >
                 <Text style={styles.buttonText}>Confirm Reset</Text>

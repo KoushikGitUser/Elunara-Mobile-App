@@ -10,7 +10,9 @@ export const globalDataStates = {
   userMessageOnLongPress:null,
   settingsInnerPageHeaderTitle:"",
   settingsInnerPageComponentToRender:"General Settings",
-  compareResponseStyleItemsArray:[]
+  compareResponseStyleItemsArray:[],
+  deleteConfirmPopupFrom:"chat",
+  guidedTourStepsCount:0,
 };
 
 export const demoChatMessages = [

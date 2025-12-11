@@ -14,10 +14,16 @@ import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcon
 import profilePic from "../../assets/images/profilepic.png";
 import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
 import { triggerToast } from "../../services/toast";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleUpdateProfilePicPopup } from "../../redux/slices/toggleSlice";
+import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
+import corporateAvatar from '../../assets/images/Corporate2.png';
+import teacherAvatar from '../../assets/images/Teacher2.png';
+import maleStudentAvatar from '../../assets/images/Student Male2.png';
+import femaleStudentAvatar from '../../assets/images/Student Female2.png';
+
 
 const EditProfile = () => {
   const [firstName, setFirstName] = React.useState("");
@@ -30,53 +36,10 @@ const EditProfile = () => {
   const emailInputRef = React.useRef(null);
   const passwordInputRef = React.useRef(null);
   const navigation = useNavigation();
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const dispatch = useDispatch();
 
-  const triggerImagePicker = async () => {
-    // Open image gallery functionality
-    try {
-      // First check current permission status
-      const permissionResult =
-        await ImagePicker.getMediaLibraryPermissionsAsync();
 
-      if (permissionResult.status !== "granted") {
-        // Request permission if not granted
-        const requestResult =
-          await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (requestResult.status !== "granted") {
-          Alert.alert(
-            "Permission Denied",
-            "Gallery permission is required to select photos. Please enable it in your device settings."
-          );
-          return;
-        }
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        if (
-          result.assets[0].mimeType == "image/png" ||
-          result.assets[0].mimeType == "image/jpg" ||
-          result.assets[0].mimeType == "image/jpeg"
-        ) {
-          // Add selected photo to Redux
-          setSelectedImage(result.assets[0].uri);
-        } else {
-          Alert.alert(
-            "Invalid type",
-            "The type of image you selected is not supported."
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert("Error", "Failed to pick image.");
-    }
-  };
 
   const commonFunctionForFocusingInput = (inputRef) => {
     if (inputRef && inputRef.current) {
@@ -94,6 +57,7 @@ const EditProfile = () => {
         backgroundColor: "#FAFAFA",
       }}
     >
+      {toggleStates.toggleUpdateProfilePicPopup && <UpdateProfilePicPopup  setSelectedImage={setSelectedImage}/>}
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120, position: "relative1" }}>
           <Image
@@ -101,7 +65,7 @@ const EditProfile = () => {
             style={{ height: "100%", width: "100%", borderRadius: 20 }}
           />
           <TouchableOpacity
-            onPress={triggerImagePicker}
+            onPress={() => dispatch(setToggleUpdateProfilePicPopup(true))}
             style={styles.editBtnImg}
           >
             <PencilIcon />
@@ -188,16 +152,25 @@ const EditProfile = () => {
         </View>
       </View>
       <TouchableOpacity
-      onPress={()=>{
-        triggerToast("Profile Updated","Your profile has been updated successfully","success",3000);
+        onPress={() => {
+          triggerToast(
+            "Profile Updated",
+            "Your profile has been updated successfully",
+            "success",
+            3000
+          );
           navigation.navigate("profile");
-
-      }}
+        }}
         style={[
           styles.button,
-          { backgroundColor: "white", borderWidth: 1, borderColor: "black",marginLeft:"auto",marginTop:20 },
+          {
+            backgroundColor: "white",
+            borderWidth: 1,
+            borderColor: "black",
+            marginLeft: "auto",
+            marginTop: 20,
+          },
         ]}
-         
       >
         <Text style={[styles.buttonText, { color: "black" }]}>Done</Text>
       </TouchableOpacity>
@@ -333,8 +306,8 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#6B7280",
   },
-    button: {
-    width:"48%",
+  button: {
+    width: "48%",
     backgroundColor: "#081A35",
     paddingVertical: 13,
     borderRadius: 50,

@@ -12,7 +12,13 @@ import {
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LibraryBig, Mic, Paperclip, Send } from "lucide-react-native";
+import {
+  LibraryBig,
+  Mic,
+  Paperclip,
+  Send,
+  TouchpadOff,
+} from "lucide-react-native";
 import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -110,10 +116,15 @@ const ChatInputMain = () => {
   useEffect(() => {
     setTimeout(() => {
       if (toggleStates.toggleIsWaitingForResponse) {
-        dispatch(setChatMessagesArray([...globalDataStates.chatMessagesArray, {
-          role: "ai",
-          message: demoResponseFromAI,
-        }]));
+        dispatch(
+          setChatMessagesArray([
+            ...globalDataStates.chatMessagesArray,
+            {
+              role: "ai",
+              message: demoResponseFromAI,
+            },
+          ])
+        );
         dispatch(setToggleIsWaitingForResponse(false));
       }
     }, 5000);
@@ -196,7 +207,10 @@ const ChatInputMain = () => {
           onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
           placeholder="Ask anything"
           placeholderTextColor="grey"
-          style={[styles.textInput, { height: inputHeight,fontFamily:"Mukta-Regular",fontSize:16 }]}
+          style={[
+            styles.textInput,
+            { height: inputHeight, fontFamily: "Mukta-Regular", fontSize: 16 },
+          ]}
           multiline
           textAlignVertical="top"
           onContentSizeChange={handleContentSizeChange}
@@ -221,33 +235,42 @@ const ChatInputMain = () => {
               <TouchableOpacity
                 onPress={() => dispatch(setToggleAddItemsToInputPopup(true))}
               >
-                <ClipIcon/>
+                <ClipIcon />
               </TouchableOpacity>
               {toggleStates.toggleAddItemsToInputPopup && (
                 <AddItemsToInputPopup />
               )}
-              {toggleStates.toggleUnlockMaxUploadLimitPopup && <UnlockMaxUploadLimitPopup/>}
+              {toggleStates.toggleUnlockMaxUploadLimitPopup && (
+                <UnlockMaxUploadLimitPopup />
+              )}
             </View>
 
             <TouchableOpacity
               onPress={() => dispatch(setToggleTopicsPopup(true))}
             >
-              <TopicsBooksIcon/>
+              <TopicsBooksIcon />
             </TouchableOpacity>
 
             <TouchableOpacity
-            style={{marginLeft:10,}}
-            // style={{marginLeft:10,borderWidth:1,padding:6,borderColor:"#BFD6FE",borderRadius:10,elevation:10,backgroundColor:"white",shadowColor:"#426eb9ff"}}
+              style={
+                toggleStates.toggleChatScreenGuideStart &&
+                globalDataStates.guidedTourStepsCount == 1
+                  ? styles.toolsIconButtonGuide
+                  : styles.toolsIconButton
+              }
+              // style={{marginLeft:10,borderWidth:1,padding:6,borderColor:"#BFD6FE",borderRadius:10,elevation:10,backgroundColor:"white",shadowColor:"#426eb9ff"}}
               onPress={() => dispatch(setToggleToolsPopup(true))}
             >
-             <ToolsIcon/>
+              <ToolsIcon />
             </TouchableOpacity>
           </View>
           <View style={styles.inputRightActionIcons}>
             <TouchableOpacity
-              onPress={()=>dispatch(setToggleUnlockPersonalisationLimitPopup(true))}
+              onPress={() =>
+                dispatch(setToggleUnlockPersonalisationLimitPopup(true))
+              }
             >
-             <MicIcon/>
+              <MicIcon />
             </TouchableOpacity>
             {(globalDataStates.userMessagePrompt !== "" ||
               globalDataStates.selectedFiles.length > 0) && (
@@ -259,7 +282,9 @@ const ChatInputMain = () => {
                       {
                         role: "user",
                         message: globalDataStates.userMessagePrompt,
-                        file:globalDataStates.selectedFiles?globalDataStates.selectedFiles[0]:null,
+                        file: globalDataStates.selectedFiles
+                          ? globalDataStates.selectedFiles[0]
+                          : null,
                       },
                     ])
                   );
@@ -270,7 +295,12 @@ const ChatInputMain = () => {
                   dispatch(setToggleIsWaitingForResponse(true));
                 }}
               >
-                <SendIcon/>
+                <SendIcon />
+              </TouchableOpacity>
+            )}
+            {toggleStates.toggleIsWaitingForResponse && (
+              <TouchableOpacity style={styles.gettingResponseIndicator}>
+                <View style={styles.innerDotGettingresponse}></View>
               </TouchableOpacity>
             )}
           </View>

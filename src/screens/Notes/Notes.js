@@ -154,6 +154,9 @@ const Notes = () => {
         {blocksForRichText.map((block, index) =>
           block.type === "text" ? (
             <TextInput
+            cursorColor="#081A35"
+             placeholder={index == 0?"Type your notes here...":""}
+             placeholderTextColor="#B5BECE"
               key={block.id}
               multiline
               style={{ fontSize: scaleFont(18), paddingVertical: 10,fontFamily:"Mukta-Regular",lineHeight:27}}

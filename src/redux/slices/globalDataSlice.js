@@ -40,6 +40,12 @@ const globalDataSlice = createSlice({
     },
     setCompareResponseStyleItemsArray: (state, action) => {
       state.globalDataStates.compareResponseStyleItemsArray = action.payload;
+    },
+    setDeleteConfirmPopupFrom: (state, action) => {
+      state.globalDataStates.deleteConfirmPopupFrom = action.payload;
+    },
+    setGuidedTourStepsCount: (state, action) => {
+      state.globalDataStates.guidedTourStepsCount = action.payload;
     }
   },
 });
@@ -55,7 +61,9 @@ export const {
   setUserMessageOnLongPress,
   setSettingsInnerPageHeaderTitle,
   setSettingsInnerPageComponentToRender,
-  setCompareResponseStyleItemsArray
+  setCompareResponseStyleItemsArray,
+  setDeleteConfirmPopupFrom,
+  setGuidedTourStepsCount
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

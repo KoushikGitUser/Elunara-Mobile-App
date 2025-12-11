@@ -137,7 +137,7 @@ const SidebarMiddle = ({ translateX }) => {
           <View style={styles.individualRecentChatsMain}>
             {recentChats.map((chat, chatIndex) => {
               return (
-                <IndividualRecentChat key={chatIndex} title={chat?.title} />
+                <IndividualRecentChat translateX={translateX} key={chatIndex} title={chat?.title} />
               );
             })}
             <TouchableOpacity
