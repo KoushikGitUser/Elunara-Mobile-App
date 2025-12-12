@@ -120,16 +120,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: scaleFont(17),
+    fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily:"Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    color: "#757575",
     marginTop: 10,
+    fontFamily:"Mukta-Regular",
+        lineHeight:20,
   },
   fullnameInput: {
     flexDirection: "row",
@@ -143,11 +145,11 @@ const styles = StyleSheet.create({
     width: "48%",
   },
   inputLabel: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     fontWeight: "400",
     color: "#5E5E5E",
     marginBottom: 8,
-    letterSpacing: 0.1,
+    fontFamily:"Mukta-Regular",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     lineHeight: 42,
     marginBottom: 20,
-    letterSpacing: -0.5,
+    fontFamily:"Mukta-Bold",
   },
   optionsContainer: {
     flexDirection: "row",
@@ -226,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     fontWeight: "400",
     color: "#1A1A1A",
-    letterSpacing: -0.3,
+   fontFamily:"Mukta-Regular",
   },
 });
 

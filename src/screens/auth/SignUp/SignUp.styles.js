@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { scaleFont } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,7 +23,7 @@ export const createStyles = (props = {}) =>
     },
     header: {
       marginTop: 30,
-      marginBottom: 10,
+      marginBottom: 5,
       width: "90%",
       flexDirection: "row",
       justifyContent: "space-between",
@@ -31,32 +32,33 @@ export const createStyles = (props = {}) =>
     logoContainer: {
       flexDirection: "column",
       alignItems: "flex-start",
-      marginBottom:25
+      marginBottom: 25,
     },
     mainLogo: {
       height: 40,
       width: 130,
     },
     chakraLogo: {
-      height: 165,
-      width: 115,
+      height: 140,
+      width: 100,
       position: "absolute",
       right: -25,
       zIndex: 99,
       marginTop: 10,
+      objectFit: "contain",
     },
     headTitle: {
       fontSize: scaleFont(28),
-      fontWeight: "700",
       color: "#4D5F75",
       letterSpacing: -0.8,
       marginTop: 15,
     },
     headDesc: {
-      fontSize: scaleFont(13),
-      color: "#939FA9",
+      fontSize: scaleFont(16),
+      color: "#757575",
       fontWeight: "400",
       marginTop: 15,
+      fontFamily: "Mukta-Regular",
     },
     logo: {
       fontSize: moderateScale(30, 0.2),
@@ -134,19 +136,18 @@ export const createStyles = (props = {}) =>
       width: "90%",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: props.socialButtonBg || "#FFFFFF",
+      backgroundColor:  "#FFFFFF",
       borderWidth: 1.5,
-      borderColor: "#999999ff",
-      paddingVertical: 12,
+      borderColor: appColors.navyBlueShade,
+      paddingVertical: 10,
       borderRadius: moderateScale(100),
       marginBottom: 15,
     },
     socialButtonText: {
-      fontSize: scaleFont(13),
-      fontWeight: "600",
-      color: props.socialButtonTextColor || "#1E2329",
-      letterSpacing: -0.1,
+      fontSize: scaleFont(15),
+      color:appColors.navyBlueShade,
       marginLeft: scale(12),
+      fontFamily: "Mukta-Bold",
     },
     socialIcons: {
       height: 25,
@@ -157,22 +158,22 @@ export const createStyles = (props = {}) =>
       fontSize: scaleFont(13),
       color: "#8A97A3",
       fontWeight: "400",
-      marginTop: 20,
-      marginBottom:25
+      marginTop: 10,
+      marginBottom: 15,
+      fontFamily: "Mukta-Regular",
     },
     emailButton: {
-      backgroundColor: "#162845ff",
+      backgroundColor:appColors.navyBlueShade,
       borderRadius: moderateScale(100),
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 16,
+      paddingVertical: 10,
       width: "100%",
     },
     emailButtonText: {
-      fontSize: scaleFont(13),
-      fontWeight: "600",
-      color: props.emailButtonTextColor || "#FFFFFF",
-      letterSpacing: -0.2,
+      fontSize: scaleFont(14),
+      color:"#FFFFFF",
+      fontFamily: "Mukta-Bold",
     },
     signupContainer: {
       flexDirection: "row",
@@ -181,14 +182,15 @@ export const createStyles = (props = {}) =>
       marginTop: 20,
     },
     signupText: {
-      fontSize: scaleFont(13),
+      fontSize: scaleFont(14),
       color: props.signupTextColor || "#5A6B7D",
       fontWeight: "400",
+      fontFamily: "Mukta-Regular",
     },
     signupLink: {
-      fontSize: scaleFont(13),
-      color: "#0F1419",
-      fontWeight: "600",
+      fontSize: scaleFont(14),
+      color: appColors.navyBlueShade,
+      fontFamily: "Mukta-Bold",
       // remove textDecorationLine for manual underline
     },
     customUnderline: {
@@ -225,21 +227,23 @@ export const createStyles = (props = {}) =>
     },
     label: {
       fontSize: scaleFont(12),
-      color: "#4E4E4E",
+      color: "#5E5E5E",
       fontWeight: "400",
       marginBottom: 8,
       textAlign: "left",
+      fontFamily: "Mukta-Regular",
     },
     input: {
       borderWidth: 1,
       borderColor: "#ABB8CC",
       borderRadius: 15,
       paddingHorizontal: 20,
-      paddingVertical: 14,
-      fontSize: scaleFont(13),
+      paddingVertical: 10,
+      fontSize: scaleFont(14),
       color: "#0F1419",
       backgroundColor: "white",
       width: "100%",
+      fontFamily: "Mukta-Regular",
     },
     passwordContainer: {
       flexDirection: "row",
@@ -253,9 +257,10 @@ export const createStyles = (props = {}) =>
     },
     passwordInput: {
       flex: 1,
-      fontSize: scaleFont(13),
+      fontSize: scaleFont(14),
       color: "#0F1419",
-      paddingVertical: 14,
+      paddingVertical: 10,
+      fontFamily: "Mukta-Regular",
     },
     eyeIconContainer: {
       padding: 6,
@@ -274,23 +279,38 @@ export const createStyles = (props = {}) =>
       flexDirection: "row",
       justifyContent: "flex-start",
       alignItems: "center",
-      gap:10
+      gap: 10,
     },
-     textContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    flex: 1,
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: scaleFont(12),
-    color: '#5A5A5A',
-  },
-  link: {
-    fontSize: scaleFont(12),
-    color: '#2C3E50',
-    fontWeight: '600',
-  },
+    radioOuter: {
+      width: 22,
+      height: 22,
+      borderRadius: 2,
+      borderWidth: 2,
+      borderColor: "#D3DAE5",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#ffffff",
+      padding: 5,
+      marginRight: 5,
+    },
+    textContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      flex: 1,
+      alignItems: "center",
+      
+    },
+    text: {
+      fontSize: scaleFont(14),
+      color: "#5A5A5A",
+      fontFamily: "Mukta-Regular",
+    },
+    link: {
+      fontSize: scaleFont(14),
+      color: "#2C3E50",
+      fontWeight: "600",
+      fontFamily: "Mukta-Bold",
+    },
   });
 
 // Export scaling functions for use in component if needed

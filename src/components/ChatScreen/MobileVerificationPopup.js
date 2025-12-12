@@ -16,6 +16,7 @@ import {
 import { BlurView } from "@react-native-community/blur";
 import { Feather } from "@expo/vector-icons";
 import { scaleFont } from "../../utils/responsive";
+import BackArrowLeftIcon from "../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 
 const { width } = Dimensions.get("window");
 
@@ -25,7 +26,7 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", "","","" ]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
     };
   }, []);
 
-    const handleChange = (index, value) => {
+  const handleChange = (index, value) => {
     if (/^\d*$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
@@ -105,10 +106,13 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
             transform: [
               {
                 translateY: animatedValue.interpolate({
-                  inputRange: [0, 320], // average keyboard height
-                  outputRange: [0, isCodeSent
+                  inputRange: [0, 400], // average keyboard height
+                  outputRange: [
+                    0,
+                    isCodeSent
                       ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),],
+                      : -(keyboardHeight * 2.3),
+                  ], 
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -128,7 +132,9 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                 {/* Title */}
                 {isCodeSent && (
                   <View style={styles.closeModalMain}>
-                    <Feather onPress={()=>setIsCodeSent(false)} name="arrow-left" size={30} color="black" />
+                    <TouchableOpacity  onPress={() => setIsCodeSent(false)}>
+                    <BackArrowLeftIcon/>
+                    </TouchableOpacity>
                   </View>
                 )}
 
@@ -143,10 +149,9 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                       style={[
                         styles.description,
                         {
-                          letterSpacing: 0,
                           marginBottom: 35,
-                          fontWeight: 900,
                           color: "black",
+                          fontFamily: "Mukta-Bold",
                         },
                       ]}
                     >
@@ -215,29 +220,38 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                   disabled={!mobileNumber}
                 >
                   <Text style={styles.verifyButtonText}>
-                    {isCodeSent?"Continue":"Verify"}
+                    {isCodeSent ? "Continue" : "Verify"}
                   </Text>
                 </TouchableOpacity>
 
                 {/* Skip for now */}
                 <TouchableOpacity
-                  style={[styles.skipButton,{marginBottom:isCodeSent?70:20}]}
+                  style={[
+                    styles.skipButton,
+                    { marginBottom: isCodeSent ? 70 : 20 },
+                  ]}
                   onPress={() => close(false)}
                   activeOpacity={0.7}
                 >
-                    {isCodeSent?<Text style={styles.skipButtonText}>Resend Code in 00:20</Text>:<Text style={styles.skipButtonText}>Skip for now</Text>}
-                  
+                  {isCodeSent ? (
+                    <Text style={styles.skipButtonText}>
+                      Resend Code in 00:20
+                    </Text>
+                  ) : (
+                    <Text style={styles.skipButtonText}>Skip for now</Text>
+                  )}
                 </TouchableOpacity>
 
                 {/* Note */}
-                {!isCodeSent && <View style={[styles.noteContainer, { marginBottom: 50 }]}>
-                  <Text style={styles.noteText}>
-                    <Text style={styles.noteBold}>Note:</Text> You can skip this
-                    step for now — but verification will be required within 7
-                    days to continue using Elunara.
-                  </Text>
-                </View>}
-                
+                {!isCodeSent && (
+                  <View style={[styles.noteContainer, { marginBottom: 50 }]}>
+                    <Text style={styles.noteText}>
+                      <Text style={styles.noteBold}>Note:</Text> You can skip
+                      this step for now — but verification will be required
+                      within 7 days to continue using Elunara.
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </ScrollView>
@@ -287,7 +301,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalSheet: {
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#FAFAFA",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     shadowColor: "#000",
@@ -311,29 +325,27 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
-    color: "#1F2937",
+    fontSize: scaleFont(24),
+    color: "#3A3A3A",
     marginBottom: 5,
-    marginTop:10,
+    marginTop: 10,
     lineHeight: 36,
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(16),
     lineHeight: 24,
-    color: "#6B7280",
-    letterSpacing: 0.2,
+    color: "#757575",
+    fontFamily: "Mukta-Regular",
   },
   inputSection: {
     marginBottom: 24,
   },
   inputLabel: {
-    fontSize: scaleFont(10),
-    fontWeight: "600",
+    fontSize: scaleFont(12),
     color: "#374151",
     marginBottom: 8,
-    letterSpacing: 0.1,
+    fontFamily: "Mukta-Regular",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -341,26 +353,29 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
     borderRadius: 15,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: scaleFont(10),
-    color: "#1F2937",
-    letterSpacing: 0.2,
+    paddingVertical: 10,
+    fontSize: scaleFont(14),
+    color: "#3A3A3A",
+    fontFamily: "Mukta-Regular",
   },
-    otpContainer: {
+  otpContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 35,
-    marginTop: 15 ,
+    marginTop: 5,
   },
   otpInput: {
     width: "15%",
     height: 57,
     borderWidth: 1.5,
-    borderColor: "#d1d5db",
+    borderColor: "#B5BECE",
+    backgroundColor:"white",
+    color:"#828282",
     borderRadius: 16,
     textAlign: "center",
     fontSize: scaleFont(15),
     fontWeight: "600",
+    fontFamily: "Mukta-Regular",
   },
   resendContainer: {
     flexDirection: "row",
@@ -380,7 +395,7 @@ const styles = StyleSheet.create({
   },
   verifyButton: {
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -391,9 +406,8 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
-    fontWeight: "500",
-    letterSpacing: 0.3,
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
   },
   skipButton: {
     alignItems: "center",
@@ -402,24 +416,25 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     color: "#0F172A",
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(14),
     fontWeight: "600",
-    textDecorationLine: "underline",
-    letterSpacing: 0.2,
+    borderBottomWidth:1,
+    fontFamily: "Mukta-Bold",
   },
   noteContainer: {
     paddingHorizontal: 16,
     borderRadius: 8,
   },
   noteText: {
-    fontSize: scaleFont(9),
+    fontSize: scaleFont(14),
     lineHeight: 20,
-    color: "#6B7280",
+    color: "#3A3A3A",
     letterSpacing: 0.1,
+    fontFamily: "Mukta-Regular",
   },
   noteBold: {
-    fontWeight: "700",
-    color: "#374151",
+    fontFamily: "Mukta-Bold",
+    color: "#3A3A3A",
   },
 });
 

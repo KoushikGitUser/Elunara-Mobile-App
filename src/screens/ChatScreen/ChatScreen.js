@@ -55,6 +55,7 @@ const ChatScreen = () => {
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+    "Mukta-Medium": require("../../../assets/fonts/Mukta-Medium.ttf"),
   });
 
   useEffect(() => {

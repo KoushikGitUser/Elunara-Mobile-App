@@ -232,16 +232,16 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(16),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+    fontFamily:"Mukta-Regular"
   },
   button: {
     width: "100%",
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: scaleFont(14),
     fontWeight: "500",
-    letterSpacing: 0.3,
+    fontFamily:"Mukta-Bold"
   },
   featuresList: {
     gap: 10,
@@ -262,12 +262,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
-    color: "#1F2937",
-    fontWeight: "500",
+    color: "#414651",
     flex: 1,
     paddingTop: 1,
+    fontFamily:"Mukta-Medium"
   },
   cardsContainer: {
     flexDirection: "row",
@@ -318,19 +318,21 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#7D1DE4",
     fontSize: 10,
-    fontWeight: "600",
+    fontFamily:"Mukta-Medium"
   },
   priceText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
     color: "#1F2937",
     textAlign: "center",
+    fontFamily:"Mukta-Bold"
   },
   periodText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
     color: "#1F2937",
     textAlign: "center",
+    fontFamily:"Mukta-Bold"
   },
   closeModalMain: {
     width: "100%",

@@ -58,7 +58,7 @@ const SignInSlider = () => {
               <View style={styles.headingContainer}>
                 {slide.heading?.map((heads, headIndex) => {
                   return (
-                    <GradientText fullWidth={true} key={headIndex} fontSize={scaleFont(36)} children={heads} />
+                    <GradientText fullWidth={true} key={headIndex} fontSize={scaleFont(35)} children={heads} />
                   );
                 })}
               </View>
@@ -123,11 +123,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(16),
+    fontSize: scaleFont(18),
     color: "#8A8A8A",
     lineHeight: 30,
-    fontWeight: "400",
     maxWidth: SCREEN_WIDTH * 0.8,
+    fontFamily:"Mukta-Regular"
   },
   paginationContainer: {
     flexDirection: "row",
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   inactiveDot: {
     width: 40,
-    backgroundColor: "#e7e7e7ff",
+    backgroundColor: "#D3DAE5",
   },
   decorativePattern: {
     position: "absolute",

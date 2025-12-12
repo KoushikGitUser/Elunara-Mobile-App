@@ -81,16 +81,18 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   title: {
-    fontSize: scaleFont(17),
+    fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-    letterSpacing: -0.5,
+   fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    lineHeight: 20,
+    color: "#757575",
     marginTop: 10,
+    fontFamily: "Mukta-Regular",
   },
   settingItem: {
     flexDirection: "row",
@@ -104,15 +106,15 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   settingTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: scaleFont(15),
     color: "#1F2937",
     marginBottom: 5,
-    letterSpacing: -0.3,
+    fontFamily: "Mukta-Bold",
   },
   settingDescription: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(12),
     color: "#6B7280",
+    fontFamily: "Mukta-Regular",
   },
 });
 

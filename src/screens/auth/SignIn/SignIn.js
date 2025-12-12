@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createStyles } from "./SignIn.styles";
 import mainLogo from "../../../assets/images/Knowledge Chakra 1.png";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
@@ -18,12 +18,15 @@ import google from "../../../assets/images/search.png";
 import LinkedIn from "../../../assets/images/linkedin.png";
 import apple from "../../../assets/images/apple-logo.png";
 import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
 import GradientText from "../../../components/common/GradientText";
 import { scaleFont } from "../../../utils/responsive";
 import { triggerToast } from "../../../services/toast";
+import { useFonts } from "expo-font";
+import { appColors } from "../../../themes/appColors";
+import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -43,6 +46,16 @@ const SignIn = () => {
   const subtitle =
     "Pick up right where you left off  /n—smarter learning awaits.";
 
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {toggleForgotPassword && (
@@ -61,12 +74,9 @@ const SignIn = () => {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Feather
-              onPress={() => navigation.navigate("welcome")}
-              name="arrow-left"
-              size={24}
-              color="black"
-            />
+           <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
+              <BackArrowLeftIcon />
+            </TouchableOpacity>
             {
               <GradientText
                 marginBottom={0}
@@ -132,9 +142,15 @@ const SignIn = () => {
           </TouchableOpacity>
           {/* Email Button */}
           <TouchableOpacity
-            onPress={() => {navigation.navigate("chat");
+            onPress={() => {
+              navigation.navigate("chat");
               setTimeout(() => {
-                triggerToast("Logged in","You have been logged in successfully","success",3000)
+                triggerToast(
+                  "Logged in",
+                  "You have been logged in successfully",
+                  "success",
+                  3000
+                );
               }, 300);
             }}
             style={styles.emailButton}

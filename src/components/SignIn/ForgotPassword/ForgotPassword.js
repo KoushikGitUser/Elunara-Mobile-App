@@ -16,6 +16,7 @@ import {
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 
 const { width } = Dimensions.get("window");
 
@@ -137,7 +138,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
-                  <AntDesign name="close" size={24} color="black" />
+                  <AntDesign name="close" size={24} color={appColors.navyBlueShade} />
                 </View>
                 {/* Title */}
                 {isCodeSent ? (
@@ -150,7 +151,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                 {isCodeSent ? (
                   <Text style={styles.description}>
                     Code has been send to{" "}
-                    <Text style={[styles.description,{fontWeight:900,color:"black"}]}>samanthaa2gmail.com.</Text>
+                    <Text style={[styles.description,{color:"black",fontFamily: "Mukta-Bold",}]}>samanthaa2gmail.com.</Text>
                   </Text>
                 ) : (
                   <Text style={styles.description}>
@@ -299,18 +300,17 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
-    color: "#1F2937",
+    fontSize: scaleFont(24),
+    color: "#3A3A3A",
     marginBottom: 5,
     lineHeight: 36,
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
   },
   description: {
-    fontSize: scaleFont(11),
-    lineHeight: 24,
-    color: "#6B7280",
-    letterSpacing: 0.2,
+    fontSize: scaleFont(15),
+    lineHeight: 26,
+    color: "#8F8F8F",
+    fontFamily: "Mukta-Regular",
   },
   otpContainer: {
     flexDirection: "row",
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: scaleFont(15),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
   },
   resendContainer: {
     flexDirection: "row",
@@ -336,25 +337,26 @@ const styles = StyleSheet.create({
     marginBottom: 80,
   },
   resendText: {
-    fontSize: scaleFont(10),
-    color: "#6b7280",
+    fontSize: scaleFont(14),
+    color: "#8F8F8F",
   },
   resendLink: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(14),
     fontWeight: "600",
-    color: "#111827",
-    textDecorationLine: "underline",
+    color: appColors.navyBlueShade,
+    borderBottomWidth:1,
+    borderColor:appColors.navyBlueShade
   },
   inputSection: {
     marginBottom: 24,
     marginTop: 30,
   },
   inputLabel: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     fontWeight: "600",
-    color: "#374151",
+    color: "#5E5E5E",
     marginBottom: 8,
-    letterSpacing: 0.1,
+    fontFamily: "Mukta-Regular",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -362,14 +364,14 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
     borderRadius: 15,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: scaleFont(10),
+    paddingVertical: 10,
+    fontSize: scaleFont(14),
     color: "#1F2937",
-    letterSpacing: 0.2,
+   fontFamily: "Mukta-Regular",
   },
   verifyButton: {
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -379,9 +381,9 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
-    letterSpacing: 0.3,
+    fontFamily: "Mukta-Bold",
   },
   skipButton: {
     alignItems: "center",

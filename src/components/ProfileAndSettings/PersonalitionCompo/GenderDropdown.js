@@ -49,6 +49,7 @@ const GenderDropdown = () => {
                 fontWeight: "400",
                 fontSize: moderateScale(12),
                 color: selected ? "black" : "#B5BECE",
+                fontFamily:"Mukta-Regular",
               }}
             >
               {selected ? selected : "Select Gender"}
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 16,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 8.5,
     width: "100%",
     backgroundColor: "white",
   },

@@ -18,7 +18,7 @@ import {
   setToggleUserMessageActionPopup,
 } from "../../../redux/slices/toggleSlice";
 import copy from "../../../assets/images/copy.png";
-import Clipboard from "@react-native-clipboard/clipboard";
+import * as Clipboard from 'expo-clipboard';
 import pencil from "../../../assets/images/PencilSimple.png";
 import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
 import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
@@ -36,8 +36,8 @@ const UserMessageActionPopup = () => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const dispatch = useDispatch();
 
-  const handleCopy = () => {
-    Clipboard.setString(globalDataStates.userMessageOnLongPress);
+  const handleCopy = async() => {
+    await Clipboard.setStringAsync(globalDataStates.userMessageOnLongPress);
     triggerToast("Message copied!", "", "normal", 3000);
   };
 

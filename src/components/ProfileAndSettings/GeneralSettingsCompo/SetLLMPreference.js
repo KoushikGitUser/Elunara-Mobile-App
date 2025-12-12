@@ -23,9 +23,10 @@ const SetLLMPreference = () => {
       </View>
       <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 25,
+          fontFamily: "Mukta-Regular",
         }}
       >
         LLM 1
@@ -37,9 +38,10 @@ const SetLLMPreference = () => {
       />
       <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 25,
+          fontFamily: "Mukta-Regular",
         }}
       >
         LLM 2
@@ -51,9 +53,10 @@ const SetLLMPreference = () => {
       />
       <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 25,
+          fontFamily: "Mukta-Regular",
         }}
       >
         LLM 3
@@ -92,16 +95,17 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   title: {
-    fontSize: scaleFont(17),
-    fontWeight: "600",
+    fontSize: scaleFont(18),
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    color: "#757575",
     marginTop: 10,
+    fontFamily: "Mukta-Regular",
+    lineHeight: 20,
   },
   settingItem: {
     flexDirection: "row",

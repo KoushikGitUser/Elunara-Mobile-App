@@ -135,18 +135,17 @@ verifiedIcon:{
     marginBottom: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(24),
     color: "#1F2937",
     marginBottom: 16,
-    letterSpacing: -0.5,
+    fontFamily:"Mukta-Bold"
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(16),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+   fontFamily:"Mukta-Regular"
   },
   button: {
     backgroundColor: "#081A35",
@@ -158,9 +157,8 @@ verifiedIcon:{
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
-    fontWeight: "500",
-    letterSpacing: 0.3,
+    fontSize: scaleFont(14),
+     fontFamily:"Mukta-Bold"
   },
 });
 

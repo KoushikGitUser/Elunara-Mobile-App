@@ -8,18 +8,22 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import google from "../../../assets/images/search.png";
 import LinkedIn from "../../../assets/images/linkedin.png";
 import apple from "../../../assets/images/apple-logo.png";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./SignUp.styles";
 import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
 import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
 import { scaleFont } from "../../../utils/responsive";
 import GradientText from "../../../components/common/GradientText";
+import { useFonts } from "expo-font";
+import { appColors } from "../../../themes/appColors";
+import { Check } from "lucide-react-native";
+import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -40,6 +44,16 @@ const SignUp = () => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const subtitle =
     "Pick up right where you left off  /n—smarter learning awaits.";
+    
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -66,12 +80,10 @@ const SignUp = () => {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Feather
-              onPress={() => navigation.navigate("welcome")}
-              name="arrow-left"
-              size={30}
-              color="black"
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
+              <BackArrowLeftIcon/>
+            </TouchableOpacity>
+
             {/* <View
               style={{
                 flexDirection: "row",
@@ -84,14 +96,11 @@ const SignUp = () => {
             <View
               style={[
                 {
-                  fontWeight: "400",
-                  color: "black",
-                  fontSize: scaleFont(22),
                   flexDirection: "row",
                   alignItems: "center",
                 },
               ]}
-            > 
+            >
               <GradientText
                 marginBottom={0}
                 marginTop={20}
@@ -104,11 +113,11 @@ const SignUp = () => {
                 style={[
                   styles.headTitle,
                   {
-                    fontWeight: "400",
                     marginTop: 15,
                     color: "black",
-                    fontSize: scaleFont(22),
+                    fontSize: scaleFont(24),
                     paddingLeft: 10,
+                    fontFamily: "Mukta-Regular",
                   },
                 ]}
               >
@@ -124,7 +133,8 @@ const SignUp = () => {
                   fontWeight: "400",
                   marginTop: 1,
                   color: "black",
-                  fontSize: scaleFont(22),
+                  fontSize: scaleFont(24),
+                   fontFamily: "Mukta-Regular",
                 },
               ]}
             >
@@ -183,10 +193,10 @@ const SignUp = () => {
           <View style={styles.forgotPasswordMain} activeOpacity={0.6}>
             <TouchableOpacity
               onPress={() => setIsChecked(!isChecked)}
-              style={styles.checkbox}
+               style={[styles.radioOuter, { borderColor: isChecked ? appColors.navyBlueShade : "#D3DAE5",backgroundColor:isChecked?appColors.navyBlueShade :"transparent" }]}
             >
               {isChecked && (
-                <Ionicons name="checkmark-outline" size={16} color="black" />
+               <Check size={19} color="white" strokeWidth={1.75} />
               )}
             </TouchableOpacity>
 
@@ -199,7 +209,10 @@ const SignUp = () => {
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
-              <TouchableOpacity onPress={()=>navigation.navigate("changepass")} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("changepass")}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.link}>Privacy Policy</Text>
               </TouchableOpacity>
             </View>

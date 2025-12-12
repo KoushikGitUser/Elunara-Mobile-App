@@ -86,7 +86,7 @@ const UnlockLearningLabPopup = () => {
               <View style={styles.featuresList}>
                 {proPlanFeature.map((feature, index) => (
                   <View key={index} style={styles.featureItem}>
-                    <Check size={24} color="#10B981" strokeWidth={1.7} />
+                    <Check style={{marginTop:5}} size={24} color="#10B981" strokeWidth={1.7} />
                     <Text style={styles.featureText}>{feature}</Text>
                   </View>
                 ))}
@@ -223,32 +223,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(24),
     color: "#1F2937",
-    marginBottom: 16,
-    letterSpacing: -0.5,
+    marginBottom: 6,
+    fontFamily:"Mukta-Bold"
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(16),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+    fontFamily:"Mukta-Regular"
   },
   button: {
     width: "100%",
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
-    fontWeight: "500",
-    letterSpacing: 0.3,
+    fontSize: scaleFont(14),
+    fontFamily:"Mukta-Bold"
   },
   featuresList: {
     gap: 10,
@@ -256,16 +254,16 @@ const styles = StyleSheet.create({
   },
   featureItem: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
-    color: "#1F2937",
-    fontWeight: "500",
+    color: "#3A3A3A",
     flex: 1,
     paddingTop: 1,
+    fontFamily:"Mukta-Bold"
   },
   cardsContainer: {
     flexDirection: "row",
@@ -315,20 +313,23 @@ const styles = StyleSheet.create({
   },
   saveText: {
     color: "#7D1DE4",
-    fontSize: 10,
+    fontSize: scaleFont(10),
     fontWeight: "600",
+    fontFamily:"Mukta-Regular"
   },
   priceText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
-    color: "#1F2937",
+    color: "#3A3A3A",
     textAlign: "center",
+    fontFamily:"Mukta-Bold"
   },
   periodText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
-    color: "#1F2937",
+    color: "#3A3A3A",
     textAlign: "center",
+    fontFamily:"Mukta-Bold"
   },
     closeModalMain: {
     width: "100%",

@@ -6,7 +6,7 @@ import LanguageDropdown from "../../ChatScreen/ChatInputCompos/ToolsPopupStates/
 import { languages } from "../../../data/datas";
 
 const SetResponseLanguage = () => {
-    const [selectedCounts,setSelectedCounts] = useState([])
+  const [selectedCounts, setSelectedCounts] = useState([]);
   return (
     <View style={styles.content}>
       {/* Header Section */}
@@ -22,9 +22,10 @@ const SetResponseLanguage = () => {
       </View>
       <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 20,
+          fontFamily: "Mukta-Regular",
         }}
       >
         Default Language
@@ -34,11 +35,12 @@ const SetResponseLanguage = () => {
         setSelectedCounts={setSelectedCounts}
         selectOptionsArray={languages}
       />
-            <Text
+      <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 20,
+          fontFamily: "Mukta-Regular",
         }}
       >
         Default Language
@@ -48,11 +50,12 @@ const SetResponseLanguage = () => {
         setSelectedCounts={setSelectedCounts}
         selectOptionsArray={languages}
       />
-            <Text
+      <Text
         style={{
-          fontSize: moderateScale(10),
+          fontSize: moderateScale(12),
           color: "#5E5E5E",
-          marginTop: 40,
+          marginTop: 20,
+          fontFamily: "Mukta-Regular",
         }}
       >
         Default Language
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: "#D3DAE5",
-    marginBottom:25
+    marginBottom: 25,
   },
   headerTitleContainer: {
     flexDirection: "row",
@@ -91,16 +94,18 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   title: {
-    fontSize: scaleFont(17),
+    fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    lineHeight: 20,
+    color: "#757575",
     marginTop: 10,
+    fontFamily: "Mukta-Regular",
   },
   settingItem: {
     flexDirection: "row",

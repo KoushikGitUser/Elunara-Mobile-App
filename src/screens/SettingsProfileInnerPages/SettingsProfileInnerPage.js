@@ -1,5 +1,5 @@
 import { View, Text, Animated } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GeneralSettings from "../SettingsPages/GeneralSettings";
 import Personalisation from "../SettingsPages/Personalisation";
@@ -19,6 +19,7 @@ import ContactPage from "../SettingsPages/ContactPage";
 import HelpCenterSearch from "../SettingsPages/HelpCenterSearch";
 import MakePaymentPage from "../SettingsPages/MakePaymentPage";
 import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
+import { useFonts } from "expo-font";
 
 const SettingsProfileInnerPage = ({ route, navigation }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -29,6 +30,18 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false }
   );
+
+    const [fontsLoaded] = useFonts({
+      "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
+      "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
+      "Mukta-Medium": require("../../../assets/fonts/Mukta-Medium.ttf"),
+    });
+  
+    useEffect(() => {
+      if (fontsLoaded) {
+      }
+    }, [fontsLoaded]);
+
 
   const pagesArray = [
     <GeneralSettings handleScroll={handleScroll} />,

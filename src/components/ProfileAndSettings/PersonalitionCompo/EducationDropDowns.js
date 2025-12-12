@@ -38,8 +38,9 @@ const EducationDropDowns = ({dataArray,placeholder}) => {
             <Text
               style={{
                 fontWeight: "400",
-                fontSize: moderateScale(12),
+                fontSize: scaleFont(13),
                 color: selected ? "black" : "#B5BECE",
+                fontFamily:"Mukta-Regular",
               }}
             >
               {selected ? selected : placeholder}
@@ -121,9 +122,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     color: "#757575",
     fontWeight: 600,
+    fontFamily:"Mukta-Regular",
   },
 });
 

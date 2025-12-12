@@ -50,16 +50,17 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   title: {
-    fontSize: scaleFont(17),
-    fontWeight: "600",
+    fontSize: scaleFont(18),
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    lineHeight: 20,
+    color: "#757575",
     marginTop: 10,
+    fontFamily: "Mukta-Regular",
   },
   settingItem: {
     flexDirection: "row",

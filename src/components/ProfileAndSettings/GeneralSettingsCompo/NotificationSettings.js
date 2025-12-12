@@ -24,7 +24,7 @@ const NotificationSettings = () => {
       </View>
 
       {/* Email Notifications Section */}
-      <View style={[styles.settingItem, { marginTop: 20 }]}>
+      <View style={[styles.settingItem, { marginTop: 10 }]}>
         <View style={styles.settingTextContainer}>
           <Text style={styles.settingTitle}>Email Notifications</Text>
           <Text style={styles.settingDescription}>
@@ -79,18 +79,20 @@ const styles = StyleSheet.create({
   },
   bellIcon: {
     marginRight: 16,
-  },
+  }, 
   title: {
-    fontSize: scaleFont(17),
+    fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily:"Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    color: "#757575",
     marginTop: 10,
+    fontFamily:"Mukta-Regular",
+        lineHeight:20,
   },
   settingItem: {
     flexDirection: "row",
@@ -104,15 +106,15 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   settingTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: scaleFont(14),
     color: "#1F2937",
     marginBottom: 5,
-    letterSpacing: -0.3,
+    fontFamily:"Mukta-Bold",
   },
   settingDescription: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(12),
     color: "#6B7280",
+    fontFamily:"Mukta-Regular",
   },
 });
 

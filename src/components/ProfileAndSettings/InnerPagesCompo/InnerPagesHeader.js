@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { scaleFont, verticalScale } from "../../../utils/responsive";
 import { useSelector } from "react-redux";
+import BackArrowLeftIcon from '../../../../assets/SvgIconsComponent/BackArrowLeftIcon'
 
 const InnerPagesHeader = ({ scrollY }) => {
   const {globalDataStates} = useSelector((state) => state.Global);
@@ -26,9 +27,9 @@ const InnerPagesHeader = ({ scrollY }) => {
             navigation.goBack();
           }}
         >
-          <ArrowLeft strokeWidth={2} />
+          <BackArrowLeftIcon/>
         </TouchableOpacity>
-        <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
+        <Text style={{ fontSize: scaleFont(20), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
           {globalDataStates.settingsInnerPageHeaderTitle}
         </Text>
       </View>

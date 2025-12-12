@@ -8,7 +8,7 @@ import share from "../../../assets/images/Share.png";
 import bookmark from "../../../assets/images/Bookmarks.png";
 import feedback from "../../../assets/images/Feedback.png";
 import repeat from "../../../assets/images/Repeat.png";
-import Clipboard from "@react-native-clipboard/clipboard";
+import * as Clipboard from 'expo-clipboard';
 import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
 import ShareIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/ShareIcon";
 import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
@@ -26,8 +26,8 @@ const AIMessageBox = ({ message }) => {
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
   const [savedToNotes,setSavedToNotes] = useState(false); 
-  const handleCopy = () => {
-    Clipboard.setString(message);
+  const handleCopy = async() => {
+    await Clipboard.setStringAsync(message);
     triggerToast("Message copied!","","normal",3000)
   };
 

@@ -59,9 +59,10 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
             <Text
               style={{
                 fontWeight: "400",
-                fontSize: moderateScale(14),
+                fontSize: scaleFont(14),
                 fontFamily:"Mukta-Bold",
                 color: selected ? "black" : "#B5BECE",
+                fontFamily:"Mukta-Regular",
               }}
             >
               {selected ? selected.title : "Select"}

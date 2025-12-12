@@ -41,7 +41,7 @@ const Personal = () => {
   };
 
   return (
-    <View style={{ flex: 1,  }}>
+    <View style={{ flex: 1 }}>
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
           <UserRound color="#888888" strokeWidth={1.75} />
@@ -55,16 +55,18 @@ const Personal = () => {
       <View style={styles.fullnameInput}>
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Birthday</Text>
-          <View style={styles.input}>
+          <View style={[styles.input,{height:50,paddingVertical:5}]}>
             {/* <TextInput
               style={styles.inputText}
               placeholder="dd/mm/yy"
               placeholderTextColor="#9CA3AF"
               returnKeyType="done"
             /> */}
-            <Text style={[styles.inputText,{color:"#a1a1a1ff"}]}>{date.toLocaleDateString()}</Text>
+            <Text style={[styles.inputText, { color: "#a1a1a1ff" }]}>
+              {date.toLocaleDateString()}
+            </Text>
             <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-              <Calendar strokeWidth={1.25} />
+              <Calendar size={23} strokeWidth={1.25} />
             </TouchableOpacity>
           </View>
           {showDatePicker && (
@@ -93,7 +95,7 @@ const Personal = () => {
         <Text style={styles.inputLabel}>Hobbies</Text>
         <View style={styles.input}>
           <TextInput
-            style={[styles.inputText,{width:"100%"}]}
+            style={[styles.inputText, { width: "100%" }]}
             placeholder="e.g., Reading, hiking, painting..."
             placeholderTextColor="#9CA3AF"
             returnKeyType="done"
@@ -123,16 +125,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: scaleFont(17),
+    fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
-    color: "#6B7280",
+    fontSize: scaleFont(14),
+    color: "#757575",
     marginTop: 10,
+    fontFamily: "Mukta-Regular",
+    lineHeight: 20,
   },
   fullnameInput: {
     flexDirection: "row",
@@ -146,11 +150,11 @@ const styles = StyleSheet.create({
     width: "48%",
   },
   inputLabel: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     fontWeight: "400",
     color: "#5E5E5E",
     marginBottom: 8,
-    letterSpacing: 0.1,
+    fontFamily:"Mukta-Regular",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -158,8 +162,7 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
     borderRadius: 16,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    height: 50,
+    paddingVertical: 0,
     color: "#1F2937",
     letterSpacing: 0.2,
     flexDirection: "row",
@@ -183,8 +186,8 @@ const styles = StyleSheet.create({
     height: 150,
   },
   inputText: {
-    fontSize: scaleFont(10),
-    letterSpacing: 0.2,
+    fontSize: scaleFont(14),
+    fontFamily:"Mukta-Regular",
   },
 });
 
