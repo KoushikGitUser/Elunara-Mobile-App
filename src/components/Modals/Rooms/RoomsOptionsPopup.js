@@ -43,7 +43,7 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup }) => {
           ]}
         >
           <RenameIcon />
-          <Text>Rename</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Rename</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -58,7 +58,7 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup }) => {
           ]}
         >
           <FilesIcon />
-          <Text>Edit Details</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Edit Details</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -73,7 +73,7 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup }) => {
           ]}
         >
           <PinIcon />
-          <Text>Pin</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Pin</Text>
         </Pressable>
         <Pressable
           onPress={() => {setRoomOptionsPopup(false);
@@ -87,7 +87,7 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup }) => {
           ]}
         >
           <TrashIcon />
-          <Text>Delete</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Delete</Text>
         </Pressable>
       </View>
     </>

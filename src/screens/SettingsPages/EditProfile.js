@@ -204,8 +204,9 @@ const styles = StyleSheet.create({
     width: "48%",
   },
   inputLabel: {
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#5E5E5E",
     marginBottom: 8,
     letterSpacing: 0.1,
@@ -226,7 +227,8 @@ const styles = StyleSheet.create({
   },
   inputText: {
     backgroundColor: "#FFFFFF",
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
     color: "#1F2937",
     letterSpacing: 0.2,
   },
@@ -246,8 +248,9 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   fullnameInput: {
@@ -292,24 +295,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(16),
-    fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
-    letterSpacing: -0.5,
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#6B7280",
     marginTop: 10,
   },
   settingDescription: {
     fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
     color: "#6B7280",
   },
   button: {
     width: "48%",
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -317,8 +321,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
 });

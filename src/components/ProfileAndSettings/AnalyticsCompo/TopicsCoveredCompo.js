@@ -94,8 +94,9 @@ const styles = StyleSheet.create({
     marginTop:15
   },
   cardTitle: {
-    fontSize: scaleFont(18),
+    fontSize: scaleFont(20),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1f2937",
     lineHeight: 36,
     marginBottom: 16,
@@ -104,6 +105,7 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: scaleFont(14),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#6b7280",
     lineHeight: 26,
     marginBottom: 28,
@@ -121,8 +123,8 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1f2937",
-    letterSpacing: 0.2,
   },
 });
 

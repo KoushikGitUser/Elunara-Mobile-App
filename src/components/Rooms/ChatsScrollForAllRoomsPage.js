@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#3A3A3A",
     marginBottom: 4,
+    fontFamily:"Mukta-Bold"
   },
   subtitleContainer: {
     flexDirection: "row",
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#757575",
     fontWeight: "400",
+    fontFamily:"Mukta-Regular"
   },
   dotSeparator: {
     fontSize: 14,

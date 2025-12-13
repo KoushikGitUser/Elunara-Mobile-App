@@ -178,12 +178,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(17),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     letterSpacing: -0.5,
     paddingLeft: 10,
   },
   subtitle: {
     fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
     color: "#6B7280",
     marginTop: 10,
   },
@@ -198,12 +200,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(17),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     letterSpacing: -0.5,
     paddingLeft: 10,
   },
   subtitle: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#6B7280",
     marginTop: 10,
   },
@@ -225,7 +229,8 @@ const styles = StyleSheet.create({
   },
   inputText: {
     backgroundColor: "#FFFFFF",
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
     color: "#1F2937",
     letterSpacing: 0.2,
   },
@@ -269,6 +274,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
   },
   addButton: {
@@ -285,6 +291,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: "#757575",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   card: {
     borderRadius: 16,
@@ -305,8 +312,9 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   sourcesPopupWrapper: {
@@ -335,6 +343,7 @@ const styles = StyleSheet.create({
   url: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     lineHeight: 24,
   },

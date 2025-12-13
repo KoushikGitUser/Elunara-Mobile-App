@@ -44,7 +44,7 @@ const AllChatsHeader = ({ isSearching,setIsSearching,translateX }) => {
           <Feather name="menu" size={30} color="black" />
         )}
       </TouchableOpacity>
-      <Text style={{ fontSize: scaleFont(18), fontWeight: 600 }}>
+      <Text style={{ fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
         {isSearching?"Search":"All Chats"}
       </Text>
     </View>

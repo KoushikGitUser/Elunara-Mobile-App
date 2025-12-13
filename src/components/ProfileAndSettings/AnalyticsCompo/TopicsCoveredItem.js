@@ -3,6 +3,7 @@ import React from 'react'
 import { CheckCircle2, ChevronRight } from 'lucide-react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { scaleFont } from '../../../utils/responsive';
+import { useNavigation } from '@react-navigation/native';
 
 const TopicsCoveredItem = ({ 
   title, 
@@ -12,10 +13,13 @@ const TopicsCoveredItem = ({
   onPress 
 }) => {
      const progress = (completed / total) * 100;
+     const navigation = useNavigation();
   return (
     <TouchableOpacity 
       style={styles.courseItem}
-      onPress={onPress}
+      onPress={()=>{
+        navigation.navigate("analyticsComplete");
+      }}
       activeOpacity={0.7}
     >
       {/* Left - Check Circle Icon */}
@@ -100,20 +104,24 @@ const styles = StyleSheet.create({
   },
   leftSection: {
     marginRight: 16,
+    alignSelf:"flex-start",
+    marginTop:8
   },
   middleSection: {
     flex: 1,
     marginRight: 12,
   },
   courseTitle: {
-    fontSize: scaleFont(16),
-    fontWeight: '700',
+    fontSize: scaleFont(18),
+    fontFamily: 'Mukta-Bold',
     color: '#2D2D2D',
     marginBottom: 4,
+    lineHeight:25
   },
   progressText: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: '400',
+    fontFamily: 'Mukta-Regular',
     color: '#888888',
   },
   rightSection: {

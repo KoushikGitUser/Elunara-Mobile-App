@@ -16,7 +16,7 @@ const ContactPage = () => {
         From feedback to feature requests, partnership inquiries to support needs, your input helps us build a better, smarter experience for everyone.
       </Text>
       <Text style={styles.bodyText}>
-        Our friendly team is here to help. Contact us on <Text style={{fontWeight:700}}>support@elunara.com
+        Our friendly team is here to help. Contact us on <Text style={{ fontFamily:"Mukta-Bold"}}>support@elunara.com
             </Text>
       </Text>
 
@@ -46,11 +46,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1A1A1A",
     marginBottom: 12,
   },
   bodyText: {
     fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
     color: "#666666",
     lineHeight: 24,
     marginBottom: 10,
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
   },
   emailIcon: {
     fontSize: 16,
+    fontFamily: "Mukta-Regular",
     marginRight: 8,
     color: "#666666",
   },
@@ -68,6 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#1A1A1A",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
   },
 });
 

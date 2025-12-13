@@ -100,7 +100,7 @@ const AddChatToRoomPopup = () => {
                 <Plus strokeWidth={1.25} />
                 <Text
                   style={{
-                    fontSize: scaleFont(13),
+                    fontSize: scaleFont(14),
                     fontWeight: 400,
                     fontFamily: "Mukta-Bold",
                     borderBottomWidth: 1,
@@ -200,10 +200,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(20),
-    fontWeight: "700",
     color: "#1F2937",
     marginBottom: 16,
-    letterSpacing: -0.5,
   },
   description: {
     fontSize: scaleFont(12),

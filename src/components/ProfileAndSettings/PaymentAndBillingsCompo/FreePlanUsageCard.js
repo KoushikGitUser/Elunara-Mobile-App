@@ -56,7 +56,7 @@ const FreePlanUsageCard = () => {
 
 
             <Text style={styles.count}>
-             <Text style={{fontWeight:700}}> {item.value}
+             <Text style={{ fontFamily:"Mukta-Bold",fontSize:16}}> {item.value}
                 </Text>/{item.max}
             </Text>
           </View>
@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
     width:"100%",
   },
   heading: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 22,
+    fontFamily: "Mukta-Bold",
     color: "#333",
     marginBottom: 20,
   },
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#757575",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
   },
   progressBg: {
     width:"100%",
@@ -116,7 +117,8 @@ const styles = StyleSheet.create({
   count: {
     textAlign: "right",
     marginTop: 6,
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#555",
   },
 });

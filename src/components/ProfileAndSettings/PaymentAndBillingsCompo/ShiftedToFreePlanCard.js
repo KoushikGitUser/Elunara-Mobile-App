@@ -43,14 +43,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   headerText: {
-    fontSize: scaleFont(15),
+    fontSize: scaleFont(16),
     fontWeight: '600',
+    fontFamily: 'Mukta-Bold',
     color: '#1e293b',
     marginLeft: 12,
     flex: 1,
   },
   descriptionText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
+    fontFamily: 'Mukta-Regular',
     color: '#535862',
     lineHeight: 24,
     marginBottom: 28,
@@ -71,8 +73,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   outlineButtonText: {
-    fontSize: 13,
+    fontSize: scaleFont(14),
     fontWeight: '600',
+    fontFamily: 'Mukta-Bold',
     color: '#0f172a',
   },
   primaryButton: {
@@ -87,6 +90,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: 'Mukta-Medium',
     color: '#ffffff',
   },
 });

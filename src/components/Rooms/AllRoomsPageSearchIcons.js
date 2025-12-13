@@ -89,12 +89,13 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     width: "100%",
-    height: verticalScale(40),
+    height: "100%",
     borderWidth: 1,
     borderRadius: 16,
     borderColor: "#ABB8CC",
-    paddingLeft: 40,
+    paddingLeft: 30,
     backgroundColor: "white",
+    fontFamily:"Mukta-Regular"
   },
   iconsMain: {
     flexDirection: "row",

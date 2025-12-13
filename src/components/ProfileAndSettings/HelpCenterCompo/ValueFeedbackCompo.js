@@ -18,33 +18,33 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import ToolsContainers from "../../ChatScreen/ChatInputCompos/ToolsContainers";
 import { feedbackOptions } from "../../../data/datas";
+import { triggerToast } from "../../../services/toast";
 
-const screenHeight = Dimensions.get("window").height
+const screenHeight = Dimensions.get("window").height;
 const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(null);
-    const [keyboardVisible, setKeyboardVisible] = useState(false);
-    const [keyboardHeight, setKeyboardHeight] = useState(0);
-  
-    useEffect(() => {
-      const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
-        setKeyboardVisible(true);
-        setKeyboardHeight(e.endCoordinates.height); // <-- set height
-      });
-  
-      const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-        setKeyboardVisible(false);
-        setKeyboardHeight(0);
-      });
-  
-      return () => {
-        showSub.remove();
-        hideSub.remove();
-      };
-    }, []);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height); // <-- set height
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -96,7 +96,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
               the options below:
             </Text>
             <ScrollView
-            showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               contentContainerStyle={{
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -108,7 +108,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                 return (
                   <React.Fragment key={optionIndex}>
                     <TouchableOpacity
-                      style={[styles.card]}
+                      style={[styles.card,]}
                       onPress={() => setSelectedStyle(optionIndex)}
                       activeOpacity={0.7}
                     >
@@ -118,7 +118,11 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                           <Text
                             style={[
                               styles.optionTitle,
-                              { fontSize: scaleFont(16), fontWeight: 600 },
+                              {
+                                fontSize: scaleFont(16),
+                                fontWeight: 600,
+                                fontFamily: "Mukta-Bold",
+                              },
                             ]}
                           >
                             {options.title}
@@ -127,8 +131,9 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                             style={[
                               styles.optionDescription,
                               {
-                                fontSize: scaleFont(12),
+                                fontSize: scaleFont(14),
                                 fontWeight: 400,
+                                fontFamily: "Mukta-Regular",
                                 color: "#8F8F8F",
                               },
                             ]}
@@ -141,7 +146,12 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                       <RadioButton selected={selectedStyle === optionIndex} />
                     </TouchableOpacity>
                     {selectedStyle == optionIndex && (
-                      <View style={[styles.inputLarge,{marginBottom:optionIndex == 2?20:0}]}>
+                      <View
+                        style={[
+                          styles.inputLarge,
+                          { marginBottom: optionIndex == 2 ? 20 : 0 },
+                        ]}
+                      >
                         <TextInput
                           style={styles.inputText}
                           placeholder="Share your dream career, ambitions, 
@@ -150,12 +160,26 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                           returnKeyType="done"
                         />
                       </View>
+                      
                     )}
+                    {optionIndex == 2 && <View style={{height:20}} />}
                   </React.Fragment>
                 );
               })}
               {keyboardVisible && <View style={{ height: screenHeight }} />}
             </ScrollView>
+            <View style={styles.btnsMain}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  triggerToast("Submitted","Your Feedback submitted successfully","success",3000)
+                  setPopupState(false)
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.buttonText}>Send Feedback</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -191,7 +215,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   modalSheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FAFAFA",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
@@ -216,23 +240,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 10,
-    letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
-    letterSpacing: 0.2,
   },
   mainOptionsContainer: {
     width: "100%",
     paddingVertical: 20,
+    paddingBottom:50,
     flexDirection: "column",
-    maxHeight:screenHeight*0.5
+    maxHeight: screenHeight * 0.5,
   },
   optionsMain: {
     width: "100%",
@@ -256,20 +279,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+    
+  },
+    btnsMain: {
+    paddingTop:20
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    paddingVertical: 20,
+    paddingVertical: 10,
     borderRadius: 18,
-    backgroundColor: "white",
+    backgroundColor: "#FAFAFA",
   },
   contentMain: {
     flexDirection: "row",
@@ -314,9 +342,9 @@ const styles = StyleSheet.create({
   },
   inputText: {
     backgroundColor: "#FFFFFF",
-    fontSize: scaleFont(10),
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
     color: "#1F2937",
-    letterSpacing: 0.2,
   },
 });
 

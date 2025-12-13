@@ -34,7 +34,7 @@ const ChatsComponent = ({ title, subject, roomName, onPress,index  }) => {
             {roomName && (
               <>
                 <Text style={styles.dotSeparator}>•</Text>
-                <Text style={[styles.subtitleText,{fontWeight:500}]}>{roomName}</Text>
+                <Text style={[styles.subtitleText,{fontWeight:500, fontFamily:"Mukta-Medium"}]}>{roomName}</Text>
               </>
             )}
           </View>

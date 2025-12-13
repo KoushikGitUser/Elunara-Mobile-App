@@ -25,10 +25,10 @@ const RoomsMiddle = ({ roomName }) => {
       <View style={styles.middleIconAndText}>
         <Image source={roomLogo} style={styles.roomLogo} />
         <View>
-          <Text style={{ fontSize: moderateScale(24), fontWeight: 600 }}>
+          <Text style={{ fontSize: moderateScale(24), fontWeight: 600, fontFamily: "Mukta-Bold" }}>
             {roomName}
           </Text>
-          <Text style={{ fontSize: moderateScale(16), color: "#717680" }}>
+          <Text style={{ fontSize: moderateScale(16), color: "#717680", fontFamily: "Mukta-Regular" }}>
             Your Study Lab: view chats, set context, add files, and start new
             conversations.
           </Text>
@@ -38,18 +38,18 @@ const RoomsMiddle = ({ roomName }) => {
         <View style={styles.sources}>
           <View style={styles.sourcesInn}>
             <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
-              <Text style={{ fontSize: scaleFont(12), fontWeight: 500 }}>
+              <Text style={{ fontSize: scaleFont(12), fontWeight: 500, fontFamily: "Mukta-Medium" }}>
                 Instructions added
               </Text>
             </TouchableOpacity>
             <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
-              <Text style={{ fontSize: scaleFont(12), fontWeight: 500 }}>
+              <Text style={{ fontSize: scaleFont(12), fontWeight: 500, fontFamily: "Mukta-Medium" }}>
                 Sources(2)
               </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.editBtn}>
-            <Text style={{ fontSize: scaleFont(14), fontWeight: 600 }}>
+            <Text style={{ fontSize: scaleFont(14), fontWeight: 600, fontFamily: "Mukta-Medium" }}>
               Edit
             </Text>
           </TouchableOpacity>
@@ -87,7 +87,8 @@ const RoomsMiddle = ({ roomName }) => {
             />
             <Text
               style={{
-                fontSize: scaleFont(13),
+                fontSize: scaleFont(14),
+                fontFamily: "Mukta-Regular",
                 textAlign: "center",
                 width: "100%",
                 color: "#757575",
@@ -103,10 +104,10 @@ const RoomsMiddle = ({ roomName }) => {
           <View style={styles.addDetailsOptions}>
             <Brain strokeWidth={1.5} size={25} style={{ marginTop: 5 }} />
             <View style={{ width: "85%" }}>
-              <Text style={{ fontSize: moderateScale(16), fontWeight: 600 }}>
+              <Text style={{ fontSize: moderateScale(16), fontWeight: 600, fontFamily: "Mukta-Bold" }}>
                 Add Instructions
               </Text>
-              <Text style={{ fontSize: moderateScale(14), color: "#717680" }}>
+              <Text style={{ fontSize: moderateScale(14), color: "#717680", fontFamily: "Mukta-Regular" }}>
                 Tailor the way Elunara AI responds in this Room
               </Text>
             </View>
@@ -114,10 +115,10 @@ const RoomsMiddle = ({ roomName }) => {
           <View style={styles.addDetailsOptions}>
             <Link strokeWidth={1.5} size={25} style={{ marginTop: 5 }} />
             <View style={{ width: "85%" }}>
-              <Text style={{ fontSize: moderateScale(16), fontWeight: 600 }}>
+              <Text style={{ fontSize: moderateScale(16), fontWeight: 600, fontFamily: "Mukta-Bold" }}>
                 Add Files or Links
               </Text>
-              <Text style={{ fontSize: moderateScale(14), color: "#717680" }}>
+              <Text style={{ fontSize: moderateScale(14), color: "#717680", fontFamily: "Mukta-Regular" }}>
                 Share sources to set the quicker context
               </Text>
             </View>
@@ -126,7 +127,7 @@ const RoomsMiddle = ({ roomName }) => {
             onPress={() => navigation.navigate("roomDetails")}
             style={styles.addDetailsBtn}
           >
-            <Text style={{ fontSize: moderateScale(14), fontWeight: 600 }}>
+            <Text style={{ fontSize: moderateScale(14), fontWeight: 600, fontFamily: "Mukta-Bold" }}>
               Add room details
             </Text>
           </TouchableOpacity>

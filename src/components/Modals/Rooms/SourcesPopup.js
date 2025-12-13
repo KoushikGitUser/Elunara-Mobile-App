@@ -52,7 +52,7 @@ const SourcesPopup = ({setSourcesPopup}) => {
           ]}
         >
           <File strokeWidth={1.25} />
-          <Text>Add File</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Add File</Text>
         </Pressable>
         <Pressable
         onPress={()=>{setSourcesPopup(false);
@@ -66,7 +66,7 @@ const SourcesPopup = ({setSourcesPopup}) => {
           ]}
         >
           <Feather name="link" size={20} color="black" />
-          <Text>Add Link</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Add Link</Text>
         </Pressable>
       </View>
     </>

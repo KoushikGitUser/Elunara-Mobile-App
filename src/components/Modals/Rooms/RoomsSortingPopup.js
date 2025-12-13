@@ -47,7 +47,7 @@ const RoomsSortingPopup = ({close}) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <CalendarCheck size={22} strokeWidth={1.25} />
-            <Text>Newest First</Text>
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Newest First</Text>
           </View>
           <RadioButton selected={selectedStyle === 0} />
         </Pressable>
@@ -62,7 +62,7 @@ const RoomsSortingPopup = ({close}) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <CalendarX size={22} strokeWidth={1.25} />
-            <Text>Oldest First</Text>
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Oldest First</Text>
           </View>
           <RadioButton selected={selectedStyle === 1}  />
         </Pressable>
@@ -77,7 +77,7 @@ const RoomsSortingPopup = ({close}) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <ArrowDownWideNarrow strokeWidth={1.25} />
-            <Text>A-Z</Text>
+            <Text style={{ fontFamily: "Mukta-Regular" }}>A-Z</Text>
           </View>
           <RadioButton selected={selectedStyle === 2}  />
         </Pressable>
@@ -92,7 +92,7 @@ const RoomsSortingPopup = ({close}) => {
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
             <ArrowUpNarrowWide strokeWidth={1.25} />
-            <Text>Z-A</Text>
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Z-A</Text>
           </View>
           <RadioButton selected={selectedStyle === 3} />
         </Pressable>

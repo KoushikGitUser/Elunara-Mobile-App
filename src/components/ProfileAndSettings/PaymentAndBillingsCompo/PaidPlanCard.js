@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: scaleFont(14),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#64748b",
     marginBottom: 14,
     marginTop:20
@@ -62,27 +63,32 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 36,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
     marginLeft: 12,
   },
   planTitlePro: {
     color: "#94a3b8",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   price: {
     fontSize: scaleFont(24),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#0f172a",
     marginBottom: 10,
   },
   billingText: {
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#64748b",
     marginBottom: 25,
     lineHeight: 26,
   },
   billingDate: {
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
   },
   cancelButton: {
@@ -97,6 +103,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
   },
 });

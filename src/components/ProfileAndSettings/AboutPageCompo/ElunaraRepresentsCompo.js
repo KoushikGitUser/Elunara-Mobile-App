@@ -81,22 +81,26 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(16),
     color: '#333333',
     fontWeight: '600',
+    fontFamily: 'Mukta-Medium',
     lineHeight: 28,
   },
   brandName: {
     color: '#333333',
     fontWeight: '700',
+    fontFamily: 'Mukta-Bold',
     fontSize: 24,
   },
   registered: {
     fontSize: 10,
     color: '#666666',
     fontWeight: '400',
+    fontFamily: 'Mukta-Regular',
   },
   tagline: {
     fontSize: 9,
     color: '#999999',
     fontStyle: 'italic',
+    fontFamily: 'Mukta-Regular',
     marginTop: 2,
     textAlign: 'right',
   },
@@ -106,6 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 20,
     fontWeight: '400',
+    fontFamily: 'Mukta-Regular',
   },
   definitionsBox: {
     backgroundColor: '#F5F5F5',
@@ -123,12 +128,14 @@ const styles = StyleSheet.create({
   wordPart: {
     fontSize: 26,
     fontWeight: '600',
+    fontFamily: 'Mukta-Medium',
     color: '#000000',
     marginRight:5,
     letterSpacing:0.5
   },
   equals: {
     fontSize: 18,
+    fontFamily: 'Mukta-Regular',
     color: '#666666',
     marginHorizontal: 0,
     marginRight:5
@@ -137,6 +144,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     color: '#666666',
     fontWeight: '400',
+    fontFamily: 'Mukta-Regular',
     flex: 1,
   },
 });

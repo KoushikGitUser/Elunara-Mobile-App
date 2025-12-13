@@ -20,14 +20,15 @@ import { academicLinks } from "../../data/datas";
 import LinkIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/LinkIcon";
 import { triggerToast } from "../../services/toast";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const AcademicLinks = () => {
-  const [toggleAddLinkPopup, setToggleAddLinkPopup] = useState(false);
   const [activePopupIndex, setActivePopupIndex] = useState(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const dispatch = useDispatch();
 
 
   const handleMorePress = (index) => {
@@ -83,7 +84,7 @@ const AcademicLinks = () => {
 
           {/* Plus Button - Centered to left content */}
           <TouchableOpacity
-            onPress={() => setToggleAddLinkPopup(true)}
+            onPress={() => dispatch(setToggleAddLinkPopup(true))}
             style={styles.addButton}
           >
             <Plus size={28} color="#1F2937" strokeWidth={1.5} />
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
   },
   visitButton: {
@@ -203,6 +205,7 @@ const styles = StyleSheet.create({
   visitText: {
     fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     borderBottomWidth: 1,
     borderBottomColor: "#1F2937",
@@ -228,6 +231,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: "#757575",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   iconContainer: {
     width: 55,
@@ -246,6 +250,7 @@ const styles = StyleSheet.create({
   url: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     lineHeight: 24,
   },
@@ -293,6 +298,7 @@ const styles = StyleSheet.create({
   deleteText: {
     fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#3A3A3A",
   },
   linksMain: {

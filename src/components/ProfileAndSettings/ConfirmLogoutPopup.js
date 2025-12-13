@@ -157,13 +157,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 16,
-    letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   button: {
     width: "48%",
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -180,8 +180,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     letterSpacing: 0.3,
   },
 });

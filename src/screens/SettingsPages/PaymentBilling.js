@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
   },
   sectionText: {
     color: "#757575",
+    fontFamily: "Mukta-Regular",
   },
   sections: {
     width: "50%",
@@ -295,16 +296,19 @@ const styles = StyleSheet.create({
     color: "#7D1DE4",
     fontSize: 10,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
   },
   priceText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
   periodText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
@@ -321,11 +325,13 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     letterSpacing: 0.3,
   },
   header: {
     fontSize: scaleFont(20),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1e293b",
     paddingTop: 30,
     paddingBottom: 5,
@@ -341,6 +347,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: scaleFont(16),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#1e293b",
     marginBottom: 10,
   },
@@ -367,11 +374,13 @@ const styles = StyleSheet.create({
   gpayText: {
     fontSize: 10,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#4285f4",
   },
   payText: {
     fontSize: 13,
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#5f6368",
   },
   mastercardContainer: {
@@ -401,6 +410,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(12),
     color: "#64748b",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     paddingLeft: 5,
   },
   rightSection: {
@@ -408,7 +418,7 @@ const styles = StyleSheet.create({
   },
   amountText: {
     fontSize: scaleFont(18),
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
     marginBottom: 10,
   },
@@ -420,6 +430,7 @@ const styles = StyleSheet.create({
   downloadText: {
     fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#1e293b",
     marginLeft: 6,
     textDecorationLine: "underline",

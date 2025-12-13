@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
     right: -2,
   },
   title: {
-    fontSize: scaleFont(24),
-    fontWeight: '700',
+    fontSize: scaleFont(25),
+    fontFamily: 'Mukta-Bold',
     color: '#374151',
   },
   subtitle: {
@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#6B7280',
     fontWeight: '400',
+    fontFamily: 'Mukta-Regular',
     marginBottom: 15,
   },
   featuresList: {
@@ -87,10 +88,11 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: '#374151',
     fontWeight: '500',
+    fontFamily: 'Mukta-Medium',
     flex: 1,
   },
 });

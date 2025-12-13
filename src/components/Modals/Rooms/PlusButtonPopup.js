@@ -39,7 +39,7 @@ const PlusButtonPopup = ({ setAddOptionsPopup }) => {
           ]}
         >
           <MessageCirclePlus strokeWidth={1.25} />
-          <Text>New Chat</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>New Chat</Text>
         </Pressable>
         <Pressable
           onPress={() => {setAddOptionsPopup(false);
@@ -53,7 +53,7 @@ const PlusButtonPopup = ({ setAddOptionsPopup }) => {
           ]}
         >
           <FilesIcon />
-          <Text>Add Chat to Learning Lab</Text>
+          <Text style={{fontFamily:"Mukta-Regular"}}>Add Chat to Learning Lab</Text>
         </Pressable>
       </View>
     </>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     padding: 7,
     width: "auto",
     top: 60,
-    right: 0,
+    right: 20,
     zIndex: 999,
     flexDirection: "column",
     alignItems: "flex-start",

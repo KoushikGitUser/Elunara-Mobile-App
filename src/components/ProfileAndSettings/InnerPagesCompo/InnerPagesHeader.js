@@ -14,7 +14,7 @@ const InnerPagesHeader = ({ scrollY }) => {
   const borderOpacity = scrollY
     ? scrollY.interpolate({
         inputRange: [0, 50],
-        outputRange: [0, 1],
+        outputRange: [0, 1], 
         extrapolate: "clamp",
       })
     : new Animated.Value(0);

@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(20),
     color: "#333333",
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     lineHeight: 28,
   },
   comaIcon: {
@@ -85,14 +86,17 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1A1A1A",
     marginBottom: 12,
     lineHeight: 36,
   },
   bodyText: {
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(16),
     fontWeight: 400,
+    fontFamily: "Mukta-Regular",
     marginBottom: 16,
+    lineHeight:20
   },
 });
 

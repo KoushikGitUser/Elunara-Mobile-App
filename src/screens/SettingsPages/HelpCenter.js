@@ -31,9 +31,6 @@ const HelpCenter = ({ handleScroll }) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const handleWalkthroughPress = () => {
-    console.log("Start Walkthrough pressed");
-  };
 
   const handleFeedbackPress = () => {
     setToggleFeedbackPopup(true)
@@ -189,7 +186,6 @@ const HelpCenter = ({ handleScroll }) => {
           </Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={handleWalkthroughPress}
             activeOpacity={0.7}
           >
             <Text style={styles.buttonText}>Start Walkthrough</Text>
@@ -252,22 +248,25 @@ const styles = StyleSheet.create({
     color: "#666666",
     marginBottom: 8,
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   mainTitle: {
     fontSize: scaleFont(24),
-    fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1A1A1A",
     marginBottom: 12,
     lineHeight: 36,
   },
   introText: {
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#666666",
     lineHeight: 24,
   },
   sectionTitle: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1A1A1A",
     marginBottom: 12,
   },
@@ -280,6 +279,7 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: 15,
+    fontFamily: "Mukta-Regular",
     color: "#666666",
     lineHeight: 24,
     marginBottom: 16,
@@ -290,6 +290,7 @@ const styles = StyleSheet.create({
   },
   bullet: {
     fontSize: 15,
+    fontFamily: "Mukta-Regular",
     color: "#666666",
     marginRight: 12,
     marginTop: 2,
@@ -302,6 +303,7 @@ const styles = StyleSheet.create({
   bulletTextBold: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1A1A1A",
     lineHeight: 24,
   },
@@ -310,10 +312,12 @@ const styles = StyleSheet.create({
     color: "#666666",
     lineHeight: 24,
     fontWeight: 400,
+    fontFamily: "Mukta-Regular",
     flex: 1,
   },
   bulletTextSimple: {
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#666666",
     lineHeight: 24,
     flex: 1,
@@ -324,6 +328,7 @@ const styles = StyleSheet.create({
   },
   emailIcon: {
     fontSize: 16,
+    fontFamily: "Mukta-Regular",
     marginRight: 8,
     color: "#666666",
   },
@@ -331,6 +336,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#1A1A1A",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
   },
   bottomSpacer: {
     height: 20,
@@ -386,6 +392,7 @@ const styles = StyleSheet.create({
   questionTitle: {
     fontSize: scaleFont(16),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     color: "#1f2937",
     lineHeight: 26,
   },
@@ -395,6 +402,7 @@ const styles = StyleSheet.create({
   answerText: {
     fontSize: scaleFont(14),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#4b5563",
     lineHeight: 28,
   },
@@ -420,6 +428,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: scaleFont(18),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1f2937",
     lineHeight: 36,
     marginBottom: 16,
@@ -427,6 +436,7 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: scaleFont(14),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#6b7280",
     lineHeight: 26,
     marginBottom: 28,
@@ -444,6 +454,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: scaleFont(14),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1f2937",
     letterSpacing: 0.2,
   },

@@ -5,6 +5,7 @@ import { graphData } from "../../../data/datas";
 import { LinearGradient } from "expo-linear-gradient";
 import { scaleFont } from "../../../utils/responsive";
 import Svg, { Line } from "react-native-svg";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const AnalyticsGraphCompo = ({
   isFilled,
@@ -72,7 +73,7 @@ const AnalyticsGraphCompo = ({
                 <Text style={styles.averageLabel}>Others daily average</Text>
                 <Text style={styles.averageValue}>{othersAverage}</Text>
                 <View style={styles.percentageContainer}>
-                  <TrendingUp size={18} color="#4CAF50" strokeWidth={2.5} />
+                  <MaterialIcons color="#4CAF50"  name="arrow-drop-up" size={25} />
                   <Text style={styles.percentageText}>
                     +{percentageChange}% from last week
                   </Text>
@@ -300,12 +301,13 @@ const styles = StyleSheet.create({
   averageLabel: {
     fontSize: scaleFont(13),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#757575",
     marginBottom: 8,
   },
   averageValue: {
-    fontSize: scaleFont(20),
-    fontWeight: "700",
+    fontSize: scaleFont(22),
+    fontFamily: "Mukta-Bold",
     color: "#2D2D2D",
     marginBottom: 4,
   },
@@ -318,6 +320,7 @@ const styles = StyleSheet.create({
   percentageText: {
     fontSize: scaleFont(12),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#888888",
   },
 
@@ -336,6 +339,7 @@ const styles = StyleSheet.create({
   yAxisLabel: {
     fontSize: 14,
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#888888",
     textAlign: "right",
   },
@@ -404,7 +408,7 @@ const styles = StyleSheet.create({
   },
   weekLabel: {
     fontSize: 22,
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#2D2D2D",
   },
   dayLabelsContainer: {
@@ -419,6 +423,7 @@ const styles = StyleSheet.create({
   dayLabel: {
     fontSize: scaleFont(12),
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#666666",
   },
 });

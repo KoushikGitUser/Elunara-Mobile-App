@@ -50,7 +50,7 @@ const Analytics = ({ handleScroll }) => {
       <YourStatisticsCard isFilled={false}/>
       <YourStatisticsCard isFilled={true} />
        
-       <Text style={{fontSize:scaleFont(18),fontWeight:600,textAlign:"left",width:"100%",marginTop:30}}>
+       <Text style={{fontSize:scaleFont(18),fontWeight:600,fontFamily:"Mukta-Medium",textAlign:"left",width:"100%",marginTop:30}}>
         Topics covered
        </Text>
       <TopicsCoveredCompo isFilled={false}/>
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   number: {
     fontSize: scaleFont(75),
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     lineHeight: 76,
     color: "#2D2D2D",
     marginBottom: 10,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   streakText: {
     fontSize: scaleFont(25),
-    fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#2D2D2D",
   },
   rightSection: {

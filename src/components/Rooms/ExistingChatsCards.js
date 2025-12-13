@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: scaleFont(15),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#3A3A3A",
     marginBottom: 4,
   },
@@ -86,9 +87,11 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#757575",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   dotSeparator: {
     fontSize: 14,
+    fontFamily: "Mukta-Regular",
     color: "#9CA3AF",
     marginHorizontal: 8,
   },

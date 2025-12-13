@@ -96,7 +96,8 @@ const UnlockPersonalisationLimitPopup = () => {
             <Text
               style={{
                 fontWeight: 600,
-                fontSize: scaleFont(13),
+                fontFamily: "Mukta-Medium",
+                fontSize: scaleFont(14),
                 paddingBottom: 10,
               }}
             >
@@ -116,6 +117,7 @@ const UnlockPersonalisationLimitPopup = () => {
                     {
                       color: selectedCategory == 1 ? "black" : "#757575",
                       fontWeight: selectedCategory == 1 ? 600 : 400,
+                      fontFamily: selectedCategory == 1 ? "Mukta-Bold" : "Mukta-Regular",
                     },
                   ]}
                 >
@@ -135,6 +137,7 @@ const UnlockPersonalisationLimitPopup = () => {
                     {
                       color: selectedCategory == 2 ? "black" : "#757575",
                       fontWeight: selectedCategory == 2 ? 600 : 400,
+                      fontFamily: selectedCategory == 2 ? "Mukta-Medium" : "Mukta-Regular",
                     },
                   ]}
                 >
@@ -321,13 +324,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(25),
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 18,
@@ -336,15 +340,16 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   featuresList: {
@@ -357,10 +362,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#1F2937",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     flex: 1,
     paddingTop: 1,
   },
@@ -414,16 +420,19 @@ const styles = StyleSheet.create({
     color: "#7D1DE4",
     fontSize: 10,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
   },
   priceText: {
     fontSize: scaleFont(12.5),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
   periodText: {
     fontSize: scaleFont(12.5),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
@@ -441,6 +450,7 @@ const styles = StyleSheet.create({
   },
   sectionText: {
     color: "#757575",
+    fontFamily: "Mukta-Regular",
   },
   sections: {
     width: "50%",

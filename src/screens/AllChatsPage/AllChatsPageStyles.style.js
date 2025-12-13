@@ -47,11 +47,13 @@ export const createStyles = (props = {}) =>
     },
     searchInput: {
       width: "100%",
-      height: verticalScale(40),
+      height: "100%",
       borderWidth: 1,
       borderRadius: 16,
       borderColor: "#ABB8CC",
       paddingLeft: 40,
+      fontFamily:"Mukta-Regular",
+      fontSize:16
     },
     iconsMain: {
       flexDirection: "row",
@@ -88,6 +90,7 @@ export const createStyles = (props = {}) =>
     titleText: {
       fontSize: scaleFont(15),
       fontWeight: "600",
+      fontFamily: "Mukta-Medium",
       color: "#3A3A3A",
       marginBottom: 4,
     },
@@ -99,9 +102,11 @@ export const createStyles = (props = {}) =>
       fontSize: scaleFont(13),
       color: "#757575",
       fontWeight: "400",
+      fontFamily: "Mukta-Regular",
     },
     dotSeparator: {
       fontSize: 14,
+      fontFamily: "Mukta-Regular",
       color: "#9CA3AF",
       marginHorizontal: 8,
     },

@@ -302,8 +302,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   headerText: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     color: "#64748b",
     marginBottom: 20,
     marginTop: 20,
@@ -334,8 +335,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   accordionTitle: {
-    fontSize: scaleFont(16),
+    fontSize: scaleFont(17),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
   },
   accordionContent: {
@@ -350,6 +352,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#1e293b",
     marginBottom: 15,
   },
@@ -369,6 +372,7 @@ const styles = StyleSheet.create({
   cvvInput: {
     flex: 1,
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#1e293b",
     padding: 0,
   },
@@ -400,6 +404,7 @@ const styles = StyleSheet.create({
   paymentLabel: {
     fontSize: scaleFont(16),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1e293b",
   },
   // PhonePe Logo
@@ -415,6 +420,7 @@ const styles = StyleSheet.create({
   phonePeText: {
     fontSize: 22,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#ffffff",
   },
   // Google Pay Logo
@@ -437,17 +443,20 @@ const styles = StyleSheet.create({
   gpayGText: {
     fontSize: 11,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#4285f4",
   },
   gpayPayText: {
     fontSize: 14,
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#5f6368",
   },
   // Paytm Logo
   paytmLogo: {
     fontSize: 18,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#00baf2",
     marginRight: 16,
   },
@@ -460,18 +469,21 @@ const styles = StyleSheet.create({
   appleIcon: {
     fontSize: 20,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1e293b",
     marginRight: 2,
   },
   applePayText: {
     fontSize: 16,
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     color: "#1e293b",
   },
   // UPI Logo
   upiLogo: {
     fontSize: 16,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1e293b",
     letterSpacing: 0.5,
     marginRight: 16,
@@ -496,8 +508,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   primaryButtonText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#ffffff",
   },
 });

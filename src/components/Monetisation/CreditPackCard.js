@@ -75,12 +75,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   creditsText: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 17,
+    fontFamily: "Mukta-Bold",
     color: "#1B1B1B",
   },
   subtitle: {
     fontSize: 13,
+    fontFamily: "Mukta-Regular",
     color: "#6C6C6C",
     marginTop: 2,
   },
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 12,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#555",
   },
   rightSection: {
@@ -104,12 +106,13 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    fontWeight: "800",
+    fontFamily: "Mukta-Bold",
     color: "#1B1B1B",
   },
   validity: {
     marginTop: 5,
     fontSize: 12,
+    fontFamily: "Mukta-Regular",
     color: "#797979",
   },
   radioOuter: {

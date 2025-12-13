@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#3B5580",
   },
   subtitle: {
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#6B7280",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
     marginBottom: 24,
   },
   featuresList: {
@@ -105,10 +107,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#1F2937",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     flex: 1,
     paddingTop: 1,
   },

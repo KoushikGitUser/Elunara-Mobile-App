@@ -14,6 +14,7 @@ import ProfileAndSettings from "../screens/ProfileAndSettings/ProfileAndSettings
 import SettingsProfileInnerPage from "../screens/SettingsProfileInnerPages/SettingsProfileInnerPage";
 import AddRoomDetails from "../screens/Rooms/AddRoomDetails";
 import AllRoomsLandingPage from "../screens/Rooms/AllRoomsLandingPage";
+import AnalyticsCompletedTopicsPage from "../screens/SettingsPages/AnalyticsCompletedTopicsPage";
 
 // Screens
 
@@ -128,6 +129,14 @@ const AppNavigator = () => {
          <Stack.Screen
           name="settingsInnerPages"
           component={SettingsProfileInnerPage}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+         <Stack.Screen
+          name="analyticsComplete"
+          component={AnalyticsCompletedTopicsPage}
           options={{
             headerShown: false,
           }}
