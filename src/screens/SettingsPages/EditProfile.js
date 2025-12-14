@@ -61,7 +61,7 @@ const EditProfile = () => {
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120, position: "relative1" }}>
           <Image
-            source={selectedImage ? { uri: selectedImage } : profilePic}
+            source={selectedImage ? (typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage) : profilePic}
             style={{ height: "100%", width: "100%", borderRadius: 20 }}
           />
           <TouchableOpacity

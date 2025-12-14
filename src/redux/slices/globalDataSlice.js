@@ -46,7 +46,13 @@ const globalDataSlice = createSlice({
     },
     setGuidedTourStepsCount: (state, action) => {
       state.globalDataStates.guidedTourStepsCount = action.payload;
-    }
+    },
+    setProfilePictureAvatar: (state, action) => {
+      state.globalDataStates.profilePictureAvatar = action.payload;
+    },
+    setProfilePictureType: (state, action) => {
+      state.globalDataStates.profilePictureType = action.payload;
+    },
   },
 });
 
@@ -63,7 +69,9 @@ export const {
   setSettingsInnerPageComponentToRender,
   setCompareResponseStyleItemsArray,
   setDeleteConfirmPopupFrom,
-  setGuidedTourStepsCount
+  setGuidedTourStepsCount,
+  setProfilePictureAvatar,
+  setProfilePictureType,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

@@ -13,6 +13,8 @@ export const globalDataStates = {
   compareResponseStyleItemsArray:[],
   deleteConfirmPopupFrom:"chat",
   guidedTourStepsCount:0,
+  profilePictureAvatar:null,
+  profilePictureType:"photo", //or avatar
 };
 
 export const demoChatMessages = [

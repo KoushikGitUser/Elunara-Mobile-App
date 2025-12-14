@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1A1A1A",
     lineHeight: 42,
-    marginBottom: 20,
+    marginBottom: 5,
     fontFamily:"Mukta-Bold",
   },
   optionsContainer: {

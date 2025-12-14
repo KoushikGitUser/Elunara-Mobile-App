@@ -115,14 +115,15 @@ const ChatHeader = ({ translateX }) => {
         <TouchableOpacity
           onPress={() => {
             // triggerToast("Connection Failed","Please check your API key and try again.","alert",1000)
-            triggerToastWithAction(
-              "This is toast",
-              "This desc of toast",
-              "success",
-              5000,
-              "Upgrade",
-              action
-            );
+            // triggerToastWithAction(
+            //   "This is toast",
+            //   "This desc of toast",
+            //   "success",
+            //   5000,
+            //   "Upgrade",
+            //   action
+            // );
+            dispatch(setToggleElunaraProWelcomePopup(true))
           }}
           style={styles.upgradeButton}
         >

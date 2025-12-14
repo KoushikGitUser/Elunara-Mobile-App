@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { scaleFont } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 import { ChevronDown, UserRound } from "lucide-react-native";
 import BriefCaseIcon from "../../../../assets/SvgIconsComponent/PersonalisationIcons/BriefCaseIcon";
 import EducationDropDowns from "./EducationDropDowns";
@@ -19,6 +20,7 @@ import {
 
 const Education = () => {
   const [selectedOption, setSelectedOption] = useState("No");
+  const [skillGapsFocused, setSkillGapsFocused] = useState(false);
   const RadioButton = ({ label, selected, onPress }) => {
     return (
       <TouchableOpacity
@@ -101,12 +103,14 @@ const Education = () => {
         <Text style={styles.inputLabel}>
           Key Skill Gaps You Want to Address
         </Text>
-        <View style={styles.input}>
+        <View style={[styles.input, skillGapsFocused && { borderColor: appColors.navyBlueShade }]}>
           <TextInput
-            style={styles.inputText}
+            style={[styles.inputText, { width: "100%" }]}
             placeholder="e.g., Data analysis, public speaking, coding..."
             placeholderTextColor="#9CA3AF"
             returnKeyType="done"
+            onFocus={() => setSkillGapsFocused(true)}
+            onBlur={() => setSkillGapsFocused(false)}
           />
         </View>
       </View>

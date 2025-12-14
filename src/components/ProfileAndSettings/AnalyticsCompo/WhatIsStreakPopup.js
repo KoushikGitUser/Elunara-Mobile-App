@@ -1,30 +1,24 @@
 import {
   View,
   Text,
+  Platform,
+  StyleSheet,
   Modal,
   TouchableOpacity,
   Image,
-  StyleSheet,
-  Platform,
 } from "react-native";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { BlurView } from "@react-native-community/blur";
-import { AntDesign } from "@expo/vector-icons";
-import UpgradeSparkleIcon from "../../../../assets/SvgIconsComponent/GeneralSettingsIcon/UpgradeSparkleIcon";
 import { scaleFont } from "../../../utils/responsive";
-import { setToggleUnlockPremiumPopup } from "../../../redux/slices/toggleSlice";
+import { BlurView } from "@react-native-community/blur";
+import flame from "../../../assets/images/flame.png";
 
-const UnlockPremiumPopup = () => {
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const dispatch = useDispatch();
-
+const WhatIsStreakPopup = ({ verificationMailSent,close}) => {
   return (
     <Modal
-      visible={toggleStates.toggleUnlockPremiumPopup}
+      visible={verificationMailSent}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleUnlockPremiumPopup(false))}
+      onRequestClose={() => close(false)}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -40,44 +34,51 @@ const UnlockPremiumPopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleUnlockPremiumPopup(false))}
+          onPress={() => close(false)}
         />
 
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
-          {/* Close Button */}
-          <View style={styles.closeModalMain}>
-            <AntDesign
-              style={{ marginRight: 20 }}
-              onPress={() => dispatch(setToggleUnlockPremiumPopup(false))}
-              name="close"
-              size={23}
-              color="black"
-            />
+          {/* Handle Bar */}
+          <View style={styles.handleContainer}>
+            <View style={styles.handle} />
           </View>
 
           {/* Content */}
           <View style={styles.content}>
             {/* Icon */}
             <View style={styles.iconContainer}>
-              <UpgradeSparkleIcon />
+              <Image source={flame} style={styles.verifiedIcon} />
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Unlock Premium Features</Text>
+            <Text style={styles.title}>What is a Streak?</Text>
 
             {/* Description */}
+            <Text style={[styles.description,{marginBottom:15}]}>
+              A streak counts how many consecutive days you’ve come back to
+              Elunara to learn and interact with the AI without missing a day.{" "}
+              <Text style={{ fontFamily: "Mukta-Bold", color: "#3A3A3A" }}>
+                It celebrates your dedication to daily learning and keeps you
+                motivated to stay engaged.
+              </Text>
+            </Text>
+            <Text style={[styles.description,{marginBottom:15}]}>
+              The longer your streak, the more consistent you’ve been in growing
+              your knowledge with Elunara!
+            </Text>
             <Text style={styles.description}>
-              Upgrade your plan to enable this option and enjoy greater ad control along with premium benefits.
+              Miss a day, and your streak resets—so keep coming back daily to
+              build your learning habit and make steady progress.
             </Text>
 
             {/* Button */}
             <TouchableOpacity
               style={styles.button}
-              onPress={() => dispatch(setToggleUnlockPremiumPopup(false))}
+              onPress={() => close(false)}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Upgrade Plan</Text>
+              <Text style={styles.buttonText}>Got it</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   modalSheet: {
-    backgroundColor: "rgba(255, 255, 255, 1)",
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
@@ -128,42 +129,34 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   verifiedIcon: {
-    height: 55,
+    height: 65,
     width: 50,
+    objectFit: "contain",
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 10,
+    paddingTop: 24,
     paddingBottom: 32,
   },
   iconContainer: {
-    marginBottom: 20,
-    backgroundColor: "#E9EAEB",
-    width:50,
-    height:50,
-    flexDirection:"row",
-    justifyContent:"center",
-    alignItems:"center",
-    borderRadius:50
+    marginBottom: 24,
   },
   title: {
     fontSize: scaleFont(24),
-    fontFamily: "Mukta-Bold",
-    color: "#1F2937",
+    color: "#3A3A3A",
     marginBottom: 16,
-    letterSpacing: -0.5,
+    fontFamily: "Mukta-Bold",
   },
   description: {
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
+    fontSize: scaleFont(16),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+    fontFamily: "Mukta-Regular",
   },
   button: {
     backgroundColor: "#081A35",
-    paddingVertical: 10,
+    paddingVertical: 13,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -172,16 +165,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFFFFF",
     fontSize: scaleFont(14),
-    fontWeight: "500",
     fontFamily: "Mukta-Bold",
-    letterSpacing: 0.3,
-  },
-  closeModalMain: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 20,
   },
 });
 
-export default UnlockPremiumPopup;
+export default WhatIsStreakPopup;

@@ -77,8 +77,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleText: {
-    fontSize: scaleFont(15),
+    fontSize: scaleFont(16),
     fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: "#3A3A3A",
     marginBottom: 4,
   },
@@ -87,14 +88,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   subtitleText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     color: "#757575",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   dotSeparator: {
     fontSize: 14,
     color: "#9CA3AF",
     marginHorizontal: 8,
+    fontFamily: "Mukta-Regular",
   },
   menuButton: {
     marginLeft: "auto",

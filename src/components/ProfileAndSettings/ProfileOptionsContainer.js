@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: scaleFont(17),
-    color: "#1A202C",
+    color: "#081A35",
     fontWeight: "500",
   },
   upgradeBtn: {

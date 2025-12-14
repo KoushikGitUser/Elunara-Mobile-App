@@ -65,8 +65,7 @@ const UnlockAdFreeExpPopup = () => {
             <GradientText
             children="Upgrade to Elunara Pro!"
             fullWidth={true}
-            fontSize={25}
-
+            fontSize={26}
             />
 
             {/* Description */}
@@ -218,12 +217,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(23),
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -239,8 +240,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   featuresList: {
@@ -253,10 +255,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#1F2937",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     flex: 1,
     paddingTop: 1,
   },
@@ -310,16 +313,19 @@ const styles = StyleSheet.create({
     color: "#7D1DE4",
     fontSize: 10,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
   },
   priceText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
   periodText: {
-    fontSize: scaleFont(12.5),
+    fontSize: scaleFont(13),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },

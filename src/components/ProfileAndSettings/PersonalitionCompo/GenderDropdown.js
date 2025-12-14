@@ -2,33 +2,34 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  LayoutAnimation,
   StyleSheet,
+  Modal,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
 import { genderSelection } from "../../../data/datas";
+import { appColors } from "../../../themes/appColors";
 
 const GenderDropdown = () => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [selectedIcon, setSelectedIcon] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const selectorRef = useRef(null);
-  const screenHeight = Dimensions.get("window").height;
 
   const toggleDropdown = () => {
     if (selectorRef.current) {
-      selectorRef.current.measure((_x, _y, _width, height, _pageX, pageY) => {
-        const spaceBelow = screenHeight - pageY - height;
-        const spaceAbove = pageY;
-        const openUp = spaceBelow < 240 && spaceAbove > spaceBelow;
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      selectorRef.current.measureInWindow((x, y, width, height) => {
+        setDropdownPosition({
+          top: y + height + 30,
+          left: x,
+          width: width,
+        });
         setVisible((prev) => !prev);
       });
     }
   };
+
   const handleSelect = (item) => {
     setSelected(item);
     setVisible(false);
@@ -39,7 +40,7 @@ const GenderDropdown = () => {
       <View style={{ width: "100%" }}>
         <TouchableOpacity
           ref={selectorRef}
-          style={styles.selector}
+          style={[styles.selector, visible && { borderColor: appColors.navyBlueShade }]}
           onPress={toggleDropdown}
           activeOpacity={0.7}
         >
@@ -49,7 +50,7 @@ const GenderDropdown = () => {
                 fontWeight: "400",
                 fontSize: moderateScale(12),
                 color: selected ? "black" : "#B5BECE",
-                fontFamily:"Mukta-Regular",
+                fontFamily: "Mukta-Regular",
               }}
             >
               {selected ? selected : "Select Gender"}
@@ -63,22 +64,43 @@ const GenderDropdown = () => {
           )}
         </TouchableOpacity>
 
-        {visible && (
-          <View style={[styles.dropdown]}>
-            {genderSelection?.map((item, itemIndex) => {
-              return (
-                <TouchableOpacity
-                  key={itemIndex}
-                  style={styles.option}
-                  onPress={() => handleSelect(item)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.description}>{item} </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
+        <Modal
+          visible={visible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setVisible(false)}
+          >
+            <View
+              style={[
+                styles.dropdown,
+                {
+                  position: "absolute",
+                  top: dropdownPosition.top,
+                  left: dropdownPosition.left,
+                  width: dropdownPosition.width,
+                },
+              ]}
+            >
+              {genderSelection?.map((item, itemIndex) => {
+                return (
+                  <TouchableOpacity
+                    key={itemIndex}
+                    style={styles.option}
+                    onPress={() => handleSelect(item)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.description}>{item}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </View>
     </View>
   );
@@ -100,9 +122,9 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "white",
   },
-  overlay: {
+  modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "transparent",
   },
   dropdown: {
     width: "100%",
@@ -131,9 +153,9 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
     color: "#757575",
-    fontWeight: 600,
+    fontFamily:"Mukta-Medium"
   },
 });
 

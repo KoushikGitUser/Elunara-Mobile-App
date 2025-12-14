@@ -1,13 +1,15 @@
 import { View, Text, ScrollView, StyleSheet, } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Droplet, Flame, Image, Info } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import AnalyticsFlameIcon from "../../../assets/SvgIconsComponent/AnalyticsIcons/AnalyticsFlameIcon";
 import YourStatisticsCard from "../../components/ProfileAndSettings/AnalyticsCompo/YourStatisticsCard";
 import TopicsCoveredCompo from "../../components/ProfileAndSettings/AnalyticsCompo/TopicsCoveredCompo";
 import AnalyticsGraphCompo from "../../components/ProfileAndSettings/AnalyticsCompo/AnalyticsGraphCompo";
+import WhatIsStreakPopup from "../../components/ProfileAndSettings/AnalyticsCompo/WhatIsStreakPopup";
 
 const Analytics = ({ handleScroll }) => {
+  const [whatIsStreakPopup,setWhatIsStreakPopup] = useState(false);
   return (
     <ScrollView
       onScroll={handleScroll}
@@ -24,6 +26,7 @@ const Analytics = ({ handleScroll }) => {
         },
       ]}
     >
+      <WhatIsStreakPopup close={setWhatIsStreakPopup} verificationMailSent={whatIsStreakPopup} />
       <View style={styles.container}>
         <View style={styles.content}>
           {/* Left side - Number and Day Streak */}
@@ -36,7 +39,7 @@ const Analytics = ({ handleScroll }) => {
             <Text style={styles.number}>10</Text>
             <View style={styles.streakContainer}>
               <Text style={styles.streakText}>Day Streak</Text>
-              <Info size={22} color="#666666" strokeWidth={2} />
+              <Info onPress={()=>setWhatIsStreakPopup(true)} size={22} color="#666666" strokeWidth={2} />
             </View>
           </View>
 

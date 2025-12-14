@@ -8,6 +8,7 @@ import {
   TextInput,
   Platform,
   Alert,
+  Image,
 } from "react-native";
 import React from "react";
 import { scaleFont } from "../../../utils/responsive";
@@ -21,9 +22,20 @@ import CorporateAvatarIcon from "../../../../assets/SvgIconsComponent/EditProfil
 import TeacherAvatarIcon from "../../../../assets/SvgIconsComponent/EditProfileIcon/TeacherAvatarIcon";
 import MaleStudentAvatarIcon from "../../../../assets/SvgIconsComponent/EditProfileIcon/MaleStudentAvatarIcon";
 import FemaleStudentAvatarIcon from "../../../../assets/SvgIconsComponent/EditProfileIcon/FemaleStudentAvatarIcon";
+import { setProfilePictureAvatar, setProfilePictureType } from "../../../redux/slices/globalDataSlice";
+import { appColors } from "../../../themes/appColors";
+import { Check } from "lucide-react-native";
+
+import corporateAvatar from '../../../assets/images/Corporate2.png';
+import teacherAvatar from '../../../assets/images/Teacher2.png';
+import maleStudentAvatar from '../../../assets/images/Student Male2.png';
+import femaleStudentAvatar from '../../../assets/images/Student Female2.png';
+
 
 const UpdateProfilePicPopup = ({setSelectedImage}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+
   const dispatch = useDispatch();
 
     const triggerImagePicker = async () => {
@@ -136,17 +148,58 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
             </Text>
 
             <View style={styles.avatarContainer}>
-                <TouchableOpacity>
-                    <CorporateAvatarIcon/>
+                <TouchableOpacity style={{position:"relative"}} onPress={()=>{
+                  dispatch(setProfilePictureType("avatar"));
+                  dispatch(setProfilePictureAvatar(1));
+                  setSelectedImage(corporateAvatar);
+                  setTimeout(() => {
+                     dispatch(setToggleUpdateProfilePicPopup(false));
+                  }, 500);
+                 
+                }}>
+                  <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?2.5:0,borderColor:"#081A35",borderRadius:16}} source={corporateAvatar} />
+                  {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?<View style={styles.checkCircle}>
+                    <Check size={16} color="#FFFFFF" strokeWidth={3} />
+                  </View>:null}
                 </TouchableOpacity>
-                 <TouchableOpacity>
-                    <TeacherAvatarIcon/>
+                 <TouchableOpacity style={{position:"relative"}} onPress={()=>{
+                  dispatch(setProfilePictureType("avatar"));
+                  dispatch(setProfilePictureAvatar(2));
+                  setSelectedImage(teacherAvatar);
+                  setTimeout(() => {
+                     dispatch(setToggleUpdateProfilePicPopup(false));
+                  }, 500);
+                 }}>
+                  <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 2?2.5:0,borderColor:"#081A35",borderRadius:16}} source={teacherAvatar} />
+                  {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 2?<View style={styles.checkCircle}>
+                    <Check size={16} color="#FFFFFF" strokeWidth={3} />
+                  </View>:null}
                 </TouchableOpacity>
-                 <TouchableOpacity>
-                    <MaleStudentAvatarIcon/>
+                 <TouchableOpacity style={{position:"relative"}} onPress={()=>{
+                  dispatch(setProfilePictureType("avatar"));
+                  dispatch(setProfilePictureAvatar(3));
+                  setSelectedImage(maleStudentAvatar);
+                  setTimeout(() => {
+                     dispatch(setToggleUpdateProfilePicPopup(false));
+                  }, 500);
+                 }}>
+                 <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 3?2.5:0,borderColor:"#081A35",borderRadius:16}} source={maleStudentAvatar} />
+                 {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 3?<View style={styles.checkCircle}>
+                   <Check size={16} color="#FFFFFF" strokeWidth={3} />
+                 </View>:null}
                 </TouchableOpacity>
-                 <TouchableOpacity>
-                    <FemaleStudentAvatarIcon/>
+                 <TouchableOpacity style={{position:"relative"}} onPress={()=>{
+                  dispatch(setProfilePictureType("avatar"));
+                  dispatch(setProfilePictureAvatar(4));
+                  setSelectedImage(femaleStudentAvatar);
+               setTimeout(() => {
+                     dispatch(setToggleUpdateProfilePicPopup(false));
+                  }, 500);
+                 }}>
+                    <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 4?2.5:0,borderColor:"#081A35",borderRadius:16}} source={femaleStudentAvatar} />
+                    {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 4?<View style={styles.checkCircle}>
+                      <Check size={16} color="#FFFFFF" strokeWidth={3} />
+                    </View>:null}
                 </TouchableOpacity>
 
             </View>
@@ -279,6 +332,19 @@ const styles = StyleSheet.create({
     justifyContent:"space-between",
     alignItems:"center",
     marginBottom:30
+  },
+  checkCircle:{
+    position:"absolute",
+    top:-6,
+    right:-6,
+    width:26,
+    height:26,
+    borderRadius:13,
+    backgroundColor:appColors.navyBlueShade,
+    borderWidth:2,
+    borderColor:"#FAFAFA",
+    alignItems:"center",
+    justifyContent:"center",
   }
 });
 

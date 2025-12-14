@@ -16,7 +16,7 @@ import {
   CalendarX,
 } from "lucide-react-native";
 
-const RoomsSortingPopup = ({close}) => {
+const RoomsSortingPopup = ({close,top,right}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(null);
@@ -33,7 +33,7 @@ const RoomsSortingPopup = ({close}) => {
         onPress={() => close(false)}
         style={styles.optionsPopupWrapper}
       ></TouchableOpacity>
-      <View style={styles.notesPopup}>
+      <View style={[styles.notesPopup,{top:top,right:right}]}>
         <Pressable
           onPress={() => {
             setSelectedStyle(0);

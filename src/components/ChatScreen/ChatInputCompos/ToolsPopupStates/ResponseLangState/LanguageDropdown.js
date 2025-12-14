@@ -75,7 +75,7 @@ const LanguageDropdown = ({setSelectedCounts,selectedCounts,selectOptionsArray})
                   onPress={() => handleSelect(item)}
                   activeOpacity={0.7}
                 >
-                    <Text style={[styles.description,{fontFamily: "Mukta-Regular" }]}>{item.lang}   {item.nativeCharacter} </Text>
+                    <Text style={[styles.description,{fontFamily: "Mukta-Bold" }]}>{item.lang}   {item.nativeCharacter} </Text>
                 </TouchableOpacity>
               );
             })}

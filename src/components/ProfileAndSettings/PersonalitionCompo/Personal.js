@@ -11,12 +11,15 @@ import { Calendar, ChevronDown, UserRound } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GenderDropdown from "./GenderDropdown";
+import { appColors } from "../../../themes/appColors";
 
 const Personal = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [hobbiesFocused, setHobbiesFocused] = useState(false);
+  const [aboutFocused, setAboutFocused] = useState(false);
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -93,18 +96,20 @@ const Personal = () => {
       </View>
       <View style={[styles.inputSection, { width: "100%" }]}>
         <Text style={styles.inputLabel}>Hobbies</Text>
-        <View style={styles.input}>
+        <View style={[styles.input, hobbiesFocused && { borderColor: appColors.navyBlueShade }]}>
           <TextInput
             style={[styles.inputText, { width: "100%" }]}
             placeholder="e.g., Reading, hiking, painting..."
             placeholderTextColor="#9CA3AF"
             returnKeyType="done"
+            onFocus={() => setHobbiesFocused(true)}
+            onBlur={() => setHobbiesFocused(false)}
           />
         </View>
       </View>
       <View style={[styles.inputSection, { width: "100%" }]}>
         <Text style={styles.inputLabel}>About You</Text>
-        <View style={styles.inputLarge}>
+        <View style={[styles.inputLarge, aboutFocused && { borderColor: appColors.navyBlueShade }]}>
           <TextInput
             style={styles.inputText}
             placeholder="Share your dream career, ambitions, or anything else you'd like us to know about you..."
@@ -112,6 +117,8 @@ const Personal = () => {
             returnKeyType="done"
             multiline
             textAlignVertical="top"
+            onFocus={() => setAboutFocused(true)}
+            onBlur={() => setAboutFocused(false)}
           />
         </View>
       </View>
@@ -188,6 +195,7 @@ const styles = StyleSheet.create({
   inputText: {
     fontSize: scaleFont(14),
     fontFamily:"Mukta-Regular",
+    color:"black"
   },
 });
 

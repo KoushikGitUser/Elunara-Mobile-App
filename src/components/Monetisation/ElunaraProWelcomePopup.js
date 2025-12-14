@@ -84,7 +84,7 @@ const ElunaraProWelcomePopup = () => {
                 children="Elunara Pro!"
                 fullWidth={true}
                 fontSize={25}
-                marginTop={3}
+                marginTop={5}
               />
             </View>
 
@@ -182,12 +182,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(25),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 10,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 18,
@@ -203,8 +205,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(14),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
   featuresList: {
@@ -217,10 +220,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   featureText: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(15),
     lineHeight: 24,
     color: "#1F2937",
     fontWeight: "500",
+    fontFamily: "Mukta-Medium",
     flex: 1,
     paddingTop: 1,
   },
@@ -274,16 +278,19 @@ const styles = StyleSheet.create({
     color: "#7D1DE4",
     fontSize: 10,
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
   },
   priceText: {
     fontSize: scaleFont(12.5),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
   periodText: {
     fontSize: scaleFont(12.5),
     fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#1F2937",
     textAlign: "center",
   },
@@ -301,6 +308,7 @@ const styles = StyleSheet.create({
   },
   sectionText: {
     color: "#757575",
+    fontFamily: "Mukta-Regular",
   },
   sections: {
     width: "50%",
