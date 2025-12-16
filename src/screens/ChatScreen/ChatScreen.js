@@ -1,9 +1,5 @@
 import {
   View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
   Dimensions,
   Animated,
   StatusBar,
@@ -27,12 +23,10 @@ import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/Ch
 import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
 import UserMessageActionPopup from "../../components/ChatScreen/Messages/UserMessageActionPopup";
 import ChatLongPressPopup from "../../components/ChatScreen/ChatHistorySidebar/ChatLongPressPopup";
-import RoomCreationPopup from "../../components/Rooms/RoomCreationPopup";
 import UnlockArchiveLimitPopup from "../../components/Monetisation/UnlockArchiveLimitPopup";
 import UnlockPersonalisationLimitPopup from "../../components/Monetisation/UnlockPersonalisationLimitPopup";
 import ElunaraProWelcomePopup from "../../components/Monetisation/ElunaraProWelcomePopup";
 import UniversalTooltip from "../../components/GuidedTourTooltip/UniversalTooltip";
-import Toaster from "../../components/UniversalToaster/Toaster";
 import ToasterWithAction from "../../components/UniversalToaster/ToasterWithAction";
 import { useFonts } from "expo-font";
 import ChangeLLMPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeResponse/ChangeLLMPopup";
@@ -50,7 +44,6 @@ const ChatScreen = () => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const translateX = React.useRef(new Animated.Value(0)).current;
-  const [showToast, setShowToast] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -79,11 +72,6 @@ const ChatScreen = () => {
     return null;
   }
 
-  const triggerToast = () => {
-    setShowToast(true);
-    // hide modal after animation completes
-    setTimeout(() => setShowToast(false), 35000);
-  };
 
   return (
     <SafeAreaView
@@ -99,7 +87,7 @@ const ChatScreen = () => {
             zIndex: 9999,
           }}
         ></View>
-        <ChatHeader triggerToast={triggerToast} translateX={translateX} />
+        <ChatHeader translateX={translateX} />
         <View style={styles.chatMainWrapper}>
           {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
           {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}

@@ -24,10 +24,14 @@ export const createStyles = (props = {}) =>
     header: {
       marginTop: 30,
       marginBottom: 5,
-      width: "90%",
+      width: "100%",
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "start",
+      paddingHorizontal:20,
+      // borderBottomWidth:1,
+      // borderColor:"lightgrey"
+
     },
     logoContainer: {
       flexDirection: "column",
@@ -238,7 +242,7 @@ export const createStyles = (props = {}) =>
       borderColor: "#ABB8CC",
       borderRadius: 15,
       paddingHorizontal: 20,
-      paddingVertical: 10,
+      paddingVertical: 0,
       fontSize: scaleFont(14),
       color: "#0F1419",
       backgroundColor: "white",

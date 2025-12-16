@@ -235,18 +235,17 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(25),
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 5,
     lineHeight: 36,
-    letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     lineHeight: 24,
     color: "#6B7280",
-    letterSpacing: 0.2,
   },
   otpContainer: {
     flexDirection: "row",
@@ -263,7 +262,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     textAlign: "center",
     fontSize: scaleFont(15),
-    fontWeight: "600",
+    fontFamily: "Mukta-Medium",
   },
   resendContainer: {
     flexDirection: "row",
@@ -273,11 +272,12 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: scaleFont(10),
+    fontFamily: "Mukta-Regular",
     color: "#6b7280",
   },
   resendLink: {
     fontSize: scaleFont(10),
-    fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#111827",
     textDecorationLine: "underline",
   },
@@ -287,10 +287,10 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: scaleFont(10),
-    fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     color: "#374151",
     marginBottom: 8,
-    letterSpacing: 0.1,
+
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -298,14 +298,14 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
     borderRadius: 15,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: scaleFont(10),
+    paddingVertical: 10,
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
     color: "#1F2937",
-    letterSpacing: 0.2,
   },
   verifyButton: {
     backgroundColor: "#081A35",
-    paddingVertical: 13,
+    paddingVertical: 10,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -315,9 +315,8 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
-    fontWeight: "500",
-    letterSpacing: 0.3,
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
   },
   skipButton: {
     alignItems: "center",
@@ -327,7 +326,7 @@ const styles = StyleSheet.create({
   skipButtonText: {
     color: "#0F172A",
     fontSize: scaleFont(10),
-    fontWeight: "600",
+    fontFamily: "Mukta-Medium",
     textDecorationLine: "underline",
     letterSpacing: 0.2,
   },
@@ -337,12 +336,13 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: scaleFont(9),
+    fontFamily: "Mukta-Regular",
     lineHeight: 20,
     color: "#6B7280",
     letterSpacing: 0.1,
   },
   noteBold: {
-    fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#374151",
   },
 });

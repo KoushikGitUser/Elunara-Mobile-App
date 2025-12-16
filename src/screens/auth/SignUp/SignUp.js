@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useState } from "react";
@@ -13,30 +14,226 @@ import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import google from "../../../assets/images/search.png";
 import LinkedIn from "../../../assets/images/linkedin.png";
 import apple from "../../../assets/images/apple-logo.png";
-import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./SignUp.styles";
 import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
 import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
 import { scaleFont } from "../../../utils/responsive";
 import GradientText from "../../../components/common/GradientText";
+import { useDispatch, useSelector } from "react-redux";
 import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
-import { Check } from "lucide-react-native";
+import { Check, AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
+import { userSignUp } from "../../../redux/slices/authSlice";
+import { triggerToast } from "../../../services/toast";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
   const [verificationMailSent, setVerificationMailSent] = useState(false);
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState(null);
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    checkbox: "",
+  });
 
-  const styleProps = {
-    // Example: backgroundColor: '#F5F5F5',
-    // Example: headingColor: '#000000',
-    // Add any dynamic values here
+  const styleProps = {};
+
+  // Real-time validation functions
+  const validateFirstName = (text) => {
+    if (!text.trim()) {
+      return "First name is required";
+    }
+    const firstNameRegex = /^[A-Za-z\s]+$/;
+    if (!firstNameRegex.test(text.trim())) {
+      return "Only alphabets and space allowed";
+    }
+    return "";
+  };
+
+  const validateLastName = (text) => {
+    if (!text.trim()) {
+      return "Last name is required";
+    }
+    const lastNameRegex = /^[A-Za-z]+$/;
+    if (!lastNameRegex.test(text.trim())) {
+      return "Only alphabets allowed";
+    }
+    return "";
+  };
+
+  const validateEmail = (text) => {
+    if (!text.trim()) {
+      return "Email is required";
+    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(text.trim())) {
+      return "Valid Email ID required";
+    }
+    return "";
+  };
+
+  const validatePassword = (text) => {
+    if (!text) {
+      return "Password is required";
+    }
+    if (text.length < 8 || text.length > 32) {
+      return "Password must be between 8 and 32 characters";
+    }
+    const hasLetter = /[A-Za-z]/.test(text);
+    const hasNumber = /[0-9]/.test(text);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(text);
+    if (!hasLetter || !hasNumber || !hasSpecialChar) {
+      return "Password must include letter, number, and special character";
+    }
+    return "";
+  };
+
+  const validateConfirmPassword = (text, passwordValue) => {
+    if (!text) {
+      return "Confirm password is required";
+    }
+    if (passwordValue !== text) {
+      return "Passwords do not match";
+    }
+    return "";
+  };
+
+  const dispatch = useDispatch();
+  const { isSignedUp } = useSelector((state) => state.Auth);
+
+  useEffect(() => {
+    if (isSignedUp === true) {
+      triggerToast("Yayy", "Account created successfully!", "success", 3000);
+    } else if (isSignedUp === false) {
+      triggerToast("Aghhh", "Sign up failed. Please try again.", "error", 3000);
+    }
+  }, [isSignedUp]);
+
+  const handleUserSignUp = () => {
+    setLoading(true);
+    // Reset errors
+    const newErrors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      checkbox: "",
+    };
+    let hasError = false;
+
+    // Validate firstName - not empty
+    if (!firstName.trim()) {
+      newErrors.firstName = "First name is required";
+      hasError = true;
+    } else {
+      // Validate firstName - only alphabets and spaces allowed
+      const firstNameRegex = /^[A-Za-z\s]+$/;
+      if (!firstNameRegex.test(firstName.trim())) {
+        newErrors.firstName = "Only alphabets and space allowed";
+        hasError = true;
+      }
+    }
+
+    // Validate lastName - not empty
+    if (!lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+      hasError = true;
+    } else {
+      // Validate lastName - only alphabets allowed (no spaces)
+      const lastNameRegex = /^[A-Za-z]+$/;
+      if (!lastNameRegex.test(lastName.trim())) {
+        newErrors.lastName = "Only alphabets allowed";
+        hasError = true;
+      }
+    }
+
+    // Validate email - not empty
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+      hasError = true;
+    } else {
+      // Validate email format
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email.trim())) {
+        newErrors.email = "Valid Email ID required";
+        hasError = true;
+      }
+    }
+
+    // Validate password - not empty
+    if (!password) {
+      newErrors.password = "Password is required";
+      hasError = true;
+    } else {
+      // Validate password - 8-32 chars, must include letter, number, and special character
+      if (password.length < 8 || password.length > 32) {
+        newErrors.password = "Password must be between 8 and 32 characters";
+        hasError = true;
+      } else {
+        const hasLetter = /[A-Za-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(
+          password
+        );
+
+        if (!hasLetter || !hasNumber || !hasSpecialChar) {
+          newErrors.password =
+            "Password must include letter, number, and special character";
+          hasError = true;
+        }
+      }
+    }
+
+    // Validate confirm password - not empty
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required";
+      hasError = true;
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      hasError = true;
+    }
+
+    // Validate terms and conditions checkbox
+    if (!isChecked) {
+      newErrors.checkbox =
+        "Please agree to the Terms of Use and Privacy Policy";
+      hasError = true;
+    }
+
+    setErrors(newErrors);
+
+    if (hasError) {
+      return;
+    }
+
+    setTimeout(() => {
+      setLoading(false);
+      const formData = new FormData();
+      formData.append("first_name", firstName.trim());
+      formData.append("last_name", lastName.trim());
+      formData.append("email", email.trim());
+      formData.append("password", password);
+      formData.append("password_confirmation", confirmPassword);
+
+      dispatch(userSignUp(formData));
+
+      navigation.navigate("signin");
+    }, 2500);
   };
 
   const navigation = useNavigation();
@@ -44,7 +241,7 @@ const SignUp = () => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const subtitle =
     "Pick up right where you left off  /n—smarter learning awaits.";
-    
+
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
@@ -70,21 +267,16 @@ const SignUp = () => {
           mobileVerificationPopup={mobileVerificationPopup}
         />
       )}
-      <ScrollView
-        contentContainerStyle={{
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-        style={styles.container}
-      >
-        {/* Header Section */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
-              <BackArrowLeftIcon/>
-            </TouchableOpacity>
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <TouchableOpacity
+            style={{ position: "" }}
+            onPress={() => navigation.navigate("welcome")}
+          >
+            <BackArrowLeftIcon />
+          </TouchableOpacity>
 
-            {/* <View
+          {/* <View
               style={{
                 flexDirection: "row",
                 gap: 10,
@@ -93,110 +285,389 @@ const SignUp = () => {
               }}
             > */}
 
-            <View
-              style={[
-                {
-                  flexDirection: "row",
-                  alignItems: "center",
-                },
-              ]}
-            >
-              <GradientText
-                marginBottom={0}
-                marginTop={20}
-                children="Join Elunara"
-                fullWidth={false}
-                widthNumber={0.5}
-                fontSize={scaleFont(25)}
-              />
-              <Text
-                style={[
-                  styles.headTitle,
-                  {
-                    marginTop: 15,
-                    color: "black",
-                    fontSize: scaleFont(24),
-                    paddingLeft: 10,
-                    fontFamily: "Mukta-Regular",
-                  },
-                ]}
-              >
-                - Your AI
-              </Text>
-            </View>
-            {/* </View> */}
-
+          <View
+            style={[
+              {
+                flexDirection: "row",
+                alignItems: "center",
+              },
+            ]}
+          >
+            <GradientText
+              marginBottom={0}
+              marginTop={20}
+              children="Join Elunara"
+              fullWidth={false}
+              widthNumber={0.5}
+              fontSize={scaleFont(25)}
+            />
             <Text
               style={[
                 styles.headTitle,
                 {
-                  fontWeight: "400",
-                  marginTop: 1,
+                  marginTop: 15,
                   color: "black",
                   fontSize: scaleFont(24),
-                   fontFamily: "Mukta-Regular",
+                  paddingLeft: 10,
+                  fontFamily: "Mukta-Regular",
                 },
               ]}
             >
-              Learning Companion
-            </Text>
-            <Text style={styles.headDesc}>
-              One account. Smarter questions, faster
-            </Text>
-            <Text style={[styles.headDesc, { marginTop: 0 }]}>
-              answers, better learning. Let's get started.
+              - Your AI
             </Text>
           </View>
-          <View>
-            <Image source={chakraLogo} style={styles.chakraLogo} />
-          </View>
+          {/* </View> */}
+
+          <Text
+            style={[
+              styles.headTitle,
+              {
+                fontWeight: "400",
+                marginTop: 1,
+                color: "black",
+                fontSize: scaleFont(24),
+                fontFamily: "Mukta-Regular",
+              },
+            ]}
+          >
+            Learning Companion
+          </Text>
+          <Text style={styles.headDesc}>
+            One account. Smarter questions, faster
+          </Text>
+          <Text style={[styles.headDesc, { marginTop: 0 }]}>
+            answers, better learning. Let's get started.
+          </Text>
         </View>
+        <View>
+          <Image source={chakraLogo} style={styles.chakraLogo} />
+        </View>
+      </View>
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        style={styles.container}
+      >
+        {/* Header Section */}
 
         {/* Email Label */}
         <View style={styles.inputFieldsMain}>
-          <View style={styles.fullnameInput}>
+          <View style={[styles.fullnameInput, { alignItems: "flex-start" }]}>
             <View style={styles.nameInput}>
               <Text style={styles.label}>First Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Your First Name"
-                placeholderTextColor="#B0B7C3"
-                value={firstName}
-                onChangeText={setFirstName}
-              />
+              <View
+                style={[
+                  styles.input,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 0,
+                  },
+                  focusedInput === "firstName" && {
+                    borderColor: appColors.navyBlueShade,
+                  },
+                  errors.firstName && {
+                    borderColor: "#D00B0B",
+                    borderWidth: 2,
+                  },
+                ]}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    height: "100%",
+                    paddingHorizontal: 15,
+                    fontFamily: "Mukta-Regular",
+                    fontSize: scaleFont(14),
+                  }}
+                  placeholder="Your First Name"
+                  placeholderTextColor="#B0B7C3"
+                  value={firstName}
+                  onChangeText={(text) => {
+                    setFirstName(text);
+                    setErrors((prev) => ({
+                      ...prev,
+                      firstName: validateFirstName(text),
+                    }));
+                  }}
+                  onFocus={() => setFocusedInput("firstName")}
+                  onBlur={() => setFocusedInput(null)}
+                />
+                {errors.firstName && (
+                  <AlertCircle
+                    size={20}
+                    color="#D00B0B"
+                    style={{ marginRight: 10 }}
+                  />
+                )}
+              </View>
+              <View style={{ minHeight: 20, marginTop: 4 }}>
+                {errors.firstName && (
+                  <Text
+                    style={{
+                      color: "#D00B0B",
+                      fontSize: scaleFont(11),
+                      fontFamily: "Mukta-Regular",
+                    }}
+                  >
+                    {errors.firstName}
+                  </Text>
+                )}
+              </View>
             </View>
             <View style={styles.nameInput}>
               <Text style={styles.label}>Last Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Your Last Name"
-                placeholderTextColor="#B0B7C3"
-                value={lastName}
-                onChangeText={setLastName}
-              />
+              <View
+                style={[
+                  styles.input,
+                  {
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 0,
+                  },
+                  focusedInput === "lastName" && {
+                    borderColor: appColors.navyBlueShade,
+                  },
+                  errors.lastName && { borderColor: "#D00B0B", borderWidth: 2 },
+                ]}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    height: "100%",
+                    paddingHorizontal: 15,
+                    fontFamily: "Mukta-Regular",
+                    fontSize: scaleFont(14),
+                  }}
+                  placeholder="Your Last Name"
+                  placeholderTextColor="#B0B7C3"
+                  value={lastName}
+                  onChangeText={(text) => {
+                    setLastName(text);
+                    setErrors((prev) => ({
+                      ...prev,
+                      lastName: validateLastName(text),
+                    }));
+                  }}
+                  onFocus={() => setFocusedInput("lastName")}
+                  onBlur={() => setFocusedInput(null)}
+                />
+                {errors.lastName && (
+                  <AlertCircle
+                    size={20}
+                    color="#D00B0B"
+                    style={{ marginRight: 10 }}
+                  />
+                )}
+              </View>
+              <View style={{ minHeight: 20, marginTop: 4 }}>
+                {errors.lastName && (
+                  <Text
+                    style={{
+                      color: "#D00B0B",
+                      fontSize: scaleFont(11),
+                      fontFamily: "Mukta-Regular",
+                    }}
+                  >
+                    {errors.lastName}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
 
           {/* Password Label */}
           <Text style={[styles.label, { marginTop: 20 }]}>Email ID</Text>
-          <View style={styles.passwordContainer}>
+          <View
+            style={[
+              styles.passwordContainer,
+              focusedInput === "email" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.email && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
             <TextInput
               style={styles.passwordInput}
               placeholder="Enter your Email ID"
               placeholderTextColor="#B0B7C3"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrors((prev) => ({ ...prev, email: validateEmail(text) }));
+              }}
+              onFocus={() => setFocusedInput("email")}
+              onBlur={() => setFocusedInput(null)}
             />
+            {errors.email && (
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 15 }}
+              />
+            )}
           </View>
+          {errors.email && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.email}
+            </Text>
+          )}
+          <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
+          <View
+            style={[
+              styles.passwordContainer,
+              focusedInput === "password" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.password && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Enter your Password"
+              placeholderTextColor="#B0B7C3"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setErrors((prev) => ({
+                  ...prev,
+                  password: validatePassword(text),
+                  confirmPassword: confirmPassword
+                    ? validateConfirmPassword(confirmPassword, text)
+                    : prev.confirmPassword,
+                }));
+              }}
+              onFocus={() => setFocusedInput("password")}
+              onBlur={() => setFocusedInput(null)}
+            />
+            {errors.password && (
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 10 }}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={{ marginRight: 15 }}
+            >
+              {showPassword ? (
+                <EyeOff size={22} color="#0F1419" />
+              ) : (
+                <Eye size={22} color="#0F1419" />
+              )}
+            </TouchableOpacity>
+          </View>
+          {errors.password && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.password}
+            </Text>
+          )}
+          <Text style={[styles.label, { marginTop: 20 }]}>
+            Confirm Password
+          </Text>
+          <View
+            style={[
+              styles.passwordContainer,
+              focusedInput === "confirmPassword" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.confirmPassword && {
+                borderColor: "#D00B0B",
+                borderWidth: 2,
+              },
+            ]}
+          >
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Enter your Password Again"
+              placeholderTextColor="#B0B7C3"
+              secureTextEntry={!showConfirmPassword}
+              value={confirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                setErrors((prev) => ({
+                  ...prev,
+                  confirmPassword: validateConfirmPassword(text, password),
+                }));
+              }}
+              onFocus={() => setFocusedInput("confirmPassword")}
+              onBlur={() => setFocusedInput(null)}
+            />
+            {errors.confirmPassword && (
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 10 }}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{ marginRight: 15 }}
+            >
+              {showConfirmPassword ? (
+                <EyeOff size={22} color="#0F1419" />
+              ) : (
+                <Eye size={22} color="#0F1419" />
+              )}
+            </TouchableOpacity>
+          </View>
+          {errors.confirmPassword && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.confirmPassword}
+            </Text>
+          )}
 
           {/* Forgot Password */}
           <View style={styles.forgotPasswordMain} activeOpacity={0.6}>
             <TouchableOpacity
-              onPress={() => setIsChecked(!isChecked)}
-               style={[styles.radioOuter, { borderColor: isChecked ? appColors.navyBlueShade : "#D3DAE5",backgroundColor:isChecked?appColors.navyBlueShade :"transparent" }]}
+              onPress={() => {
+                const newChecked = !isChecked;
+                setIsChecked(newChecked);
+                setErrors((prev) => ({
+                  ...prev,
+                  checkbox: newChecked
+                    ? ""
+                    : "Please agree to the Terms of Use and Privacy Policy",
+                }));
+              }}
+              style={[
+                styles.radioOuter,
+                {
+                  borderColor: isChecked ? appColors.navyBlueShade : "#D3DAE5",
+                  backgroundColor: isChecked
+                    ? appColors.navyBlueShade
+                    : "transparent",
+                },
+                errors.checkbox && { borderColor: "#D00B0B", borderWidth: 2 },
+              ]}
             >
               {isChecked && (
-               <Check size={19} color="white" strokeWidth={1.75} />
+                <Check size={19} color="white" strokeWidth={1.75} />
               )}
             </TouchableOpacity>
 
@@ -217,13 +688,50 @@ const SignUp = () => {
               </TouchableOpacity>
             </View>
           </View>
+          {errors.checkbox && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: -15,
+                marginBottom: 15,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.checkbox}
+            </Text>
+          )}
           {/* Email Button */}
           <TouchableOpacity
-            onPress={() => setVerificationMailSent(true)}
-            style={styles.emailButton}
+            onPress={() => handleUserSignUp()}
+            style={[
+              styles.emailButton,
+              (!firstName.trim() ||
+                !lastName.trim() ||
+                !email.trim() ||
+                !password ||
+                !confirmPassword ||
+                !isChecked ||
+                loading) && {
+                backgroundColor: "#CDD5DC",
+              },
+            ]}
             activeOpacity={0.8}
+            disabled={
+              loading ||
+              !firstName.trim() ||
+              !lastName.trim() ||
+              !email.trim() ||
+              !password ||
+              !confirmPassword ||
+              !isChecked
+            }
           >
-            <Text style={styles.emailButtonText}>Verify Email</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.emailButtonText}>Verify Email</Text>
+            )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}

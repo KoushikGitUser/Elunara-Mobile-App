@@ -6,18 +6,21 @@ import {
   Image,
   Platform,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { triggerToast } from "../../services/toast";
+import { appColors } from "../../themes/appColors";
 
 const ConfirmLogoutPopup = ({
   toggleLogOutConfirmPopup,
   setToggleLogOutConfirmPopup,
 }) => {
-    const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
   return (
     <Modal
       visible={toggleLogOutConfirmPopup}
@@ -56,7 +59,8 @@ const ConfirmLogoutPopup = ({
 
             {/* Description */}
             <Text style={styles.description}>
-              Are you sure you want to log out? You’ll need to sign in again to access your Rooms and chats.
+              Are you sure you want to log out? You’ll need to sign in again to
+              access your Rooms and chats.
             </Text>
 
             {/* Button */}
@@ -78,14 +82,36 @@ const ConfirmLogoutPopup = ({
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.button}
-                onPress={() => {setToggleLogOutConfirmPopup(false);
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: loading
+                      ? "#CDD5DC"
+                      : appColors.navyBlueShade,
+                  },
+                ]}
+                disabled={loading}
+                onPress={() => {
+                  setLoading(true)
+                  setTimeout(() => {
+                    setLoading(false)
+                    setToggleLogOutConfirmPopup(false);
                     navigation.navigate("welcome");
-                    triggerToast("Logged Out","You have been logged out successfully","success",3000);
+                    triggerToast(
+                      "Logged Out",
+                      "You have been logged out successfully",
+                      "success",
+                      3000
+                    );
+                  }, 2500);
                 }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Log Out</Text>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Log Out</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>

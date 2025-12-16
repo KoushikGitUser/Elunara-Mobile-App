@@ -1,11 +1,11 @@
 import axios from "axios";
 
-let mainURL = "http://curriculight.test/api/v1";
+let mainURL = "https://app.interactivevirtualtutor.ai/api/v1";
 export const baseURL = mainURL;
 let apiInstance = axios.create({ baseURL });
 
 export const photoFetch = (mediaUrl) => {
-  return `http://curriculight.test/api/v1/${mediaUrl}`;
+  return `https://app.interactivevirtualtutor.ai/api/v1/${mediaUrl}`;
 };
 
 let isRefreshing = false;
