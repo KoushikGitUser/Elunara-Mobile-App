@@ -3,15 +3,25 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, StatusBar, ImageBackground, Image } from 'react-native';
 import { scaleFont } from '../../utils/responsive';
 import chakraLogoSplash from '../../assets/images/chakraBig.png';
-import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png'
+import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('welcome');
-    }, 2000); // 2.5 seconds 
+    const checkAuthAndNavigate = async () => {
+      const authenticUser = await AsyncStorage.getItem('authenticUser');
+      const timer = setTimeout(() => {
+        if (authenticUser === 'true') {
+          navigation.replace('chat');
+        } else {
+          navigation.replace('welcome');
+        }
+      }, 2500);
 
-    return () => clearTimeout(timer);   
+      return () => clearTimeout(timer);
+    };
+
+    checkAuthAndNavigate();
   }, [navigation]);
 
   return (

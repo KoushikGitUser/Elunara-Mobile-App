@@ -30,6 +30,7 @@ import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLef
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { userSignIn } from "../../../redux/slices/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -114,7 +115,7 @@ const SignIn = () => {
     formData.append("email", email.trim());
     formData.append("password", password.trim());
     dispatch(userSignIn(formData));
-
+     AsyncStorage.setItem("authenticUser", "true");
     // Proceed with login
     navigation.navigate("chat");
    }, 2500);

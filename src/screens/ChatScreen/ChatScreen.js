@@ -3,10 +3,12 @@ import {
   Dimensions,
   Animated,
   StatusBar,
+  BackHandler,
+  Alert,
 } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import ChatHeader from "../../components/ChatScreen/ChatHeader";
@@ -34,6 +36,7 @@ import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActio
 import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
+import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
 
 const ChatScreen = () => {
   const styleProps = {};
@@ -43,7 +46,8 @@ const ChatScreen = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
-  const translateX = React.useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -66,6 +70,21 @@ const ChatScreen = () => {
     };
     checkNewUser();
   }, []);
+
+    useEffect(() => {
+    const backAction = () => {
+      setToggleExitAppConfirmPopup(true);
+      return true; // prevent default behavior (exit)
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove(); // clean up
+  }, [toggleExitAppConfirmPopup]);
+
 
   // Show nothing (or a loader) while fonts are loading
   if (!fontsLoaded) {
@@ -97,6 +116,7 @@ const ChatScreen = () => {
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && (
             <ChangeLLMPopup />
           )}
+          {toggleExitAppConfirmPopup && <ExitAppConfirmationPopup setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup} toggleExitAppConfirmPopup={toggleExitAppConfirmPopup} />}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
           {toggleStates.toggleChangeResponseStyleWhileChatPopup && (
             <ChangeResponseStylePopup />

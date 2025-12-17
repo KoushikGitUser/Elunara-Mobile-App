@@ -1,59 +1,53 @@
-import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Modal,
-  Dimensions,
-  Platform,
-  TextInput,
   KeyboardAvoidingView,
-  ScrollView,
-  Keyboard,
+  Platform,
+  TouchableOpacity,
   Animated,
+  ScrollView,
+  TextInput,
+  Keyboard,
 } from "react-native";
-import { BlurView } from "@react-native-community/blur";
+import React, { useEffect, useRef, useState } from "react";
 import { scaleFont } from "../../utils/responsive";
+import { BlurView } from "@react-native-community/blur";
 import BackArrowLeftIcon from "../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 
-const { width } = Dimensions.get("window");
-
-const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
 
-  useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
-      const height = e.endCoordinates.height;
-      setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5, // pushes up slightly, not fully
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
-    });
+    useEffect(() => {
+      const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+        const height = e.endCoordinates.height;
+        setKeyboardHeight(height);
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5, // pushes up slightly, not fully
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      });
+  
+      const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      });
+  
+      return () => {
+        keyboardDidShow.remove();
+        keyboardDidHide.remove();
+      };
+    }, []);
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
-    });
-
-    return () => {
-      keyboardDidShow.remove();
-      keyboardDidHide.remove();
-    };
-  }, []);
-
-  const handleChange = (index, value) => {
+      const handleChange = (index, value) => {
     if (/^\d*$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
@@ -70,10 +64,11 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
       inputRefs.current[index - 1]?.focus();
     }
   };
+  
 
   return (
     <Modal
-      visible={mobileVerificationPopup}
+      visible={verifyMailOtpPopup}
       transparent={true}
       animationType="slide"
       onRequestClose={() => close(false)}
@@ -108,10 +103,8 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                   inputRange: [0, 400], // average keyboard height
                   outputRange: [
                     0,
-                    isCodeSent
-                      ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),
-                  ], 
+                   -(keyboardHeight * 3.5)
+                  ],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -129,16 +122,13 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
               {/* Content */}
               <View style={styles.content}>
                 {/* Title */}
-                {isCodeSent && (
+
                   <View style={styles.closeModalMain}>
-                    <TouchableOpacity  onPress={() => setIsCodeSent(false)}>
-                    <BackArrowLeftIcon/>
+                    <TouchableOpacity >
+                      <BackArrowLeftIcon />
                     </TouchableOpacity>
                   </View>
-                )}
-
-                {isCodeSent ? (
-                  <>
+ 
                     <Text style={styles.title}>Enter the 6-digit code</Text>
                     {/* Description */}
                     <Text style={styles.description}>
@@ -154,72 +144,47 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                         },
                       ]}
                     >
-                      9876543210
+                      abcd400@gmail.com
                     </Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.title}>
-                      Lastly, Verify your{"\n"}mobile number
-                    </Text>
-                    {/* Description */}
-                    <Text style={styles.description}>
-                      To enhance security, we need to verify.
-                    </Text>
-                    <Text style={[styles.description, { marginBottom: 35 }]}>
-                      your mobile number
-                    </Text>
-                  </>
-                )}
+
 
                 {/* Input Section */}
-                {isCodeSent ? (
-                  <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                      <TextInput
-                        key={index}
-                        ref={(ref) => (inputRefs.current[index] = ref)}
-                        style={[styles.otpInput]}
-                        value={digit}
-                        onChangeText={(value) => handleChange(index, value)}
-                        onKeyPress={({ nativeEvent: { key } }) =>
-                          handleKeyPress(index, key)
-                        }
-                        keyboardType="number-pad"
-                        maxLength={1}
-                        selectTextOnFocus
-                      />
-                    ))}
-                  </View>
-                ) : (
-                  <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Mobile Number</Text>
+                <View style={styles.otpContainer}>
+                  {otp.map((digit, index) => (
                     <TextInput
-                      style={styles.input}
-                      placeholder="Enter your mobile number"
-                      placeholderTextColor="#9CA3AF"
-                      value={mobileNumber}
-                      onChangeText={setMobileNumber}
-                      keyboardType="phone-pad"
-                      returnKeyType="done"
+                      key={index}
+                      ref={(ref) => (inputRefs.current[index] = ref)}
+                      style={[styles.otpInput]}
+                      value={digit}
+                      onChangeText={(value) => handleChange(index, value)}
+                      onKeyPress={({ nativeEvent: { key } }) =>
+                        handleKeyPress(index, key)
+                      }
+                      keyboardType="number-pad"
+                      maxLength={1}
+                      selectTextOnFocus
                     />
-                  </View>
-                )}
+                  ))}
+                </View>
 
                 {/* Verify Button */}
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    !mobileNumber && styles.verifyButtonDisabled,
+                    otp.some((digit) => digit === "") && styles.verifyButtonDisabled,
                   ]}
                   onPress={() => {
-                    setIsCodeSent(true);
+                    if (otp.every((digit) => digit !== "")) {
+                      // All digits filled, proceed with verification
+                      const otpCode = otp.join("");
+                      console.log("OTP Code:", otpCode);
+                    }
                   }}
                   activeOpacity={0.8}
-                  disabled={!mobileNumber}
+                  disabled={otp.some((digit) => digit === "")}
                 >
                   <Text style={styles.verifyButtonText}>
-                    {isCodeSent ? "Continue" : "Verify"}
+                    Verify
                   </Text>
                 </TouchableOpacity>
 
@@ -227,30 +192,15 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                 <TouchableOpacity
                   style={[
                     styles.skipButton,
-                    { marginBottom: isCodeSent ? 70 : 20 },
+                    { marginBottom: 70 },
                   ]}
                   onPress={() => close(false)}
                   activeOpacity={0.7}
                 >
-                  {isCodeSent ? (
-                    <Text style={styles.skipButtonText}>
-                      Resend Code in 00:20
-                    </Text>
-                  ) : (
-                    <Text style={styles.skipButtonText}>Skip for now</Text>
-                  )}
+                  <Text style={styles.skipButtonText}>
+                    Resend Code in 00:20
+                  </Text>
                 </TouchableOpacity>
-
-                {/* Note */}
-                {!isCodeSent && (
-                  <View style={[styles.noteContainer, { marginBottom: 50 }]}>
-                    <Text style={styles.noteText}>
-                      <Text style={styles.noteBold}>Note:</Text> You can skip
-                      this step for now — but verification will be required
-                      within 7 days to continue using Elunara.
-                    </Text>
-                  </View>
-                )}
               </View>
             </View>
           </ScrollView>
@@ -366,10 +316,10 @@ const styles = StyleSheet.create({
   otpInput: {
     width: "15%",
     height: 57,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#B5BECE",
-    backgroundColor:"white",
-    color:"#828282",
+    backgroundColor: "white",
+    color: "#828282",
     borderRadius: 16,
     textAlign: "center",
     fontSize: scaleFont(15),
@@ -417,7 +367,7 @@ const styles = StyleSheet.create({
     color: "#0F172A",
     fontSize: scaleFont(14),
     fontWeight: "600",
-    borderBottomWidth:1,
+    borderBottomWidth: 1,
     fontFamily: "Mukta-Bold",
   },
   noteContainer: {
@@ -437,4 +387,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MobileVerificationPopup;
+export default VerifyMailOtpPopup;

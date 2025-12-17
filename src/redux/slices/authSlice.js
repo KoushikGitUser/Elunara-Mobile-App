@@ -1,7 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiInstance from "../helper";
 import { triggerToast } from "../../services/toast";
-import { storeToken, removeToken } from "../../utils/Secure/secureStore";
+import {
+  storeToken,
+  removeToken,
+  storeRefreshToken,
+} from "../../utils/Secure/secureStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
   user: null,
@@ -11,7 +16,8 @@ const initialState = {
   error: null,
   isSignedUp: null,
   isSignedIn: null,
-  isLogOut:null,
+  isLogOut: null,
+  isPasswordReset: null,
 };
 
 export const userSignUp = createAsyncThunk(
@@ -86,6 +92,29 @@ export const userLogOut = createAsyncThunk(
   }
 );
 
+export const resetPassword = createAsyncThunk(
+  "/resetPassword",
+  async (passDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/reset-password", passDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -122,7 +151,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    //signup
+      //signup
       .addCase(userSignUp.pending, (state, action) => {
         state.isSignedUp = "pending";
       })
@@ -132,7 +161,6 @@ const authSlice = createSlice({
       .addCase(userSignUp.rejected, (state, action) => {
         state.isSignedUp = false;
       })
-
 
       //signin
       .addCase(userSignIn.pending, (state, action) => {
@@ -148,6 +176,14 @@ const authSlice = createSlice({
         if (payload.data?.token) {
           storeToken(payload.data.token);
         }
+
+        // Store refresh token in secure storage
+        if (payload.data?.refreshToken) {
+          storeRefreshToken(payload.data.refreshToken);
+        }
+
+        // Set authenticated user flag in AsyncStorage
+        AsyncStorage.setItem("authenticUser", "true");
 
         setTimeout(() => {
           triggerToast(
@@ -165,7 +201,7 @@ const authSlice = createSlice({
         }, 300);
       })
 
-     //Logout
+      //Logout
       .addCase(userLogOut.pending, (state, action) => {
         state.isLogOut = "pending";
       })
@@ -185,9 +221,24 @@ const authSlice = createSlice({
       .addCase(userLogOut.rejected, (state, action) => {
         state.isLogOut = false;
         setTimeout(() => {
-          triggerToast("Error", "Logout failed, try again later", "error", 3000);
+          triggerToast(
+            "Error",
+            "Logout failed, try again later",
+            "error",
+            3000
+          );
         }, 300);
       })
+
+      .addCase(resetPassword.pending, (state, action) => {
+        state.isPasswordReset = "pending";
+      })
+      .addCase(resetPassword.fulfilled, (state, { payload }) => {
+        state.isPasswordReset = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isPasswordReset = false;
+      });
   },
 });
 

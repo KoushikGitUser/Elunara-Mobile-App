@@ -1,4 +1,6 @@
 import axios from "axios";
+import { getToken, storeToken, getRefreshToken, updateRefreshToken, removeToken, removeRefreshToken } from "../utils/Secure/secureStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 let mainURL = "https://app.interactivevirtualtutor.ai/api/v1";
 export const baseURL = mainURL;
@@ -24,12 +26,12 @@ const processQueue = (error, token = null) => {
 };
 
 apiInstance.interceptors.request.use(
-  (config) => {
-    const accessToken = "ejupuiig896968976vtguigjuh87t87gjuhg87tuygvjh";
+  async (config) => {
+    const accessToken = await getToken();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
-      config.headers.Accept = "application/json";
     }
+    config.headers.Accept = "application/json";
     return config;
   },
   (error) => Promise.reject(error)
@@ -40,7 +42,8 @@ apiInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-     if (originalRequest.url.includes('/login')) {
+    // Skip refresh token logic for login and refresh-token endpoints
+    if (originalRequest.url.includes('/login') || originalRequest.url.includes('/refresh-token')) {
       return Promise.reject(error);
     }
 
@@ -60,23 +63,40 @@ apiInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = "refreshlihguibvhiuyh9869876897ybviuo789yo9";
+        // Get refresh token from secure store
+        const refreshToken = await getRefreshToken();
+
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
+        }
+
         const response = await apiInstance.post("/refresh-token", {
           refresh_token: refreshToken,
         });
+
         const newAccessToken = response?.data?.data?.access_token;
         const newRefreshToken = response?.data?.data?.refresh_token;
-        localStorage.setItem("access_token", newAccessToken);
-        localStorage.setItem("refresh_token", newRefreshToken);
+
+        // Store new tokens in secure store
+        if (newAccessToken) {
+          await storeToken(newAccessToken);
+        }
+
+        if (newRefreshToken) {
+          await updateRefreshToken(newRefreshToken);
+        }
+
         processQueue(null, newAccessToken);
-        // YOU will re-dispatch your thunk with the new token
+
+        // Retry the original request with new token
         originalRequest.headers["Authorization"] = "Bearer " + newAccessToken;
         return apiInstance(originalRequest);
       } catch (err) {
-        // toast.error("Session timed out,Please Sign-in again");
-        // localStorage.removeItem("access_token");
-        // localStorage.removeItem("refresh_token");
-        // window.location.reload();
+        // Clear tokens on refresh failure
+        await removeToken();
+        await removeRefreshToken();
+        await AsyncStorage.removeItem("authenticUser");
+
         processQueue(err, null);
         return Promise.reject(err);
       } finally {

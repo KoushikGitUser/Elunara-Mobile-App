@@ -1,33 +1,16 @@
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Image,
-  Platform,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
-import React, { useState } from "react";
-import { BlurView } from "@react-native-community/blur";
-import { scaleFont } from "../../utils/responsive";
-import { useNavigation } from "@react-navigation/native";
-import { triggerToast } from "../../services/toast";
-import { appColors } from "../../themes/appColors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, Platform, StyleSheet, Modal, TouchableOpacity, BackHandler } from 'react-native'
+import React from 'react'
+import { scaleFont } from '../../utils/responsive'
+import { BlurView } from '@react-native-community/blur'
+import { appColors } from '../../themes/appColors'
 
-const ConfirmLogoutPopup = ({
-  toggleLogOutConfirmPopup,
-  setToggleLogOutConfirmPopup,
-}) => {
-  const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
+const ExitAppConfirmationPopup = ({ toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup }) => {
   return (
     <Modal
-      visible={toggleLogOutConfirmPopup}
+      visible={toggleExitAppConfirmPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => setToggleLogOutConfirmPopup(false)}
+      onRequestClose={() => setToggleExitAppConfirmPopup(false)}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -43,7 +26,7 @@ const ConfirmLogoutPopup = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => setToggleLogOutConfirmPopup(false)}
+          onPress={() => setToggleExitAppConfirmPopup(false)}
         />
 
         {/* Modal Sheet */}
@@ -56,12 +39,11 @@ const ConfirmLogoutPopup = ({
           {/* Content */}
           <View style={styles.content}>
             {/* Title */}
-            <Text style={styles.title}>Confirm Log Out</Text>
+            <Text style={styles.title}>Confirm Exit App?</Text>
 
             {/* Description */}
             <Text style={styles.description}>
-              Are you sure you want to log out? You’ll need to sign in again to
-              access your Rooms and chats.
+              Are you sure you want to exit the app? Unsaved progress may be lost.
             </Text>
 
             {/* Button */}
@@ -75,7 +57,7 @@ const ConfirmLogoutPopup = ({
                     borderColor: "black",
                   },
                 ]}
-                onPress={() => setToggleLogOutConfirmPopup(false)}
+                onPress={() => setToggleExitAppConfirmPopup(false)}
                 activeOpacity={0.8}
               >
                 <Text style={[styles.buttonText, { color: "black" }]}>
@@ -86,42 +68,24 @@ const ConfirmLogoutPopup = ({
                 style={[
                   styles.button,
                   {
-                    backgroundColor: loading
-                      ? "#CDD5DC"
-                      : appColors.navyBlueShade,
+                    backgroundColor: appColors.navyBlueShade,
                   },
                 ]} 
-                disabled={loading}
                 onPress={() => {
-                  setLoading(true)
-                  setTimeout(() => {
-                    setLoading(false)
-                    setToggleLogOutConfirmPopup(false);
-                    navigation.navigate("welcome");
-                    AsyncStorage.setItem("authenticUser", "false");
-                    triggerToast(
-                      "Logged Out",
-                      "You have been logged out successfully",
-                      "success",
-                      3000
-                    );
-                  }, 2500);
+                   setToggleExitAppConfirmPopup(false);
+                   BackHandler.exitApp();
                 }}
                 activeOpacity={0.8}
               >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.buttonText}>Log Out</Text>
-                )}
+                  <Text style={styles.buttonText}>Exit</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
     </Modal>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -215,4 +179,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConfirmLogoutPopup;
+export default ExitAppConfirmationPopup

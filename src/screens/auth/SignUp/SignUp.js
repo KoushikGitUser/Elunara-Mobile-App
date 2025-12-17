@@ -27,6 +27,7 @@ import { Check, AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 import { userSignUp } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
+import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -37,9 +38,10 @@ const SignUp = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-  const [verificationMailSent, setVerificationMailSent] = useState(false);
+  const [verificationMailSent, setVerificationMailSent] = useState(true);
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [errors, setErrors] = useState({
     firstName: "",
@@ -232,7 +234,7 @@ const SignUp = () => {
 
       dispatch(userSignUp(formData));
 
-      navigation.navigate("signin");
+      setVerificationMailSent(true);
     }, 2500);
   };
 
@@ -257,8 +259,15 @@ const SignUp = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       {verificationMailSent && (
         <VerificationMailPopup
+          setVerifyMailOtpPopup={setVerifyMailOtpPopup}
           close={setVerificationMailSent}
           verificationMailSent={verificationMailSent}
+        />
+      )}
+      {verifyMailOtpPopup && (
+        <VerifyMailOtpPopup
+          close={setVerifyMailOtpPopup}
+          verifyMailOtpPopup={verifyMailOtpPopup}
         />
       )}
       {mobileVerificationPopup && (

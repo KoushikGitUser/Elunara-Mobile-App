@@ -17,6 +17,7 @@ import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont } from "../../../utils/responsive";
 import { appColors } from "../../../themes/appColors";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -28,6 +29,8 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const [otp, setOtp] = useState(["0", "0", "0", "0"]);
   const inputRefs = useRef([]);
   const animatedValue = useState(new Animated.Value(0))[0]; 
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -208,8 +211,11 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                     { marginBottom: isCodeSent ? 35 : 85 },
                   ]}
                   onPress={() => {
-                    setIsCodeSent(true);
-                  }}
+                    if (isCodeSent) {
+                      navigation.navigate("changepass");
+                    } else {
+                      setIsCodeSent(true);
+                  }}}
                   activeOpacity={0.8}
                   disabled={!email}
                 >

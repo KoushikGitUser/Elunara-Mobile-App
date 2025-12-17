@@ -13,10 +13,12 @@ import { BlurView } from "@react-native-community/blur";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import verifiedIcon from '../../assets/images/Group.png';
 import { scaleFont } from "../../utils/responsive";
+import { appColors } from "../../themes/appColors";
+import { ArrowRight } from "lucide-react-native";
 
 const { width } = Dimensions.get("window");
 
-const VerificationMailPopup = ({close,verificationMailSent}) => {
+const VerificationMailPopup = ({close,verificationMailSent,setVerifyMailOtpPopup}) => {
 
   return (
     <Modal
@@ -57,22 +59,34 @@ const VerificationMailPopup = ({close,verificationMailSent}) => {
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>Verification link sent!</Text>
+            <Text style={styles.title}>Verification mail sent!</Text>
 
             {/* Description */}
             <Text style={styles.description}>
               It may take a few minutes to arrive, check your spam or promotions
-              folder if you don't see it. Click the link to verify your account,
-              set your password, and sign in.
+              folder if you don't see it.
+            </Text>
+             <Text style={[styles.description,{marginBottom:15}]}>
+              Click the link, verify your account and sign in.
+            </Text>
+            <Text style={[styles.description,{textAlign:"center",fontFamily:"Mukta-Bold",marginBottom:15,color:appColors.navyBlueShade,fontSize:20}]}>
+              or
+            </Text>
+            <Text style={[styles.description,{marginBottom:25}]}>
+              Enter the OTP received in the same mail, verify your account and sign in.
             </Text>
 
             {/* Button */}
             <TouchableOpacity
               style={styles.button}
-              onPress={() => close(false)}
+              onPress={() => {
+                setVerifyMailOtpPopup(true);
+                close(false);
+              }}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Got it</Text>
+              <Text style={styles.buttonText}>Enter OTP</Text>
+              <ArrowRight color="white" size={20} strokeWidth={1.75} />
             </TouchableOpacity>
           </View>
         </View>
@@ -153,7 +167,9 @@ verifiedIcon:{
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom:20
+    marginBottom:20,
+    flexDirection:"row",
+    gap:5
   },
   buttonText: {
     color: "#FFFFFF",
