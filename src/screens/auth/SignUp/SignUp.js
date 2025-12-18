@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useState } from "react";
@@ -28,6 +29,7 @@ import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLef
 import { userSignUp } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
+import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -38,9 +40,8 @@ const SignUp = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-  const [verificationMailSent, setVerificationMailSent] = useState(true);
+  const [verificationMailSent, setVerificationMailSent] = useState(false);
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [errors, setErrors] = useState({
@@ -51,6 +52,29 @@ const SignUp = () => {
     confirmPassword: "",
     checkbox: "",
   });
+    const { authStates } = useSelector((state) => state.Auth);
+
+  useEffect(()=>{
+    if(authStates.isSignedUp == true){
+      setVerificationMailSent(true);
+    }
+    else if(authStates.isAccountRecoverable){
+      triggerToast("Account recoverable!","This email is recoverable","error",3000)
+    }
+  },[authStates.isSignedUp,authStates.isAccountRecoverable])
+
+  useEffect(() => {
+    const backAction = () => {
+      return true; // prevent default behavior (exit)
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove(); // clean up
+  }, []);
 
   const styleProps = {};
 
@@ -72,7 +96,7 @@ const SignUp = () => {
     }
     const lastNameRegex = /^[A-Za-z]+$/;
     if (!lastNameRegex.test(text.trim())) {
-      return "Only alphabets allowed";
+      return "No space or number allowed";
     }
     return "";
   };
@@ -115,127 +139,19 @@ const SignUp = () => {
   };
 
   const dispatch = useDispatch();
-  const { isSignedUp } = useSelector((state) => state.Auth);
 
-  useEffect(() => {
-    if (isSignedUp === true) {
-      triggerToast("Yayy", "Account created successfully!", "success", 3000);
-    } else if (isSignedUp === false) {
-      triggerToast("Aghhh", "Sign up failed. Please try again.", "error", 3000);
-    }
-  }, [isSignedUp]);
+  const hasErrors = Object.values(errors).some((error) => error !== "");
 
   const handleUserSignUp = () => {
-    setLoading(true);
-    // Reset errors
-    const newErrors = {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      checkbox: "",
-    };
-    let hasError = false;
-
-    // Validate firstName - not empty
-    if (!firstName.trim()) {
-      newErrors.firstName = "First name is required";
-      hasError = true;
-    } else {
-      // Validate firstName - only alphabets and spaces allowed
-      const firstNameRegex = /^[A-Za-z\s]+$/;
-      if (!firstNameRegex.test(firstName.trim())) {
-        newErrors.firstName = "Only alphabets and space allowed";
-        hasError = true;
-      }
-    }
-
-    // Validate lastName - not empty
-    if (!lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-      hasError = true;
-    } else {
-      // Validate lastName - only alphabets allowed (no spaces)
-      const lastNameRegex = /^[A-Za-z]+$/;
-      if (!lastNameRegex.test(lastName.trim())) {
-        newErrors.lastName = "Only alphabets allowed";
-        hasError = true;
-      }
-    }
-
-    // Validate email - not empty
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-      hasError = true;
-    } else {
-      // Validate email format
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailRegex.test(email.trim())) {
-        newErrors.email = "Valid Email ID required";
-        hasError = true;
-      }
-    }
-
-    // Validate password - not empty
-    if (!password) {
-      newErrors.password = "Password is required";
-      hasError = true;
-    } else {
-      // Validate password - 8-32 chars, must include letter, number, and special character
-      if (password.length < 8 || password.length > 32) {
-        newErrors.password = "Password must be between 8 and 32 characters";
-        hasError = true;
-      } else {
-        const hasLetter = /[A-Za-z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(
-          password
-        );
-
-        if (!hasLetter || !hasNumber || !hasSpecialChar) {
-          newErrors.password =
-            "Password must include letter, number, and special character";
-          hasError = true;
-        }
-      }
-    }
-
-    // Validate confirm password - not empty
-    if (!confirmPassword) {
-      newErrors.confirmPassword = "Confirm password is required";
-      hasError = true;
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-      hasError = true;
-    }
-
-    // Validate terms and conditions checkbox
-    if (!isChecked) {
-      newErrors.checkbox =
-        "Please agree to the Terms of Use and Privacy Policy";
-      hasError = true;
-    }
-
-    setErrors(newErrors);
-
-    if (hasError) {
-      return;
-    }
-
-    setTimeout(() => {
-      setLoading(false);
+    if (hasErrors) return;
       const formData = new FormData();
       formData.append("first_name", firstName.trim());
       formData.append("last_name", lastName.trim());
       formData.append("email", email.trim());
       formData.append("password", password);
       formData.append("password_confirmation", confirmPassword);
-
+      dispatch(setUserMailIDOnSignup(email.trim()));
       dispatch(userSignUp(formData));
-
-      setVerificationMailSent(true);
-    }, 2500);
   };
 
   const navigation = useNavigation();
@@ -715,19 +631,21 @@ const SignUp = () => {
             onPress={() => handleUserSignUp()}
             style={[
               styles.emailButton,
-              (!firstName.trim() ||
+              (hasErrors ||
+                !firstName.trim() ||
                 !lastName.trim() ||
                 !email.trim() ||
                 !password ||
                 !confirmPassword ||
                 !isChecked ||
-                loading) && {
+                authStates.isSignedUp == "pending") && {
                 backgroundColor: "#CDD5DC",
               },
             ]}
             activeOpacity={0.8}
             disabled={
-              loading ||
+              authStates.isSignedUp == "pending" ||
+              hasErrors ||
               !firstName.trim() ||
               !lastName.trim() ||
               !email.trim() ||
@@ -736,7 +654,7 @@ const SignUp = () => {
               !isChecked
             }
           >
-            {loading ? (
+            {authStates.isSignedUp == "pending" ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <Text style={styles.emailButtonText}>Verify Email</Text>

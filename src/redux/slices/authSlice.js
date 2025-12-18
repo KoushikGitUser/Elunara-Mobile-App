@@ -7,18 +7,8 @@ import {
   storeRefreshToken,
 } from "../../utils/Secure/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { allInitialStates } from "../allInitialStates";
 
-const initialState = {
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  loading: false,
-  error: null,
-  isSignedUp: null,
-  isSignedIn: null,
-  isLogOut: null,
-  isPasswordReset: null,
-};
 
 export const userSignUp = createAsyncThunk(
   "/userSignUp",
@@ -27,6 +17,7 @@ export const userSignUp = createAsyncThunk(
       let res = await apiInstance.post("/register", registerDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -50,6 +41,7 @@ export const userSignIn = createAsyncThunk(
       let res = await apiInstance.post("/login", loginDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -68,14 +60,12 @@ export const userSignIn = createAsyncThunk(
 
 export const userLogOut = createAsyncThunk(
   "/userLogOut",
-  async ({ rejectWithValue }) => {
-    const details = {
-      token: "",
-    };
+  async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.post("/logout", details, {
+      let res = await apiInstance.post("/logout", {}, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -99,6 +89,7 @@ export const resetPassword = createAsyncThunk(
       let res = await apiInstance.post("/reset-password", passDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -115,62 +106,145 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const verifyEmail = createAsyncThunk(
+  "/verifyEmail",
+  async (mailDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/verify-email", mailDetails, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const recoverAccount = createAsyncThunk(
+  "/recoverAccount",
+  async (mailDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/recover-account", mailDetails, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const getOTPForMobileNumber = createAsyncThunk(
+  "/getOTPForMobileNumber",
+  async (mobileDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/send-phone-otp", mobileDetails, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const verifyOTPForMobileNumber = createAsyncThunk(
+  "/verifyOTPForMobileNumber",
+  async (otp, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/verify-phone", otp, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
 const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState:allInitialStates,
   reducers: {
-    loginStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    loginSuccess: (state, action) => {
-      state.loading = false;
-      state.isAuthenticated = true;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.error = null;
-    },
-    loginFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.isSignedIn = null;
-      state.loading = false;
-      state.error = null;
-
-      // Remove token from secure storage
-      removeToken();
-    },
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
   },
   extraReducers: (builder) => {
     builder
       //signup
       .addCase(userSignUp.pending, (state, action) => {
-        state.isSignedUp = "pending";
+        state.authStates.isSignedUp = "pending";
       })
       .addCase(userSignUp.fulfilled, (state, { payload }) => {
-        state.isSignedUp = true;
+        if(payload?.status == 201){
+        state.authStates.isSignedUp = true;
+        }
       })
-      .addCase(userSignUp.rejected, (state, action) => {
-        state.isSignedUp = false;
+      .addCase(userSignUp.rejected, (state, {payload}) => {
+        state.authStates.isSignedUp = false;
+        if(payload?.status == 422){
+          if(payload?.data?.data?.account_recoverable === true){
+            state.authStates.isAccountRecoverable = true;
+            state.authStates.accountRecoverableMessage = payload?.message
+          }
+          else{
+            triggerToast("Account exists","This email is already registered, Log-in to continue","error",3000);
+          }
+
+        }
       })
 
       //signin
       .addCase(userSignIn.pending, (state, action) => {
-        state.isSignedIn = "pending";
+        state.authStates.isSignedIn = "pending";
       })
       .addCase(userSignIn.fulfilled, (state, { payload }) => {
-        state.isSignedIn = true;
-        state.token = payload.data?.token;
-        state.user = payload.data?.user;
-        state.isAuthenticated = true;
+        state.authStates.isSignedIn = true;
+        state.authStates.token = payload.data?.token;
+        state.authStates.user = payload.data?.user;
+        state.authStates.isAuthenticated = true;
 
         // Store token in secure storage
         if (payload.data?.token) {
@@ -195,7 +269,7 @@ const authSlice = createSlice({
         }, 300);
       })
       .addCase(userSignIn.rejected, (state, action) => {
-        state.isSignedIn = false;
+        state.authStates.isSignedIn = false;
         setTimeout(() => {
           triggerToast("Error", "Login failed, try again later", "error", 3000);
         }, 300);
@@ -203,12 +277,11 @@ const authSlice = createSlice({
 
       //Logout
       .addCase(userLogOut.pending, (state, action) => {
-        state.isLogOut = "pending";
+        state.authStates.isLogOut = "pending";
       })
       .addCase(userLogOut.fulfilled, (state, { payload }) => {
-        state.isLogOut = true;
-        state.isAuthenticated = false;
-
+        state.authStates.isLogOut = true;
+        state.authStates.isAuthenticated = false;
         setTimeout(() => {
           triggerToast(
             "Logged out",
@@ -219,7 +292,7 @@ const authSlice = createSlice({
         }, 300);
       })
       .addCase(userLogOut.rejected, (state, action) => {
-        state.isLogOut = false;
+        state.authStates.isLogOut = false;
         setTimeout(() => {
           triggerToast(
             "Error",
@@ -231,14 +304,60 @@ const authSlice = createSlice({
       })
 
       .addCase(resetPassword.pending, (state, action) => {
-        state.isPasswordReset = "pending";
+        state.authStates.isPasswordReset = "pending";
       })
       .addCase(resetPassword.fulfilled, (state, { payload }) => {
-        state.isPasswordReset = true;
+        state.authStates.isPasswordReset = true;
       })
       .addCase(resetPassword.rejected, (state, action) => {
-        state.isPasswordReset = false;
-      });
+        state.authStates.isPasswordReset = false;
+      })
+
+
+      .addCase(verifyEmail.pending, (state, action) => {
+        state.authStates.isMailVerified = "pending";
+      })
+      .addCase(verifyEmail.fulfilled, (state, { payload }) => {
+        state.authStates.isMailVerified = true;
+      })
+      .addCase(verifyEmail.rejected, (state, {payload}) => {
+        state.authStates.isMailVerified = false;
+        console.log(payload.status,"failed");
+        
+      })
+
+
+      .addCase(recoverAccount.pending, (state, action) => {
+        state.authStates.isOTPReceivedForAccountRecovery = "pending";
+      })
+      .addCase(recoverAccount.fulfilled, (state, { payload }) => {
+        state.authStates.isOTPReceivedForAccountRecovery = true;
+      })
+      .addCase(recoverAccount.rejected, (state, action) => {
+        state.authStates.isOTPReceivedForAccountRecovery = false;
+      })
+
+
+      .addCase(getOTPForMobileNumber.pending, (state, action) => {
+        state.authStates.isOTPReceivedForMobileVerification = "pending";
+      })
+      .addCase(getOTPForMobileNumber.fulfilled, (state, { payload }) => {
+        state.authStates.isOTPReceivedForMobileVerification = true;
+      })
+      .addCase(getOTPForMobileNumber.rejected, (state, action) => {
+        state.authStates.isOTPReceivedForMobileVerification = false;
+      })
+
+
+      .addCase(verifyOTPForMobileNumber.pending, (state, action) => {
+        state.authStates.isMobileOTPVerified = "pending";
+      })
+      .addCase(verifyOTPForMobileNumber.fulfilled, (state, { payload }) => {
+        state.authStates.isMobileOTPVerified = true;
+      })
+      .addCase(verifyOTPForMobileNumber.rejected, (state, action) => {
+        state.authStates.isMobileOTPVerified = false;
+      })
   },
 });
 

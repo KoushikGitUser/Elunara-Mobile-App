@@ -2,12 +2,12 @@ import axios from "axios";
 import { getToken, storeToken, getRefreshToken, updateRefreshToken, removeToken, removeRefreshToken } from "../utils/Secure/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-let mainURL = "https://app.interactivevirtualtutor.ai/api/v1";
+let mainURL = "http://api.elunara.ai/api/v1";
 export const baseURL = mainURL;
 let apiInstance = axios.create({ baseURL });
 
 export const photoFetch = (mediaUrl) => {
-  return `https://app.interactivevirtualtutor.ai/api/v1/${mediaUrl}`;
+  return `http://api.elunara.ai/api/v1/${mediaUrl}`;
 };
 
 let isRefreshing = false;

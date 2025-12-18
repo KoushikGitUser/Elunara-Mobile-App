@@ -10,44 +10,70 @@ import {
   ScrollView,
   TextInput,
   Keyboard,
+  ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { scaleFont } from "../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import BackArrowLeftIcon from "../../../assets/SvgIconsComponent/BackArrowLeftIcon";
+import { useDispatch, useSelector } from "react-redux";
+import { verifyEmail } from "../../redux/slices/authSlice";
+import SuccessCheckMark from "./SuccessCheckMark";
+import { appColors } from "../../themes/appColors";
+import { useNavigation } from "@react-navigation/native";
 
 const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
   const animatedValue = useState(new Animated.Value(0))[0];
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
+  const { globalDataStates } = useSelector((state) => state.Global);
+  const { authStates } = useSelector((state) => state.Auth);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+      const height = e.endCoordinates.height;
+      setKeyboardHeight(height);
+      Animated.timing(animatedValue, {
+        toValue: height / 2.5, // pushes up slightly, not fully
+        duration: 250,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+      Animated.timing(animatedValue, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    return () => {
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
+    };
+  }, []);
+
+
 
     useEffect(() => {
-      const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
-        const height = e.endCoordinates.height;
-        setKeyboardHeight(height);
-        Animated.timing(animatedValue, {
-          toValue: height / 2.5, // pushes up slightly, not fully
-          duration: 250,
-          useNativeDriver: false,
-        }).start();
-      });
-  
-      const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-        Animated.timing(animatedValue, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: false,
-        }).start();
-      });
-  
-      return () => {
-        keyboardDidShow.remove();
-        keyboardDidHide.remove();
+      const backAction = () => {
+        return true; // prevent default behavior (exit)
       };
+  
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+  
+      return () => backHandler.remove(); // clean up
     }, []);
 
-      const handleChange = (index, value) => {
+  const handleChange = (index, value) => {
     if (/^\d*$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
@@ -59,12 +85,19 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
     }
   };
 
+  const verifyMailOtpFunction = () => {
+      const fullOTP = otp.join("");
+      const formData = new FormData();
+      formData.append("otp", fullOTP);
+      formData.append("email", globalDataStates.userMailIDOnSignup);
+      dispatch(verifyEmail(formData));
+  };
+
   const handleKeyPress = (index, key) => {
     if (key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
-  
 
   return (
     <Modal
@@ -85,15 +118,13 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
           reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
         />
         <View style={styles.androidBlur} />
-        <View style={styles.gapFiller} />
+        <View
+          style={[styles.gapFiller, { height: authStates.isMailVerified == true ? "30%" : "40%" }]}
+        />
 
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={0.5}
-          onPress={() => {
-            close(false);
-            Keyboard.dismiss();
-          }}
         />
         <Animated.View
           style={{
@@ -101,10 +132,7 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 400], // average keyboard height
-                  outputRange: [
-                    0,
-                   -(keyboardHeight * 3.5)
-                  ],
+                  outputRange: [0, -(keyboardHeight * 3.5)],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -123,13 +151,42 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
               <View style={styles.content}>
                 {/* Title */}
 
-                  <View style={styles.closeModalMain}>
-                    <TouchableOpacity >
-                      <BackArrowLeftIcon />
-                    </TouchableOpacity>
+                {authStates.isMailVerified == true? (
+                  <View style={styles.verified}>
+                    <SuccessCheckMark color={appColors.navyBlueShade} />
+                    <Text
+                      style={[
+                        styles.description,
+                        { textAlign: "center", marginTop: 20, fontSize: 18 },
+                      ]}
+                    >
+                      Your email has been verified successfully
+                    </Text>
+                    <View style={styles.signupContainer}>
+                      <Text style={styles.signupText}>
+                        You can now {""}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>{ 
+                          close(false);
+                          navigation.navigate("signin");
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.signupLink}> Log In</Text>
+                        <View style={styles.customUnderline} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
- 
-                    <Text style={styles.title}>Enter the 6-digit code</Text>
+                ) : (
+                  <>
+                    <View style={styles.closeModalMain}>
+                      <TouchableOpacity>
+                        <BackArrowLeftIcon />
+                      </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.title}>Enter the 4-digit code</Text>
                     {/* Description */}
                     <Text style={styles.description}>
                       We've sent a one-time password (OTP) to
@@ -144,63 +201,60 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
                         },
                       ]}
                     >
-                      abcd400@gmail.com
+                      {globalDataStates.userMailIDOnSignup}
                     </Text>
 
+                    {/* Input Section */}
+                    <View style={styles.otpContainer}>
+                      {otp.map((digit, index) => (
+                        <TextInput
+                          key={index}
+                          ref={(ref) => (inputRefs.current[index] = ref)}
+                          style={[styles.otpInput]}
+                          value={digit}
+                          onChangeText={(value) => handleChange(index, value)}
+                          onKeyPress={({ nativeEvent: { key } }) =>
+                            handleKeyPress(index, key)
+                          }
+                          keyboardType="number-pad"
+                          maxLength={1}
+                          selectTextOnFocus
+                        />
+                      ))}
+                    </View>
 
-                {/* Input Section */}
-                <View style={styles.otpContainer}>
-                  {otp.map((digit, index) => (
-                    <TextInput
-                      key={index}
-                      ref={(ref) => (inputRefs.current[index] = ref)}
-                      style={[styles.otpInput]}
-                      value={digit}
-                      onChangeText={(value) => handleChange(index, value)}
-                      onKeyPress={({ nativeEvent: { key } }) =>
-                        handleKeyPress(index, key)
-                      }
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      selectTextOnFocus
-                    />
-                  ))}
-                </View>
+                    {/* Verify Button */}
+                    <TouchableOpacity
+                      style={[
+                        styles.verifyButton,
+                        (otp.some((digit) => digit === "") || authStates.isMailVerified == "pending") &&
+                          styles.verifyButtonDisabled,
+                      ]}
+                      onPress={() => {
+                        verifyMailOtpFunction();
+                      }}
+                      activeOpacity={0.8}
+                      disabled={otp.some((digit) => digit === "") || authStates.isMailVerified == "pending"}
+                    >
+                      {authStates.isMailVerified == "pending" ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <Text style={styles.verifyButtonText}>Verify</Text>
+                      )}
+                    </TouchableOpacity>
 
-                {/* Verify Button */}
-                <TouchableOpacity
-                  style={[
-                    styles.verifyButton,
-                    otp.some((digit) => digit === "") && styles.verifyButtonDisabled,
-                  ]}
-                  onPress={() => {
-                    if (otp.every((digit) => digit !== "")) {
-                      // All digits filled, proceed with verification
-                      const otpCode = otp.join("");
-                      console.log("OTP Code:", otpCode);
-                    }
-                  }}
-                  activeOpacity={0.8}
-                  disabled={otp.some((digit) => digit === "")}
-                >
-                  <Text style={styles.verifyButtonText}>
-                    Verify
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Skip for now */}
-                <TouchableOpacity
-                  style={[
-                    styles.skipButton,
-                    { marginBottom: 70 },
-                  ]}
-                  onPress={() => close(false)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.skipButtonText}>
-                    Resend Code in 00:20
-                  </Text>
-                </TouchableOpacity>
+                    {/* Skip for now */}
+                    <TouchableOpacity
+                      style={[styles.skipButton, { marginBottom: 70 }]}
+                      onPress={() => close(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.skipButtonText}>
+                        Resend Code in 00:20
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
               </View>
             </View>
           </ScrollView>
@@ -309,9 +363,10 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     marginBottom: 35,
     marginTop: 5,
+    gap: 17,
   },
   otpInput: {
     width: "15%",
@@ -350,6 +405,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 16,
   },
+  verified: {
+    marginBottom: 100,
+    marginTop: 30,
+  },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",
   },
@@ -384,6 +443,30 @@ const styles = StyleSheet.create({
   noteBold: {
     fontFamily: "Mukta-Bold",
     color: "#3A3A3A",
+  },
+  signupContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  signupText: {
+    fontSize: scaleFont(14),
+    color: "#5A6B7D",
+    fontWeight: "400",
+    fontFamily: "Mukta-Regular",
+  },
+  signupLink: {
+    fontSize: scaleFont(14),
+    color: appColors.navyBlueShade,
+    fontFamily: "Mukta-Bold",
+    // remove textDecorationLine for manual underline
+  },
+  customUnderline: {
+    height: 2,
+    backgroundColor: "#0F1419",
+    width: "100%", // adjust based on text width
+    marginTop: 1, // pushes the line slightly downward
   },
 });
 

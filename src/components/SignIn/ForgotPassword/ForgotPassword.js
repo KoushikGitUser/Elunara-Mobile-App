@@ -12,23 +12,68 @@ import {
   ScrollView,
   Keyboard,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont } from "../../../utils/responsive";
 import { appColors } from "../../../themes/appColors";
 import { useNavigation } from "@react-navigation/native";
+import { AlertCircle } from "lucide-react-native";
+import { useDispatch } from "react-redux";
+import { recoverAccount } from "../../../redux/slices/authSlice";
+import { setUserMailIDOnForgotPassword, setUserOTPOnForgotPassword } from "../../../redux/slices/globalDataSlice";
 
 const { width } = Dimensions.get("window");
 
 const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const [email, setEmail] = useState("");
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [otp, setOtp] = useState(["0", "0", "0", "0"]);
+  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
-  const animatedValue = useState(new Animated.Value(0))[0]; 
+  const dispatch = useDispatch();
+  const animatedValue = useState(new Animated.Value(0))[0];
+
+  const validateEmail = (text) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!text) {
+      setEmailError("");
+    } else if (!emailRegex.test(text)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const getCodeFunction = () => {
+    if (isCodeSent) {
+      dispatch(setUserOTPOnForgotPassword(otp.join("")));
+      navigation.navigate("changepass");
+    } else {
+      setLoading(true);
+      setTimeout(() => {
+        setIsCodeSent(true);
+        const formData = new FormData();
+        formData.append("email", email);
+        dispatch(recoverAccount(formData));
+        dispatch(setUserMailIDOnForgotPassword(email));
+        setLoading(false);
+      }, 2500);
+    }
+  };
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    validateEmail(text);
+  };
+
+  const isEmailValid = email && !emailError;
+  const isOtpComplete = otp.every((digit) => digit.length === 1);
 
   const navigation = useNavigation();
 
@@ -102,7 +147,12 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
           reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
         />
         <View style={styles.androidBlur} />
-        <View style={[styles.gapFiller, { height: isKeyboardVisible ? '50%' : '30%' }]} />
+        <View
+          style={[
+            styles.gapFiller,
+            { height: isKeyboardVisible ? "50%" : "30%" },
+          ]}
+        />
 
         <TouchableOpacity
           style={styles.backdrop}
@@ -141,7 +191,11 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
-                  <AntDesign name="close" size={24} color={appColors.navyBlueShade} />
+                  <AntDesign
+                    name="close"
+                    size={24}
+                    color={appColors.navyBlueShade}
+                  />
                 </View>
                 {/* Title */}
                 {isCodeSent ? (
@@ -154,7 +208,14 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                 {isCodeSent ? (
                   <Text style={styles.description}>
                     Code has been send to{" "}
-                    <Text style={[styles.description,{color:"black",fontFamily: "Mukta-Bold",}]}>samanthaa2gmail.com.</Text>
+                    <Text
+                      style={[
+                        styles.description,
+                        { color: "black", fontFamily: "Mukta-Bold" },
+                      ]}
+                    >
+                      samanthaa2gmail.com.
+                    </Text>
                   </Text>
                 ) : (
                   <Text style={styles.description}>
@@ -191,15 +252,36 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                 ) : (
                   <View style={styles.inputSection}>
                     <Text style={styles.inputLabel}>Email</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter your email"
-                      placeholderTextColor="#9CA3AF"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="text"
-                      returnKeyType="done"
-                    />
+                    <View style={styles.inputWrapper}>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          isEmailFocused && styles.inputFocused,
+                          emailError && styles.inputError,
+                        ]}
+                        placeholder="Enter your email"
+                        placeholderTextColor="#9CA3AF"
+                        value={email}
+                        onChangeText={handleEmailChange}
+                        onFocus={() => setIsEmailFocused(true)}
+                        onBlur={() => setIsEmailFocused(false)}
+                        keyboardType="email-address"
+                        returnKeyType="done"
+                        autoCapitalize="none"
+                      />
+                      {emailError ? (
+                        <View style={styles.errorIconContainer}>
+                          <AlertCircle
+                            size={20}
+                            color="#D00B0B"
+                            style={{ marginRight: 10 }}
+                          />
+                        </View>
+                      ) : null}
+                    </View>
+                    {emailError ? (
+                      <Text style={styles.errorText}>{emailError}</Text>
+                    ) : null}
                   </View>
                 )}
 
@@ -207,21 +289,29 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    !email && styles.verifyButtonDisabled,
+                    ((!isEmailValid && !isCodeSent) ||
+                      (isCodeSent && !isOtpComplete) ||
+                      loading) &&
+                      styles.verifyButtonDisabled,
                     { marginBottom: isCodeSent ? 35 : 85 },
                   ]}
                   onPress={() => {
-                    if (isCodeSent) {
-                      navigation.navigate("changepass");
-                    } else {
-                      setIsCodeSent(true);
-                  }}}
+                    getCodeFunction();
+                  }}
                   activeOpacity={0.8}
-                  disabled={!email}
+                  disabled={
+                    (!isCodeSent && !isEmailValid) ||
+                    (isCodeSent && !isOtpComplete) ||
+                    loading
+                  }
                 >
-                  <Text style={styles.verifyButtonText}>
-                    {isCodeSent ? "Verify" : "Get Code"}
-                  </Text>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.verifyButtonText}>
+                      {isCodeSent ? "Continue" : "Get Code"}
+                    </Text>
+                  )}
                 </TouchableOpacity>
 
                 {isCodeSent && (
@@ -282,7 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   closeModalMain: {
-    width: "100%", 
+    width: "100%",
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -322,19 +412,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     marginBottom: 35,
-    marginTop: 40,
-    gap: 10,
+    marginTop: 25,
+    gap: 17,
   },
   otpInput: {
-    width: 65,
-    height: 65,
-    borderWidth: 1.5,
-    borderColor: "#d1d5db",
+    width: "15%",
+    height: 57,
+    borderWidth: 1,
+    borderColor: "#B5BECE",
+    backgroundColor: "white",
+    color: "#828282",
     borderRadius: 16,
     textAlign: "center",
     fontSize: scaleFont(15),
     fontWeight: "600",
-    fontFamily: "Mukta-Bold",
+    fontFamily: "Mukta-Regular",
   },
   resendContainer: {
     flexDirection: "row",
@@ -345,13 +437,14 @@ const styles = StyleSheet.create({
   resendText: {
     fontSize: scaleFont(14),
     color: "#8F8F8F",
+    fontFamily: "Mukta-Regular",
   },
   resendLink: {
     fontSize: scaleFont(14),
-    fontWeight: "600",
+    fontFamily: "Mukta-Bold",
     color: appColors.navyBlueShade,
-    borderBottomWidth:1,
-    borderColor:appColors.navyBlueShade
+    borderBottomWidth: 1,
+    borderColor: appColors.navyBlueShade,
   },
   inputSection: {
     marginBottom: 24,
@@ -364,6 +457,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontFamily: "Mukta-Regular",
   },
+  inputWrapper: {
+    position: "relative",
+  },
   input: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
@@ -371,9 +467,30 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    paddingRight: 45,
     fontSize: scaleFont(14),
     color: "#1F2937",
-   fontFamily: "Mukta-Regular",
+    fontFamily: "Mukta-Regular",
+  },
+  inputFocused: {
+    borderColor: appColors.navyBlueShade,
+  },
+  inputError: {
+    borderColor: "#D00B0B",
+  },
+  errorIconContainer: {
+    position: "absolute",
+    right: 16,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "#D00B0B",
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    marginTop: 4,
   },
   verifyButton: {
     backgroundColor: "#081A35",

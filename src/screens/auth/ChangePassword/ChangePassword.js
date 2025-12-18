@@ -18,10 +18,11 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChangePassword.styles";
 import { useFonts } from "expo-font";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { resetPassword } from "../../../redux/slices/authSlice";
 import { appColors } from "../../../themes/appColors";
 import { Check, X, Info } from "lucide-react-native";
+import { triggerToast } from "../../../services/toast";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
@@ -35,10 +36,11 @@ const ChangePassword = () => {
     useState(false);
   const [hasStartedTypingConfirm, setHasStartedTypingConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { globalDataStates } = useSelector((state) => state.Global);
 
   // Validation states
   const hasMinLength = password.length >= 8;
-  const hasNumberAndSpecial =
+  const hasNumberAndSpecial =   
     /[0-9]/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch =
     password === confirmPassword && confirmPassword.length > 0;
@@ -92,20 +94,20 @@ const ChangePassword = () => {
     }
   }, [fontsLoaded]);
 
-  const resetPasswordFunction = async () => {
+  const resetPasswordFunction = () => {
     setLoading(true);
-    try {
-      const token = await SecureStore.getItemAsync("authToken");
+    setTimeout(() => {
       const formData = new FormData();
       formData.append("token", token);
+      formData.append("email", globalDataStates.userMailIDOnForgotPassword);
+      formData.append("otp", globalDataStates.userOTPOnForgotPassword);
       formData.append("password", password);
       formData.append("password_confirmation", confirmPassword);
       dispatch(resetPassword(formData));
-    } catch (error) {
-      console.error("Error retrieving auth token:", error);
-    } finally {
+      navigation.navigate("signin");
+      triggerToast("Password reset","Your password reset successfully","success",3000)
       setLoading(false);
-    }
+    }, 2500);
   };
 
   return (
@@ -162,7 +164,7 @@ const ChangePassword = () => {
               activeOpacity={0.7}
             >
               <Ionicons
-                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
                 size={24}
                 color="#0F1419"
               />
@@ -298,13 +300,13 @@ const ChangePassword = () => {
           </TouchableOpacity>
 
           {/* Sign Up Link */}
-          <View style={styles.signupContainer}>
+          {/* <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate("signin")}>
               <Text style={styles.signupLink}>Log In</Text>
               <View style={styles.customUnderline} />
             </TouchableOpacity>
-          </View>
+          </View> */}
           {/* Divider */}
         </View>
       </View>

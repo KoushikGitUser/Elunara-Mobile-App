@@ -15,6 +15,10 @@ export const globalDataStates = {
   guidedTourStepsCount:0,
   profilePictureAvatar:null,
   profilePictureType:"photo", //or avatar
+  userMailIDOnSignup:"",
+  userMailIDOnForgotPassword:"",
+  userOTPOnForgotPassword:"",
+  userMobileNumberForMobileVerification:"",
 };
 
 export const demoChatMessages = [

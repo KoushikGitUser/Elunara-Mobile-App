@@ -53,6 +53,18 @@ const globalDataSlice = createSlice({
     setProfilePictureType: (state, action) => {
       state.globalDataStates.profilePictureType = action.payload;
     },
+    setUserMailIDOnSignup: (state, action) => {
+      state.globalDataStates.userMailIDOnSignup = action.payload;
+    },
+    setUserMailIDOnForgotPassword: (state, action) => {
+      state.globalDataStates.userMailIDOnForgotPassword = action.payload;
+    },
+    setUserOTPOnForgotPassword: (state, action) => {
+      state.globalDataStates.userOTPOnForgotPassword = action.payload;
+    },
+    setUserMobileNumberForMobileVerification: (state, action) => {
+      state.globalDataStates.userMobileNumberForMobileVerification = action.payload;
+    },
   },
 });
 
@@ -72,6 +84,10 @@ export const {
   setGuidedTourStepsCount,
   setProfilePictureAvatar,
   setProfilePictureType,
+  setUserMailIDOnSignup,
+  setUserMailIDOnForgotPassword,
+  setUserOTPOnForgotPassword,
+  setUserMobileNumberForMobileVerification
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

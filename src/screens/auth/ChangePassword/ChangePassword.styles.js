@@ -42,7 +42,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
   headTitle:{
     fontSize: scaleFont(26),
     fontFamily: 'Mukta-Bold',
-    color: '#4D5F75',
+    color: '#3A3A3A',
     letterSpacing: -0.8,
     marginTop:15
   },
