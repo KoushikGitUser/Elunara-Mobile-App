@@ -70,7 +70,7 @@ apiInstance.interceptors.response.use(
           throw new Error("No refresh token available");
         }
 
-        const response = await apiInstance.post("/refresh-token", {
+        const response = await apiInstance.post("/auth/refresh-token", {
           refresh_token: refreshToken,
         });
 

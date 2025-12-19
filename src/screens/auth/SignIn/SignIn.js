@@ -28,7 +28,7 @@ import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userSignIn } from "../../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -38,12 +38,19 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [toggleForgotPassword, setToggleForgotPassword] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
+  const { authStates } = useSelector((state) => state.Auth);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (authStates.isSignedIn == true) {
+      navigation.navigate("chat");
+    }
+  },[authStates.isSignedIn]);
 
   // Real-time validation functions
   const validateEmail = (text) => {
@@ -108,19 +115,10 @@ const SignIn = () => {
       return;
     }
 
-  
-   setTimeout(() => {
-    setLoading(false);
     const formData = new FormData();
     formData.append("email", email.trim());
     formData.append("password", password.trim());
     dispatch(userSignIn(formData));
-     AsyncStorage.setItem("authenticUser", "true");
-    // Proceed with login
-    navigation.navigate("chat");
-   }, 2500);
-
-
   };
 
   const styleProps = {
@@ -163,7 +161,7 @@ const SignIn = () => {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-           <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
+            <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
               <BackArrowLeftIcon />
             </TouchableOpacity>
             {
@@ -190,20 +188,34 @@ const SignIn = () => {
         {/* Email Label */}
         <View style={styles.inputFieldsMain}>
           <Text style={styles.label}>Email</Text>
-          <View style={[
-            styles.input,
-            { flexDirection: "row", alignItems: "center", paddingHorizontal: 0 },
-            focusedInput === "email" && { borderColor: appColors.navyBlueShade },
-            errors.email && { borderColor: "#D00B0B", borderWidth: 2 },
-          ]}>
+          <View
+            style={[
+              styles.input,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 0,
+              },
+              focusedInput === "email" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.email && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
             <TextInput
-              style={{ flex: 1, height: "100%", paddingHorizontal: 15, fontFamily: "Mukta-Regular", fontSize: scaleFont(14) }}
+              style={{
+                flex: 1,
+                height: "100%",
+                paddingHorizontal: 15,
+                fontFamily: "Mukta-Regular",
+                fontSize: scaleFont(14),
+              }}
               placeholder="Enter your email"
               placeholderTextColor="#B0B7C3"
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
-                setErrors(prev => ({ ...prev, email: validateEmail(text) }));
+                setErrors((prev) => ({ ...prev, email: validateEmail(text) }));
               }}
               onFocus={() => setFocusedInput("email")}
               onBlur={() => setFocusedInput(null)}
@@ -211,22 +223,37 @@ const SignIn = () => {
               autoCapitalize="none"
             />
             {errors.email && (
-              <AlertCircle size={20} color="#D00B0B" style={{ marginRight: 15 }} />
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 15 }}
+              />
             )}
           </View>
           {errors.email && (
-            <Text style={{ color: "#D00B0B", fontSize: scaleFont(11), marginTop: 4, fontFamily: "Mukta-Regular" }}>
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
               {errors.email}
             </Text>
           )}
 
           {/* Password Label */}
           <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
-          <View style={[
-            styles.passwordContainer,
-            focusedInput === "password" && { borderColor: appColors.navyBlueShade },
-            errors.password && { borderColor: "#D00B0B", borderWidth: 2 },
-          ]}>
+          <View
+            style={[
+              styles.passwordContainer,
+              focusedInput === "password" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.password && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
             <TextInput
               style={styles.passwordInput}
               placeholder="Enter your password"
@@ -235,13 +262,20 @@ const SignIn = () => {
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
-                setErrors(prev => ({ ...prev, password: validatePassword(text) }));
+                setErrors((prev) => ({
+                  ...prev,
+                  password: validatePassword(text),
+                }));
               }}
               onFocus={() => setFocusedInput("password")}
               onBlur={() => setFocusedInput(null)}
             />
             {errors.password && (
-              <AlertCircle size={20} color="#D00B0B" style={{ marginRight: 10 }} />
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 10 }}
+              />
             )}
             <TouchableOpacity
               onPress={() => setShowPassword(!showPassword)}
@@ -256,7 +290,14 @@ const SignIn = () => {
             </TouchableOpacity>
           </View>
           {errors.password && (
-            <Text style={{ color: "#D00B0B", fontSize: scaleFont(11), marginTop: 4, fontFamily: "Mukta-Regular" }}>
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
               {errors.password}
             </Text>
           )}
@@ -274,12 +315,14 @@ const SignIn = () => {
             onPress={handleUserSignIn}
             style={[
               styles.emailButton,
-              (!email.trim() || !password || loading) && { backgroundColor: "#CDD5DC" },
+              (!email.trim() || !password || authStates.isSignedIn == "pending") && {
+                backgroundColor: "#CDD5DC",
+              },
             ]}
             activeOpacity={0.8}
-            disabled={!email.trim() || !password || loading}
+            disabled={!email.trim() || !password || authStates.isSignedIn == "pending"}
           >
-            {loading ? (
+            {authStates.isSignedIn == "pending" ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <Text style={styles.emailButtonText}>Login</Text>

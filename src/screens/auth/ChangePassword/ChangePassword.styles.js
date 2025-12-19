@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions, Platform } from 'react-native';
 import { moderateScale, scale, scaleFont, verticalScale } from '../../../utils/responsive';
+import { appColors } from '../../../themes/appColors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -155,7 +156,7 @@ export const createStyles = (props = {}) => StyleSheet.create({
     marginTop:20
   },
   emailButton: {
-    backgroundColor: "#162845ff",
+    backgroundColor: appColors.navyBlueShade,
     borderRadius: moderateScale(100),
     alignItems: 'center',
     justifyContent: 'center',

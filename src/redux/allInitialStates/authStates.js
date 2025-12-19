@@ -1,7 +1,4 @@
 export const authStates = { 
-  user: null,
-  token: null,
-  isAuthenticated: false,
   loading: false,
   error: null,
   isSignedUp: null,

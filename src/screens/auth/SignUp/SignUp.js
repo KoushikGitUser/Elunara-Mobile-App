@@ -30,6 +30,7 @@ import { userSignUp } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
+import AccountNotRecoveredPopup from "../../../components/SignUp/AccountNotRecoveredPopup";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -44,6 +45,7 @@ const SignUp = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [toggleAccNotRecovered,setToggleAccNotRecovered] = useState(false)
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -59,7 +61,7 @@ const SignUp = () => {
       setVerificationMailSent(true);
     }
     else if(authStates.isAccountRecoverable){
-      triggerToast("Account recoverable!","This email is recoverable","error",3000)
+     setToggleAccNotRecovered(true);
     }
   },[authStates.isSignedUp,authStates.isAccountRecoverable])
 
@@ -180,6 +182,8 @@ const SignUp = () => {
           verificationMailSent={verificationMailSent}
         />
       )}
+      {toggleAccNotRecovered && 
+      <AccountNotRecoveredPopup close={setToggleAccNotRecovered} toggleAccNotRecovered={toggleAccNotRecovered} />}
       {verifyMailOtpPopup && (
         <VerifyMailOtpPopup
           close={setVerifyMailOtpPopup}

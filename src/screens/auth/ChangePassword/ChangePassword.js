@@ -31,16 +31,16 @@ const ChangePassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
-    useState(false);
+    useState(false); 
   const [hasStartedTypingPassword, setHasStartedTypingPassword] =
     useState(false);
   const [hasStartedTypingConfirm, setHasStartedTypingConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { authStates } = useSelector((state) => state.Auth);
 
   // Validation states
   const hasMinLength = password.length >= 8;
-  const hasNumberAndSpecial =   
+  const hasNumberAndSpecial =
     /[0-9]/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch =
     password === confirmPassword && confirmPassword.length > 0;
@@ -69,8 +69,8 @@ const ChangePassword = () => {
 
   // Get hint color based on validation state
   const getHintColor = (isValid, hasStartedTyping) => {
-    if (!hasStartedTyping) return "#6B7280"; // Default gray
-    return isValid ? "#22C55E" : "#D00B0B"; // Green or Red
+    if (!hasStartedTyping) return "#757575"; // Default gray
+    return isValid ? "#03B32F" : "#D00B0B"; // Green or Red
   };
 
   const styleProps = {
@@ -94,20 +94,25 @@ const ChangePassword = () => {
     }
   }, [fontsLoaded]);
 
-  const resetPasswordFunction = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const formData = new FormData();
-      formData.append("token", token);
-      formData.append("email", globalDataStates.userMailIDOnForgotPassword);
-      formData.append("otp", globalDataStates.userOTPOnForgotPassword);
-      formData.append("password", password);
-      formData.append("password_confirmation", confirmPassword);
-      dispatch(resetPassword(formData));
+  useEffect(() => {
+    if (authStates.isPasswordReset == true) {
       navigation.navigate("signin");
-      triggerToast("Password reset","Your password reset successfully","success",3000)
-      setLoading(false);
-    }, 2500);
+      triggerToast(
+        "Password reset successfull",
+        "Your account password has been reset successfully. You can now log-in.",
+        "success",
+        3000
+      );
+    }
+  }, [authStates.isPasswordReset]);
+
+  const resetPasswordFunction = () => {
+    const formData = new FormData();
+    formData.append("email", globalDataStates.userMailIDOnForgotPassword);
+    formData.append("otp", globalDataStates.userOTPOnForgotPassword);
+    formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword);
+    dispatch(resetPassword(formData));
   };
 
   return (
@@ -287,12 +292,12 @@ const ChangePassword = () => {
             }}
             style={[
               styles.emailButton,
-              (!isFormValid || loading) && styles.emailButtonDisabled,
+              (!isFormValid || authStates.isPasswordReset == "pending") && styles.emailButtonDisabled,
             ]}
             activeOpacity={0.8}
             disabled={!isFormValid}
           >
-            {loading ? (
+            {authStates.isPasswordReset == "pending" ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <Text style={styles.emailButtonText}>Continue</Text>

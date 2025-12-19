@@ -15,14 +15,41 @@ import SettingsProfileInnerPage from "../screens/SettingsProfileInnerPages/Setti
 import AddRoomDetails from "../screens/Rooms/AddRoomDetails";
 import AllRoomsLandingPage from "../screens/Rooms/AllRoomsLandingPage";
 import AnalyticsCompletedTopicsPage from "../screens/SettingsPages/AnalyticsCompletedTopicsPage";
+import * as Linking from "expo-linking";
 
 // Screens
 
 const Stack = createNativeStackNavigator();
 
+const prefix = Linking.createURL("/");
+
+const linking = {
+  prefixes: [prefix, "elunara://", "exp+elunara://"],
+  config: {
+    screens: {
+      Splash: "splash",
+      welcome: "welcome",
+      signin: "signin",
+      signup: "signup",
+      changepass: "changepass",
+      chat: "chat/:chatId?",           // optional param
+      notes: "notes/:noteId?",         // optional param
+      allRooms: "allRooms",
+      rooms: "rooms/:roomId?",         // optional param
+      roomDetails: "roomDetails/:roomId?",
+      allchats: "allchats",
+      profile: "profile",
+      settingsInnerPages: "settings/:page?",
+      analyticsComplete: "analyticsComplete",
+    },
+  },
+};
+
+
+
 const AppNavigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={{

@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOTPForMobileNumber, verifyOTPForMobileNumber } from "../../redux/slices/authSlice";
 import { setUserMobileNumberForMobileVerification } from "../../redux/slices/globalDataSlice";
 import { triggerToast } from "../../services/toast";
+import Toaster from '../../components/UniversalToaster/Toaster'
 
 const { width } = Dimensions.get("window");
 
@@ -30,34 +31,38 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [isMobileFocused, setIsMobileFocused] = useState(false);
   const [mobileError, setMobileError] = useState("");
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [loading, setLoading] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
+  const { authStates } = useSelector((state) => state.Auth);
 
-  const validateMobileNumber = (text) => {
+  const validateMobileNumber = (text, touched = isTouched) => {
     // Indian mobile number: 10 digits starting with 6, 7, 8, or 9
     const indianMobileRegex = /^[6-9]\d{9}$/;
-    if (!text) {
-      setMobileError("");
-    } else if (text.length < 10) {
+    if (!text && touched) {
+      setMobileError("Mobile number is required");
+    } else if (text && text.length < 10) {
       setMobileError("Mobile number must be 10 digits");
-    } else if (!indianMobileRegex.test(text)) {
+    } else if (text && !indianMobileRegex.test(text)) {
       setMobileError("Please enter a valid Indian mobile number");
     } else {
       setMobileError("");
     }
   };
 
+  useEffect(()=>{
+     if(authStates.isOTPReceivedForMobileVerification == true){
+        setIsCodeSent(true);
+     }
+  },[authStates.isOTPReceivedForMobileVerification])
+
   const getCodeFromMobileNumber = () => {
     if (isCodeSent) {
-      setLoading(true);
-      setTimeout(() => {
         const formData = new FormData();
         formData.append("otp", otp.join(""));
         dispatch(verifyOTPForMobileNumber(formData));
@@ -66,18 +71,11 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
           "Verified",
           "Mobile number verified successfully","success",3000
         );
-        setLoading(false);
-      }, 2500);
     } else {
-      setLoading(true);
-      setTimeout(() => {
-        setIsCodeSent(true);
         dispatch(setUserMobileNumberForMobileVerification(mobileNumber));
         const formData = new FormData();
         formData.append("phone_number", mobileNumber);
         dispatch(getOTPForMobileNumber(formData));
-        setLoading(false);
-      }, 2500);
     }
   };
 
@@ -85,7 +83,11 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
     // Only allow digits and max 10 characters
     const cleanedText = text.replace(/[^0-9]/g, "").slice(0, 10);
     setMobileNumber(cleanedText);
-    validateMobileNumber(cleanedText);
+    // Set touched to true on first input and validate in real-time
+    if (!isTouched) {
+      setIsTouched(true);
+    }
+    validateMobileNumber(cleanedText, true);
   };
 
   const isMobileValid = mobileNumber.length === 10 && !mobileError;
@@ -140,6 +142,7 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
       animationType="slide"
       onRequestClose={() => close(false)}
     >
+      <Toaster/>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}
@@ -261,19 +264,23 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                         style={[
                           styles.input,
                           isMobileFocused && styles.inputFocused,
-                          mobileError && styles.inputError,
+                          (mobileError || (isTouched && !mobileNumber)) && styles.inputError,
                         ]}
                         placeholder="Enter your mobile number"
                         placeholderTextColor="#9CA3AF"
                         value={mobileNumber}
                         onChangeText={handleMobileChange}
                         onFocus={() => setIsMobileFocused(true)}
-                        onBlur={() => setIsMobileFocused(false)}
+                        onBlur={() => {
+                          setIsMobileFocused(false);
+                          setIsTouched(true);
+                          validateMobileNumber(mobileNumber, true);
+                        }}
                         keyboardType="phone-pad"
                         returnKeyType="done"
                         maxLength={10}
                       />
-                      {mobileError ? (
+                      {(mobileError || (isTouched && !mobileNumber)) ? (
                         <View style={styles.errorIconContainer}>
                           <AlertCircle
                             size={20}
@@ -283,8 +290,8 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                         </View>
                       ) : null}
                     </View>
-                    {mobileError ? (
-                      <Text style={styles.errorText}>{mobileError}</Text>
+                    {(mobileError || (isTouched && !mobileNumber)) ? (
+                      <Text style={styles.errorText}>{mobileError || "Mobile number is required"}</Text>
                     ) : null}
                   </View>
                 )}
@@ -293,16 +300,16 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    ((!isMobileValid && !isCodeSent) || loading) &&
+                    ((!isMobileValid && !isCodeSent) || authStates.isOTPReceivedForMobileVerification == "pending") &&
                       styles.verifyButtonDisabled,
                   ]}
                   onPress={() => {
                     getCodeFromMobileNumber();
                   }}
                   activeOpacity={0.8}
-                  disabled={(!isCodeSent && !isMobileValid) || loading}
+                  disabled={(!isCodeSent && !isMobileValid) || authStates.isOTPReceivedForMobileVerification == "pending"}
                 >
-                  {loading ? (
+                  {authStates.isOTPReceivedForMobileVerification == "pending" ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <Text style={styles.verifyButtonText}>
