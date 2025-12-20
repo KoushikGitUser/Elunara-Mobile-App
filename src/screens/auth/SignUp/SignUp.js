@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   BackHandler,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useState } from "react";
@@ -26,7 +27,7 @@ import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
 import { Check, AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
-import { userSignUp } from "../../../redux/slices/authSlice";
+import { userSignUp, signWithGoogle, signWithApple, signWithLinkedIn } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
@@ -64,6 +65,25 @@ const SignUp = () => {
      setToggleAccNotRecovered(true);
     }
   },[authStates.isSignedUp,authStates.isAccountRecoverable])
+
+  // Social login redirect handlers
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForGoogle == true) {
+      Linking.openURL(authStates.redirectURLForGoogle);
+    }
+  }, [authStates.isRedirectURLReceivedForGoogle]);
+
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForApple == true) {
+      Linking.openURL(authStates.redirectURLForApple);
+    }
+  }, [authStates.isRedirectURLReceivedForApple]);
+
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForLinkedIn == true) {
+      Linking.openURL(authStates.redirectURLForLinkedIn);
+    }
+  }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
   useEffect(() => {
     const backAction = () => {
@@ -683,24 +703,60 @@ const SignUp = () => {
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
           {/* Google Button */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Image source={google} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <TouchableOpacity
+            disabled={authStates.isRedirectURLReceivedForGoogle == "pending"}
+            onPress={() => {
+              dispatch(signWithGoogle());
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            {authStates.isRedirectURLReceivedForGoogle == "pending" ? (
+              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+            ) : (
+              <>
+                <Image source={google} style={styles.socialIcons} />
+                <Text style={styles.socialButtonText}>Continue with Google</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {/* LinkedIn Button */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Image source={LinkedIn} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
+          <TouchableOpacity
+            disabled={authStates.isRedirectURLReceivedForLinkedIn == "pending"}
+            onPress={() => {
+              dispatch(signWithLinkedIn());
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            {authStates.isRedirectURLReceivedForLinkedIn == "pending" ? (
+              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+            ) : (
+              <>
+                <Image source={LinkedIn} style={styles.socialIcons} />
+                <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {/* Apple Button */}
           <TouchableOpacity
+            disabled={authStates.isRedirectURLReceivedForApple == "pending"}
+            onPress={() => {
+              dispatch(signWithApple());
+            }}
             style={[styles.socialButton, { marginBottom: 0 }]}
             activeOpacity={0.7}
           >
-            <Image source={apple} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with Apple</Text>
+            {authStates.isRedirectURLReceivedForApple == "pending" ? (
+              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+            ) : (
+              <>
+                <Image source={apple} style={styles.socialIcons} />
+                <Text style={styles.socialButtonText}>Continue with Apple</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

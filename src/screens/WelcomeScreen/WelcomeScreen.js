@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  ActivityIndicator,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -19,6 +21,9 @@ import { createStyles } from "./WelcomeScreen.styles";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
+import { useDispatch, useSelector } from "react-redux";
+import { signWithGoogle, signWithApple, signWithLinkedIn } from "../../redux/slices/authSlice";
+import { appColors } from "../../themes/appColors";
 
 const WelcomeScreen = () => {
   // You can pass custom props to override default styles
@@ -27,6 +32,8 @@ const WelcomeScreen = () => {
   const styles = useMemo(() => createStyles(styleProps), []);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { authStates } = useSelector((state) => state.Auth);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -37,6 +44,27 @@ const WelcomeScreen = () => {
     if (fontsLoaded) {
     }
   }, [fontsLoaded]);
+
+  // Social login redirect handlers
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForGoogle == true) {
+      Linking.openURL(authStates.redirectURLForGoogle);
+      console.log(authStates.redirectURLForGoogle);
+    }
+  }, [authStates.isRedirectURLReceivedForGoogle]);
+
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForApple == true) {
+      Linking.openURL(authStates.redirectURLForApple);
+      console.log(authStates.redirectURLForApple);
+    }
+  }, [authStates.isRedirectURLReceivedForApple]);
+
+  useEffect(() => {
+    if (authStates.isRedirectURLReceivedForLinkedIn == true) {
+      Linking.openURL(authStates.redirectURLForLinkedIn);
+    }
+  }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -60,26 +88,62 @@ const WelcomeScreen = () => {
           {/* Buttons Section */}
           <View style={styles.buttonsContainer}>
             {/* Google Button */}
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-              <Image source={google} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
+            <TouchableOpacity
+              disabled={authStates.isRedirectURLReceivedForGoogle == "pending"}
+              onPress={() => {
+                dispatch(signWithGoogle());
+              }}
+              style={styles.socialButton}
+              activeOpacity={0.7}
+            >
+              {authStates.isRedirectURLReceivedForGoogle == "pending" ? (
+                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+              ) : (
+                <>
+                  <Image source={google} style={styles.socialIcons} />
+                  <Text style={styles.socialButtonText}>Continue with Google</Text>
+                </>
+              )}
             </TouchableOpacity>
 
             {/* LinkedIn Button */}
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-              <Image source={LinkedIn} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>
-                Continue with LinkedIn
-              </Text>
+            <TouchableOpacity
+              disabled={authStates.isRedirectURLReceivedForLinkedIn == "pending"}
+              onPress={() => {
+                dispatch(signWithLinkedIn());
+              }}
+              style={styles.socialButton}
+              activeOpacity={0.7}
+            >
+              {authStates.isRedirectURLReceivedForLinkedIn == "pending" ? (
+                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+              ) : (
+                <>
+                  <Image source={LinkedIn} style={styles.socialIcons} />
+                  <Text style={styles.socialButtonText}>
+                    Continue with LinkedIn
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
 
             {/* Apple Button */}
             <TouchableOpacity
+              disabled={authStates.isRedirectURLReceivedForApple == "pending"}
+              onPress={() => {
+                dispatch(signWithApple());
+              }}
               style={[styles.socialButton, { marginBottom: 0 }]}
               activeOpacity={0.7}
             >
-              <Image source={apple} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+              {authStates.isRedirectURLReceivedForApple == "pending" ? (
+                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+              ) : (
+                <>
+                  <Image source={apple} style={styles.socialIcons} />
+                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                </>
+              )}
             </TouchableOpacity>
 
             {/* Divider */}

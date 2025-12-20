@@ -10,5 +10,13 @@ export const authStates = {
   isOTPReceivedForMobileVerification:false,
   isMobileOTPVerified:false,
   isAccountRecoverable:false,
-  accountRecoverableMessage:""
+  accountRecoverableMessage:"",
+
+  //oauth states, signin/signup with social
+  isRedirectURLReceivedForGoogle:false,
+  redirectURLForGoogle:"",
+  isRedirectURLReceivedForApple:false,
+  redirectURLForApple:"",
+  isRedirectURLReceivedForLinkedIn:false,
+  redirectURLForLinkedIn:"",
 };

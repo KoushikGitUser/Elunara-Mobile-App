@@ -205,6 +205,80 @@ export const verifyOTPForMobileNumber = createAsyncThunk(
   }
 );
 
+
+export const signWithGoogle = createAsyncThunk(
+  "/signWithGoogle",
+  async (_, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.get("/auth/google/redirect",{
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const signWithApple = createAsyncThunk(
+  "/signWithApple",
+  async (_, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.get("/auth/apple/redirect",{
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const signWithLinkedIn = createAsyncThunk(
+  "/signWithLinkedIn",
+  async (_, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.get("/auth/linkedin/redirect",{
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState: allInitialStates,
@@ -302,6 +376,8 @@ const authSlice = createSlice({
         }, 300);
       })
 
+
+      //reset password
       .addCase(resetPassword.pending, (state, action) => {
         state.authStates.isPasswordReset = "pending";
       })
@@ -328,6 +404,8 @@ const authSlice = createSlice({
         }
       })
 
+
+      //verify email
       .addCase(verifyEmail.pending, (state, action) => {
         state.authStates.isMailVerified = "pending";
       })
@@ -341,6 +419,8 @@ const authSlice = createSlice({
         }
       })
 
+
+      //recover account
       .addCase(recoverAccount.pending, (state, action) => {
         state.authStates.isOTPReceivedForAccountRecovery = "pending";
       })
@@ -358,6 +438,8 @@ const authSlice = createSlice({
         
       })
 
+
+      //get mobile otp
       .addCase(getOTPForMobileNumber.pending, (state, action) => {
         state.authStates.isOTPReceivedForMobileVerification = "pending";
       })
@@ -371,6 +453,8 @@ const authSlice = createSlice({
         
       })
 
+
+      //verify mobile otp
       .addCase(verifyOTPForMobileNumber.pending, (state, action) => {
         state.authStates.isMobileOTPVerified = "pending";
       })
@@ -379,7 +463,53 @@ const authSlice = createSlice({
       })
       .addCase(verifyOTPForMobileNumber.rejected, (state, action) => {
         state.authStates.isMobileOTPVerified = false;
-      });
+      })
+
+
+      //signin/signup with google
+       .addCase(signWithGoogle.pending, (state, action) => {
+        state.authStates.isRedirectURLReceivedForGoogle = "pending";
+      })
+      .addCase(signWithGoogle.fulfilled, (state, { payload }) => {
+        state.authStates.isRedirectURLReceivedForGoogle = true;
+        state.authStates.redirectURLForGoogle = payload.data.data.redirect_url
+      })
+      .addCase(signWithGoogle.rejected, (state, {payload}) => {
+        state.authStates.isRedirectURLReceivedForGoogle = false;
+        
+      })
+
+
+      //signin/signup with apple
+       .addCase(signWithApple.pending, (state, action) => {
+        state.authStates.isRedirectURLReceivedForApple = "pending";
+      })
+      .addCase(signWithApple.fulfilled, (state, { payload }) => {
+        state.authStates.isRedirectURLReceivedForApple = true;
+        state.authStates.redirectURLForApple = payload.data.data.redirect_url
+        console.log(payload.data.data.redirect_url,"url");
+        
+      })
+      .addCase(signWithApple.rejected, (state, {payload}) => {
+        state.authStates.isRedirectURLReceivedForApple = false;
+        console.log(payload.status);
+        
+      })
+
+
+      //signin/signup with linkedIn
+       .addCase(signWithLinkedIn.pending, (state, action) => {
+        state.authStates.isRedirectURLReceivedForLinkedIn = "pending";
+      })
+      .addCase(signWithLinkedIn.fulfilled, (state, { payload }) => {
+        state.authStates.isRedirectURLReceivedForLinkedIn = true;
+        state.authStates.redirectURLForLinkedIn = payload.data.data.redirect_url
+        console.log(payload.data.data.redirect_url,"url");
+      })
+      .addCase(signWithLinkedIn.rejected, (state, action) => {
+        state.authStates.isRedirectURLReceivedForLinkedIn = false;
+      })
+
   },
 });
 
