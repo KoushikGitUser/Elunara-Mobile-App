@@ -53,7 +53,7 @@ export const createStyles = ({}) =>
       position: "absolute",
       bottom: 0,
       width: "100%",
-      paddingVertical: 7,
+      paddingVertical: 12,
       paddingHorizontal: 20,
       marginBottom: 50,
       backgroundColor: "#E2E2E2",
@@ -61,6 +61,19 @@ export const createStyles = ({}) =>
       justifyContent: "space-between",
       alignItems: "center",
       zIndex: 1,
+    },
+    sizingOptionsMain:{
+      flexDirection:"row",
+      justifyContent:"space-between",
+      alignItems:"center",
+      gap:15
+    },
+    backFromSize:{
+      borderRightWidth:1,
+      paddingVertical:1,
+      paddingRight:10,
+      borderColor:"#888888",
+
     },
     searchInputMain: {
       width:"60%",

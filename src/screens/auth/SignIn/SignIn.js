@@ -137,10 +137,11 @@ const SignIn = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("email", email.trim());
-    formData.append("password", password.trim());
-    dispatch(userSignIn(formData));
+    // const formData = new FormData();
+    // formData.append("email", email.trim());
+    // formData.append("password", password.trim());
+    // dispatch(userSignIn(formData));
+    navigation.navigate("chat");
   };
 
   const styleProps = {

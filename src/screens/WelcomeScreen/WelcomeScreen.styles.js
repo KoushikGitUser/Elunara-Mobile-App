@@ -146,7 +146,7 @@ export const createStyles = (props = {}) =>
       fontFamily: "Mukta-Regular",
     },
     emailButton: {
-      backgroundColor: "#162845ff",
+      backgroundColor: appColors.navyBlueShade,
       borderRadius: moderateScale(100),
       alignItems: "center",
       justifyContent: "center",

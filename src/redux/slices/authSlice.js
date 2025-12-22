@@ -496,7 +496,7 @@ const authSlice = createSlice({
         
       })
 
-
+    
       //signin/signup with linkedIn
        .addCase(signWithLinkedIn.pending, (state, action) => {
         state.authStates.isRedirectURLReceivedForLinkedIn = "pending";
