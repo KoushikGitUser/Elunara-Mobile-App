@@ -49,14 +49,12 @@ const WelcomeScreen = () => {
   useEffect(() => {
     if (authStates.isRedirectURLReceivedForGoogle == true) {
       Linking.openURL(authStates.redirectURLForGoogle);
-      console.log(authStates.redirectURLForGoogle);
     }
   }, [authStates.isRedirectURLReceivedForGoogle]);
 
   useEffect(() => {
     if (authStates.isRedirectURLReceivedForApple == true) {
       Linking.openURL(authStates.redirectURLForApple);
-      console.log(authStates.redirectURLForApple);
     }
   }, [authStates.isRedirectURLReceivedForApple]);
 

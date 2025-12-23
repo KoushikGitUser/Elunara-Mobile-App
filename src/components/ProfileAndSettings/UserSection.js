@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import userImg from "../../assets/images/profilepic.png";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
@@ -9,16 +9,35 @@ import {
   setSettingsInnerPageHeaderTitle,
 } from "../../redux/slices/globalDataSlice";
 import { useNavigation } from "@react-navigation/native";
+import MobileVerificationPopup from "../ChatScreen/MobileVerificationPopup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserSection = () => {
+  const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
+  const [isMobileVerified, setIsMobileVerified] = useState(true);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const checkMobileVerification = async () => {
+      const verified = await AsyncStorage.getItem("isMobileNumberVerifiedByOTP");
+      setIsMobileVerified(verified === "true");
+    };
+    checkMobileVerification();
+  }, []);
   const navigation = useNavigation();
   return (
     <View style={styles.upgradeBtn}>
+      <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} isFromProfile={true} />
       <View style={styles.upper}>
         <Image source={userImg} style={styles.userImg} />
         <View>
-          <Text style={{ fontSize: scaleFont(16), fontWeight: 600,fontFamily:"Mukta-Bold"}}>
+          <Text
+            style={{
+              fontSize: scaleFont(16),
+              fontWeight: 600,
+              fontFamily: "Mukta-Bold",
+            }}
+          >
             Neha Jain
           </Text>
           <Text
@@ -27,7 +46,7 @@ const UserSection = () => {
               fontWeight: 400,
               color: "#757575",
               marginTop: 3,
-              fontFamily:"Mukta-Regular"
+              fontFamily: "Mukta-Regular",
             }}
           >
             neha@gmail.com
@@ -47,11 +66,21 @@ const UserSection = () => {
           <PencilIcon />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.mobileVerifyButton}>
-        <Text style={{fontSize:scaleFont(13),color:"#3A3A3A",fontWeight:500,fontFamily:"Mukta-Bold"}}>
-          Verify mobile no. — 8 days left
-        </Text>
-      </TouchableOpacity>
+      
+      {!isMobileVerified && (
+        <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} style={styles.mobileVerifyButton}>
+          <Text
+            style={{
+              fontSize: scaleFont(13),
+              color: "#3A3A3A",
+              fontWeight: 500,
+              fontFamily: "Mukta-Bold",
+            }}
+          >
+            Verify mobile no. — 8 days left
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -83,12 +112,12 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#F3F3F3",
     height: 40,
-    borderBottomRightRadius:16,
-    borderBottomLeftRadius:16,
-    flexDirection:"row",
-    justifyContent:"flex-start",
-    alignItems:"center",
-    paddingLeft:12
+    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingLeft: 12,
   },
 });
 

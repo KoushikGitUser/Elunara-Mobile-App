@@ -20,14 +20,24 @@ import BackArrowLeftIcon from "../../../assets/SvgIconsComponent/BackArrowLeftIc
 import { appColors } from "../../themes/appColors";
 import { AlertCircle } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { getOTPForMobileNumber, verifyOTPForMobileNumber } from "../../redux/slices/authSlice";
+import {
+  getOTPForMobileNumber,
+  setIsOTPReceivedForMobileVerification,
+  verifyOTPForMobileNumber,
+} from "../../redux/slices/authSlice";
 import { setUserMobileNumberForMobileVerification } from "../../redux/slices/globalDataSlice";
 import { triggerToast } from "../../services/toast";
-import Toaster from '../../components/UniversalToaster/Toaster'
+import Toaster from "../../components/UniversalToaster/Toaster";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
+const MobileVerificationPopup = ({
+  close,
+  mobileVerificationPopup,
+  isFromProfile,
+}) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [isMobileFocused, setIsMobileFocused] = useState(false);
   const [mobileError, setMobileError] = useState("");
@@ -35,10 +45,12 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [isCodeSent, setIsCodeSent] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
 
   const validateMobileNumber = (text, touched = isTouched) => {
@@ -55,27 +67,62 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
     }
   };
 
-  useEffect(()=>{
-     if(authStates.isOTPReceivedForMobileVerification == true){
-        setIsCodeSent(true);
-     }
-  },[authStates.isOTPReceivedForMobileVerification])
+  useEffect(() => {
+    if (authStates.isOTPReceivedForMobileVerification == true) {
+      setIsCodeSent(true);
+      setResendTimer(20);
+      dispatch(setIsOTPReceivedForMobileVerification(null));
+    }
+    if (authStates.isMobileOTPVerified == true) {
+      AsyncStorage.setItem("isMobileNumberVerifiedByOTP", "true");
+      close(false);
+      navigation.goBack();
+      triggerToast(
+        "Verified",
+        "Mobile number verified successfully",
+        "success",
+        3000
+      );
+    }
+  }, [
+    authStates.isOTPReceivedForMobileVerification,
+    authStates.isMobileOTPVerified,
+  ]);
+
+  // Resend timer countdown
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  const resendCode = () => {
+    const formData = new FormData();
+    formData.append("phone_number", mobileNumber);
+    dispatch(getOTPForMobileNumber(formData));
+    setResendTimer(20);
+  };
+
+  const formatTimer = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   const getCodeFromMobileNumber = () => {
     if (isCodeSent) {
-        const formData = new FormData();
-        formData.append("otp", otp.join(""));
-        dispatch(verifyOTPForMobileNumber(formData));
-        close(false);
-        triggerToast(
-          "Verified",
-          "Mobile number verified successfully","success",3000
-        );
+      const formData = new FormData();
+      formData.append("otp", otp.join(""));
+      dispatch(verifyOTPForMobileNumber(formData));
     } else {
-        dispatch(setUserMobileNumberForMobileVerification(mobileNumber));
-        const formData = new FormData();
-        formData.append("phone_number", mobileNumber);
-        dispatch(getOTPForMobileNumber(formData));
+      dispatch(setUserMobileNumberForMobileVerification(mobileNumber));
+      const formData = new FormData();
+      formData.append("phone_number", mobileNumber);
+      dispatch(getOTPForMobileNumber(formData));
     }
   };
 
@@ -142,7 +189,7 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
       animationType="slide"
       onRequestClose={() => close(false)}
     >
-      <Toaster/>
+      <Toaster />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}
@@ -224,16 +271,24 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                   </>
                 ) : (
                   <>
-                    <Text style={styles.title}>
-                      Lastly, Verify your{"\n"}mobile number
-                    </Text>
-                    {/* Description */}
-                    <Text style={styles.description}>
-                      To enhance security, we need to verify.
-                    </Text>
-                    <Text style={[styles.description, { marginBottom: 35 }]}>
-                      your mobile number
-                    </Text>
+                    {isFromProfile ? (
+                      <Text style={styles.title}>Add mobile number</Text>
+                    ) : (
+                      <>
+                        <Text style={styles.title}>
+                          Lastly, Verify your{"\n"}mobile number
+                        </Text>
+                        {/* Description */}
+                        <Text style={styles.description}>
+                          To enhance security, we need to verify.
+                        </Text>
+                        <Text
+                          style={[styles.description, { marginBottom: 35 }]}
+                        >
+                          your mobile number
+                        </Text>
+                      </>
+                    )}
                   </>
                 )}
 
@@ -259,13 +314,23 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                 ) : (
                   <View style={styles.inputSection}>
                     <Text style={styles.inputLabel}>Mobile Number</Text>
-                    <View style={styles.inputWrapper}>
+                    <View
+                      style={[
+                        styles.inputWrapper,
+                        isMobileFocused && styles.inputWrapperFocused,
+                        (mobileError || (isTouched && !mobileNumber)) &&
+                          styles.inputWrapperError,
+                      ]}
+                    >
+                      <TouchableOpacity
+                        style={styles.countrySection}
+                        disabled={true}
+                        activeOpacity={1}
+                      >
+                        <Text style={styles.countryText}>IN</Text>
+                      </TouchableOpacity>
                       <TextInput
-                        style={[
-                          styles.input,
-                          isMobileFocused && styles.inputFocused,
-                          (mobileError || (isTouched && !mobileNumber)) && styles.inputError,
-                        ]}
+                        style={styles.input}
                         placeholder="Enter your mobile number"
                         placeholderTextColor="#9CA3AF"
                         value={mobileNumber}
@@ -280,7 +345,7 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                         returnKeyType="done"
                         maxLength={10}
                       />
-                      {(mobileError || (isTouched && !mobileNumber)) ? (
+                      {mobileError || (isTouched && !mobileNumber) ? (
                         <View style={styles.errorIconContainer}>
                           <AlertCircle
                             size={20}
@@ -290,8 +355,10 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                         </View>
                       ) : null}
                     </View>
-                    {(mobileError || (isTouched && !mobileNumber)) ? (
-                      <Text style={styles.errorText}>{mobileError || "Mobile number is required"}</Text>
+                    {mobileError || (isTouched && !mobileNumber) ? (
+                      <Text style={styles.errorText}>
+                        {mobileError || "Mobile number is required"}
+                      </Text>
                     ) : null}
                   </View>
                 )}
@@ -300,16 +367,22 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    ((!isMobileValid && !isCodeSent) || authStates.isOTPReceivedForMobileVerification == "pending") &&
+                    ((!isMobileValid && !isCodeSent) ||
+                      authStates.isOTPReceivedForMobileVerification ==
+                        "pending") &&
                       styles.verifyButtonDisabled,
                   ]}
                   onPress={() => {
                     getCodeFromMobileNumber();
                   }}
                   activeOpacity={0.8}
-                  disabled={(!isCodeSent && !isMobileValid) || authStates.isOTPReceivedForMobileVerification == "pending"}
+                  disabled={
+                    (!isCodeSent && !isMobileValid) ||
+                    authStates.isOTPReceivedForMobileVerification == "pending"
+                  }
                 >
-                  {authStates.isOTPReceivedForMobileVerification == "pending" ? (
+                  {authStates.isOTPReceivedForMobileVerification ==
+                  "pending" ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <Text style={styles.verifyButtonText}>
@@ -318,23 +391,34 @@ const MobileVerificationPopup = ({ close, mobileVerificationPopup }) => {
                   )}
                 </TouchableOpacity>
 
-                {/* Skip for now */}
-                <TouchableOpacity
-                  style={[
-                    styles.skipButton,
-                    { marginBottom: isCodeSent ? 70 : 20 },
-                  ]}
-                  onPress={() => close(false)}
-                  activeOpacity={0.7}
-                >
-                  {isCodeSent ? (
-                    <Text style={styles.skipButtonText}>
-                      Resend Code in 00:20
+                {/* Skip for now / Resend Code */}
+                {isCodeSent ? (
+                  <TouchableOpacity
+                    style={[styles.skipButton, { marginBottom: 70 }]}
+                    onPress={resendTimer === 0 ? resendCode : undefined}
+                    activeOpacity={resendTimer === 0 ? 0.7 : 1}
+                    disabled={resendTimer > 0}
+                  >
+                    <Text style={[
+                      styles.skipButtonText,
+                      resendTimer > 0 && { color: "#9CA3AF" }
+                    ]}>
+                      {resendTimer > 0
+                        ? `Resend Code in ${formatTimer(resendTimer)}`
+                        : "Resend Code"}
                     </Text>
-                  ) : (
-                    <Text style={styles.skipButtonText}>Skip for now</Text>
-                  )}
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                ) : (
+                  !isFromProfile && (
+                    <TouchableOpacity
+                      style={[styles.skipButton, { marginBottom: 20 }]}
+                      onPress={() => close(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.skipButtonText}>Skip for now</Text>
+                    </TouchableOpacity>
+                  )
+                )}
 
                 {/* Note */}
                 {!isCodeSent && (
@@ -434,6 +518,7 @@ const styles = StyleSheet.create({
   },
   inputSection: {
     marginBottom: 24,
+    marginTop: 30,
   },
   inputLabel: {
     fontSize: scaleFont(12),
@@ -443,12 +528,30 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     position: "relative",
-  },
-  input: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: "#D1D5DB",
     borderRadius: 15,
+  },
+  countrySection: {
+    paddingLeft: 14,
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  countryText: {
+    fontSize: scaleFont(14),
+    color: "#acacacff",
+    fontFamily: "Mukta-Medium",
+    borderRightWidth: 1,
+    borderRightColor: "#D4D4D4",
+    paddingRight: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: "transparent",
     paddingHorizontal: 16,
     paddingVertical: 10,
     paddingRight: 45,
@@ -456,10 +559,10 @@ const styles = StyleSheet.create({
     color: "#3A3A3A",
     fontFamily: "Mukta-Regular",
   },
-  inputFocused: {
+  inputWrapperFocused: {
     borderColor: appColors.navyBlueShade,
   },
-  inputError: {
+  inputWrapperError: {
     borderColor: "#D00B0B",
   },
   errorIconContainer: {

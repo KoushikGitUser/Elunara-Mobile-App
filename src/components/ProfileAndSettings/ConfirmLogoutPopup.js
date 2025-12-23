@@ -8,20 +8,45 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { triggerToast } from "../../services/toast";
 import { appColors } from "../../themes/appColors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsLogOutToFalse, userLogOut } from "../../redux/slices/authSlice";
+import {
+  removeToken,
+  removeRefreshToken,
+} from "../../utils/Secure/secureStore";
 
 const ConfirmLogoutPopup = ({
   toggleLogOutConfirmPopup,
   setToggleLogOutConfirmPopup,
 }) => {
-  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { authStates } = useSelector((state) => state.Auth);
+
+  useEffect(() => {
+    const handleLogout = async () => {
+      if (authStates.isLogOut === true) {
+        await removeToken();
+        await removeRefreshToken();
+        setToggleLogOutConfirmPopup(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "welcome" }],
+        });
+        AsyncStorage.setItem("authenticUser", "false");
+        dispatch(setIsLogOutToFalse());
+      }
+    };
+    handleLogout();
+  }, [authStates.isLogOut]);
+
   return (
     <Modal
       visible={toggleLogOutConfirmPopup}
@@ -60,7 +85,7 @@ const ConfirmLogoutPopup = ({
 
             {/* Description */}
             <Text style={styles.description}>
-              Are you sure you want to log out? You’ll need to sign in again to
+              Are you sure you want to log out? You'll need to sign in again to
               access your Rooms and chats.
             </Text>
 
@@ -86,30 +111,19 @@ const ConfirmLogoutPopup = ({
                 style={[
                   styles.button,
                   {
-                    backgroundColor: loading
-                      ? "#CDD5DC"
-                      : appColors.navyBlueShade,
+                    backgroundColor:
+                      authStates.isLogOut == "pending"
+                        ? "#CDD5DC"
+                        : appColors.navyBlueShade,
                   },
-                ]} 
-                disabled={loading}
+                ]}
+                disabled={authStates.isLogOut == "pending"}
                 onPress={() => {
-                  setLoading(true)
-                  setTimeout(() => {
-                    setLoading(false)
-                    setToggleLogOutConfirmPopup(false);
-                    navigation.navigate("welcome");
-                    AsyncStorage.setItem("authenticUser", "false");
-                    triggerToast(
-                      "Logged Out",
-                      "You have been logged out successfully",
-                      "success",
-                      3000
-                    );
-                  }, 2500);
+                  dispatch(userLogOut());
                 }}
                 activeOpacity={0.8}
               >
-                {loading ? (
+                {authStates.isLogOut == "pending" ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
                   <Text style={styles.buttonText}>Log Out</Text>

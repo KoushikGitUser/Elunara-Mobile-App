@@ -5,6 +5,7 @@ import {
   storeToken,
   removeToken,
   storeRefreshToken,
+  getToken,
 } from "../../utils/Secure/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { allInitialStates } from "../allInitialStates";
@@ -205,12 +206,11 @@ export const verifyOTPForMobileNumber = createAsyncThunk(
   }
 );
 
-
 export const signWithGoogle = createAsyncThunk(
   "/signWithGoogle",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.get("/auth/google/redirect",{
+      let res = await apiInstance.get("/auth/google/redirect", {
         headers: {
           Accept: "application/json",
         },
@@ -228,13 +228,12 @@ export const signWithGoogle = createAsyncThunk(
     }
   }
 );
-
 
 export const signWithApple = createAsyncThunk(
   "/signWithApple",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.get("/auth/apple/redirect",{
+      let res = await apiInstance.get("/auth/apple/redirect", {
         headers: {
           Accept: "application/json",
         },
@@ -252,13 +251,12 @@ export const signWithApple = createAsyncThunk(
     }
   }
 );
-
 
 export const signWithLinkedIn = createAsyncThunk(
   "/signWithLinkedIn",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.get("/auth/linkedin/redirect",{
+      let res = await apiInstance.get("/auth/linkedin/redirect", {
         headers: {
           Accept: "application/json",
         },
@@ -277,12 +275,36 @@ export const signWithLinkedIn = createAsyncThunk(
   }
 );
 
-
-
 const authSlice = createSlice({
   name: "auth",
   initialState: allInitialStates,
-  reducers: {},
+  reducers: {
+    setIsSignedInToFalse: (state, action) => {
+      state.authStates.isSignedIn = false;
+    },
+    setIsSignedUpToFalse: (state, action) => {
+      state.authStates.isSignedUp = false;
+    },
+    setIsLogOutToFalse: (state, action) => {
+      state.authStates.isLogOut = false;
+    },
+    setIsPasswordResetToFalse: (state, action) => {
+      state.authStates.isPasswordReset = false;
+    },
+    setIsMailVerifiedToFalse: (state, action) => {
+      state.authStates.isMailVerified = false;
+    },
+    setIsAccountRecoverableToFalse: (state, action) => {
+      state.authStates.isAccountRecoverable = false;
+      state.authStates.accountRecoverableMessage = "";
+    },
+    setAuthError: (state, action) => {
+      state.authStates.error = action.payload;
+    },
+    setIsOTPReceivedForMobileVerification: (state, action) => {
+      state.authStates.isOTPReceivedForMobileVerification = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       //signup
@@ -321,15 +343,13 @@ const authSlice = createSlice({
         const { payload } = action;
         state.authStates.isSignedIn = true;
         // Store token in secure storage
-        if (payload.data?.token) {
+        if (payload.data?.data?.access_token) {
           storeToken(payload.data.data.access_token);
         }
         // Store refresh token in secure storage
-        if (payload.data?.refreshToken) {
+        if (payload.data?.data?.refresh_token) {
           storeRefreshToken(payload.data.data.refresh_token);
         }
-        // Set authenticated user flag in AsyncStorage
-        AsyncStorage.setItem("authenticUser", "true");
         setTimeout(() => {
           triggerToast(
             "Logged in",
@@ -355,6 +375,7 @@ const authSlice = createSlice({
       .addCase(userLogOut.fulfilled, (state, { payload }) => {
         state.authStates.isLogOut = true;
         state.authStates.isAuthenticated = false;
+        console.log(payload.message, "logout done");
         setTimeout(() => {
           triggerToast(
             "Logged out",
@@ -364,8 +385,9 @@ const authSlice = createSlice({
           );
         }, 300);
       })
-      .addCase(userLogOut.rejected, (state, action) => {
+      .addCase(userLogOut.rejected, (state, { payload }) => {
         state.authStates.isLogOut = false;
+        console.log(payload.data.message, "logout fail");
         setTimeout(() => {
           triggerToast(
             "Error",
@@ -375,7 +397,6 @@ const authSlice = createSlice({
           );
         }, 300);
       })
-
 
       //reset password
       .addCase(resetPassword.pending, (state, action) => {
@@ -393,8 +414,7 @@ const authSlice = createSlice({
             "error",
             3000
           );
-        }
-        else{
+        } else {
           triggerToast(
             "Password not set",
             "Invalid email provided",
@@ -403,7 +423,6 @@ const authSlice = createSlice({
           );
         }
       })
-
 
       //verify email
       .addCase(verifyEmail.pending, (state, action) => {
@@ -414,11 +433,15 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmail.rejected, (state, { payload }) => {
         state.authStates.isMailVerified = false;
-        if(payload.status == 400){
-          triggerToast("Invalid token/OTP","The token/OTP provided is invalid or expired","error",3000)
+        if (payload.status == 400) {
+          triggerToast(
+            "Invalid token/OTP",
+            "The token/OTP provided is invalid or expired",
+            "error",
+            3000
+          );
         }
       })
-
 
       //recover account
       .addCase(recoverAccount.pending, (state, action) => {
@@ -427,17 +450,24 @@ const authSlice = createSlice({
       .addCase(recoverAccount.fulfilled, (state, { payload }) => {
         state.authStates.isOTPReceivedForAccountRecovery = true;
       })
-      .addCase(recoverAccount.rejected, (state, {payload}) => {
+      .addCase(recoverAccount.rejected, (state, { payload }) => {
         state.authStates.isOTPReceivedForAccountRecovery = false;
-        if(payload.status == 422){
-          triggerToast("Invalid email","The selected email is invalid.","error",3000)
+        if (payload.status == 422) {
+          triggerToast(
+            "Invalid email",
+            "The selected email is invalid.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Attempts limit reached",
+            "Too many recovery attempts. Please try again after 24 hours.",
+            "error",
+            3000
+          );
         }
-        else{
-          triggerToast("Attempts limit reached","Too many recovery attempts. Please try again after 24 hours.","error",3000)
-        }
-        
       })
-
 
       //get mobile otp
       .addCase(getOTPForMobileNumber.pending, (state, action) => {
@@ -446,13 +476,31 @@ const authSlice = createSlice({
       .addCase(getOTPForMobileNumber.fulfilled, (state, { payload }) => {
         state.authStates.isOTPReceivedForMobileVerification = true;
       })
-      .addCase(getOTPForMobileNumber.rejected, (state, {payload}) => {
+      .addCase(getOTPForMobileNumber.rejected, (state, { payload }) => {
         state.authStates.isOTPReceivedForMobileVerification = false;
-        triggerToast("Unauthenticated","User not authentucated","error",3000)
-        console.log(payload.message,"failed",payload.status);
-        
+        if (payload.status == 422) {
+          triggerToast(
+            "Already in use",
+            "This phone number is already registered with another account.",
+            "error",
+            3000
+          );
+        } else if (payload.status == 429) {
+          triggerToast(
+            "Attempts limit reached",
+            "Too many OTP requests. Please try again after 60 minute(s).",
+            "error",
+            3000
+          );
+        } else if (payload.status == 500) {
+          triggerToast(
+            "Server error",
+            "Failed to send OTP. Please try again.",
+            "error",
+            3000
+          );
+        }
       })
-
 
       //verify mobile otp
       .addCase(verifyOTPForMobileNumber.pending, (state, action) => {
@@ -465,55 +513,57 @@ const authSlice = createSlice({
         state.authStates.isMobileOTPVerified = false;
       })
 
-
       //signin/signup with google
-       .addCase(signWithGoogle.pending, (state, action) => {
+      .addCase(signWithGoogle.pending, (state, action) => {
         state.authStates.isRedirectURLReceivedForGoogle = "pending";
       })
       .addCase(signWithGoogle.fulfilled, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForGoogle = true;
-        state.authStates.redirectURLForGoogle = payload.data.data.redirect_url
+        state.authStates.redirectURLForGoogle = payload.data.data.redirect_url;
       })
-      .addCase(signWithGoogle.rejected, (state, {payload}) => {
+      .addCase(signWithGoogle.rejected, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForGoogle = false;
-        
       })
-
 
       //signin/signup with apple
-       .addCase(signWithApple.pending, (state, action) => {
+      .addCase(signWithApple.pending, (state, action) => {
         state.authStates.isRedirectURLReceivedForApple = "pending";
       })
       .addCase(signWithApple.fulfilled, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForApple = true;
-        state.authStates.redirectURLForApple = payload.data.data.redirect_url
-        console.log(payload.data.data.redirect_url,"url");
-        
+        state.authStates.redirectURLForApple = payload.data.data.redirect_url;
+        console.log(payload.data.data.redirect_url, "url");
       })
-      .addCase(signWithApple.rejected, (state, {payload}) => {
+      .addCase(signWithApple.rejected, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForApple = false;
         console.log(payload.status);
-        
       })
 
-    
       //signin/signup with linkedIn
-       .addCase(signWithLinkedIn.pending, (state, action) => {
+      .addCase(signWithLinkedIn.pending, (state, action) => {
         state.authStates.isRedirectURLReceivedForLinkedIn = "pending";
       })
       .addCase(signWithLinkedIn.fulfilled, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForLinkedIn = true;
-        state.authStates.redirectURLForLinkedIn = payload.data.data.redirect_url
-        console.log(payload.data.data.redirect_url,"url");
+        state.authStates.redirectURLForLinkedIn =
+          payload.data.data.redirect_url;
+        console.log(payload.data.data.redirect_url, "url");
       })
       .addCase(signWithLinkedIn.rejected, (state, action) => {
         state.authStates.isRedirectURLReceivedForLinkedIn = false;
-      })
-
+      });
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout, setUser } =
-  authSlice.actions;
+export const {
+  setAuthError,
+  setIsAccountRecoverableToFalse,
+  setIsLogOutToFalse,
+  setIsMailVerifiedToFalse,
+  setIsPasswordResetToFalse,
+  setIsSignedInToFalse,
+  setIsSignedUpToFalse,
+  setIsOTPReceivedForMobileVerification,
+} = authSlice.actions;
 
 export default authSlice.reducer;

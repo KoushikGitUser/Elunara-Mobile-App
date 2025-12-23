@@ -27,7 +27,7 @@ import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
 import { Check, AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
-import { userSignUp, signWithGoogle, signWithApple, signWithLinkedIn } from "../../../redux/slices/authSlice";
+import { userSignUp, signWithGoogle, signWithApple, signWithLinkedIn, setIsSignedUpToFalse } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
@@ -60,6 +60,7 @@ const SignUp = () => {
   useEffect(()=>{
     if(authStates.isSignedUp == true){
       setVerificationMailSent(true);
+      dispatch(setIsSignedUpToFalse());
     }
     else if(authStates.isAccountRecoverable){
      setToggleAccNotRecovered(true);

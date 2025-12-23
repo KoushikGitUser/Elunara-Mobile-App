@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
 import profilePic from "../../assets/images/profilepic.png";
@@ -23,12 +23,25 @@ import corporateAvatar from '../../assets/images/Corporate2.png';
 import teacherAvatar from '../../assets/images/Teacher2.png';
 import maleStudentAvatar from '../../assets/images/Student Male2.png';
 import femaleStudentAvatar from '../../assets/images/Student Female2.png';
+import MobileVerificationPopup from "../../components/ChatScreen/MobileVerificationPopup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const EditProfile = () => {
+  const [isMobileVerified, setIsMobileVerified] = useState(true);
+
+  useEffect(() => {
+    const checkMobileVerification = async () => {
+      const verified = await AsyncStorage.getItem("isMobileNumberVerifiedByOTP");
+      setIsMobileVerified(verified === "true");
+    };
+    checkMobileVerification();
+  }, []);
+  
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [mobileVerificationPopup,setMobileVerificationPopup] = useState(false)
   const [password, setPassword] = React.useState("");
   const [selectedImage, setSelectedImage] = React.useState(null);
   const firstNameInputRef = React.useRef(null);
@@ -57,6 +70,7 @@ const EditProfile = () => {
         backgroundColor: "#FAFAFA",
       }}
     >
+      <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} isFromProfile={true} />
       {toggleStates.toggleUpdateProfilePicPopup && <UpdateProfilePicPopup  setSelectedImage={setSelectedImage}/>}
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120, position: "relative1" }}>
@@ -174,25 +188,27 @@ const EditProfile = () => {
       >
         <Text style={[styles.buttonText, { color: "black" }]}>Done</Text>
       </TouchableOpacity>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <View style={styles.headerTitleContainer}>
-            <TouchableOpacity>
-              <InfoIcon />
-            </TouchableOpacity>
-            <Text style={styles.title}>Verify Mobile no. in 10 Days</Text>
-          </View>
-          <Text style={styles.subtitle}>
-            Verifying your mobile no. helps protect your account and enables
-            important notifications.
-          </Text>
-          <TouchableOpacity style={[styles.verifyButton]} activeOpacity={0.8}>
-            <Text style={styles.verifyButtonText}>
-              Verify and Secure Account
+      {!isMobileVerified && (
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <View style={styles.headerTitleContainer}>
+              <TouchableOpacity>
+                <InfoIcon />
+              </TouchableOpacity>
+              <Text style={styles.title}>Verify Mobile no. in 10 Days</Text>
+            </View>
+            <Text style={styles.subtitle}>
+              Verifying your mobile no. helps protect your account and enables
+              important notifications.
             </Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} style={[styles.verifyButton]} activeOpacity={0.8}>
+              <Text style={styles.verifyButtonText}>
+                Verify and Secure Account
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
     </ScrollView>
   );
 };

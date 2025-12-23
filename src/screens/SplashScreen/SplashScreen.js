@@ -4,14 +4,14 @@ import { View, Text, StyleSheet, ActivityIndicator, StatusBar, ImageBackground, 
 import { scaleFont } from '../../utils/responsive';
 import chakraLogoSplash from '../../assets/images/chakraBig.png';
 import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getToken } from '../../utils/Secure/secureStore';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
-      const authenticUser = await AsyncStorage.getItem('authenticUser');
+      const accessToken = await getToken();
       const timer = setTimeout(() => {
-        if (authenticUser === 'true') {
+        if (accessToken) {
           navigation.replace('chat');
         } else {
           navigation.replace('welcome');

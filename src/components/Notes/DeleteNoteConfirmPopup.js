@@ -13,6 +13,7 @@ import { scaleFont } from "../../utils/responsive";
 const DeleteNoteConfirmPopup = ({
   toggleDeleteNotePopup,
   setToggleDeleteNotePopup,
+  onDelete,
 }) => {
   return (
     <Modal
@@ -77,6 +78,7 @@ const DeleteNoteConfirmPopup = ({
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
+                  onDelete?.();
                   setToggleDeleteNotePopup(false);
                 }}
                 activeOpacity={0.8}

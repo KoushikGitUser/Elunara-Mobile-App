@@ -30,7 +30,7 @@ import { appColors } from "../../../themes/appColors";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { signWithGoogle, signWithApple, signWithLinkedIn, userSignIn } from "../../../redux/slices/authSlice";
+import { signWithGoogle, signWithApple, signWithLinkedIn, userSignIn, setIsSignedInToFalse } from "../../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
@@ -69,6 +69,7 @@ const SignIn = () => {
   useEffect(() => {
     if (authStates.isSignedIn == true) {
       navigation.navigate("chat");
+     dispatch(setIsSignedInToFalse());
     }
   }, [authStates.isSignedIn]);
 
@@ -137,11 +138,11 @@ const SignIn = () => {
       return;
     }
 
-    // const formData = new FormData();
-    // formData.append("email", email.trim());
-    // formData.append("password", password.trim());
-    // dispatch(userSignIn(formData));
-    navigation.navigate("chat");
+    const formData = new FormData();
+    formData.append("email", email.trim());
+    formData.append("password", password.trim());
+    dispatch(userSignIn(formData));
+    // navigation.navigate("chat");
   };
 
   const styleProps = {

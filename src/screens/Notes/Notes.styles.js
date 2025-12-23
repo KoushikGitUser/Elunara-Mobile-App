@@ -81,19 +81,21 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       alignItems: "center",
       backgroundColor:"white",
-      borderRadius:16
+      borderRadius:16,
+      borderWidth: 1,
+      borderColor: "#ABB8CC",
+      height: verticalScale(37),
     },
     searchIcon: {
       position: "absolute",
       left: 10,
+      zIndex: 1,
     },
     searchInput: {
-      width:"100%",
-      height: verticalScale(37),
-      borderWidth: 1,
-      borderRadius: 16,
-      borderColor: "#ABB8CC",
+      flex: 1,
+      height: "100%",
       paddingLeft: 40,
+      paddingRight: 60,
     },
     collapsedButton: {
       position: "absolute",
