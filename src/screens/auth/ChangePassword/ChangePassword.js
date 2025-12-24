@@ -24,7 +24,7 @@ import { appColors } from "../../../themes/appColors";
 import { Check, X, Info } from "lucide-react-native";
 import { triggerToast } from "../../../services/toast";
 
-const ChangePassword = () => {
+const ChangePassword = ({route}) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +37,8 @@ const ChangePassword = () => {
   const [hasStartedTypingConfirm, setHasStartedTypingConfirm] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
+
+  const { recoveryToken,isForTokenOrOTP } = route.params || {};
 
   // Validation states
   const hasMinLength = password.length >= 8;
@@ -107,12 +109,22 @@ const ChangePassword = () => {
   }, [authStates.isPasswordReset]);
 
   const resetPasswordFunction = () => {
+    if(isForTokenOrOTP == "token"){
+    const formData = new FormData();
+    formData.append("token", recoveryToken);
+    formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword);
+    dispatch(resetPassword(formData));
+    }
+    else{
     const formData = new FormData();
     formData.append("email", globalDataStates.userMailIDOnForgotPassword);
     formData.append("otp", globalDataStates.userOTPOnForgotPassword);
     formData.append("password", password);
     formData.append("password_confirmation", confirmPassword);
     dispatch(resetPassword(formData));
+    }
+
   };
 
   return (

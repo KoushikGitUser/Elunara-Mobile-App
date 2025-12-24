@@ -16,6 +16,7 @@ import AddRoomDetails from "../screens/Rooms/AddRoomDetails";
 import AllRoomsLandingPage from "../screens/Rooms/AllRoomsLandingPage";
 import AnalyticsCompletedTopicsPage from "../screens/SettingsPages/AnalyticsCompletedTopicsPage";
 import * as Linking from "expo-linking";
+import VerifyEmailWhileSignup from "../screens/auth/redirectionsAuth/VerifyEmailWhileSignup";
 
 // Screens
 
@@ -24,23 +25,24 @@ const Stack = createNativeStackNavigator();
 const prefix = Linking.createURL("/");
 
 const linking = {
-  prefixes: [prefix, "elunara://", "exp+elunara://"],
+  prefixes: [prefix, "elunara://", "exp+elunara://","elunaraapp://"],
   config: {
     screens: {
-      Splash: "splash",
-      welcome: "welcome",
-      signin: "signin",
-      signup: "signup",
-      changepass: "changepass",
-      chat: "chat/:chatId?",           // optional param
-      notes: "notes/:noteId?",         // optional param
-      allRooms: "allRooms",
-      rooms: "rooms/:roomId?",         // optional param
-      roomDetails: "roomDetails/:roomId?",
-      allchats: "allchats",
-      profile: "profile",
-      settingsInnerPages: "settings/:page?",
-      analyticsComplete: "analyticsComplete",
+      "Splash": "splash",
+      "welcome": "welcome",
+      "signin": "signin",
+      "signup": "signup",
+      "changepass": "changepass/:recoveryToken/:isForTokenOrOTP",
+      "chat": "chat/:chatId?",           // optional param
+      "notes": "notes/:noteId?",         // optional param
+      "allRooms": "allRooms",
+      "rooms": "rooms/:roomId?",         // optional param
+      "roomDetails": "roomDetails/:roomId?",
+      "allchats": "allchats",
+      "profile": "profile",
+      "settingsInnerPages": "settings/:page?",
+      "analyticsComplete": "analyticsComplete",
+      "verify-email": "verify-email/:emailToken",
     },
   },
 };
@@ -164,6 +166,14 @@ const AppNavigator = () => {
          <Stack.Screen
           name="analyticsComplete"
           component={AnalyticsCompletedTopicsPage}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="verify-email"
+          component={VerifyEmailWhileSignup}
           options={{
             headerShown: false,
           }}

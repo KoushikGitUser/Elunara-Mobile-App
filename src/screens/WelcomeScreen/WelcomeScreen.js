@@ -170,7 +170,7 @@ const WelcomeScreen = () => {
 
             {/* Footer Links */}
             <View style={styles.footer}>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity onPress={()=>navigation.navigate("verify-email")} activeOpacity={0.7}>
                 <Text style={styles.footerLink}>Terms Of Use</Text>
               </TouchableOpacity>
               <Text style={styles.footerDot}> • </Text>

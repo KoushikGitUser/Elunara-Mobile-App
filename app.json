@@ -2,7 +2,7 @@
   "expo": {
     "name": "Elunara",
     "slug": "elunara",
-    "scheme": "elunara",
+    "scheme": ["elunara", "elunaraapp"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
