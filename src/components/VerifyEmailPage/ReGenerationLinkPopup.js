@@ -1,36 +1,41 @@
 import {
   View,
   Text,
-  Dimensions,
   Modal,
-  TouchableOpacity,
-  Image,
-  Platform,
-  StyleSheet,
-  Animated,
-  Keyboard,
   KeyboardAvoidingView,
+  TouchableOpacity,
+  Animated,
   ScrollView,
   TextInput,
   ActivityIndicator,
+  Keyboard,
+  Platform,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
-import { AlertCircle, ArrowRight, UserRoundCheck } from "lucide-react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { AlertCircle } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import { appColors } from "../../themes/appColors";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
-import { recoverAccount, verifyEmail } from "../../redux/slices/authSlice";
-import SuccessCheckMark from "./SuccessCheckMark";
-const { width } = Dimensions.get("window");
+import { useDispatch, useSelector } from "react-redux";
+import {
+  recoverAccount,
+  setIsOTPReceivedForAccountRecovery,
+} from "../../redux/slices/authSlice";
+import {
+  setUserMailIDOnForgotPassword,
+  setUserOTPOnForgotPassword,
+} from "../../redux/slices/globalDataSlice";
+import { triggerToast } from "../../services/toast";
 
-const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
+const ReGenerationLinkPopup = ({ close, toggleGenerateLinkPopup }) => {
+  const [email, setEmail] = useState("");
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isCodeSent, setIsCodeSent] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
@@ -38,19 +43,49 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
 
-  const isOtpComplete = otp.every((digit) => digit.length === 1);
-  const isRecoveryPending =
-    authStates.isOTPReceivedForAccountRecovery === "pending";
-
-  const navigation = useNavigation();
+  const validateEmail = (text) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!text) {
+      setEmailError("");
+    } else if (!emailRegex.test(text)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
 
   useEffect(() => {
     if (authStates.isOTPReceivedForAccountRecovery == true) {
-      setIsCodeSent(true);
-    }
-    if (authStates.isMailVerified == true) {
+      navigation.navigate("changepass", {
+        recoveryToken: null,
+        isForTokenOrOTP: "OTP",
+      });
+      triggerToast(
+        "Link and OTP sent",
+        "Recovery link and OTP sent to your mail ID",
+        "success",
+        3000
+      );
+      dispatch(setIsOTPReceivedForAccountRecovery(false));
     }
   }, [authStates.isOTPReceivedForAccountRecovery]);
+
+  const getCodeFunction = () => {
+    const formData = new FormData();
+    formData.append("email", email);
+    dispatch(recoverAccount(formData));
+    dispatch(setUserMailIDOnForgotPassword(email));
+  };
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    validateEmail(text);
+  };
+
+  const isEmailValid = email && !emailError;
+  const isOtpComplete = otp.every((digit) => digit.length === 1);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -103,22 +138,9 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
     inputRefs.current[0]?.focus();
   };
 
-  const getCodeForAccountRecoveryFunction = () => {
-    if (!isCodeSent) {
-      const formData = new FormData();
-      formData.append("email", globalDataStates.userMailIDOnSignup);
-      dispatch(recoverAccount(formData));
-    } else {
-      const formData = new FormData();
-      formData.append("otp", otp.join(""));
-      formData.append("email", globalDataStates.userMailIDOnSignup);
-      dispatch(verifyEmail(formData));
-    }
-  };
-
   return (
     <Modal
-      visible={toggleAccNotRecovered}
+      visible={toggleGenerateLinkPopup}
       transparent={true}
       animationType="slide"
       onRequestClose={() => close(false)}
@@ -158,9 +180,8 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
                   inputRange: [0, 320], // average keyboard height
                   outputRange: [
                     0,
-                    isCodeSent
-                      ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),
+
+                       -(keyboardHeight * 2.7),
                   ],
                   // perfect lift without large gap
                   extrapolate: "clamp",
@@ -186,141 +207,89 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
                   />
                 </View>
                 {/* Title */}
-
-                {!isCodeSent ? (
-                  <Text style={styles.title}>Account already exists!</Text>
-                ) : isCodeSent && !authStates.isMailVerified == true ? (
-                  <Text style={styles.title}>Verify Account</Text>
-                ) : null}
+                <Text style={styles.title}>Recover your account</Text>
 
                 {/* Description */}
-                {!isCodeSent ? (
-                  <Text style={[styles.description, { marginBottom: 15 }]}>
-                    We found an unverified account associated with this email.
-                    Would you like to recover it?
-                    {}
-                  </Text>
-                ) : isCodeSent && !authStates.isMailVerified == true ? (
-                  <Text style={styles.description}>
-                    Code and recovery link has been sent to{" "}
-                    <Text
-                      style={[
-                        styles.description,
-                        { color: "black", fontFamily: "Mukta-Bold" },
-                      ]}
-                    >
-                      {globalDataStates.userMailIDOnSignup}
-                    </Text>
-                  </Text>
-                ) : null}
-
-                {!isCodeSent ? (
-                  <Text style={[styles.description, { marginBottom: 20 }]}>
-                    An OTP and a recovery link will be sent to your registered email{" "}
-                    <Text
-                      style={{
-                        fontFamily: "Mukta-Bold",
-                        color: appColors.navyBlueShade,
-                      }}
-                    >
-                      {globalDataStates.userMailIDOnSignup}
-                    </Text>{" "}
-                  </Text>
-                ) : isCodeSent && !authStates.isMailVerified == true ? (
-                  <Text style={styles.description}>
-                    Click that recovery link to recover your account or 
-                    you can enter the code for the same.
-                  </Text>
-                ) : null}
+                <Text style={styles.description}>
+                  Enter your registered email, and we'll send
+                </Text>
+                <Text style={styles.description}>
+                  a new recovery link and a verification code.
+                </Text>
 
                 {/* Input Section */}
-                {isCodeSent ? (
-                  <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                      <TextInput
-                        key={index}
-                        ref={(ref) => (inputRefs.current[index] = ref)}
-                        style={[styles.otpInput]}
-                        value={digit}
-                        onChangeText={(value) => handleChange(index, value)}
-                        onKeyPress={({ nativeEvent: { key } }) =>
-                          handleKeyPress(index, key)
-                        }
-                        keyboardType="number-pad"
-                        maxLength={1}
-                        selectTextOnFocus
-                      />
-                    ))}
-                  </View>
-                ) : null}
-
-                {isCodeSent && authStates.isMailVerified == true && (
-                  <View style={styles.verified}>
-                    <SuccessCheckMark color={appColors.navyBlueShade} />
-                    <Text
+                <View style={styles.inputSection}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
                       style={[
-                        styles.description,
-                        { textAlign: "center", marginTop: 20, fontSize: 18 },
+                        styles.input,
+                        isEmailFocused && styles.inputFocused,
+                        emailError && styles.inputError,
                       ]}
-                    >
-                      Your email has been verified successfully
-                    </Text>
-                    <View style={styles.signupContainer}>
-                      <Text style={styles.signupText}>You can now {""}</Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          close(false);
-                          navigation.navigate("signin");
-                        }}
-                        activeOpacity={0.7}
-                      >
-                        <Text style={styles.signupLink}> Log In</Text>
-                        <View style={styles.customUnderline} />
-                      </TouchableOpacity>
-                    </View>
+                      placeholder="Enter your email"
+                      placeholderTextColor="#9CA3AF"
+                      value={email}
+                      onChangeText={handleEmailChange}
+                      onFocus={() => setIsEmailFocused(true)}
+                      onBlur={() => setIsEmailFocused(false)}
+                      keyboardType="email-address"
+                      returnKeyType="done"
+                      autoCapitalize="none"
+                    />
+                    {emailError ? (
+                      <View style={styles.errorIconContainer}>
+                        <AlertCircle
+                          size={20}
+                          color="#D00B0B"
+                          style={{ marginRight: 10 }}
+                        />
+                      </View>
+                    ) : null}
                   </View>
-                )}
+                  {emailError ? (
+                    <Text style={styles.errorText}>{emailError}</Text>
+                  ) : null}
+                </View>
 
                 {/* Verify Button */}
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    ((isCodeSent && !isOtpComplete) ||
-                      authStates.isMailVerified == "pending" ||
-                      isRecoveryPending) &&
+                    (!isEmailValid ||
+                      authStates.isOTPReceivedForAccountRecovery ==
+                        "pending") &&
                       styles.verifyButtonDisabled,
-                    { marginBottom: isCodeSent ? 35 : 85 },
+                    { marginBottom:85 },
                   ]}
                   onPress={() => {
-                    getCodeForAccountRecoveryFunction();
+                    getCodeFunction();
                   }}
                   activeOpacity={0.8}
                   disabled={
-                    (isCodeSent && !isOtpComplete) ||
-                    authStates.isMailVerified == "pending" ||
-                    isRecoveryPending
+                    !isEmailValid ||
+                    authStates.isOTPReceivedForAccountRecovery == "pending"
                   }
                 >
-                  {authStates.isMailVerified == "pending" ||
-                  isRecoveryPending ? (
+                  {authStates.isOTPReceivedForAccountRecovery == "pending" ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
                     <Text style={styles.verifyButtonText}>
-                      {isCodeSent ? "Verify" : "Proceed"}
+                      Proceed
                     </Text>
                   )}
                 </TouchableOpacity>
 
-                {isCodeSent && (
+                {/* {isCodeSent && (
                   <View style={styles.resendContainer}>
                     <Text style={styles.resendText}>
-                      Did't receive the OTP?{" "}
+                      Don't receive the OTP?{" "}
                     </Text>
                     <TouchableOpacity onPress={handleResend}>
                       <Text style={styles.resendLink}>Resend OTP</Text>
                     </TouchableOpacity>
                   </View>
-                )}
+                )} */}
               </View>
             </View>
           </ScrollView>
@@ -395,7 +364,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(24),
     color: "#3A3A3A",
-    marginBottom: 15,
+    marginBottom: 5,
     lineHeight: 36,
     fontFamily: "Mukta-Bold",
   },
@@ -531,30 +500,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#374151",
   },
-  verified: {
-    marginBottom: 100,
-    marginTop: 30,
-  },
-  verifyButtonDisabled: {
-    backgroundColor: "#CDD5DC",
-  },
-  verifyButtonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Bold",
-  },
-  skipButton: {
-    alignItems: "center",
-    paddingVertical: 12,
-    marginBottom: 10,
-  },
-  skipButtonText: {
-    color: "#0F172A",
-    fontSize: scaleFont(14),
-    fontWeight: "600",
-    borderBottomWidth: 1,
-    fontFamily: "Mukta-Bold",
-  },
 });
 
-export default AccountNotRecoveredPopup;
+export default ReGenerationLinkPopup;

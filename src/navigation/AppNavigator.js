@@ -17,6 +17,7 @@ import AllRoomsLandingPage from "../screens/Rooms/AllRoomsLandingPage";
 import AnalyticsCompletedTopicsPage from "../screens/SettingsPages/AnalyticsCompletedTopicsPage";
 import * as Linking from "expo-linking";
 import VerifyEmailWhileSignup from "../screens/auth/redirectionsAuth/VerifyEmailWhileSignup";
+import AuthenticateUserUsingProvider from "../screens/auth/redirectionsAuth/AuthenticateUserUsingProvider";
 
 // Screens
 
@@ -43,6 +44,7 @@ const linking = {
       "settingsInnerPages": "settings/:page?",
       "analyticsComplete": "analyticsComplete",
       "verify-email": "verify-email/:emailToken",
+      "auth-using-provider":"auth-using-provider/:provider/:authCode/:state",
     },
   },
 };
@@ -174,6 +176,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="verify-email"
           component={VerifyEmailWhileSignup}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="auth-using-provider"
+          component={AuthenticateUserUsingProvider}
           options={{
             headerShown: false,
           }}

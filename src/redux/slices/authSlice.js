@@ -275,6 +275,32 @@ export const signWithLinkedIn = createAsyncThunk(
   }
 );
 
+
+export const loginUsingProviderCallback = createAsyncThunk(
+  "/loginUsingProviderCallback",
+  async (providerDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.get(`/auth/${providerDetails.provider}/callback?code=${providerDetails.authCode}&state=${providerDetails.state}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState: allInitialStates,
@@ -304,6 +330,22 @@ const authSlice = createSlice({
     setIsOTPReceivedForMobileVerification: (state, action) => {
       state.authStates.isOTPReceivedForMobileVerification = action.payload;
     },
+    setIsOTPReceivedForAccountRecovery: (state, action) => {
+      state.authStates.isOTPReceivedForAccountRecovery = action.payload;
+    },
+    setLoggedInUsingProvider: (state, action) => {
+      state.authStates.loggedInUsingProvider = action.payload;
+    },
+    setIsRedirectURLReceivedForGoogle: (state, action) => {
+      state.authStates.isRedirectURLReceivedForGoogle = action.payload;
+    },
+    setIsRedirectURLReceivedForApple: (state, action) => {
+      state.authStates.isRedirectURLReceivedForApple = action.payload;
+    },
+    setIsRedirectURLReceivedForLinkedIn: (state, action) => {
+      state.authStates.isRedirectURLReceivedForLinkedIn = action.payload;
+    },
+    
   },
   extraReducers: (builder) => {
     builder
@@ -551,6 +593,17 @@ const authSlice = createSlice({
       })
       .addCase(signWithLinkedIn.rejected, (state, action) => {
         state.authStates.isRedirectURLReceivedForLinkedIn = false;
+      })
+
+
+      .addCase(loginUsingProviderCallback.pending, (state, action) => {
+        state.authStates.loggedInUsingProvider = "pending";
+      })
+      .addCase(loginUsingProviderCallback.fulfilled, (state, { payload }) => {
+        state.authStates.loggedInUsingProvider = true;
+      })
+      .addCase(loginUsingProviderCallback.rejected, (state, action) => {
+        state.authStates.loggedInUsingProvider = false;
       });
   },
 });
@@ -564,6 +617,7 @@ export const {
   setIsSignedInToFalse,
   setIsSignedUpToFalse,
   setIsOTPReceivedForMobileVerification,
+  setIsOTPReceivedForAccountRecovery
 } = authSlice.actions;
 
 export default authSlice.reducer;

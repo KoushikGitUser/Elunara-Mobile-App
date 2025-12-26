@@ -19,4 +19,6 @@ export const authStates = {
   redirectURLForApple:"",
   isRedirectURLReceivedForLinkedIn:false,
   redirectURLForLinkedIn:"",
+
+  loggedInUsingProvider:false,
 };

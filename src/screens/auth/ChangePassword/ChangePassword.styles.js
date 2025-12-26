@@ -295,5 +295,43 @@ customUnderline: {
   emailButtonDisabled: {
     backgroundColor: "#CDD5DC",
   },
+    otpContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginBottom: 35,
+    marginTop: 5,
+    gap: 17,
+  },
+  otpInput: {
+    width: "15%",
+    height: 57,
+    borderWidth: 1,
+    borderColor: "#B5BECE",
+    backgroundColor: "white",
+    color: "#828282",
+    borderRadius: 16,
+    textAlign: "center",
+    fontSize: scaleFont(15),
+    fontWeight: "600",
+    fontFamily: "Mukta-Regular",
+  },
+  resendContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: 80,
+  },
+  resendText: {
+    fontSize: scaleFont(14),
+    color: "#8F8F8F",
+    fontFamily: "Mukta-Regular",
+  },
+  resendLink: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
+    color: appColors.navyBlueShade,
+    borderBottomWidth: 1,
+    borderColor: appColors.navyBlueShade,
+  },
 });
 

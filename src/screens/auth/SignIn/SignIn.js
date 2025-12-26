@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Linking,
+  BackHandler,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -72,6 +73,17 @@ const SignIn = () => {
      dispatch(setIsSignedInToFalse());
     }
   }, [authStates.isSignedIn]);
+
+    useEffect(() => {
+      const backAction = () => {
+        return true; // prevent default behavior (exit)
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+      return () => backHandler.remove(); // clean up
+    }, [navigation]);
 
   
 

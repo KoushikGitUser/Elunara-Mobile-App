@@ -1,52 +1,50 @@
 import {
   View,
   Text,
-  StyleSheet,
-  Image,
   TouchableOpacity,
+  Image,
+  StyleSheet,
   BackHandler,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { scaleFont } from "../../../utils/responsive";
-import { verticalScale } from "../SignUp/SignUp.styles";
-import loader from "../../../assets/images/authLoader.gif";
-import GradientText from "../../../components/common/GradientText";
 import SuccessCheckMark from "../../../components/SignUp/SuccessCheckMark";
 import { appColors } from "../../../themes/appColors";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { verifyEmail } from "../../../redux/slices/authSlice";
+import { useNavigation } from "@react-navigation/native";
 import RejectedCrossMark from "../../../components/SignUp/RejectedCrossMark";
-import ReGenerationLinkPopup from "../../../components/VerifyEmailPage/ReGenerationLinkPopup";
+import loader from "../../../assets/images/authLoader.gif";
+import GradientText from "../../../components/common/GradientText";
+import { scaleFont } from "../../../utils/responsive";
+import { loginUsingProviderCallback } from "../../../redux/slices/authSlice";
 
-const VerifyEmailWhileSignup = ({ route }) => {
+const AuthenticateUserUsingProvider = ({ route }) => {
+  const { provider, authCode, state } = route.params || {};
   const [isVerified, setIsVerified] = useState("loading");
-  const [generateLinkPopup,setGenerateLinkPopup] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
-  const { emailToken } = route.params || {};
 
   useEffect(() => {
-    const formData = new FormData();
-    formData.append("token", emailToken);
-    dispatch(verifyEmail(formData));
-  }, [emailToken]);
-
-  useEffect(() => {
-    if (authStates.isMailVerified == true) {
+    if (authStates.loggedInUsingProvider == true) {
       setIsVerified(true);
     }
-    if(authStates.isMailVerified == false){
+    if(authStates.loggedInUsingProvider == false){
       setIsVerified(false);
     }
-  }, [authStates.isMailVerified]);
-     
+  }, [authStates.loggedInUsingProvider]);
+
+  useEffect(() => {
+      const providerDetails = {
+        provider,
+        authCode,
+        state,
+      };
+      dispatch(loginUsingProviderCallback(providerDetails));
+  }, []);
 
   useEffect(() => {
     const backAction = () => {
-      navigation.navigate("signin");
       return true; // prevent default behavior (exit)
     };
     const backHandler = BackHandler.addEventListener(
@@ -58,7 +56,6 @@ const VerifyEmailWhileSignup = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.wrapper}>
-      {generateLinkPopup && <ReGenerationLinkPopup toggleGenerateLinkPopup={generateLinkPopup} close={setGenerateLinkPopup} />}
       {isVerified == true ? (
         <View style={styles.wrapper}>
           <SuccessCheckMark color={appColors.navyBlueShade} />
@@ -85,28 +82,26 @@ const VerifyEmailWhileSignup = ({ route }) => {
         </View>
       ) : isVerified == false ? (
         <View style={styles.wrapper}>
-         <RejectedCrossMark/>
+          <RejectedCrossMark />
           <Text
             style={[
               styles.description,
               { textAlign: "center", marginTop: 20, fontSize: 18 },
             ]}
           >
-            The link has been expired, want to recover your account?
+            Looks like we are facing some issues right now. Please try again later.
           </Text>
           <View style={styles.signupContainer}>
             <TouchableOpacity
-            style={styles.generateBtn}
-              onPress={() => {
-                setGenerateLinkPopup(true)
-              }}
+              style={styles.generateBtn}
+              onPress={() => navigation.navigate("signin")}
               activeOpacity={0.7}
             >
-              <Text style={styles.signupLink}> Recover Account</Text>
+              <Text style={styles.signupLink}>Back to Login</Text>
             </TouchableOpacity>
           </View>
         </View>
-      ):isVerified == "loading"? (
+      ) : isVerified == "loading" ? (
         <View style={styles.wrapper}>
           <Image
             style={{ height: 100, width: 100, objectFit: "contain" }}
@@ -129,7 +124,7 @@ const VerifyEmailWhileSignup = ({ route }) => {
             Almost there! We appreciate your patience.
           </Text>
         </View>
-      ):null}
+      ) : null}
     </SafeAreaView>
   );
 };
@@ -158,11 +153,11 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "Mukta-Regular",
   },
-  generateBtn:{
-   backgroundColor:appColors.navyBlueShade,
-   paddingVertical:10,
-   paddingHorizontal:35,
-   borderRadius:50
+  generateBtn: {
+    backgroundColor: appColors.navyBlueShade,
+    paddingVertical: 10,
+    paddingHorizontal: 35,
+    borderRadius: 50,
   },
   signupLink: {
     fontSize: scaleFont(14),
@@ -178,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerifyEmailWhileSignup;
+export default AuthenticateUserUsingProvider;

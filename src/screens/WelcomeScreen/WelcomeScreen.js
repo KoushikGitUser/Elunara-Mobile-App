@@ -7,6 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Linking,
+  BackHandler,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -22,7 +23,11 @@ import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { useDispatch, useSelector } from "react-redux";
-import { signWithGoogle, signWithApple, signWithLinkedIn } from "../../redux/slices/authSlice";
+import {
+  signWithGoogle,
+  signWithApple,
+  signWithLinkedIn,
+} from "../../redux/slices/authSlice";
 import { appColors } from "../../themes/appColors";
 
 const WelcomeScreen = () => {
@@ -64,6 +69,18 @@ const WelcomeScreen = () => {
     }
   }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
+  useEffect(() => {
+    const backAction = () => {
+      return true; // prevent default behavior (exit)
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove(); // clean up
+  }, [navigation]);
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
@@ -95,18 +112,25 @@ const WelcomeScreen = () => {
               activeOpacity={0.7}
             >
               {authStates.isRedirectURLReceivedForGoogle == "pending" ? (
-                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+                <ActivityIndicator
+                  size="small"
+                  color={appColors.navyBlueShade}
+                />
               ) : (
                 <>
                   <Image source={google} style={styles.socialIcons} />
-                  <Text style={styles.socialButtonText}>Continue with Google</Text>
+                  <Text style={styles.socialButtonText}>
+                    Continue with Google
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
 
             {/* LinkedIn Button */}
             <TouchableOpacity
-              disabled={authStates.isRedirectURLReceivedForLinkedIn == "pending"}
+              disabled={
+                authStates.isRedirectURLReceivedForLinkedIn == "pending"
+              }
               onPress={() => {
                 dispatch(signWithLinkedIn());
               }}
@@ -114,7 +138,10 @@ const WelcomeScreen = () => {
               activeOpacity={0.7}
             >
               {authStates.isRedirectURLReceivedForLinkedIn == "pending" ? (
-                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+                <ActivityIndicator
+                  size="small"
+                  color={appColors.navyBlueShade}
+                />
               ) : (
                 <>
                   <Image source={LinkedIn} style={styles.socialIcons} />
@@ -135,11 +162,16 @@ const WelcomeScreen = () => {
               activeOpacity={0.7}
             >
               {authStates.isRedirectURLReceivedForApple == "pending" ? (
-                <ActivityIndicator size="small" color={appColors.navyBlueShade} />
+                <ActivityIndicator
+                  size="small"
+                  color={appColors.navyBlueShade}
+                />
               ) : (
                 <>
                   <Image source={apple} style={styles.socialIcons} />
-                  <Text style={styles.socialButtonText}>Continue with Apple</Text>
+                  <Text style={styles.socialButtonText}>
+                    Continue with Apple
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
@@ -170,11 +202,14 @@ const WelcomeScreen = () => {
 
             {/* Footer Links */}
             <View style={styles.footer}>
-              <TouchableOpacity onPress={()=>navigation.navigate("verify-email")} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("verify-email")}
+                activeOpacity={0.7}
+              >
                 <Text style={styles.footerLink}>Terms Of Use</Text>
               </TouchableOpacity>
               <Text style={styles.footerDot}> • </Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity onPress={()=>navigation.navigate("auth-using-provider",{authCode:8716,state:"WB"})} activeOpacity={0.7}>
                 <Text style={styles.footerLink}>Privacy Policy</Text>
               </TouchableOpacity>
             </View>

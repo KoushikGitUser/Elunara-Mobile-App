@@ -21,7 +21,7 @@ import { appColors } from "../../../themes/appColors";
 import { useNavigation } from "@react-navigation/native";
 import { AlertCircle } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { recoverAccount } from "../../../redux/slices/authSlice";
+import { recoverAccount, setIsOTPReceivedForAccountRecovery } from "../../../redux/slices/authSlice";
 import {
   setUserMailIDOnForgotPassword,
   setUserOTPOnForgotPassword,
@@ -35,7 +35,6 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const [emailError, setEmailError] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isCodeSent, setIsCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
@@ -53,24 +52,23 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
     } else {
       setEmailError("");
     }
-  };
+  }; 
 
-  useEffect(()=>{
-    if(authStates.isOTPReceivedForAccountRecovery == true){
-      setIsCodeSent(true);
+  useEffect(() => {
+    if (authStates.isOTPReceivedForAccountRecovery == true) {
+      navigation.navigate("changepass",{ 
+        recoveryToken: null,
+        isForTokenOrOTP: "OTP",
+      });
+      dispatch(setIsOTPReceivedForAccountRecovery(false));
     }
-  },[authStates.isOTPReceivedForAccountRecovery])
+  }, [authStates.isOTPReceivedForAccountRecovery]);
 
   const getCodeFunction = () => {
-    if (isCodeSent) {
-      dispatch(setUserOTPOnForgotPassword(otp.join("")));
-      navigation.navigate("changepass");
-    } else {
-      const formData = new FormData();
-      formData.append("email", email);
-      dispatch(recoverAccount(formData));
-      dispatch(setUserMailIDOnForgotPassword(email));
-    }
+    const formData = new FormData();
+    formData.append("email", email);
+    dispatch(recoverAccount(formData));
+    dispatch(setUserMailIDOnForgotPassword(email));
   };
 
   const handleEmailChange = (text) => {
@@ -79,8 +77,6 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   };
 
   const isEmailValid = email && !emailError;
-  const isOtpComplete = otp.every((digit) => digit.length === 1);
-
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -110,29 +106,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
     };
   }, []);
 
-  const handleChange = (index, value) => {
-    if (/^\d*$/.test(value)) {
-      const newOtp = [...otp];
-      newOtp[index] = value;
-      setOtp(newOtp);
 
-      if (value && index < 3) {
-        inputRefs.current[index + 1]?.focus();
-      }
-    }
-  };
-
-  const handleKeyPress = (index, key) => {
-    if (key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleResend = () => {
-    console.log("Resending OTP");
-    setOtp(["", "", "", ""]);
-    inputRefs.current[0]?.focus();
-  };
 
   return (
     <Modal
@@ -174,12 +148,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 320], // average keyboard height
-                  outputRange: [
-                    0,
-                    isCodeSent
-                      ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),
-                  ],
+                  outputRange: [0, -(keyboardHeight * 2.7)],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -204,132 +173,76 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
                   />
                 </View>
                 {/* Title */}
-                {isCodeSent ? (
-                  <Text style={styles.title}>Verify Account</Text>
-                ) : (
-                  <Text style={styles.title}>Forgot Your Password?</Text>
-                )}
+                <Text style={styles.title}>Forgot Your Password?</Text>
 
                 {/* Description */}
-                {isCodeSent ? (
-                  <Text style={styles.description}>
-                    Code has been send to{" "}
-                    <Text
-                      style={[
-                        styles.description,
-                        { color: "black", fontFamily: "Mukta-Bold" },
-                      ]}
-                    >
-                      {globalDataStates.userMailIDOnForgotPassword}
-                    </Text>
-                  </Text>
-                ) : (
-                  <Text style={styles.description}>
-                    Enter your email, and we'll send a
-                  </Text>
-                )}
-                {isCodeSent ? (
-                  <Text style={styles.description}>
-                    Enter the code to verify your account.
-                  </Text>
-                ) : (
-                  <Text style={styles.description}>verification code.</Text>
-                )}
+                <Text style={styles.description}>
+                  Enter your email, and we'll send
+                </Text>
+                <Text style={styles.description}>
+                  a recovery link and a verification code.
+                </Text>
 
                 {/* Input Section */}
-                {isCodeSent ? (
-                  <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                      <TextInput
-                        key={index}
-                        ref={(ref) => (inputRefs.current[index] = ref)}
-                        style={[styles.otpInput]}
-                        value={digit}
-                        onChangeText={(value) => handleChange(index, value)}
-                        onKeyPress={({ nativeEvent: { key } }) =>
-                          handleKeyPress(index, key)
-                        }
-                        keyboardType="number-pad"
-                        maxLength={1}
-                        selectTextOnFocus
-                      />
-                    ))}
-                  </View>
-                ) : (
-                  <View style={styles.inputSection}>
-                    <Text style={styles.inputLabel}>Email</Text>
-                    <View style={styles.inputWrapper}>
-                      <TextInput
-                        style={[
-                          styles.input,
-                          isEmailFocused && styles.inputFocused,
-                          emailError && styles.inputError,
-                        ]}
-                        placeholder="Enter your email"
-                        placeholderTextColor="#9CA3AF"
-                        value={email}
-                        onChangeText={handleEmailChange}
-                        onFocus={() => setIsEmailFocused(true)}
-                        onBlur={() => setIsEmailFocused(false)}
-                        keyboardType="email-address"
-                        returnKeyType="done"
-                        autoCapitalize="none"
-                      />
-                      {emailError ? (
-                        <View style={styles.errorIconContainer}>
-                          <AlertCircle
-                            size={20}
-                            color="#D00B0B"
-                            style={{ marginRight: 10 }}
-                          />
-                        </View>
-                      ) : null}
-                    </View>
+                <View style={styles.inputSection}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <View style={styles.inputWrapper}>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        isEmailFocused && styles.inputFocused,
+                        emailError && styles.inputError,
+                      ]}
+                      placeholder="Enter your email"
+                      placeholderTextColor="#9CA3AF"
+                      value={email}
+                      onChangeText={handleEmailChange}
+                      onFocus={() => setIsEmailFocused(true)}
+                      onBlur={() => setIsEmailFocused(false)}
+                      keyboardType="email-address"
+                      returnKeyType="done"
+                      autoCapitalize="none"
+                    />
                     {emailError ? (
-                      <Text style={styles.errorText}>{emailError}</Text>
+                      <View style={styles.errorIconContainer}>
+                        <AlertCircle
+                          size={20}
+                          color="#D00B0B"
+                          style={{ marginRight: 10 }}
+                        />
+                      </View>
                     ) : null}
                   </View>
-                )}
+                  {emailError ? (
+                    <Text style={styles.errorText}>{emailError}</Text>
+                  ) : null}
+                </View>
 
                 {/* Verify Button */}
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    ((!isEmailValid && !isCodeSent) ||
-                      (isCodeSent && !isOtpComplete) ||
-                      authStates.isOTPReceivedForAccountRecovery == "pending") &&
+                    (!isEmailValid ||
+                      authStates.isOTPReceivedForAccountRecovery ==
+                        "pending") &&
                       styles.verifyButtonDisabled,
-                    { marginBottom: isCodeSent ? 35 : 85 },
+                    { marginBottom: 85 },
                   ]}
                   onPress={() => {
                     getCodeFunction();
                   }}
                   activeOpacity={0.8}
                   disabled={
-                    (!isCodeSent && !isEmailValid) ||
-                    (isCodeSent && !isOtpComplete) ||
-                   authStates.isOTPReceivedForAccountRecovery == "pending"
+                    !isEmailValid ||
+                    authStates.isOTPReceivedForAccountRecovery == "pending"
                   }
                 >
                   {authStates.isOTPReceivedForAccountRecovery == "pending" ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.verifyButtonText}>
-                      {isCodeSent ? "Continue" : "Get Code"}
-                    </Text>
+                    <Text style={styles.verifyButtonText}>Proceed</Text>
                   )}
                 </TouchableOpacity>
-
-                {isCodeSent && (
-                  <View style={styles.resendContainer}>
-                    <Text style={styles.resendText}>
-                      Don't receive the OTP?{" "}
-                    </Text>
-                    <TouchableOpacity onPress={handleResend}>
-                      <Text style={styles.resendLink}>Resend OTP</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
               </View>
             </View>
           </ScrollView>
