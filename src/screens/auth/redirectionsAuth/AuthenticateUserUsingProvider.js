@@ -88,7 +88,7 @@ const AuthenticateUserUsingProvider = ({ route }) => {
               styles.description,
               { textAlign: "center", marginTop: 20, fontSize: 18 },
             ]}
-          >
+               >
             Looks like we are facing some issues right now. Please try again later.
           </Text>
           <View style={styles.signupContainer}>

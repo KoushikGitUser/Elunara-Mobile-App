@@ -47,9 +47,6 @@ const VerificationMailPopup = ({close,verificationMailSent,setVerifyMailOtpPopup
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
           {/* Handle Bar */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
-          </View>
 
           {/* Content */}
           <View style={styles.content}>

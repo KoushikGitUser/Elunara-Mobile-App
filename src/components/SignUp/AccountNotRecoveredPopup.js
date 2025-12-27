@@ -46,9 +46,11 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
 
   useEffect(() => {
     if (authStates.isOTPReceivedForAccountRecovery == true) {
-      setIsCodeSent(true);
-    }
-    if (authStates.isMailVerified == true) {
+      navigation.navigate("changepass",{ 
+        recoveryToken: null,
+        isForTokenOrOTP: "OTP",
+      });
+      close(false);
     }
   }, [authStates.isOTPReceivedForAccountRecovery]);
 

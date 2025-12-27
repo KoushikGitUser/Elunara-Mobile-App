@@ -186,7 +186,7 @@ const ChangePassword = ({ route }) => {
       dispatch(resetPassword(formData));
     } else {
       const formData = new FormData();
-      formData.append("email", globalDataStates.userMailIDOnForgotPassword);
+      formData.append("email", globalDataStates.userMailIDOnForgotPassword == ""?globalDataStates.userMailIDOnSignup:globalDataStates.userMailIDOnForgotPassword);
       formData.append("otp", globalDataStates.userOTPOnForgotPassword);
       formData.append("password", password);
       formData.append("password_confirmation", confirmPassword);
