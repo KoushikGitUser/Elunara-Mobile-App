@@ -17,6 +17,7 @@ import {
   GraduationCap,
   File,
   ArrowUpRight,
+  TextAlignJustify,
 } from "lucide-react-native";
 import gemini from "../assets/images/gemini.png";
 import anthropic from "../assets/images/antropic.png";
@@ -24,33 +25,8 @@ import mistral from "../assets/images/mistral.png";
 import meta from "../assets/images/meta.png";
 import chatgpt from "../assets/images/chatgpt.png";
 import chakraLogo from "../assets/images/chakraFull.png";
-import finance from "../assets/images/finance.png";
-import marketing from "../assets/images/marketing.png";
-import HR from "../assets/images/HR.png";
-import IT from "../assets/images/IT.png";
-import operations from "../assets/images/operation.png";
-import business from "../assets/images/business.png";
-import economics from "../assets/images/economics.png";
-import others from "../assets/images/others.png";
-import bookmark from "../assets/images/BookmarkSimple.png";
-import folderPlus from "../assets/images/FolderNotchPlus.png";
-import edit from "../assets/images/PencilSimple.png";
-import pin from "../assets/images/PushPin.png";
-import archive from "../assets/images/ArchiveBox.png";
-import trash from "../assets/images/Trash.png";
-import books from "../assets/images/Books.png";
-import llm from "../assets/images/GitFork.png";
-import responseStyle from "../assets/images/UserSwitch.png";
-import language from "../assets/images/Translate.png";
-import citation from "../assets/images/GraduationCap.png";
 
-import bulb from "../assets/images/LightbulbFilament.png";
-import file from "../assets/images/FileText.png";
-import chatBubble from "../assets/images/ChatCircleDots.png";
-import files from "../assets/images/Files.png";
-import paintBrush from "../assets/images/PaintBrush.png";
 
-import penNib from "../assets/images/PenNib.png";
 import RupeeIcon from "../../assets/SvgIconsComponent/TopicsIcons/RupeeIcon";
 import MarketingIcon from "../../assets/SvgIconsComponent/TopicsIcons/MarketingIcon";
 import HRIcon from "../../assets/SvgIconsComponent/TopicsIcons/HRIcon";
@@ -92,6 +68,10 @@ import SignOutIcon from "../../assets/SvgIconsComponent/ProfilePageOptionsIcons/
 import FileTextIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/FileTextIcon";
 import ShootingStarIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/ShootingStarIcon";
 import FeedBackIcon from "../../assets/SvgIconsComponent/HelpCenterIcons/FeedBackIcon";
+
+import ChatIcon from '../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon'
+import FolderIcon from '../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon'
+
 
 export const slides = [
   {
@@ -1397,3 +1377,22 @@ export const topicsexploredArray = [
     accessed: false,
   },
 ];
+
+
+export const guidedTourOptions = [
+  {
+    icon:<TextAlignJustify strokeWidth={1.25} />,
+    title:"Navigation Basics",
+    desc:"Find your way around Elunara and explore essential features."
+  },
+  {
+    icon:<ChatIcon/>,
+    title:"Chat Functions",
+    desc:"Get fast, accurate answers with smart chat features."
+  },
+  {
+    icon:<FolderIcon/>,
+    title:"Learning Labs (Pro feature)",
+    desc:"Organize and manage your research by Learning Labs"
+  }
+]

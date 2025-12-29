@@ -68,12 +68,13 @@ const EditProfile = () => {
         width: "100%",
         paddingHorizontal: 20,
         backgroundColor: "#FAFAFA",
+        paddingTop:3e0
       }}
     >
       <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} isFromProfile={true} />
       {toggleStates.toggleUpdateProfilePicPopup && <UpdateProfilePicPopup  setSelectedImage={setSelectedImage}/>}
       <View style={styles.profileImgContainer}>
-        <View style={{ height: 120, width: 120, position: "relative1" }}>
+        <View style={{ height: 120, width: 120, }}>
           <Image
             source={selectedImage ? (typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage) : profilePic}
             style={{ height: "100%", width: "100%", borderRadius: 20 }}

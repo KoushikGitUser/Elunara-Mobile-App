@@ -19,6 +19,10 @@ export const globalDataStates = {
   userMailIDOnForgotPassword:"",
   userOTPOnForgotPassword:"",
   userMobileNumberForMobileVerification:"",
+  manualGuidedTourRunning:false,
+  navigationBasicsGuideTourSteps:0,
+  chatFunctionsGuideTourSteps:0,
+  learningLabsGuideTourSteps:0
 };
 
 export const demoChatMessages = [

@@ -65,6 +65,18 @@ const globalDataSlice = createSlice({
     setUserMobileNumberForMobileVerification: (state, action) => {
       state.globalDataStates.userMobileNumberForMobileVerification = action.payload;
     },
+    setManualGuidedTourRunning: (state, action) => {
+      state.globalDataStates.manualGuidedTourRunning = action.payload;
+    },
+    setNavigationBasicsGuideTourSteps: (state, action) => {
+      state.globalDataStates.navigationBasicsGuideTourSteps = action.payload;
+    },
+    setChatFunctionsGuideTourSteps: (state, action) => {
+      state.globalDataStates.chatFunctionsGuideTourSteps = action.payload;
+    },
+    setLearningLabsGuideTourSteps: (state, action) => {
+      state.globalDataStates.learningLabsGuideTourSteps = action.payload;
+    },
   },
 });
 
@@ -87,7 +99,11 @@ export const {
   setUserMailIDOnSignup,
   setUserMailIDOnForgotPassword,
   setUserOTPOnForgotPassword,
-  setUserMobileNumberForMobileVerification
+  setUserMobileNumberForMobileVerification,
+  setManualGuidedTourRunning,
+  setNavigationBasicsGuideTourSteps,
+  setChatFunctionsGuideTourSteps,
+  setLearningLabsGuideTourSteps,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

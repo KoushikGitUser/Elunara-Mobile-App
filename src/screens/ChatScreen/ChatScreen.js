@@ -91,6 +91,12 @@ const ChatScreen = () => {
     return null;
   }
 
+  useEffect(()=>{
+    if(globalDataStates.manualGuidedTourRunning){
+      
+    }
+  },[])
+
 
   return (
     <SafeAreaView

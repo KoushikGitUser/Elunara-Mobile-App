@@ -21,11 +21,13 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
 import ValueFeedbackCompo from "../../components/ProfileAndSettings/HelpCenterCompo/ValueFeedbackCompo";
+import GuidedTourStartPopup from "../../components/ProfileAndSettings/HelpCenterCompo/GuidedTourStartPopup";
 
 const HelpCenter = ({ handleScroll }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [moreAccordions, setMoreAccordions] = useState(false);
   const [toggleFeedbackPopup,setToggleFeedbackPopup] = useState(false);
+  const [toggleGuideTourStartPopup,setToggleGuideTourStartPopup] = useState(false);
   const navigation = useNavigation();
   const toggleAccordion = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -40,6 +42,7 @@ const HelpCenter = ({ handleScroll }) => {
   return (
     <View style={styles.container}>
       <ValueFeedbackCompo popupState={toggleFeedbackPopup} setPopupState={setToggleFeedbackPopup} />
+      <GuidedTourStartPopup popupState={toggleGuideTourStartPopup} setPopupState={setToggleGuideTourStartPopup} />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView
         onScroll={handleScroll}
@@ -185,6 +188,7 @@ const HelpCenter = ({ handleScroll }) => {
             refresher.
           </Text>
           <TouchableOpacity
+          onPress={()=>setToggleGuideTourStartPopup(true)}
             style={styles.button}
             activeOpacity={0.7}
           >
