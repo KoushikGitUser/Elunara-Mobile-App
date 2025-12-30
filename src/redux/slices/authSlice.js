@@ -210,7 +210,7 @@ export const signWithGoogle = createAsyncThunk(
   "/signWithGoogle",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.get("/auth/google/redirect", {
+      let res = await apiInstance.get("/auth/google/redirect?platform=android", {
         headers: {
           Accept: "application/json",
         },
@@ -381,7 +381,6 @@ const authSlice = createSlice({
         state.authStates.isSignedIn = "pending";
       })
       .addCase(userSignIn.fulfilled, (state, action) => {
-        console.log("userSignIn fulfilled - request payload:", action.meta.arg);
         const { payload } = action;
         state.authStates.isSignedIn = true;
         // Store token in secure storage
@@ -558,6 +557,8 @@ const authSlice = createSlice({
       //signin/signup with google
       .addCase(signWithGoogle.pending, (state, action) => {
         state.authStates.isRedirectURLReceivedForGoogle = "pending";
+        console.log("fetching link");
+        
       })
       .addCase(signWithGoogle.fulfilled, (state, { payload }) => {
         state.authStates.isRedirectURLReceivedForGoogle = true;

@@ -44,7 +44,7 @@ const linking = {
       "settingsInnerPages": "settings/:page?",
       "analyticsComplete": "analyticsComplete",
       "verify-email": "verify-email/:emailToken",
-      "auth-using-provider":"auth-using-provider/:provider/:authCode/:state",
+      "auth-using-provider":"oauth/callback",
     },
   },
 };

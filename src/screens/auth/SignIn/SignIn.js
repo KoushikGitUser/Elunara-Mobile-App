@@ -31,7 +31,13 @@ import { appColors } from "../../../themes/appColors";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { signWithGoogle, signWithApple, signWithLinkedIn, userSignIn, setIsSignedInToFalse } from "../../../redux/slices/authSlice";
+import {
+  signWithGoogle,
+  signWithApple,
+  signWithLinkedIn,
+  userSignIn,
+  setIsSignedInToFalse,
+} from "../../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
@@ -48,44 +54,24 @@ const SignIn = () => {
   const { authStates } = useSelector((state) => state.Auth);
   const dispatch = useDispatch();
 
-  //listening to asynchronus states update due to API
-  useEffect(() => {
-    if (authStates.isRedirectURLReceivedForGoogle == true) {
-      Linking.openURL(authStates.redirectURLForGoogle);
-    }
-  }, [authStates.isRedirectURLReceivedForGoogle]);
-
-  useEffect(() => {
-    if (authStates.isRedirectURLReceivedForApple == true) {
-      Linking.openURL(authStates.redirectURLForApple);
-    }
-  }, [authStates.isRedirectURLReceivedForApple]);
-
-  useEffect(() => {
-    if (authStates.isRedirectURLReceivedForLinkedIn == true) {
-      Linking.openURL(authStates.redirectURLForLinkedIn);
-    }
-  }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
   useEffect(() => {
     if (authStates.isSignedIn == true) {
       navigation.navigate("chat");
-     dispatch(setIsSignedInToFalse());
+      dispatch(setIsSignedInToFalse());
     }
   }, [authStates.isSignedIn]);
 
-    useEffect(() => {
-      const backAction = () => {
-        return true; // prevent default behavior (exit)
-      };
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-      return () => backHandler.remove(); // clean up
-    }, [navigation]);
-
-  
+  useEffect(() => {
+    const backAction = () => {
+      return true; // prevent default behavior (exit)
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove(); // clean up
+  }, [navigation]);
 
   // Real-time validation functions
   const validateEmail = (text) => {
@@ -385,61 +371,44 @@ const SignIn = () => {
         <View style={styles.buttonsContainer}>
           {/* Google Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForGoogle == "pending"}
             onPress={() => {
-              dispatch(signWithGoogle());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+              );
             }}
             style={styles.socialButton}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForGoogle == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={google} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>
-                  Continue with Google
-                </Text>
-              </>
-            )}
+            <Image source={google} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           {/* LinkedIn Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForLinkedIn == "pending"}
             onPress={() => {
-              dispatch(signWithLinkedIn());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+              );
             }}
             style={styles.socialButton}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForLinkedIn == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={LinkedIn} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
-              </>
-            )}
+            <Image source={LinkedIn} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
           </TouchableOpacity>
 
           {/* Apple Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForApple == "pending"}
             onPress={() => {
-              dispatch(signWithApple());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+              );
             }}
             style={[styles.socialButton, { marginBottom: 0 }]}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForApple == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={apple} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>Continue with Apple</Text>
-              </>
-            )}
+            <Image source={apple} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

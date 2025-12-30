@@ -27,7 +27,13 @@ import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
 import { Check, AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
-import { userSignUp, signWithGoogle, signWithApple, signWithLinkedIn, setIsSignedUpToFalse } from "../../../redux/slices/authSlice";
+import {
+  userSignUp,
+  signWithGoogle,
+  signWithApple,
+  signWithLinkedIn,
+  setIsSignedUpToFalse,
+} from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
@@ -46,7 +52,7 @@ const SignUp = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
-  const [toggleAccNotRecovered,setToggleAccNotRecovered] = useState(false)
+  const [toggleAccNotRecovered, setToggleAccNotRecovered] = useState(false);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -55,17 +61,16 @@ const SignUp = () => {
     confirmPassword: "",
     checkbox: "",
   });
-    const { authStates } = useSelector((state) => state.Auth);
+  const { authStates } = useSelector((state) => state.Auth);
 
-  useEffect(()=>{
-    if(authStates.isSignedUp == true){
+  useEffect(() => {
+    if (authStates.isSignedUp == true) {
       setVerificationMailSent(true);
       dispatch(setIsSignedUpToFalse());
+    } else if (authStates.isAccountRecoverable) {
+      setToggleAccNotRecovered(true);
     }
-    else if(authStates.isAccountRecoverable){
-     setToggleAccNotRecovered(true);
-    }
-  },[authStates.isSignedUp,authStates.isAccountRecoverable])
+  }, [authStates.isSignedUp, authStates.isAccountRecoverable]);
 
   // Social login redirect handlers
   useEffect(() => {
@@ -167,14 +172,14 @@ const SignUp = () => {
 
   const handleUserSignUp = () => {
     if (hasErrors) return;
-      const formData = new FormData();
-      formData.append("first_name", firstName.trim());
-      formData.append("last_name", lastName.trim());
-      formData.append("email", email.trim());
-      formData.append("password", password);
-      formData.append("password_confirmation", confirmPassword);
-      dispatch(setUserMailIDOnSignup(email.trim()));
-      dispatch(userSignUp(formData));
+    const formData = new FormData();
+    formData.append("first_name", firstName.trim());
+    formData.append("last_name", lastName.trim());
+    formData.append("email", email.trim());
+    formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword);
+    dispatch(setUserMailIDOnSignup(email.trim()));
+    dispatch(userSignUp(formData));
   };
 
   const navigation = useNavigation();
@@ -203,8 +208,12 @@ const SignUp = () => {
           verificationMailSent={verificationMailSent}
         />
       )}
-      {toggleAccNotRecovered && 
-      <AccountNotRecoveredPopup close={setToggleAccNotRecovered} toggleAccNotRecovered={toggleAccNotRecovered} />}
+      {toggleAccNotRecovered && (
+        <AccountNotRecoveredPopup
+          close={setToggleAccNotRecovered}
+          toggleAccNotRecovered={toggleAccNotRecovered}
+        />
+      )}
       {verifyMailOtpPopup && (
         <VerifyMailOtpPopup
           close={setVerifyMailOtpPopup}
@@ -705,59 +714,44 @@ const SignUp = () => {
         <View style={styles.buttonsContainer}>
           {/* Google Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForGoogle == "pending"}
             onPress={() => {
-              dispatch(signWithGoogle());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+              );
             }}
             style={styles.socialButton}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForGoogle == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={google} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>Continue with Google</Text>
-              </>
-            )}
+            <Image source={google} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
           {/* LinkedIn Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForLinkedIn == "pending"}
             onPress={() => {
-              dispatch(signWithLinkedIn());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+              );
             }}
             style={styles.socialButton}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForLinkedIn == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={LinkedIn} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
-              </>
-            )}
+            <Image source={LinkedIn} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
           </TouchableOpacity>
 
           {/* Apple Button */}
           <TouchableOpacity
-            disabled={authStates.isRedirectURLReceivedForApple == "pending"}
             onPress={() => {
-              dispatch(signWithApple());
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+              );
             }}
             style={[styles.socialButton, { marginBottom: 0 }]}
             activeOpacity={0.7}
           >
-            {authStates.isRedirectURLReceivedForApple == "pending" ? (
-              <ActivityIndicator size="small" color={appColors.navyBlueShade} />
-            ) : (
-              <>
-                <Image source={apple} style={styles.socialIcons} />
-                <Text style={styles.socialButtonText}>Continue with Apple</Text>
-              </>
-            )}
+            <Image source={apple} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

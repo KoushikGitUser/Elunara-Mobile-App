@@ -36,17 +36,14 @@ const apiCommonSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
       // Handle pending API calls
       .addCase(commonFunctionForAPICalls.pending, (state, action) => {
         addCasePending(state, action);
       })
-
       // Handle fulfilled API calls
       .addCase(commonFunctionForAPICalls.fulfilled, (state, action) => {
          addCaseFulfilled(state, action);
       })
-
       // Handle rejected API calls
       .addCase(commonFunctionForAPICalls.rejected, (state, action) => {
         addCaseRejected(state, action);

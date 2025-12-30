@@ -17,31 +17,22 @@ import loader from "../../../assets/images/authLoader.gif";
 import GradientText from "../../../components/common/GradientText";
 import { scaleFont } from "../../../utils/responsive";
 import { loginUsingProviderCallback } from "../../../redux/slices/authSlice";
+import { storeToken } from "../../../utils/Secure/secureStore";
+import { triggerToast } from "../../../services/toast";
 
 const AuthenticateUserUsingProvider = ({ route }) => {
-  const { provider, authCode, state } = route.params || {};
+  const { token, error } = route.params || {};
   const [isVerified, setIsVerified] = useState("loading");
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
 
-  useEffect(() => {
-    if (authStates.loggedInUsingProvider == true) {
-      setIsVerified(true);
+  const getErrorMessage = () => {
+    if (error === "email_required") {
+      return "No email id found in this device as an account";
     }
-    if(authStates.loggedInUsingProvider == false){
-      setIsVerified(false);
-    }
-  }, [authStates.loggedInUsingProvider]);
-
-  useEffect(() => {
-      const providerDetails = {
-        provider,
-        authCode,
-        state,
-      };
-      dispatch(loginUsingProviderCallback(providerDetails));
-  }, []);
+    return "Looks like something went wrong. Please try again later.";
+  };
 
   useEffect(() => {
     const backAction = () => {
@@ -54,6 +45,29 @@ const AuthenticateUserUsingProvider = ({ route }) => {
     return () => backHandler.remove(); // clean up
   }, [navigation]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (isVerified == true) {
+        navigation.navigate("chat");
+        storeToken(token);
+        triggerToast(
+          "Logged in",
+          "You have been logged in successfully",
+          "success",
+          3000
+        );
+      }
+    }, 2500);
+  }, [isVerified]);
+
+  useEffect(() => {
+    if (token) {
+      setIsVerified(true);
+    } else if (error) {
+      setIsVerified(false);
+    }
+  }, [token, error]);
+
   return (
     <SafeAreaView style={styles.wrapper}>
       {isVerified == true ? (
@@ -65,19 +79,21 @@ const AuthenticateUserUsingProvider = ({ route }) => {
               { textAlign: "center", marginTop: 20, fontSize: 18 },
             ]}
           >
-            Your email has been verified successfully
+            Your have been logged in successfully
           </Text>
           <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>You can now {""}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("signin");
-              }}
-              activeOpacity={0.7}
+            <Text
+              style={[
+                styles.description,
+                {
+                  textAlign: "center",
+                  fontSize: 25,
+                  color: appColors.navyBlueShade,
+                },
+              ]}
             >
-              <Text style={styles.signupLink}> Log In</Text>
-              <View style={styles.customUnderline} />
-            </TouchableOpacity>
+              Redirecting...
+            </Text>
           </View>
         </View>
       ) : isVerified == false ? (
@@ -88,11 +104,11 @@ const AuthenticateUserUsingProvider = ({ route }) => {
               styles.description,
               { textAlign: "center", marginTop: 20, fontSize: 18 },
             ]}
-               >
-            Looks like we are facing some issues right now. Please try again later.
+          >
+            {getErrorMessage()}
           </Text>
           <View style={styles.signupContainer}>
-            <TouchableOpacity
+            <TouchableOpacity 
               style={styles.generateBtn}
               onPress={() => navigation.navigate("signin")}
               activeOpacity={0.7}
@@ -136,8 +152,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   description: {
-    fontSize: scaleFont(16),
-    lineHeight: 24,
+    lineHeight: 30,
     color: "#757575",
     fontFamily: "Mukta-Regular",
   },
