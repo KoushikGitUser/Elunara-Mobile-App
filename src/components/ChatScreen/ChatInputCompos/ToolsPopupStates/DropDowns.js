@@ -10,25 +10,59 @@ import {
   LayoutAnimation,
   Image,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LLMOptionsAvailable } from "../../../../data/datas";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../../utils/responsive";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
+import { useDispatch, useSelector } from "react-redux";
+import gemini from "../../../../assets/images/gemini.png";
+import anthropic from "../../../../assets/images/antropic.png";
+import mistral from "../../../../assets/images/mistral.png";
+import chatgpt from "../../../../assets/images/chatgpt.png";
 
-const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
+const providerImages = {
+  "google": gemini,
+  "anthropic": anthropic,
+  "mistral ai": mistral,
+  "open ai": chatgpt,
+  "openai": chatgpt,
+};
+
+const getProviderImage = (provider) => {
+  const key = provider?.toLowerCase();
+  return providerImages[key] || anthropic;
+};
+
+const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetValue}) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const selectorRef = useRef(null);
   const screenHeight = Dimensions.get("window").height;
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+    useEffect(()=>{
+      const payload = {
+        method:"GET",
+        url:"/master/llms",
+        name:"getAllLLMsAvailable"
+      }
+    dispatch(commonFunctionForAPICalls(payload))
+    },[]);
+
+    useEffect(()=>{
+      if(initialSetValue){
+        setSelected(initialSetValue);
+        setSelectedIcon(getProviderImage(initialSetValue?.provider));
+      }
+    },[initialSetValue])
 
   const toggleDropdown = () => {
     if (selectorRef.current) {
       selectorRef.current.measure((_x, _y, _width, height, _pageX, pageY) => {
-        const spaceBelow = screenHeight - pageY - height;
-        const spaceAbove = pageY;
-        const openUp = spaceBelow < 240 && spaceAbove > spaceBelow;
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setVisible((prev) => !prev);
       });
@@ -38,7 +72,8 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
   const handleSelect = (item) => {
     setSelected(item);
     setVisible(false);
-    setSelectedIcon(item.icon);
+    triggerAPICall(item?.id)
+    setSelectedIcon(getProviderImage(item?.provider));
     setSelectedCounts([...selectedCounts,0])
   };
 
@@ -65,7 +100,7 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
                 fontFamily:"Mukta-Regular",
               }}
             >
-              {selected ? selected.title : "Select"}
+              {selected == null?"Select": selected.name}
             </Text>
           </View>
 
@@ -78,7 +113,7 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
 
         {visible && (
           <View style={[styles.dropdown]}>
-            {selectOptionsArray?.map((item, itemIndex) => {
+            {settingsStates.settingsMasterDatas.allLLMsAvailable?.map((item, itemIndex) => {
               return (
                 <TouchableOpacity
                   key={itemIndex}
@@ -93,8 +128,8 @@ const DropDowns = ({ selectOptionsArray,setSelectedCounts,selectedCounts}) => {
                       alignItems: "center",
                     }}
                   >
-                    <Image style={styles.iconImage} source={item?.icon} />
-                    <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>{item.title}</Text>
+                    <Image style={styles.iconImage} source={getProviderImage(item?.provider)} />
+                    <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>{item.name}</Text>
                   </View>
 
                   <View>

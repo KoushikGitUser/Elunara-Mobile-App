@@ -4,12 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { scaleFont } from "../../../utils/responsive";
 import BellIcon from "../../../../assets/SvgIconsComponent/GeneralSettingsIcon/BellIcon";
 import CustomSwitch from "../InnerPagesCompo/CustomSwitch";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const NotificationSettings = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const { settingsStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setEmailNotifications(
@@ -19,7 +21,36 @@ const NotificationSettings = () => {
     setPushNotifications(
       settingsStates.allGeneralSettings.notificationsSettings.push_notifications
     );
-  }, []);
+  }, [
+    settingsStates.allGeneralSettings.notificationsSettings.email_notifications,
+    settingsStates.allGeneralSettings.notificationsSettings.push_notifications,
+  ]);
+
+  const toggleEmailNotificationSettings = () => {
+    const data = {
+      email_notifications: !emailNotifications,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const togglePushNotificationSettings = () => {
+    const data = {
+      push_notifications: !pushNotifications,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <View style={styles.content}>
@@ -44,6 +75,7 @@ const NotificationSettings = () => {
           </Text>
         </View>
         <CustomSwitch
+          triggerAPICall={toggleEmailNotificationSettings}
           value={emailNotifications}
           onValueChange={setEmailNotifications}
           action="Email Notifications"
@@ -59,6 +91,7 @@ const NotificationSettings = () => {
           </Text>
         </View>
         <CustomSwitch
+          triggerAPICall={togglePushNotificationSettings}
           value={pushNotifications}
           onValueChange={setPushNotifications}
           action="Push Notifications"

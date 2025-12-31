@@ -4,9 +4,40 @@ import FlagIcon from "../../../../assets/SvgIconsComponent/GeneralSettingsIcon/F
 import LanguageDropdown from "../../ChatScreen/ChatInputCompos/ToolsPopupStates/ResponseLangState/LanguageDropdown";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
 import { languages } from "../../../data/datas";
+import RegionDropdown from "./RegionDropdown";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const RegionSettings = () => {
   const [selectedCounts, setSelectedCounts] = useState([]);
+  const { settingsStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
+
+  const updateCountry = (id) => {
+    const data = {
+      country_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateCity = (id) => {
+    const data = {
+      city_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <View style={styles.content}>
@@ -29,12 +60,16 @@ const RegionSettings = () => {
           fontFamily: "Mukta-Regular",
         }}
       >
-        Default Language
+        Country
       </Text>
-      <LanguageDropdown
+      <RegionDropdown
+        initialSetValue={
+          settingsStates.allGeneralSettings.regionSettings.country
+        }
+        triggerAPICall={updateCountry}
+        country={true}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={languages}
       />
       <Text
         style={{
@@ -44,12 +79,14 @@ const RegionSettings = () => {
           fontFamily: "Mukta-Regular",
         }}
       >
-        Default Language
+        City
       </Text>
-      <LanguageDropdown
+      <RegionDropdown
+        initialSetValue={settingsStates.allGeneralSettings.regionSettings.city}
+        triggerAPICall={updateCity}
+        country={false}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={languages}
       />
     </View>
   );

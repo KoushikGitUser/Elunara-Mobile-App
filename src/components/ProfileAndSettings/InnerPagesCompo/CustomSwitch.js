@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React, { use, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -10,11 +10,11 @@ import { useDispatch } from 'react-redux';
 import { setToggleUnlockPremiumPopup } from '../../../redux/slices/toggleSlice';
 import { triggerToast } from '../../../services/toast';
 
-const CustomSwitch = ({ value, onValueChange,skipAd,action }) => {
+const CustomSwitch = ({ value, onValueChange,skipAd,action,triggerAPICall }) => {
   const animatedValue = React.useRef(new Animated.Value(value ? 1 : 0)).current;
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: value ? 1 : 0,
       duration: 250,
@@ -36,7 +36,7 @@ const CustomSwitch = ({ value, onValueChange,skipAd,action }) => {
   const handlePress = () => {
     const newValue = !value;
     onValueChange(newValue);
-
+    triggerAPICall()
     if (action) {
       const status = newValue ? 'enabled' : 'disabled';
       triggerToast(
@@ -52,12 +52,7 @@ const CustomSwitch = ({ value, onValueChange,skipAd,action }) => {
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={()=>{
-        if(!skipAd){
           handlePress()
-        }
-        else{
-            dispatch(setToggleUnlockPremiumPopup(true));
-        }
       }}
       style={styles.container}
     >

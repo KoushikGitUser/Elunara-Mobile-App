@@ -1,25 +1,11 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  LayoutAnimation,
-  Dimensions,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, StyleSheet, LayoutAnimation } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
-import { moderateScale, scaleFont } from "../../../../../utils/responsive";
-import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { moderateScale, scaleFont } from "../../../utils/responsive";
+import { commonFunctionForAPICalls, setIsCountrySelectionChanged, setSelectedCountryCode } from "../../../redux/slices/apiCommonSlice";
 
-const LanguageDropdown = ({
-  setSelectedCounts,
-  selectedCounts,
-  triggerAPICall,
-  initialSetValue
-}) => {
+const RegionDropdown = ({ setSelectedCounts, selectedCounts, country, triggerAPICall, initialSetValue }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const selectorRef = useRef(null);
@@ -27,38 +13,54 @@ const LanguageDropdown = ({
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const payload = {
-      method: "GET",
-      url: "/master/languages",
-      name: "getAllLanguagesAvailable",
+    useEffect(() => {
+      const payload = {
+        method: "GET",
+        url:country?"/master/countries":`/master/cities?country_id=${settingsStates.settingsMasterDatas.selectedCountryCode}`,
+        name:country?"getAllCountriesAvailable":"getAllCitiesAvailable",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }, [settingsStates.settingsMasterDatas.selectedCountryCode]);
+
+    useEffect(() => {
+      if (initialSetValue) {
+        setSelected(initialSetValue);
+        if (country) {
+          dispatch(setSelectedCountryCode(initialSetValue?.id));
+        }
+      }
+    }, [initialSetValue]);
+
+    const toggleDropdown = () => {
+      if (selectorRef.current) {
+        selectorRef.current.measure((_x, _y, _width, height, _pageX, pageY) => {
+          const spaceBelow = screenHeight - pageY - height;
+          const spaceAbove = pageY;
+          const openUp = spaceBelow < 240 && spaceAbove > spaceBelow;
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setVisible((prev) => !prev);
+        });
+      }
     };
-    dispatch(commonFunctionForAPICalls(payload));
-  }, []);
+    const handleSelect = (item) => {
+      setSelected(item);
+      setVisible(false);
+      if(country){
+        dispatch(setSelectedCountryCode(item?.id))
+        dispatch(setIsCountrySelectionChanged(true));
+      }
+      triggerAPICall(item?.id);
+      setSelectedCounts([...selectedCounts, 0]);
+    };
 
-  useEffect(() => {
-    if (initialSetValue) {
-      setSelected(initialSetValue);
-    }
-  }, [initialSetValue]);
+    useEffect(()=>{
+      if(settingsStates.settingsMasterDatas.isCountrySelectionChanged && !country){
+        setSelected(null);
+        dispatch(setIsCountrySelectionChanged(false));
+      }
+    },[settingsStates.settingsMasterDatas.isCountrySelectionChanged])
 
-  const toggleDropdown = () => {
-    if (selectorRef.current) {
-      selectorRef.current.measure((_x, _y, _width, height, _pageX, pageY) => {
-        const spaceBelow = screenHeight - pageY - height;
-        const spaceAbove = pageY;
-        const openUp = spaceBelow < 240 && spaceAbove > spaceBelow;
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setVisible((prev) => !prev);
-      });
-    }
-  };
-  const handleSelect = (item) => {
-    setSelected(item);
-    setVisible(false);
-    triggerAPICall(item?.id);
-    setSelectedCounts([...selectedCounts, 0]);
-  };
+
 
   return (
     <View style={styles.container}>
@@ -78,8 +80,9 @@ const LanguageDropdown = ({
                 fontFamily: "Mukta-Regular",
               }}
             >
-              {selected == null
-                ?"Select": selected.name + "  " + selected.native_name}
+              {selected
+                ? selected.name
+                : "Select"}
             </Text>
           </View>
 
@@ -92,7 +95,7 @@ const LanguageDropdown = ({
 
         {visible && (
           <View style={[styles.dropdown]}>
-            {settingsStates.settingsMasterDatas.allLanguagesAvailable?.map(
+            {country?settingsStates.settingsMasterDatas.allCountriesAvailable?.map(
               (item, itemIndex) => {
                 return (
                   <TouchableOpacity
@@ -104,7 +107,24 @@ const LanguageDropdown = ({
                     <Text
                       style={[styles.description, { fontFamily: "Mukta-Bold" }]}
                     >
-                      {item.name} {item.native_name}{" "}
+                      {item.name} {item.code}{" "}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+            ):settingsStates.settingsMasterDatas.allCitiesAvailable?.map(
+              (item, itemIndex) => {
+                return (
+                  <TouchableOpacity
+                    key={itemIndex}
+                    style={styles.option}
+                    onPress={() => handleSelect(item)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[styles.description, { fontFamily: "Mukta-Bold" }]}
+                    >
+                      {item.name}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -116,6 +136,7 @@ const LanguageDropdown = ({
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -170,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LanguageDropdown;
+export default RegionDropdown;

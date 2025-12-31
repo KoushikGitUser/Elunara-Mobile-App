@@ -4,9 +4,53 @@ import { moderateScale, scaleFont } from "../../../utils/responsive";
 import ResLangIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import LanguageDropdown from "../../ChatScreen/ChatInputCompos/ToolsPopupStates/ResponseLangState/LanguageDropdown";
 import { languages } from "../../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SetResponseLanguage = () => {
   const [selectedCounts, setSelectedCounts] = useState([]);
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  const updateResponseLanguage1 = (id) => {
+    const data = {
+      response_language_1_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateResponseLanguage2 = (id) => {
+    const data = {
+      response_language_2_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateResponseLanguage3 = (id) => {
+    const data = {
+      response_language_3_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
   return (
     <View style={styles.content}>
       {/* Header Section */}
@@ -33,7 +77,8 @@ const SetResponseLanguage = () => {
       <LanguageDropdown
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={languages}
+        triggerAPICall={updateResponseLanguage1}
+        initialSetValue={settingsStates.allGeneralSettings.responseLanguageSettings.response_language_1}
       />
       <Text
         style={{
@@ -48,7 +93,8 @@ const SetResponseLanguage = () => {
       <LanguageDropdown
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={languages}
+        triggerAPICall={updateResponseLanguage2}
+        initialSetValue={settingsStates.allGeneralSettings.responseLanguageSettings.response_language_2}
       />
       <Text
         style={{
@@ -63,7 +109,8 @@ const SetResponseLanguage = () => {
       <LanguageDropdown
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={languages}
+        triggerAPICall={updateResponseLanguage3}
+        initialSetValue={settingsStates.allGeneralSettings.responseLanguageSettings.response_language_3}
       />
     </View>
   );

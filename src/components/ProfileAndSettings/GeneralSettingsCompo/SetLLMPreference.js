@@ -3,10 +3,52 @@ import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
 import ResLangIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import DropDowns from "../../ChatScreen/ChatInputCompos/ToolsPopupStates/DropDowns";
-import { LLMOptionsAvailable } from "../../../data/datas";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const SetLLMPreference = () => {
   const [selectedCounts, setSelectedCounts] = useState([]);
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  const updateLLM1 = (id) => {
+    const data = {
+      preferred_llm_1_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateLLM2 = (id) => {
+    const data = {
+      preferred_llm_2_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateLLM3 = (id) => {
+    const data = {
+      preferred_llm_3_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <View style={styles.content}>
@@ -32,9 +74,12 @@ const SetLLMPreference = () => {
         LLM 1
       </Text>
       <DropDowns
+        initialSetValue={
+          settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_1
+        }
+        triggerAPICall={updateLLM1}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={LLMOptionsAvailable}
       />
       <Text
         style={{
@@ -47,9 +92,12 @@ const SetLLMPreference = () => {
         LLM 2
       </Text>
       <DropDowns
+        initialSetValue={
+          settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_2
+        }
+        triggerAPICall={updateLLM2}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={LLMOptionsAvailable}
       />
       <Text
         style={{
@@ -62,9 +110,12 @@ const SetLLMPreference = () => {
         LLM 3
       </Text>
       <DropDowns
+        initialSetValue={
+          settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_3
+        }
+        triggerAPICall={updateLLM3}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-        selectOptionsArray={LLMOptionsAvailable}
       />
     </View>
   );

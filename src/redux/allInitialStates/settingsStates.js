@@ -1,17 +1,20 @@
 export const settingsStates = {
-  fetchingAllGeneralSettings:false,
+  fetchingAllGeneralSettings: false,
   allGeneralSettings: {
     notificationsSettings: {},
     preferredLLMs: {},
     responseLanguageSettings: {},
     regionSettings: {},
     adSettings: {},
+    isAnythingChangedInGeneralSettings:false,
   },
-  defaultSettings: {
-    notificationsSettings: {},
-    preferredLLMs: {},
-    responseLanguageSettings: {},
-    regionSettings: {},
-    adSettings: {},
+  isGeneralSettingsRestored:null,
+  settingsMasterDatas: {
+    allLLMsAvailable: [],
+    allLanguagesAvailable: [],
+    allCountriesAvailable: [],
+    allCitiesAvailable: [],
+    selectedCountryCode: null,
+    isCountrySelectionChanged: false,
   },
 };

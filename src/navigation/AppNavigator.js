@@ -18,6 +18,7 @@ import AnalyticsCompletedTopicsPage from "../screens/SettingsPages/AnalyticsComp
 import * as Linking from "expo-linking";
 import VerifyEmailWhileSignup from "../screens/auth/redirectionsAuth/VerifyEmailWhileSignup";
 import AuthenticateUserUsingProvider from "../screens/auth/redirectionsAuth/AuthenticateUserUsingProvider";
+import { navigationRef } from "../services/navigationService";
 
 // Screens
 
@@ -53,7 +54,7 @@ const linking = {
 
 const AppNavigator = () => {
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer ref={navigationRef} linking={linking}>
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={{

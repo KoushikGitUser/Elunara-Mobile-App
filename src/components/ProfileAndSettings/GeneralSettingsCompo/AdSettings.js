@@ -1,12 +1,54 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SpeakerIcon from "../../../../assets/SvgIconsComponent/GeneralSettingsIcon/SpeakerIcon";
 import CustomSwitch from "../InnerPagesCompo/CustomSwitch";
 import { scaleFont } from "../../../utils/responsive";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const AdSettings = () => {
   const [skipAdPermission, setSkipAdPermission] = useState(false);
   const [personalizedAds, setPersonalizedAds] = useState(false);
+  const { settingsStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setSkipAdPermission(
+      settingsStates.allGeneralSettings.adSettings.skip_ad_permission
+    );
+    setPersonalizedAds(
+      settingsStates.allGeneralSettings.adSettings.personalized_ads
+    );
+  }, [
+    settingsStates.allGeneralSettings.adSettings.skip_ad_permission,
+    settingsStates.allGeneralSettings.adSettings.personalized_ads,
+  ]);
+
+  const toggleSkipAdSettings = () => {
+    const data = {
+      skip_ad_permission: !skipAdPermission,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const togglePersonalisedAdsSettings = () => {
+    const data = {
+      personalized_ads: !personalizedAds,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <View style={styles.content}>
@@ -31,6 +73,8 @@ const AdSettings = () => {
           </Text>
         </View>
         <CustomSwitch
+          triggerAPICall={toggleSkipAdSettings}
+          action="Skip Ad Permission"
           skipAd={true}
           value={skipAdPermission}
           onValueChange={setSkipAdPermission}
@@ -47,6 +91,7 @@ const AdSettings = () => {
           </Text>
         </View>
         <CustomSwitch
+        triggerAPICall={togglePersonalisedAdsSettings}
           value={personalizedAds}
           onValueChange={setPersonalizedAds}
           action="Personalised Ads"
@@ -84,7 +129,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(18),
     fontWeight: "600",
     color: "#1F2937",
-   fontFamily: "Mukta-Bold",
+    fontFamily: "Mukta-Bold",
     paddingLeft: 10,
   },
   subtitle: {

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";         
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiInstance from "../helper";
 import { allInitialStates } from "../allInitialStates";
 import { addCasePending } from "../addCases/pending";
@@ -32,7 +32,21 @@ export const commonFunctionForAPICalls = createAsyncThunk(
 const apiCommonSlice = createSlice({
   name: "apiCommonSlice",
   initialState: allInitialStates,
-  reducers: { 
+  reducers: {
+    setSelectedCountryCode: (state, action) => {
+      state.settingsStates.settingsMasterDatas.selectedCountryCode =
+        action?.payload;
+    },
+    setIsCountrySelectionChanged: (state, action) => {
+      state.settingsStates.settingsMasterDatas.isCountrySelectionChanged =
+        action?.payload;
+    },
+    setIsAnythingChangedInGeneralSettings:(state,action)=>{
+      state.settingsStates.allGeneralSettings.isAnythingChangedInGeneralSettings = action.payload;
+    },
+    setIsGeneralSettingsRestored:(state,action)=>{
+      state.settingsStates.isGeneralSettingsRestored = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -42,7 +56,7 @@ const apiCommonSlice = createSlice({
       })
       // Handle fulfilled API calls
       .addCase(commonFunctionForAPICalls.fulfilled, (state, action) => {
-         addCaseFulfilled(state, action);
+        addCaseFulfilled(state, action);
       })
       // Handle rejected API calls
       .addCase(commonFunctionForAPICalls.rejected, (state, action) => {
@@ -50,5 +64,8 @@ const apiCommonSlice = createSlice({
       });
   },
 });
+
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored} =
+  apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

@@ -5,18 +5,33 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { scaleFont } from "../../../utils/responsive";
 import { setToggleResetSettingsPopup } from "../../../redux/slices/toggleSlice";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { triggerToast } from "../../../services/toast";
+import { commonFunctionForAPICalls, setIsAnythingChangedInGeneralSettings, setIsGeneralSettingsRestored } from "../../../redux/slices/apiCommonSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const ResetSettingsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  useEffect(() => {
+    if (settingsStates.isGeneralSettingsRestored === true) {
+      dispatch(setToggleResetSettingsPopup(false));
+      navigation.navigate("profile");
+      triggerToast("Settings restored","Your all general settings restored to default","success",3000);
+      dispatch(setIsAnythingChangedInGeneralSettings(true));
+      dispatch(setIsGeneralSettingsRestored(false));
+    }
+  }, [settingsStates.isGeneralSettingsRestored]);
 
   return (
     <Modal
@@ -45,7 +60,12 @@ const ResetSettingsPopup = () => {
         {/* Modal Sheet */}
         <View style={styles.modalSheet}>
           <View style={styles.closeModalMain}>
-            <AntDesign onPress={() => dispatch(setToggleResetSettingsPopup(false))} name="close" size={24} color="black" />
+            <AntDesign
+              onPress={() => dispatch(setToggleResetSettingsPopup(false))}
+              name="close"
+              size={24}
+              color="black"
+            />
           </View>
 
           {/* Content */}
@@ -78,16 +98,28 @@ const ResetSettingsPopup = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.button}
-                onPress={() => {dispatch(setToggleResetSettingsPopup(false));
-                  setTimeout(() => {
-                     triggerToast("Settings Restored","Your general settings restored successfully","success",3000);   
-                  }, 300);
-                 
+                style={[
+                  styles.button,
+                  settingsStates.isGeneralSettingsRestored === "pending" && {
+                    backgroundColor: "#CDD5DC",
+                  },
+                ]}
+                onPress={() => {
+                  const payload = {
+                    method: "POST",
+                    url: "/settings/restore-defaults",
+                    name: "restoreAllGeneralSettings",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
                 }}
                 activeOpacity={0.8}
+                disabled={settingsStates.isGeneralSettingsRestored === "pending"}
               >
-                <Text style={styles.buttonText}>Confirm Reset</Text>
+                {settingsStates.isGeneralSettingsRestored === "pending" ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Confirm Reset</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -138,12 +170,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 20,
   },
-    closeModalMain: {
-    width: "100%", 
+  closeModalMain: {
+    width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
-    paddingHorizontal:20,
-    marginTop:30
+    paddingHorizontal: 20,
+    marginTop: 30,
   },
   btnsMain: {
     width: "100%",

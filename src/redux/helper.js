@@ -1,6 +1,8 @@
 import axios from "axios";
 import { getToken, storeToken, getRefreshToken, updateRefreshToken, removeToken, removeRefreshToken } from "../utils/Secure/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { reset } from "../services/navigationService";
+import { triggerToast } from "../services/toast";
 
 let mainURL = "http://api.elunara.ai/api/v1";
 export const baseURL = mainURL;
@@ -67,6 +69,8 @@ apiInstance.interceptors.response.use(
         const refreshToken = await getRefreshToken();
 
         if (!refreshToken) {
+          console.log("No refresh token available");
+          
           throw new Error("No refresh token available");
         }
 
@@ -95,8 +99,8 @@ apiInstance.interceptors.response.use(
         // Clear tokens on refresh failure
         await removeToken();
         await removeRefreshToken();
-        await AsyncStorage.removeItem("authenticUser");
-
+        reset("signin"); 
+        triggerToast("Session expired","Looks like your session has expired, please sign in again","error",4000);
         processQueue(err, null);
         return Promise.reject(err);
       } finally {

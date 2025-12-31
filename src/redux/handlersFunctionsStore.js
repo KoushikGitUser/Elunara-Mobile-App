@@ -1,6 +1,11 @@
-import { handleGetAllGeneralSettings } from "./apiExtraReducerHandlers/settingsHandlers";
+import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
   getAllGeneralSettings:handleGetAllGeneralSettings,
-  
+  getAllLLMsAvailable:handleGetAllLLMsAvailable,
+  getAllLanguagesAvailable:handleGetAllLanguagesAvailable,
+  getAllCountriesAvailable:handleGetAllCountriesAvailable,
+  getAllCitiesAvailable:handleGetAllCitiesAvailable,
+  updateGeneralSettings:handleUpdateGeneralSettings,
+  restoreAllGeneralSettings:handleRestoreAllGeneralSettings,
 }
