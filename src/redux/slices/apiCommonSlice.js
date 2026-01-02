@@ -44,6 +44,9 @@ const apiCommonSlice = createSlice({
     setIsAnythingChangedInGeneralSettings:(state,action)=>{
       state.settingsStates.allGeneralSettings.isAnythingChangedInGeneralSettings = action.payload;
     },
+    setIsAnythingChangedInPersonalisationSettings:(state,action)=>{
+      state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings = action.payload;
+    },
     setIsGeneralSettingsRestored:(state,action)=>{
       state.settingsStates.isGeneralSettingsRestored = action.payload;
     },
@@ -65,7 +68,7 @@ const apiCommonSlice = createSlice({
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored} =
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings} =
   apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

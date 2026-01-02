@@ -1,21 +1,38 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-} from "react-native";
-import React, { useRef, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
 import { genderSelection } from "../../../data/datas";
 import { appColors } from "../../../themes/appColors";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
-const GenderDropdown = () => {
+const GenderDropdown = ({ triggerAPICall }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
   const selectorRef = useRef(null);
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/genders",
+      name: "getAllGendersAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  useEffect(() => {
+    if (settingsStates.allPersonalisationsSettings.personalInfos.gender.name) {
+      setSelected(settingsStates.allPersonalisationsSettings.personalInfos.gender.name);
+    }
+  }, [settingsStates.allPersonalisationsSettings.personalInfos.gender.name]);
 
   const toggleDropdown = () => {
     if (selectorRef.current) {
@@ -33,6 +50,7 @@ const GenderDropdown = () => {
   const handleSelect = (item) => {
     setSelected(item);
     setVisible(false);
+    triggerAPICall(item?.id);
   };
 
   return (
@@ -40,7 +58,10 @@ const GenderDropdown = () => {
       <View style={{ width: "100%" }}>
         <TouchableOpacity
           ref={selectorRef}
-          style={[styles.selector, visible && { borderColor: appColors.navyBlueShade }]}
+          style={[
+            styles.selector,
+            visible && { borderColor: appColors.navyBlueShade },
+          ]}
           onPress={toggleDropdown}
           activeOpacity={0.7}
         >
@@ -86,18 +107,20 @@ const GenderDropdown = () => {
                 },
               ]}
             >
-              {genderSelection?.map((item, itemIndex) => {
-                return (
-                  <TouchableOpacity
-                    key={itemIndex}
-                    style={styles.option}
-                    onPress={() => handleSelect(item)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.description}>{item}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              {settingsStates.settingsMasterDatas.allGendersAvailable?.map(
+                (item, itemIndex) => {
+                  return (
+                    <TouchableOpacity
+                      key={itemIndex}
+                      style={styles.option}
+                      onPress={() => handleSelect(item)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.description}>{item}</Text>
+                    </TouchableOpacity>
+                  );
+                }
+              )}
             </View>
           </TouchableOpacity>
         </Modal>
@@ -155,7 +178,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: scaleFont(14),
     color: "#757575",
-    fontFamily:"Mukta-Medium"
+    fontFamily: "Mukta-Medium",
   },
 });
 

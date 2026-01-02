@@ -13,12 +13,16 @@ import Personal from "../../components/ProfileAndSettings/PersonalitionCompo/Per
 import Education from "../../components/ProfileAndSettings/PersonalitionCompo/Education";
 import Learning from "../../components/ProfileAndSettings/PersonalitionCompo/Learning";
 import { appColors } from "../../themes/appColors";
+import { commonFunctionForAPICalls, setIsAnythingChangedInPersonalisationSettings } from "../../redux/slices/apiCommonSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Personalisation = () => {
   const [selectedCategory, setSelectedCategory] = useState(1);
   const screen_height = Dimensions.get("window").height;
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -36,6 +40,33 @@ const Personalisation = () => {
       hideSub.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/settings/personalization",
+      name: "getAllPersonalisationsSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  useEffect(() => {
+    if (
+      settingsStates.allPersonalisationsSettings
+        .isAnythingChangedInPersonalisationSettings
+    ) {
+      const payload = {
+        method: "GET",
+        url: "/settings/personalization",
+        name: "getAllPersonalisationsSettings",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(setIsAnythingChangedInPersonalisationSettings(false));
+    }
+  }, [
+    settingsStates.allPersonalisationsSettings
+      .isAnythingChangedInPersonalisationSettings,
+  ]);
 
   return (
     <View style={styles.container}>

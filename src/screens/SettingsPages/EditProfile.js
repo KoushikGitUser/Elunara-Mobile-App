@@ -19,29 +19,31 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUpdateProfilePicPopup } from "../../redux/slices/toggleSlice";
 import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
-import corporateAvatar from '../../assets/images/Corporate2.png';
-import teacherAvatar from '../../assets/images/Teacher2.png';
-import maleStudentAvatar from '../../assets/images/Student Male2.png';
-import femaleStudentAvatar from '../../assets/images/Student Female2.png';
+import corporateAvatar from "../../assets/images/Corporate2.png";
+import teacherAvatar from "../../assets/images/Teacher2.png";
+import maleStudentAvatar from "../../assets/images/Student Male2.png";
+import femaleStudentAvatar from "../../assets/images/Student Female2.png";
 import MobileVerificationPopup from "../../components/ChatScreen/MobileVerificationPopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const EditProfile = () => {
   const [isMobileVerified, setIsMobileVerified] = useState(true);
 
   useEffect(() => {
     const checkMobileVerification = async () => {
-      const verified = await AsyncStorage.getItem("isMobileNumberVerifiedByOTP");
+      const verified = await AsyncStorage.getItem(
+        "isMobileNumberVerifiedByOTP"
+      );
       setIsMobileVerified(verified === "true");
     };
     checkMobileVerification();
   }, []);
-  
+
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [mobileVerificationPopup,setMobileVerificationPopup] = useState(false)
+  const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [password, setPassword] = React.useState("");
   const [selectedImage, setSelectedImage] = React.useState(null);
   const firstNameInputRef = React.useRef(null);
@@ -52,13 +54,20 @@ const EditProfile = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
 
-
-
   const commonFunctionForFocusingInput = (inputRef) => {
     if (inputRef && inputRef.current) {
       inputRef.current.focus();
     }
   };
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/settings/profile",
+      name: "getAllProfileInfos",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
   return (
     <ScrollView
@@ -68,15 +77,27 @@ const EditProfile = () => {
         width: "100%",
         paddingHorizontal: 20,
         backgroundColor: "#FAFAFA",
-        paddingTop:3e0
+        paddingTop: 3,
       }}
     >
-      <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} isFromProfile={true} />
-      {toggleStates.toggleUpdateProfilePicPopup && <UpdateProfilePicPopup  setSelectedImage={setSelectedImage}/>}
+      <MobileVerificationPopup
+        close={setMobileVerificationPopup}
+        mobileVerificationPopup={mobileVerificationPopup}
+        isFromProfile={true}
+      />
+      {toggleStates.toggleUpdateProfilePicPopup && (
+        <UpdateProfilePicPopup setSelectedImage={setSelectedImage} />
+      )}
       <View style={styles.profileImgContainer}>
-        <View style={{ height: 120, width: 120, }}>
+        <View style={{ height: 120, width: 120 }}>
           <Image
-            source={selectedImage ? (typeof selectedImage === 'string' ? { uri: selectedImage } : selectedImage) : profilePic}
+            source={
+              selectedImage
+                ? typeof selectedImage === "string"
+                  ? { uri: selectedImage }
+                  : selectedImage
+                : profilePic
+            }
             style={{ height: "100%", width: "100%", borderRadius: 20 }}
           />
           <TouchableOpacity
@@ -202,7 +223,11 @@ const EditProfile = () => {
               Verifying your mobile no. helps protect your account and enables
               important notifications.
             </Text>
-            <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} style={[styles.verifyButton]} activeOpacity={0.8}>
+            <TouchableOpacity
+              onPress={() => setMobileVerificationPopup(true)}
+              style={[styles.verifyButton]}
+              activeOpacity={0.8}
+            >
               <Text style={styles.verifyButtonText}>
                 Verify and Secure Account
               </Text>

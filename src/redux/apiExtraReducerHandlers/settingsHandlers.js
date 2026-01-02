@@ -62,7 +62,6 @@ export const handleGetAllCountriesAvailable = {
   },
 };
 
-
 export const handleGetAllCitiesAvailable = {
   pending: (state) => {
     state.settingsStates.fetchingAllGeneralSettings = true;
@@ -76,7 +75,6 @@ export const handleGetAllCitiesAvailable = {
     state.settingsStates.fetchingAllGeneralSettings = false;
   },
 };
-
 
 export const handleUpdateGeneralSettings = {
   pending: (state) => {
@@ -92,10 +90,22 @@ export const handleUpdateGeneralSettings = {
 };
 
 
+export const handleUpdatePersonalisationsSettings = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings = true;
+    state.settingsStates.fetchingAllGeneralSettings = false;
+  },
+  rejected: (state, action) => {
+    state.settingsStates.fetchingAllGeneralSettings = false;
+  },
+};
+
 export const handleRestoreAllGeneralSettings = {
   pending: (state) => {
     state.settingsStates.fetchingAllGeneralSettings = true;
-        state.settingsStates.isGeneralSettingsRestored = "pending";
+    state.settingsStates.isGeneralSettingsRestored = "pending";
   },
   fulfilled: (state, action) => {
     state.settingsStates.isGeneralSettingsRestored = true;
@@ -104,5 +114,70 @@ export const handleRestoreAllGeneralSettings = {
   rejected: (state, action) => {
     state.settingsStates.fetchingAllGeneralSettings = false;
     state.settingsStates.isGeneralSettingsRestored = false;
+  },
+};
+
+export const handleGetAllPersonalisationsSettings = {
+  pending: (state) => {
+    state.settingsStates.isGeneralSettingsRestored = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allPersonalisationsSettings.personalInfos = action.payload.data.data.personal_info;
+    state.settingsStates.allPersonalisationsSettings.academicCareer = action.payload.data.data.academic_career;
+    state.settingsStates.allPersonalisationsSettings.learningDevices = action.payload.data.data.learning_devices;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+
+
+export const handleGetAllGendersAvailable = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allGendersAvailable = action.payload.data.data;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleGetAllUniversitiesAvailable = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allUniversitiesAvailable = action.payload.data.data;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleGetAllDegreeProgramsAvailable = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allDegreeProgramsAvailable = action.payload.data.data;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleGetAllSpecializationsAvailable = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allSpecializationsAvailable = action.payload.data.data;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleGetAllProfileInfos = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allProfileInfos = action.payload.data.data;
+  },
+  rejected: (state, action) => {
   },
 };

@@ -14,7 +14,18 @@ export const settingsStates = {
     allLanguagesAvailable: [],
     allCountriesAvailable: [],
     allCitiesAvailable: [],
+    allGendersAvailable:[],
+    allUniversitiesAvailable:[],
+    allDegreeProgramsAvailable:[],
+    allSpecializationsAvailable:[],
     selectedCountryCode: null,
     isCountrySelectionChanged: false,
   },
+  allPersonalisationsSettings:{
+    personalInfos:{},
+    academicCareer:{},
+    learningDevices:{},
+    isAnythingChangedInPersonalisationSettings:false,
+  },
+  allProfileInfos:{},
 };

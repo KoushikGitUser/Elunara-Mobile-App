@@ -50,7 +50,7 @@ const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetVa
         url:"/master/llms",
         name:"getAllLLMsAvailable"
       }
-    dispatch(commonFunctionForAPICalls(payload))
+    dispatch(commonFunctionForAPICalls(payload)) 
     },[]);
 
     useEffect(()=>{

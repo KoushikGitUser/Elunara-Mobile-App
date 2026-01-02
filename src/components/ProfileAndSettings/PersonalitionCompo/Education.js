@@ -5,7 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { scaleFont } from "../../../utils/responsive";
 import { appColors } from "../../../themes/appColors";
 import { ChevronDown, UserRound } from "lucide-react-native";
@@ -21,6 +23,108 @@ import {
 const Education = () => {
   const [selectedOption, setSelectedOption] = useState("No");
   const [skillGapsFocused, setSkillGapsFocused] = useState(false);
+  const [skillGapsText, setSkillGapsText] = useState("");
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  useEffect(() => {
+    const universitiesPayload = {
+      method: "GET",
+      url: "/master/universities",
+      name: "getAllUniversitiesAvailable",
+    };
+    const degreeProgramsPayload = {
+      method: "GET",
+      url: "/master/degree-programs",
+      name: "getAllDegreeProgramsAvailable",
+    };
+    const specializationsPayload = {
+      method: "GET",
+      url: "/master/specialisations",
+      name: "getAllSpecializationsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(universitiesPayload));
+    dispatch(commonFunctionForAPICalls(degreeProgramsPayload));
+    dispatch(commonFunctionForAPICalls(specializationsPayload));
+  }, []);
+
+  useEffect(() => {
+    const isWorking = settingsStates.allPersonalisationsSettings.academicCareer.is_working_alongside_studies;
+    if (isWorking !== undefined && isWorking !== null) {
+      setSelectedOption(isWorking ? "Yes" : "No");
+    }
+  }, [settingsStates.allPersonalisationsSettings.academicCareer.is_working_alongside_studies]);
+
+  useEffect(() => {
+    setSkillGapsText(
+      settingsStates.allPersonalisationsSettings.academicCareer.skills_to_develop
+    );
+  }, [settingsStates.allPersonalisationsSettings.academicCareer.skills_to_develop]);
+
+  const updateAcademicCareer = (dataKey, id) => {
+    const data = {
+      [dataKey]: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/personalization",
+      data,
+      name: "updatePersonalizationSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateUniversity = (id) => updateAcademicCareer("university_id", id);
+  const updateDegreeProgram = (id) => updateAcademicCareer("degree_program_id", id);
+  const updateSemester = (id) => updateAcademicCareer("semester", id);
+  const updateSpecialization = (id) => updateAcademicCareer("specialisation_id", id);
+  const updateIsWorkingAlongsideStudies = (value) => updateAcademicCareer("is_working_alongside_studies", value);
+
+  const handleWorkingOptionChange = (option) => {
+    setSelectedOption(option);
+    updateIsWorkingAlongsideStudies(option === "Yes");
+  };
+
+  const updateSkillGaps = useCallback((skillGaps) => {
+    const data = {
+      skills_to_develop: skillGaps,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/personalization",
+      data,
+      name: "updatePersonalizationSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, [dispatch]);
+
+  // Debounce timer ref
+  const skillGapsDebounceRef = useRef(null);
+
+  // Debounced skill gaps update
+  useEffect(() => {
+    // Skip initial render / when skillGapsText matches stored value
+    const storedSkillGaps = settingsStates.allPersonalisationsSettings.academicCareer.key_skill_gaps;
+    if (skillGapsText === storedSkillGaps) return;
+
+    // Clear previous timer
+    if (skillGapsDebounceRef.current) {
+      clearTimeout(skillGapsDebounceRef.current);
+    }
+
+    // Set new timer
+    skillGapsDebounceRef.current = setTimeout(() => {
+      updateSkillGaps(skillGapsText);
+    }, 500);
+
+    // Cleanup on unmount or when skillGapsText changes
+    return () => {
+      if (skillGapsDebounceRef.current) {
+        clearTimeout(skillGapsDebounceRef.current);
+      }
+    };
+  }, [skillGapsText, updateSkillGaps, settingsStates.allPersonalisationsSettings.academicCareer.skills_to_develop]);
+
   const RadioButton = ({ label, selected, onPress }) => {
     return (
       <TouchableOpacity
@@ -38,7 +142,9 @@ const Education = () => {
     );
   };
 
-  return (
+  
+
+  return ( 
     <View style={{ flex: 1,paddingBottom:100}}>
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
@@ -53,16 +159,20 @@ const Education = () => {
       <View style={[styles.inputSection, { width: "100%", marginTop: 30 }]}>
         <Text style={styles.inputLabel}>Current University</Text>
         <EducationDropDowns
-          dataArray={currentUniversity}
+          dataArray={settingsStates.settingsMasterDatas.allUniversitiesAvailable}
           placeholder="Select current university"
+          triggerAPICall={updateUniversity}
+          initialValue={settingsStates.allPersonalisationsSettings.academicCareer.university}
         />
       </View>
       <View style={styles.fullnameInput}>
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Degree Program</Text>
           <EducationDropDowns
-            dataArray={degreeProgram}
+            dataArray={settingsStates.settingsMasterDatas.allDegreeProgramsAvailable}
             placeholder="Select degree"
+            triggerAPICall={updateDegreeProgram}
+            initialValue={settingsStates.allPersonalisationsSettings.academicCareer.degree_program}
           />
         </View>
         <View style={styles.inputSection}>
@@ -70,14 +180,18 @@ const Education = () => {
           <EducationDropDowns
             dataArray={semester}
             placeholder="Select semester"
+            triggerAPICall={updateSemester}
+            initialValue={settingsStates.allPersonalisationsSettings.academicCareer.semester}
           />
         </View>
       </View>
       <View style={[styles.inputSection, { width: "100%", marginTop: 15 }]}>
         <Text style={styles.inputLabel}>Specialisation</Text>
         <EducationDropDowns
-          dataArray={specialization}
+          dataArray={settingsStates.settingsMasterDatas.allSpecializationsAvailable}
           placeholder="Select specialisation..."
+          triggerAPICall={updateSpecialization}
+          initialValue={settingsStates.allPersonalisationsSettings.academicCareer.specialisation}
         />
       </View>
       <View style={{ marginTop: 10, marginBottom: 20 }}>
@@ -89,12 +203,12 @@ const Education = () => {
           <RadioButton
             label="Yes"
             selected={selectedOption === "Yes"}
-            onPress={() => setSelectedOption("Yes")}
+            onPress={() => handleWorkingOptionChange("Yes")}
           />
           <RadioButton
             label="No"
             selected={selectedOption === "No"}
-            onPress={() => setSelectedOption("No")}
+            onPress={() => handleWorkingOptionChange("No")}
           />
         </View>
       </View>
@@ -107,6 +221,8 @@ const Education = () => {
           <TextInput
             style={[styles.inputText, { width: "100%" }]}
             placeholder="e.g., Data analysis, public speaking, coding..."
+            value={skillGapsText}
+            onChangeText={setSkillGapsText}
             placeholderTextColor="#9CA3AF"
             returnKeyType="done"
             onFocus={() => setSkillGapsFocused(true)}

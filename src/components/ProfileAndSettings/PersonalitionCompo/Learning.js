@@ -5,17 +5,67 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../../utils/responsive";
 import DeskMobIcon from "../../../../assets/SvgIconsComponent/PersonalisationIcons/DeskMobIcon";
 import { ChevronDown } from "lucide-react-native";
 import EducationDropDowns from "./EducationDropDowns";
 import { internetQuality } from "../../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const Learning = () => {
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+  const learningDevices = settingsStates.allPersonalisationsSettings.learningDevices;
+
   const [primaryDevice, setPrimaryDevice] = useState(null);
   const [groupStudyPreference, setGroupStudyPreference] = useState(null);
   const [quietPlacePreference, setQuietPlacePreference] = useState(null);
+
+  // Initialize values from API
+  useEffect(() => {
+    if (learningDevices.primary_device) {
+      setPrimaryDevice(learningDevices.primary_device);
+    }
+    if (learningDevices.prefers_group_study) {
+      setGroupStudyPreference(learningDevices.prefers_group_study);
+    }
+    if (typeof learningDevices.has_quiet_study_place === "boolean") {
+      setQuietPlacePreference(learningDevices.has_quiet_study_place);
+    }
+  }, [learningDevices]);
+
+  const updateLearningDevices = (dataKey, value) => {
+    const data = {
+      [dataKey]: value,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/personalization",
+      data,
+      name: "updatePersonalizationSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateInternetQuality = (id) => updateLearningDevices("internet_quality", id);
+
+  const handlePrimaryDeviceChange = (value) => {
+    setPrimaryDevice(value);
+    updateLearningDevices("primary_device", value);
+  };
+
+  const handleGroupStudyChange = (value) => {
+    setGroupStudyPreference(value);
+    updateLearningDevices("prefers_group_study", value);
+  };
+
+  const handleQuietPlaceChange = (value) => {
+    setQuietPlacePreference(value);
+    updateLearningDevices("has_quiet_study_place", value);
+  };
+
   const RadioButton = ({ label, selected, onPress }) => {
     return (
       <TouchableOpacity
@@ -51,6 +101,8 @@ const Learning = () => {
         <EducationDropDowns
           dataArray={internetQuality}
           placeholder="Select internet quality...."
+          triggerAPICall={updateInternetQuality}
+          initialValue={settingsStates.allPersonalisationsSettings.learningDevices.internet_quality}
         />
       </View>
       <View style={{ marginTop: 10, marginBottom: 20 }}>
@@ -60,17 +112,17 @@ const Learning = () => {
           <RadioButton
             label="Mobile"
             selected={primaryDevice === "Mobile"}
-            onPress={() => setPrimaryDevice("Mobile")}
+            onPress={() => handlePrimaryDeviceChange("Mobile")}
           />
           <RadioButton
             label="Laptop"
             selected={primaryDevice === "Laptop"}
-            onPress={() => setPrimaryDevice("Laptop")}
+            onPress={() => handlePrimaryDeviceChange("Laptop")}
           />
           <RadioButton
             label="Tablet"
             selected={primaryDevice === "Tablet"}
-            onPress={() => setPrimaryDevice("Tablet")}
+            onPress={() => handlePrimaryDeviceChange("Tablet")}
           />
         </View>
       </View>
@@ -81,17 +133,17 @@ const Learning = () => {
           <RadioButton
             label="Yes"
             selected={groupStudyPreference === "Yes"}
-            onPress={() => setGroupStudyPreference("Yes")}
+            onPress={() => handleGroupStudyChange("Yes")}
           />
           <RadioButton
             label="No"
             selected={groupStudyPreference === "No"}
-            onPress={() => setGroupStudyPreference("No")}
+            onPress={() => handleGroupStudyChange("No")}
           />
           <RadioButton
             label="Sometimes"
             selected={groupStudyPreference === "Sometimes"}
-            onPress={() => setGroupStudyPreference("Sometimes")}
+            onPress={() => handleGroupStudyChange("Sometimes")}
           />
         </View>
       </View>
@@ -101,13 +153,13 @@ const Learning = () => {
         <View style={styles.optionsContainer}>
           <RadioButton
             label="Yes"
-            selected={quietPlacePreference === "Yes"}
-            onPress={() => setQuietPlacePreference("Yes")}
+            selected={quietPlacePreference === true}
+            onPress={() => handleQuietPlaceChange(true)}
           />
           <RadioButton
             label="No"
-            selected={quietPlacePreference === "No"}
-            onPress={() => setQuietPlacePreference("No")}
+            selected={quietPlacePreference === false}
+            onPress={() => handleQuietPlaceChange(false)}
           />
         </View>
       </View>

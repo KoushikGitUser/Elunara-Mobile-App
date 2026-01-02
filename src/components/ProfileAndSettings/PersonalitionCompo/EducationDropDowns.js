@@ -1,14 +1,20 @@
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { moderateScale, scaleFont } from '../../../utils/responsive';
 import { appColors } from '../../../themes/appColors';
 
-const EducationDropDowns = ({dataArray,placeholder}) => {
+const EducationDropDowns = ({dataArray, placeholder, triggerAPICall, initialValue}) => {
       const [visible, setVisible] = useState(false);
       const [selected, setSelected] = useState(null);
       const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
       const selectorRef = useRef(null);
+
+      useEffect(() => {
+        if (initialValue) {
+          setSelected(initialValue);
+        }
+      }, [initialValue]);
 
       const toggleDropdown = () => {
         if (selectorRef.current) {
@@ -26,11 +32,14 @@ const EducationDropDowns = ({dataArray,placeholder}) => {
       const handleSelect = (item) => {
         setSelected(item);
         setVisible(false);
+        if (triggerAPICall) {
+          triggerAPICall(item?.id?item?.id:item);
+        }
       };
 
   return (
     <View style={styles.container}>
-      <View style={{ width: "100%" }}>
+      <View style={{ width: "100%" }}> 
         <TouchableOpacity
           ref={selectorRef}
           style={[styles.selector, visible && { borderColor: appColors.navyBlueShade}]}
