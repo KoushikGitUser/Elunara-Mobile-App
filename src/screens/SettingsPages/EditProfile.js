@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
 import profilePic from "../../assets/images/profilepic.png";
@@ -44,7 +44,8 @@ const EditProfile = () => {
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
-  const [password, setPassword] = React.useState("");
+  const [password, setPassword] = React.useState("12345678");
+  const [hasPassword, setHasPassword] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
   const firstNameInputRef = React.useRef(null);
   const lastNameInputRef = React.useRef(null);
@@ -52,6 +53,7 @@ const EditProfile = () => {
   const passwordInputRef = React.useRef(null);
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
   const commonFunctionForFocusingInput = (inputRef) => {
@@ -68,6 +70,80 @@ const EditProfile = () => {
     };
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
+
+  useEffect(() => {
+    const profileData = settingsStates?.allProfileInfos;
+    if (profileData) {
+      // Set profile image based on avatar_type and profile_image
+      if (profileData.avatar_type === null && profileData.profile_image === null) {
+        // Default from local asset (already null, will use profilePic in Image)
+        setSelectedImage(null);
+      } else if (profileData.avatar_type === null && profileData.profile_image) {
+        // Profile image from API
+        setSelectedImage(profileData.profile_image);
+      } else if (profileData.profile_image === null && profileData.avatar_type) {
+        // Set respective avatar from local assets
+        switch (profileData.avatar_type) {
+          case "corporate":
+            setSelectedImage(corporateAvatar);
+            break;
+          case "teacher":
+            setSelectedImage(teacherAvatar);
+            break;
+          case "student_male":
+            setSelectedImage(maleStudentAvatar);
+            break;
+          case "student_female":
+            setSelectedImage(femaleStudentAvatar);
+            break;
+          default:
+            setSelectedImage(null);
+        }
+      }
+
+      if (profileData.first_name) {
+        setFirstName(profileData.first_name);
+      }
+      if (profileData.last_name) {
+        setLastName(profileData.last_name);
+      }
+      if (profileData.email) {
+        setEmail(profileData.email);
+      }
+      setHasPassword(profileData.has_password);
+    }
+  }, [settingsStates?.allProfileInfos]);
+
+  const debounceTimerRef = useRef(null);
+
+  const updateName = useCallback((newFirstName, newLastName) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      const payload = {
+        method: "PUT",
+        url: "/settings/profile/name",
+        name: "updateProfileName",
+        data: {
+          first_name: newFirstName,
+          last_name: newLastName,
+        },
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }, 500);
+  }, [dispatch]);
+
+  const handleFirstNameChange = (text) => {
+    setFirstName(text);
+    updateName(text, lastName);
+  };
+
+  const handleLastNameChange = (text) => {
+    setLastName(text);
+    updateName(firstName, text);
+  };
 
   return (
     <ScrollView
@@ -118,7 +194,7 @@ const EditProfile = () => {
               placeholder="Your first name"
               placeholderTextColor="#9CA3AF"
               value={firstName}
-              onChangeText={(text) => setFirstName(text)}
+              onChangeText={handleFirstNameChange}
               returnKeyType="done"
             />
             <TouchableOpacity
@@ -137,7 +213,7 @@ const EditProfile = () => {
               placeholder="Your last name"
               placeholderTextColor="#9CA3AF"
               value={lastName}
-              onChangeText={(text) => setLastName(text)}
+              onChangeText={handleLastNameChange}
               returnKeyType="done"
             />
             <TouchableOpacity
@@ -167,26 +243,30 @@ const EditProfile = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={[styles.inputSection, { width: "100%" }]}>
-        <Text style={styles.inputLabel}>Password</Text>
-        <View style={styles.input}>
-          <TextInput
-            ref={passwordInputRef}
-            style={styles.inputText}
-            placeholder="Your password"
-            placeholderTextColor="#9CA3AF"
-            value={password}
-            secureTextEntry={true}
-            onChangeText={(text) => setPassword(text)}
-            returnKeyType="done"
-          />
-          <TouchableOpacity
-            onPress={() => commonFunctionForFocusingInput(passwordInputRef)}
-          >
-            <PencilIcon />
-          </TouchableOpacity>
+      {hasPassword && (
+        <View style={[styles.inputSection, { width: "100%" }]}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <View style={styles.input}>
+            <TextInput
+              editable={false}
+              ref={passwordInputRef}
+              style={styles.inputText}
+              placeholder="Your password"
+              placeholderTextColor="#9CA3AF"
+              value={password}
+              secureTextEntry={true}
+              onChangeText={(text) => setPassword(text)}
+              returnKeyType="done"
+            />
+            <TouchableOpacity
+              onPress={() => commonFunctionForFocusingInput(passwordInputRef)}
+            >
+              <PencilIcon />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
+
       <TouchableOpacity
         onPress={() => {
           triggerToast(

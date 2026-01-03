@@ -181,3 +181,34 @@ export const handleGetAllProfileInfos = {
   rejected: (state, action) => {
   },
 };
+
+export const handleUpdateProfileName = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allProfileInfos.first_name = action.payload.data.data.first_name;
+    state.settingsStates.allProfileInfos.last_name = action.payload.data.data.last_name;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleUpdateProfileImage = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allProfileInfos.profile_image = action.payload.data.data.profile_image;
+  },
+  rejected: (state, action) => {
+  },
+};
+
+export const handleUpdateProfileAvatarImage = {
+  pending: (state) => {
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.allProfileInfos.profile_image = action.payload.data.data.profile_image;
+  },
+  rejected: (state, action) => {
+  },
+};

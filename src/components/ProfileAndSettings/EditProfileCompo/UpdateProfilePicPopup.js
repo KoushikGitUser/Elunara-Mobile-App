@@ -15,6 +15,7 @@ import { scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUpdateProfilePicPopup } from "../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import ProfilePicUploadIcon from "../../../../assets/SvgIconsComponent/EditProfileIcon/ProfilePicUploadIcon";
@@ -31,12 +32,24 @@ import teacherAvatar from '../../../assets/images/Teacher2.png';
 import maleStudentAvatar from '../../../assets/images/Student Male2.png';
 import femaleStudentAvatar from '../../../assets/images/Student Female2.png';
 
-
+ 
 const UpdateProfilePicPopup = ({setSelectedImage}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
 
   const dispatch = useDispatch();
+
+  const updateAvatarImage = (avatarType) => {
+    const payload = {
+      method: "PUT",
+      url: "/settings/profile/avatar",
+      name: "updateProfileAvatarImage",
+      data: {
+        avatar_type: avatarType,
+      },
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
     const triggerImagePicker = async () => {
     // Open image gallery functionality
@@ -72,6 +85,25 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
         ) {
           // Add selected photo to Redux
           setSelectedImage(result.assets[0].uri);
+
+          // Create FormData and call API
+          const formData = new FormData();
+          formData.append("profile_image", {
+            uri: result.assets[0].uri,
+            type: result.assets[0].mimeType,
+            name: result.assets[0].fileName || "profile_image.jpg",
+          });
+
+          const payload = {
+            method: "POST",
+            url: "/settings/profile/photo",
+            name: "updateProfileImage",
+            data: formData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          };
+          dispatch(commonFunctionForAPICalls(payload));
         } else {
           Alert.alert(
             "Invalid type",
@@ -152,10 +184,11 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
                   dispatch(setProfilePictureType("avatar"));
                   dispatch(setProfilePictureAvatar(1));
                   setSelectedImage(corporateAvatar);
+                  updateAvatarImage("corporate");
                   setTimeout(() => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
-                 
+
                 }}>
                   <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?2.5:0,borderColor:"#081A35",borderRadius:16}} source={corporateAvatar} />
                   {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?<View style={styles.checkCircle}>
@@ -166,6 +199,7 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
                   dispatch(setProfilePictureType("avatar"));
                   dispatch(setProfilePictureAvatar(2));
                   setSelectedImage(teacherAvatar);
+                  updateAvatarImage("teacher");
                   setTimeout(() => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
@@ -179,6 +213,7 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
                   dispatch(setProfilePictureType("avatar"));
                   dispatch(setProfilePictureAvatar(3));
                   setSelectedImage(maleStudentAvatar);
+                  updateAvatarImage("student_male");
                   setTimeout(() => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
@@ -192,6 +227,7 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
                   dispatch(setProfilePictureType("avatar"));
                   dispatch(setProfilePictureAvatar(4));
                   setSelectedImage(femaleStudentAvatar);
+                  updateAvatarImage("student_female");
                setTimeout(() => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);

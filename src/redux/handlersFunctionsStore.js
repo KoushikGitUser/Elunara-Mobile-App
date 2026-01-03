@@ -1,4 +1,4 @@
-import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos } from "./apiExtraReducerHandlers/settingsHandlers";
+import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
   // get all settings of sections
@@ -20,5 +20,10 @@ export const settingsHandlersFunctions = {
   updateGeneralSettings:handleUpdateGeneralSettings,
   restoreAllGeneralSettings:handleRestoreAllGeneralSettings,
   updatePersonalizationSettings:handleUpdatePersonalisationsSettings,
+
+  // profile section manage
+  updateProfileName: handleUpdateProfileName,
+  updateProfileImage: handleUpdateProfileImage,
+  updateProfileAvatarImage: handleUpdateProfileAvatarImage,
 
 }
