@@ -29,10 +29,10 @@ const GenderDropdown = ({ triggerAPICall }) => {
   }, []);
 
   useEffect(() => {
-    if (settingsStates.allPersonalisationsSettings.personalInfos.gender.name) {
-      setSelected(settingsStates.allPersonalisationsSettings.personalInfos.gender.name);
+    if (settingsStates.allPersonalisationsSettings.personalInfos.gender?.name) {
+      setSelected(settingsStates.allPersonalisationsSettings.personalInfos.gender?.name);
     }
-  }, [settingsStates.allPersonalisationsSettings.personalInfos.gender.name]);
+  }, [settingsStates.allPersonalisationsSettings.personalInfos.gender?.name]);
 
   const toggleDropdown = () => {
     if (selectorRef.current) {

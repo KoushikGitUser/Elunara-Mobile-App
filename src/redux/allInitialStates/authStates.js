@@ -1,4 +1,4 @@
-export const authStates = { 
+export const authStates = {
   loading: false,
   error: null,
   isSignedUp: null,
@@ -11,6 +11,10 @@ export const authStates = {
   isMobileOTPVerified:false,
   isAccountRecoverable:false,
   accountRecoverableMessage:"",
+  isEmailChangeRequested:false,
+  isOTPSentForEmailChange:null,
+  isEmailChangeRequestVerified:null,
+  isPasswordUpdated:null,
 
   //oauth states, signin/signup with social
   isRedirectURLReceivedForGoogle:false,

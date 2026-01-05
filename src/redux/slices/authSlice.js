@@ -300,6 +300,78 @@ export const loginUsingProviderCallback = createAsyncThunk(
 );
 
 
+export const requestForEmailChange = createAsyncThunk(
+  "/requestForEmailChange",
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/settings/profile/email/request",userDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const verifyEmailChangeRequest = createAsyncThunk(
+  "/verifyEmailChangeRequest",
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/settings/profile/email/verify",userDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const updatePasswordWithCurrent = createAsyncThunk(
+  "/updatePasswordWithCurrent",
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.put("/settings/profile/password",userDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -345,7 +417,10 @@ const authSlice = createSlice({
     setIsRedirectURLReceivedForLinkedIn: (state, action) => {
       state.authStates.isRedirectURLReceivedForLinkedIn = action.payload;
     },
-    
+    setIsEmailChangeRequestedToFalse: (state, action) => {
+      state.authStates.isEmailChangeRequested = false;
+    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -605,6 +680,131 @@ const authSlice = createSlice({
       })
       .addCase(loginUsingProviderCallback.rejected, (state, action) => {
         state.authStates.loggedInUsingProvider = false;
+      })
+
+      //request email change
+      .addCase(requestForEmailChange.pending, (state) => {
+        state.authStates.isEmailChangeRequested = "pending";
+        state.authStates.isOTPSentForEmailChange = "pending";
+      })
+      .addCase(requestForEmailChange.fulfilled, (state, { payload }) => {
+        state.authStates.isEmailChangeRequested = true;
+        state.authStates.isOTPSentForEmailChange = true;
+        if (payload?.status === 200) {
+          triggerToast(
+            "Verification email sent",
+            "Please check your new email address to verify the change.",
+            "success",
+            3000
+          );
+        }
+      })
+      .addCase(requestForEmailChange.rejected, (state, { payload }) => {
+        state.authStates.isEmailChangeRequested = false;
+        state.authStates.isOTPSentForEmailChange = false;
+        if (payload?.status === 401) {
+          triggerToast(
+            "Invalid password",
+            "The password you entered is incorrect.",
+            "error",
+            3000
+          );
+        } else if (payload?.status === 422) {
+          triggerToast(
+            "Email already in use",
+            "This email is already registered with another account.",
+            "error",
+            3000
+          );
+        } else if (payload?.status === 429) {
+          triggerToast(
+            "Too many attempts",
+            "Too many email change requests. Please try again later.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Request failed",
+            "Failed to request email change. Please try again.",
+            "error",
+            3000
+          );
+        }
+      })
+
+      //verify email change request
+      .addCase(verifyEmailChangeRequest.pending, (state) => {
+        state.authStates.isEmailChangeRequestVerified = "pending";
+      })
+      .addCase(verifyEmailChangeRequest.fulfilled, (state, { payload }) => {
+        state.authStates.isEmailChangeRequestVerified = true;
+        if (payload?.status === 200) {
+          triggerToast(
+            "Email Address Updated Successfully!",
+            "",
+            "success",
+            3000
+          );
+        }
+      })
+      .addCase(verifyEmailChangeRequest.rejected, (state, { payload }) => {
+        state.authStates.isEmailChangeRequestVerified = false;
+        if (payload?.status === 400) {
+          triggerToast(
+            "Invalid OTP",
+            "The OTP you entered is invalid or expired.",
+            "error",
+            3000
+          );
+        } else if (payload?.status === 422) {
+          triggerToast(
+            "Validation Error",
+            "Please check your input and try again.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Verification failed",
+            "Failed to verify email change. Please try again.",
+            "error",
+            3000
+          );
+        }
+      })
+
+      //update password with current
+      .addCase(updatePasswordWithCurrent.pending, (state) => {
+        state.authStates.isPasswordUpdated = "pending";
+      })
+      .addCase(updatePasswordWithCurrent.fulfilled, (state) => {
+        state.authStates.isPasswordUpdated = true;
+      })
+      .addCase(updatePasswordWithCurrent.rejected, (state, { payload }) => {
+        state.authStates.isPasswordUpdated = false;
+        if (payload?.status === 401) {
+          triggerToast(
+            "Invalid password",
+            "The current password you entered is incorrect.",
+            "error",
+            3000
+          );
+        } else if (payload?.status === 422) {
+          triggerToast(
+            "Validation Error",
+            "Please check your input and try again.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Update failed",
+            "Failed to update password. Please try again.",
+            "error",
+            3000
+          );
+        }
       });
   },
 });
@@ -618,7 +818,8 @@ export const {
   setIsSignedInToFalse,
   setIsSignedUpToFalse,
   setIsOTPReceivedForMobileVerification,
-  setIsOTPReceivedForAccountRecovery
+  setIsOTPReceivedForAccountRecovery,
+  setIsEmailChangeRequestedToFalse
 } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -1,3 +1,5 @@
+import { triggerToast } from "../../services/toast";
+
 export const handleGetAllGeneralSettings = {
   pending: (state) => {
     state.settingsStates.fetchingAllGeneralSettings = true;
@@ -89,10 +91,8 @@ export const handleUpdateGeneralSettings = {
   },
 };
 
-
 export const handleUpdatePersonalisationsSettings = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
     state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings = true;
     state.settingsStates.fetchingAllGeneralSettings = false;
@@ -122,93 +122,91 @@ export const handleGetAllPersonalisationsSettings = {
     state.settingsStates.isGeneralSettingsRestored = "pending";
   },
   fulfilled: (state, action) => {
-    state.settingsStates.allPersonalisationsSettings.personalInfos = action.payload.data.data.personal_info;
-    state.settingsStates.allPersonalisationsSettings.academicCareer = action.payload.data.data.academic_career;
-    state.settingsStates.allPersonalisationsSettings.learningDevices = action.payload.data.data.learning_devices;
+    state.settingsStates.allPersonalisationsSettings.personalInfos =
+      action.payload.data.data.personal_info;
+    state.settingsStates.allPersonalisationsSettings.academicCareer =
+      action.payload.data.data.academic_career;
+    state.settingsStates.allPersonalisationsSettings.learningDevices =
+      action.payload.data.data.learning_devices;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
-
-
 export const handleGetAllGendersAvailable = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.settingsMasterDatas.allGendersAvailable = action.payload.data.data;
+    state.settingsStates.settingsMasterDatas.allGendersAvailable =
+      action.payload.data.data;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleGetAllUniversitiesAvailable = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.settingsMasterDatas.allUniversitiesAvailable = action.payload.data.data;
+    state.settingsStates.settingsMasterDatas.allUniversitiesAvailable =
+      action.payload.data.data;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleGetAllDegreeProgramsAvailable = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.settingsMasterDatas.allDegreeProgramsAvailable = action.payload.data.data;
+    state.settingsStates.settingsMasterDatas.allDegreeProgramsAvailable =
+      action.payload.data.data;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleGetAllSpecializationsAvailable = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.settingsMasterDatas.allSpecializationsAvailable = action.payload.data.data;
+    state.settingsStates.settingsMasterDatas.allSpecializationsAvailable =
+      action.payload.data.data;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleGetAllProfileInfos = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos = action.payload.data.data;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleUpdateProfileName = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.allProfileInfos.first_name = action.payload.data.data.first_name;
-    state.settingsStates.allProfileInfos.last_name = action.payload.data.data.last_name;
+    state.settingsStates.allProfileInfos.first_name =
+      action.payload.data.data.first_name;
+    state.settingsStates.allProfileInfos.last_name =
+      action.payload.data.data.last_name;
+    triggerToast(
+      "Profile Updated",
+      "Your name has been updated successfully",
+      "success",
+      3000
+    );
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleUpdateProfileImage = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.allProfileInfos.profile_image = action.payload.data.data.profile_image;
+    state.settingsStates.allProfileInfos.profile_image =
+      action.payload.data.data.profile_image;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };
 
 export const handleUpdateProfileAvatarImage = {
-  pending: (state) => {
-  },
+  pending: (state) => {},
   fulfilled: (state, action) => {
-    state.settingsStates.allProfileInfos.profile_image = action.payload.data.data.profile_image;
+    state.settingsStates.allProfileInfos.profile_image =
+      action.payload.data.data.profile_image;
   },
-  rejected: (state, action) => {
-  },
+  rejected: (state, action) => {},
 };

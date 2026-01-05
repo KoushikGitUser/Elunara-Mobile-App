@@ -8,14 +8,13 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
 import profilePic from "../../assets/images/profilepic.png";
 import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
 import { triggerToast } from "../../services/toast";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUpdateProfilePicPopup } from "../../redux/slices/toggleSlice";
 import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
@@ -26,6 +25,9 @@ import femaleStudentAvatar from "../../assets/images/Student Female2.png";
 import MobileVerificationPopup from "../../components/ChatScreen/MobileVerificationPopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import UpdateEmailPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateEmailPopup";
+import UpdatePasswordPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdatePasswordPopup";
+
 
 const EditProfile = () => {
   const [isMobileVerified, setIsMobileVerified] = useState(true);
@@ -47,11 +49,15 @@ const EditProfile = () => {
   const [password, setPassword] = React.useState("12345678");
   const [hasPassword, setHasPassword] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
+  const [isNameEditing, setIsNameEditing] = useState(false);
+  const [originalFirstName, setOriginalFirstName] = useState("");
+  const [originalLastName, setOriginalLastName] = useState("");
+  const [updateEmailPopup,setUpdateEmailPopup] = useState(false);
+  const [updatePasswordPopup,setUpdatePasswordPopup] = useState(false);
   const firstNameInputRef = React.useRef(null);
   const lastNameInputRef = React.useRef(null);
   const emailInputRef = React.useRef(null);
   const passwordInputRef = React.useRef(null);
-  const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
@@ -103,9 +109,11 @@ const EditProfile = () => {
 
       if (profileData.first_name) {
         setFirstName(profileData.first_name);
+        setOriginalFirstName(profileData.first_name);
       }
       if (profileData.last_name) {
         setLastName(profileData.last_name);
+        setOriginalLastName(profileData.last_name);
       }
       if (profileData.email) {
         setEmail(profileData.email);
@@ -114,35 +122,38 @@ const EditProfile = () => {
     }
   }, [settingsStates?.allProfileInfos]);
 
-  const debounceTimerRef = useRef(null);
-
-  const updateName = useCallback((newFirstName, newLastName) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = setTimeout(() => {
-      const payload = {
-        method: "PUT",
-        url: "/settings/profile/name",
-        name: "updateProfileName",
-        data: {
-          first_name: newFirstName,
-          last_name: newLastName,
-        },
-      };
-      dispatch(commonFunctionForAPICalls(payload));
-    }, 500);
-  }, [dispatch]);
-
   const handleFirstNameChange = (text) => {
     setFirstName(text);
-    updateName(text, lastName);
+    if (text !== originalFirstName || lastName !== originalLastName) {
+      setIsNameEditing(true);
+    } else if (text === originalFirstName && lastName === originalLastName) {
+      setIsNameEditing(false);
+    }
   };
 
   const handleLastNameChange = (text) => {
     setLastName(text);
-    updateName(firstName, text);
+    if (text !== originalLastName || firstName !== originalFirstName) {
+      setIsNameEditing(true);
+    } else if (text === originalLastName && firstName === originalFirstName) {
+      setIsNameEditing(false);
+    }
+  };
+
+  const handleUpdateName = () => {
+    const payload = {
+      method: "PUT",
+      url: "/settings/profile/name",
+      name: "updateProfileName",
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+      },
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+    setOriginalFirstName(firstName);
+    setOriginalLastName(lastName);
+    setIsNameEditing(false);
   };
 
   return (
@@ -156,6 +167,8 @@ const EditProfile = () => {
         paddingTop: 3,
       }}
     >
+      <UpdateEmailPopup updateEmailPopup={updateEmailPopup} close={setUpdateEmailPopup}  />
+      <UpdatePasswordPopup close={setUpdatePasswordPopup} updatePassPopup={updatePasswordPopup} />
       <MobileVerificationPopup
         close={setMobileVerificationPopup}
         mobileVerificationPopup={mobileVerificationPopup}
@@ -237,7 +250,7 @@ const EditProfile = () => {
             returnKeyType="done"
           />
           <TouchableOpacity
-            onPress={() => commonFunctionForFocusingInput(emailInputRef)}
+            onPress={() => setUpdateEmailPopup(true)}
           >
             <PencilIcon />
           </TouchableOpacity>
@@ -259,7 +272,7 @@ const EditProfile = () => {
               returnKeyType="done"
             />
             <TouchableOpacity
-              onPress={() => commonFunctionForFocusingInput(passwordInputRef)}
+              onPress={() => setUpdatePasswordPopup(true)}
             >
               <PencilIcon />
             </TouchableOpacity>
@@ -267,29 +280,23 @@ const EditProfile = () => {
         </View>
       )}
 
-      <TouchableOpacity
-        onPress={() => {
-          triggerToast(
-            "Profile Updated",
-            "Your profile has been updated successfully",
-            "success",
-            3000
-          );
-          navigation.navigate("profile");
-        }}
-        style={[
-          styles.button,
-          {
-            backgroundColor: "white",
-            borderWidth: 1,
-            borderColor: "black",
-            marginLeft: "auto",
-            marginTop: 20,
-          },
-        ]}
-      >
-        <Text style={[styles.buttonText, { color: "black" }]}>Done</Text>
-      </TouchableOpacity>
+      {isNameEditing && (
+        <TouchableOpacity
+          onPress={handleUpdateName}
+          style={[
+            styles.button,
+            {
+              backgroundColor: "white",
+              borderWidth: 1,
+              borderColor: "black",
+              marginLeft: "auto",
+              marginTop: 20,
+            },
+          ]}
+        >
+          <Text style={[styles.buttonText, { color: "black" }]}>Done</Text>
+        </TouchableOpacity>
+      )}
       {!isMobileVerified && (
         <View style={styles.content}>
           <View style={styles.header}>
