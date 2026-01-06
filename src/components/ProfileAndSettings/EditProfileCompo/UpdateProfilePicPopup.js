@@ -78,20 +78,32 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
       });
 
       if (!result.canceled) {
+        const selectedAsset = result.assets[0];
+        const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+
+        // Check file size (max 2MB)
+        if (selectedAsset.fileSize && selectedAsset.fileSize > maxFileSize) {
+          Alert.alert(
+            "File too large",
+            "The selected image exceeds 2MB. Please select a smaller image."
+          );
+          return;
+        }
+
         if (
-          result.assets[0].mimeType == "image/png" ||
-          result.assets[0].mimeType == "image/jpg" ||
-          result.assets[0].mimeType == "image/jpeg"
+          selectedAsset.mimeType == "image/png" ||
+          selectedAsset.mimeType == "image/jpg" ||
+          selectedAsset.mimeType == "image/jpeg"
         ) {
           // Add selected photo to Redux
-          setSelectedImage(result.assets[0].uri);
+          setSelectedImage(selectedAsset.uri);
 
           // Create FormData and call API
           const formData = new FormData();
           formData.append("profile_image", {
-            uri: result.assets[0].uri,
-            type: result.assets[0].mimeType,
-            name: result.assets[0].fileName || "profile_image.jpg",
+            uri: selectedAsset.uri,
+            type: selectedAsset.mimeType,
+            name: selectedAsset.fileName || "profile_image.jpg",
           });
 
           const payload = {

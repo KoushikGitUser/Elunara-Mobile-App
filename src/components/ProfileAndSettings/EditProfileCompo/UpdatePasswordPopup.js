@@ -10,7 +10,7 @@ import { appColors } from '../../../themes/appColors';
 import { updatePasswordWithCurrent } from '../../../redux/slices/authSlice';
 import { triggerToast } from '../../../services/toast';
 
-const UpdatePasswordPopup = ({updatePassPopup,close}) => {
+const UpdatePasswordPopup = ({updatePassPopup,close,setForgotPassProfilePopup}) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -252,7 +252,7 @@ const UpdatePasswordPopup = ({updatePassPopup,close}) => {
                     style={styles.forgotPasswordContainer}
                     onPress={() => {
                       close(false);
-                      navigation.navigate("forgotpass");
+                      setForgotPassProfilePopup(true)
                     }}
                   >
                     <Text style={styles.forgotPasswordText}>Forgot Password?</Text>

@@ -372,6 +372,54 @@ export const updatePasswordWithCurrent = createAsyncThunk(
 );
 
 
+export const forgotPasswordFromProfile = createAsyncThunk(
+  "/forgotPasswordFromProfile",
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/settings/profile/password/forgot",userDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
+export const updatePasswordForgotProfile = createAsyncThunk(
+  "/updatePasswordForgotProfile",
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      let res = await apiInstance.post("/settings/profile/password/forgot",userDetails, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return {
+        data: res.data,
+        status: res.status,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
+  }
+);
+
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -419,6 +467,10 @@ const authSlice = createSlice({
     },
     setIsEmailChangeRequestedToFalse: (state, action) => {
       state.authStates.isEmailChangeRequested = false;
+    },
+    setForgotPasswordProfileStatesToNull: (state) => {
+      state.authStates.isCodeSentForForgotPassInProfile = null;
+      state.authStates.isPasswordUpdatedForgotProfile = null;
     },
 
   },
@@ -805,6 +857,65 @@ const authSlice = createSlice({
             3000
           );
         }
+      })
+
+      //forgot password from profile - send code
+      .addCase(forgotPasswordFromProfile.pending, (state) => {
+        state.authStates.isCodeSentForForgotPassInProfile = "pending";
+      })
+      .addCase(forgotPasswordFromProfile.fulfilled, (state) => {
+        state.authStates.isCodeSentForForgotPassInProfile = true;
+      })
+      .addCase(forgotPasswordFromProfile.rejected, (state, { payload }) => {
+        state.authStates.isCodeSentForForgotPassInProfile = false;
+        if (payload?.status === 429) {
+          triggerToast(
+            "Too many attempts",
+            "Too many requests. Please try again later.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Request failed",
+            "Failed to send verification code. Please try again.",
+            "error",
+            3000
+          );
+        }
+      })
+
+      //update password forgot profile - reset password with OTP
+      .addCase(updatePasswordForgotProfile.pending, (state) => {
+        state.authStates.isPasswordUpdatedForgotProfile = "pending";
+      })
+      .addCase(updatePasswordForgotProfile.fulfilled, (state) => {
+        state.authStates.isPasswordUpdatedForgotProfile = true;
+      })
+      .addCase(updatePasswordForgotProfile.rejected, (state, { payload }) => {
+        state.authStates.isPasswordUpdatedForgotProfile = false;
+        if (payload?.status === 400) {
+          triggerToast(
+            "Invalid OTP",
+            "The OTP you entered is invalid or expired.",
+            "error",
+            3000
+          );
+        } else if (payload?.status === 422) {
+          triggerToast(
+            "Validation Error",
+            "Please check your input and try again.",
+            "error",
+            3000
+          );
+        } else {
+          triggerToast(
+            "Update failed",
+            "Failed to update password. Please try again.",
+            "error",
+            3000
+          );
+        }
       });
   },
 });
@@ -819,7 +930,8 @@ export const {
   setIsSignedUpToFalse,
   setIsOTPReceivedForMobileVerification,
   setIsOTPReceivedForAccountRecovery,
-  setIsEmailChangeRequestedToFalse
+  setIsEmailChangeRequestedToFalse,
+  setForgotPasswordProfileStatesToNull
 } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -15,6 +15,8 @@ export const authStates = {
   isOTPSentForEmailChange:null,
   isEmailChangeRequestVerified:null,
   isPasswordUpdated:null,
+  isCodeSentForForgotPassInProfile:null,
+  isPasswordUpdatedForgotProfile:null,
 
   //oauth states, signin/signup with social
   isRedirectURLReceivedForGoogle:false,

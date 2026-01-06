@@ -198,8 +198,11 @@ export const handleUpdateProfileImage = {
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
+        console.log("success",action.payload?.data.message);
   },
-  rejected: (state, action) => {},
+  rejected: (state, action) => {
+        console.log("error",action.payload?.data.message);
+  },
 };
 
 export const handleUpdateProfileAvatarImage = {
@@ -208,5 +211,8 @@ export const handleUpdateProfileAvatarImage = {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
   },
-  rejected: (state, action) => {},
+  rejected: (state, action) => {
+
+    
+  },
 };

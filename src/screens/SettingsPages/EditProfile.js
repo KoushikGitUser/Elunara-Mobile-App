@@ -27,6 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import UpdateEmailPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateEmailPopup";
 import UpdatePasswordPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdatePasswordPopup";
+import ForgotPasswordPopupProfile from "../../components/ProfileAndSettings/EditProfileCompo/ForgotPasswordPopupProfile";
 
 
 const EditProfile = () => {
@@ -54,6 +55,7 @@ const EditProfile = () => {
   const [originalLastName, setOriginalLastName] = useState("");
   const [updateEmailPopup,setUpdateEmailPopup] = useState(false);
   const [updatePasswordPopup,setUpdatePasswordPopup] = useState(false);
+  const [forgotPassProfilePopup,setForgotPassProfilePopup] = useState(false);
   const firstNameInputRef = React.useRef(null);
   const lastNameInputRef = React.useRef(null);
   const emailInputRef = React.useRef(null);
@@ -169,6 +171,7 @@ const EditProfile = () => {
     >
       <UpdateEmailPopup updateEmailPopup={updateEmailPopup} close={setUpdateEmailPopup}  />
       <UpdatePasswordPopup close={setUpdatePasswordPopup} updatePassPopup={updatePasswordPopup} />
+      <ForgotPasswordPopupProfile visible={forgotPassProfilePopup} close={setForgotPassProfilePopup}  />
       <MobileVerificationPopup
         close={setMobileVerificationPopup}
         mobileVerificationPopup={mobileVerificationPopup}
