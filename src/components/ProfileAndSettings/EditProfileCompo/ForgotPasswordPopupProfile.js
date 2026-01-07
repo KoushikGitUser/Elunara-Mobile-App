@@ -239,8 +239,7 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
           blurAmount={5}
           reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
         />
-        <View style={styles.androidBlur} />
-        <View style={styles.gapFiller} />
+        <View style={styles.androidBlur} /> 
 
         <TouchableOpacity
           style={styles.backdrop}
@@ -301,7 +300,7 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
                 {popupState === 'createPassword' && (
                   <>
                     <Text style={styles.title}>Create New Password</Text>
-                    <Text style={styles.description}>
+                    <Text style={[styles.description,{marginBottom:20}]}>
                       Almost there! Just set up your new password below.
                     </Text>
 
@@ -592,7 +591,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(24),
     color: "#3A3A3A",
-    marginBottom: 5,
+    marginBottom: 20,
     marginTop: 10,
     lineHeight: 36,
     fontFamily: "Mukta-Bold",
@@ -688,7 +687,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 35,
   },
   primaryButtonDisabled: {
     backgroundColor: "#CDD5DC",
@@ -702,7 +701,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 40,
   },
   resendText: {
     fontSize: scaleFont(13),

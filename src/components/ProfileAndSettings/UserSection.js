@@ -1,9 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import userImg from "../../assets/images/profilepic.png";
+import corporateAvatar from "../../assets/images/Corporate2.png";
+import teacherAvatar from "../../assets/images/Teacher2.png";
+import maleStudentAvatar from "../../assets/images/Student Male2.png";
+import femaleStudentAvatar from "../../assets/images/Student Female2.png";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setSettingsInnerPageComponentToRender,
   setSettingsInnerPageHeaderTitle,
@@ -11,25 +15,84 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import MobileVerificationPopup from "../ChatScreen/MobileVerificationPopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const UserSection = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [isMobileVerified, setIsMobileVerified] = useState(true);
+  const [profileImage, setProfileImage] = useState(null);
+  const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const checkMobileVerification = async () => {
-      const verified = await AsyncStorage.getItem("isMobileNumberVerifiedByOTP");
-      setIsMobileVerified(verified === "true");
+    const checkMobileVerification =  () => {
+      setIsMobileVerified(settingsStates?.allProfileInfos?.phone_verified);
     };
     checkMobileVerification();
+  }, [settingsStates?.allProfileInfos?.phone_verified]);
+
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/settings/profile",
+      name: "getAllProfileInfos",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
   }, []);
+
+  // Set profile image based on API data
+  useEffect(() => {
+    const profileData = settingsStates?.allProfileInfos;
+    if (profileData) {
+      if (profileData.profile_image !== null) {
+        // Profile image from API takes priority
+        setProfileImage(profileData.profile_image);
+      } else if (profileData.avatar_type !== null) {
+        // Set respective avatar from local assets
+        switch (profileData.avatar_type) {
+          case "corporate":
+            setProfileImage(corporateAvatar);
+            break;
+          case "teacher":
+            setProfileImage(teacherAvatar);
+            break;
+          case "student_male":
+            setProfileImage(maleStudentAvatar);
+            break;
+          case "student_female":
+            setProfileImage(femaleStudentAvatar);
+            break;
+          default:
+            setProfileImage(null);
+        }
+      } else {
+        // Both are null, use default local asset
+        setProfileImage(null);
+      }
+    }
+  }, [settingsStates?.allProfileInfos]);
+
   const navigation = useNavigation();
+  
   return (
     <View style={styles.upgradeBtn}>
-      <MobileVerificationPopup close={setMobileVerificationPopup} mobileVerificationPopup={mobileVerificationPopup} isFromProfile={true} />
+      <MobileVerificationPopup
+        close={setMobileVerificationPopup}
+        mobileVerificationPopup={mobileVerificationPopup}
+        isFromProfile={true}
+      />
       <View style={styles.upper}>
-        <Image source={userImg} style={styles.userImg} />
+        <Image
+          source={
+            profileImage
+              ? typeof profileImage === "string"
+                ? { uri: profileImage }
+                : profileImage
+              : userImg
+          }
+          style={styles.userImg}
+        />
         <View>
           <Text
             style={{
@@ -38,7 +101,7 @@ const UserSection = () => {
               fontFamily: "Mukta-Bold",
             }}
           >
-            Neha Jain
+            {settingsStates?.allProfileInfos?.first_name || ""} {settingsStates?.allProfileInfos?.last_name || ""}
           </Text>
           <Text
             style={{
@@ -49,7 +112,7 @@ const UserSection = () => {
               fontFamily: "Mukta-Regular",
             }}
           >
-            neha@gmail.com
+            {settingsStates?.allProfileInfos?.email || ""}
           </Text>
           {/* <Text style={{ fontSize: scaleFont(14), fontWeight: 400,color:"#757575",marginTop:3}}>
             +91 9807649876
@@ -66,9 +129,12 @@ const UserSection = () => {
           <PencilIcon />
         </TouchableOpacity>
       </View>
-      
+
       {!isMobileVerified && (
-        <TouchableOpacity onPress={()=>setMobileVerificationPopup(true)} style={styles.mobileVerifyButton}>
+        <TouchableOpacity
+          onPress={() => setMobileVerificationPopup(true)}
+          style={styles.mobileVerifyButton}
+        >
           <Text
             style={{
               fontSize: scaleFont(13),

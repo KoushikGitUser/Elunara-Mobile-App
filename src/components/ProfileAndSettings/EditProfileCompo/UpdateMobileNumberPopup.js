@@ -1,47 +1,38 @@
 import {
   View,
   Text,
+  StyleSheet,
   Modal,
   KeyboardAvoidingView,
+  Platform,
   TouchableOpacity,
   Animated,
   ScrollView,
   TextInput,
-  Platform,
-  StyleSheet,
-  Keyboard,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { scaleFont } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 import Toaster from "../../UniversalToaster/Toaster";
 import { BlurView } from "@react-native-community/blur";
 import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
-import { scaleFont } from "../../../utils/responsive";
-import { appColors } from "../../../themes/appColors";
+import { AlertCircle } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getOTPForMobileNumber, setIsMobileOTPVerified, setIsOTPReceivedForMobileVerification, verifyOTPForMobileNumber } from "../../../redux/slices/authSlice";
 import { triggerToast } from "../../../services/toast";
-import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
-import {
-  requestForEmailChange,
-  setIsEmailChangeRequestedToFalse,
-  verifyEmailChangeRequest,
-} from "../../../redux/slices/authSlice";
+import { setUserMobileNumberForMobileVerification } from "../../../redux/slices/globalDataSlice";
 
-const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [isEmailTouched, setIsEmailTouched] = useState(false);
-  const [isPasswordTouched, setIsPasswordTouched] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isMobileFocused, setIsMobileFocused] = useState(false);
+  const [mobileError, setMobileError] = useState("");
+  const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isCodeSent, setIsCodeSent] = useState(true);
   const [resendTimer, setResendTimer] = useState(0);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -50,25 +41,17 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
   const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
 
-  const validateEmail = (text, touched = isEmailTouched) => {
-    // Email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validateMobileNumber = (text, touched = isTouched) => {
+    // Indian mobile number: 10 digits starting with 6, 7, 8, or 9
+    const indianMobileRegex = /^[6-9]\d{9}$/;
     if (!text && touched) {
-      setEmailError("Email is required");
-    } else if (text && !emailRegex.test(text)) {
-      setEmailError("Please enter a valid email address");
+      setMobileError("Mobile number is required");
+    } else if (text && text.length < 10) {
+      setMobileError("Mobile number must be 10 digits");
+    } else if (text && !indianMobileRegex.test(text)) {
+      setMobileError("Please enter a valid Indian mobile number");
     } else {
-      setEmailError("");
-    }
-  };
-
-  const validatePassword = (text, touched = isPasswordTouched) => {
-    if (!text && touched) {
-      setPasswordError("Password is required");
-    } else if (text && text.length < 8) {
-      setPasswordError("Password must be at least 8 characters");
-    } else {
-      setPasswordError("");
+      setMobileError("");
     }
   };
 
@@ -76,10 +59,10 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
     if (authStates.isOTPReceivedForMobileVerification == true) {
       setIsCodeSent(true);
       setResendTimer(20);
-      dispatch(setIsOTPReceivedForMobileVerification(null));
+      
     }
     if (authStates.isMobileOTPVerified == true) {
-      AsyncStorage.setItem("isMobileNumberVerifiedByOTP", "true");
+      dispatch(setIsMobileOTPVerified(null));
       close(false);
       navigation.goBack();
       triggerToast(
@@ -89,19 +72,9 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
         3000
       );
     }
-    if (authStates.isOTPSentForEmailChange == true) {
-      setIsCodeSent(true);
-      setResendTimer(20);
-      dispatch(setIsEmailChangeRequestedToFalse());
-    }
-    if (authStates.isEmailChangeRequestVerified == true) {
-      close(false);
-    }
   }, [
     authStates.isOTPReceivedForMobileVerification,
     authStates.isMobileOTPVerified,
-    authStates.isOTPSentForEmailChange,
-    authStates.isEmailChangeRequestVerified,
   ]);
 
   // Resend timer countdown
@@ -132,40 +105,29 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
 
   const getCodeFromMobileNumber = () => {
     if (isCodeSent) {
-      const payload = {
-        otp: otp.join(""),
-      };
-      dispatch(verifyEmailChangeRequest(payload));
+      const formData = new FormData();
+      formData.append("otp", otp.join(""));
+      dispatch(verifyOTPForMobileNumber(formData));
     } else {
-      // Handle email verification logic here
-      const payload = {
-        new_email: email,
-        current_password: password,
-      };
-
-      dispatch(requestForEmailChange(payload));
+      dispatch(setUserMobileNumberForMobileVerification(mobileNumber));
+      const formData = new FormData();
+      formData.append("phone_number", mobileNumber);
+      dispatch(getOTPForMobileNumber(formData));
     }
   };
 
-  const handleEmailChange = (text) => {
-    setEmail(text);
-    if (!isEmailTouched) {
-      setIsEmailTouched(true);
+  const handleMobileChange = (text) => {
+    // Only allow digits and max 10 characters
+    const cleanedText = text.replace(/[^0-9]/g, "").slice(0, 10);
+    setMobileNumber(cleanedText);
+    // Set touched to true on first input and validate in real-time
+    if (!isTouched) {
+      setIsTouched(true);
     }
-    validateEmail(text, true);
+    validateMobileNumber(cleanedText, true);
   };
 
-  const handlePasswordChange = (text) => {
-    setPassword(text);
-    if (!isPasswordTouched) {
-      setIsPasswordTouched(true);
-    }
-    validatePassword(text, true);
-  };
-
-  const isEmailValid = email && !emailError;
-  const isPasswordValid = password && password.length >= 8 && !passwordError;
-  const isFormValid = isEmailValid && isPasswordValid;
+  const isMobileValid = mobileNumber.length === 10 && !mobileError;
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -179,7 +141,6 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
     });
 
     const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHeight(0);
       Animated.timing(animatedValue, {
         toValue: 0,
         duration: 250,
@@ -210,9 +171,10 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
       inputRefs.current[index - 1]?.focus();
     }
   };
+
   return (
     <Modal
-      visible={updateEmailPopup}
+      visible={mobileVerificationPopup}
       transparent={true}
       animationType="slide"
       onRequestClose={() => close(false)}
@@ -245,8 +207,13 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
             transform: [
               {
                 translateY: animatedValue.interpolate({
-                  inputRange: [0, 700], // average keyboard height
-                  outputRange: [0, -(keyboardHeight * 1.2)],
+                  inputRange: [0, 350], // average keyboard height
+                  outputRange: [
+                    0,
+                    isCodeSent
+                      ? -(keyboardHeight * 2.7)
+                      : -(keyboardHeight * 2.3),
+                  ],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -262,12 +229,7 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
           >
             <View style={styles.modalSheet}>
               {/* Content */}
-              <View
-                style={[
-                  styles.content,
-                  { paddingBottom: keyboardHeight > 0 ? keyboardHeight : 20 },
-                ]}
-              >
+              <View style={styles.content}>
                 {/* Title */}
                 {isCodeSent && (
                   <View style={styles.closeModalMain}>
@@ -279,37 +241,39 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
 
                 {isCodeSent ? (
                   <>
-                    <Text style={styles.title}>Enter Verification Code</Text>
+                    <Text style={styles.title}>Enter the 6-digit code</Text>
                     {/* Description */}
                     <Text style={styles.description}>
-                      We've sent a one-time password (OTP){" "}
-                      <Text
-                        style={[
-                          styles.description,
-                          {
-                            marginBottom: 35,
-                            color: "black",
-                            fontFamily: "Mukta-Bold",
-                          },
-                        ]}
-                      >
-                        {" "}
-                        {email}.
-                      </Text>{" "}
-                      Enter the code to update your email.
+                      We've sent a one-time password (OTP) to
+                    </Text>
+                    <Text
+                      style={[
+                        styles.description,
+                        {
+                          marginBottom: 35,
+                          color: "black",
+                          fontFamily: "Mukta-Bold",
+                        },
+                      ]}
+                    >
+                      {globalDataStates.userMobileNumberForMobileVerification}
                     </Text>
                   </>
                 ) : (
-                  <>
-                    <Text style={styles.title}>Update your Email Address</Text>
-                    {/* Description */}
-                    <Text style={styles.description}>
-                      Please enter your new email and current
-                    </Text>
-                    <Text style={[styles.description, { marginBottom: 10 }]}>
-                      password to update your account email.
-                    </Text>
-                  </>
+                      <>
+                        <Text style={styles.title}>
+                          Update your Mobile Number
+                        </Text>
+                        {/* Description */}
+                        <Text style={styles.description}>
+                          Please provide the new mobile 
+                        </Text>
+                        <Text
+                          style={[styles.description, { marginBottom: 35 }]}
+                        >
+                           number to update
+                        </Text>
+                      </>
                 )}
 
                 {/* Input Section */}
@@ -332,111 +296,66 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
                     ))}
                   </View>
                 ) : (
-                  <>
-                    <View style={styles.inputSection}>
-                      <Text style={styles.inputLabel}>New Email id</Text>
-                      <View
-                        style={[
-                          styles.inputWrapper,
-                          isEmailFocused && styles.inputWrapperFocused,
-                          (emailError || (isEmailTouched && !email)) &&
-                            styles.inputWrapperError,
-                        ]}
+                  <View style={styles.inputSection}>
+                    <Text style={styles.inputLabel}>Mobile Number</Text>
+                    <View
+                      style={[
+                        styles.inputWrapper,
+                        isMobileFocused && styles.inputWrapperFocused,
+                        (mobileError || (isTouched && !mobileNumber)) &&
+                          styles.inputWrapperError,
+                      ]}
+                    >
+                      <TouchableOpacity
+                        style={styles.countrySection}
+                        disabled={true}
+                        activeOpacity={1}
                       >
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Enter new email"
-                          placeholderTextColor="#9CA3AF"
-                          value={email}
-                          onChangeText={handleEmailChange}
-                          onFocus={() => setIsEmailFocused(true)}
-                          onBlur={() => {
-                            setIsEmailFocused(false);
-                            setIsEmailTouched(true);
-                            validateEmail(email, true);
-                          }}
-                          keyboardType="email-address"
-                          returnKeyType="next"
-                          autoCapitalize="none"
-                        />
-                        {emailError || (isEmailTouched && !email) ? (
-                          <View style={styles.errorIconContainer}>
-                            <AlertCircle
-                              size={20}
-                              color="#D00B0B"
-                              style={{ marginRight: 10 }}
-                            />
-                          </View>
-                        ) : null}
-                      </View>
-                      {emailError || (isEmailTouched && !email) ? (
-                        <Text style={styles.errorText}>
-                          {emailError || "Email is required"}
-                        </Text>
-                      ) : null}
-                    </View>
-                    <View style={styles.inputSection}>
-                      <Text style={styles.inputLabel}>Password</Text>
-                      <View
-                        style={[
-                          styles.inputWrapper,
-                          isPasswordFocused && styles.inputWrapperFocused,
-                          (passwordError || (isPasswordTouched && !password)) &&
-                            styles.inputWrapperError,
-                        ]}
-                      >
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Enter password"
-                          placeholderTextColor="#9CA3AF"
-                          value={password}
-                          onChangeText={handlePasswordChange}
-                          onFocus={() => setIsPasswordFocused(true)}
-                          onBlur={() => {
-                            setIsPasswordFocused(false);
-                            setIsPasswordTouched(true);
-                            validatePassword(password, true);
-                          }}
-                          secureTextEntry={!showPassword}
-                          returnKeyType="done"
-                          autoCapitalize="none"
-                        />
+                        <Text style={styles.countryText}>IN</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Enter your new mobile number"
+                        placeholderTextColor="#9CA3AF"
+                        value={mobileNumber}
+                        onChangeText={handleMobileChange}
+                        onFocus={() => setIsMobileFocused(true)}
+                        onBlur={() => {
+                          setIsMobileFocused(false);
+                          setIsTouched(true);
+                          validateMobileNumber(mobileNumber, true);
+                        }}
+                        keyboardType="phone-pad"
+                        returnKeyType="done"
+                        maxLength={10}
+                      />
+                      {mobileError || (isTouched && !mobileNumber) ? (
                         <View style={styles.errorIconContainer}>
-                          {passwordError || (isPasswordTouched && !password) ? (
-                            <AlertCircle
-                              size={20}
-                              color="#D00B0B"
-                              style={{ marginRight: 10 }}
-                            />
-                          ) : null}
-                          <TouchableOpacity
-                            onPress={() => setShowPassword(!showPassword)}
-                            style={styles.eyeIconButton}
-                          >
-                            {showPassword ? (
-                              <EyeOff size={20} color="#9CA3AF" />
-                            ) : (
-                              <Eye size={20} color="#9CA3AF" />
-                            )}
-                          </TouchableOpacity>
+                          <AlertCircle
+                            size={20}
+                            color="#D00B0B"
+                            style={{ marginRight: 10 }}
+                          />
                         </View>
-                      </View>
-                      {passwordError || (isPasswordTouched && !password) ? (
-                        <Text style={styles.errorText}>
-                          {passwordError || "Password is required"}
-                        </Text>
                       ) : null}
                     </View>
-                  </>
+                    {mobileError || (isTouched && !mobileNumber) ? (
+                      <Text style={styles.errorText}>
+                        {mobileError || "Mobile number is required"}
+                      </Text>
+                    ) : null}
+                  </View>
                 )}
 
                 {/* Verify Button */}
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    ((!isFormValid && !isCodeSent) ||
-                      authStates.isEmailChangeRequested == "pending" ||
-                      authStates.isEmailChangeRequestVerified == "pending") &&
+                    ((!isMobileValid && !isCodeSent) ||
+                      authStates.isOTPReceivedForMobileVerification ==
+                        "pending" ||
+                      (isCodeSent &&
+                        authStates.isMobileOTPVerified == "pending")) &&
                       styles.verifyButtonDisabled,
                   ]}
                   onPress={() => {
@@ -444,23 +363,28 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
                   }}
                   activeOpacity={0.8}
                   disabled={
-                    (!isCodeSent && !isFormValid) ||
-                    authStates.isEmailChangeRequested == "pending" ||
-                    authStates.isEmailChangeRequestVerified == "pending"
+                    (!isCodeSent && !isMobileValid) ||
+                    authStates.isOTPReceivedForMobileVerification ==
+                      "pending" ||
+                    (isCodeSent && authStates.isMobileOTPVerified == "pending")
                   }
                 >
-                  {authStates.isEmailChangeRequested == "pending" ||
-                  authStates.isEmailChangeRequestVerified == "pending" ? (
+                  {(
+                    isCodeSent
+                      ? authStates.isMobileOTPVerified == "pending"
+                      : authStates.isOTPReceivedForMobileVerification ==
+                        "pending"
+                  ) ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <Text style={styles.verifyButtonText}>
-                      {isCodeSent ? "Verify" : "Verify Email"}
+                      {isCodeSent ? "Continue" : "Verify"}
                     </Text>
                   )}
                 </TouchableOpacity>
 
                 {/* Skip for now / Resend Code */}
-                {isCodeSent ? (
+                {isCodeSent &&  (
                   <TouchableOpacity
                     style={[styles.skipButton, { marginBottom: 70 }]}
                     onPress={resendTimer === 0 ? resendCode : undefined}
@@ -478,7 +402,7 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
                         : "Resend Code"}
                     </Text>
                   </TouchableOpacity>
-                ) : null}
+                )}
               </View>
             </View>
           </ScrollView>
@@ -513,7 +437,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "40%",
+    height: "30%",
     backgroundColor: "white",
   },
   backdrop: {
@@ -554,7 +478,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(24),
     color: "#3A3A3A",
-    marginBottom: 5,
+    marginBottom: 20,
     marginTop: 10,
     lineHeight: 36,
     fontFamily: "Mukta-Bold",
@@ -567,7 +491,7 @@ const styles = StyleSheet.create({
   },
   inputSection: {
     marginBottom: 24,
-    marginTop: 15,
+    marginTop: 0,
   },
   inputLabel: {
     fontSize: scaleFont(12),
@@ -619,12 +543,8 @@ const styles = StyleSheet.create({
     right: 16,
     top: 0,
     bottom: 0,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  },
-  eyeIconButton: {
-    padding: 4,
   },
   errorText: {
     color: "#D00B0B",
@@ -673,8 +593,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop:20,
-    marginBottom: 40,
+    marginBottom: 60,
+    marginTop: 20,
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",
@@ -713,4 +633,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpdateEmailPopup;
+export default UpdateMobileNumberPopup;

@@ -472,6 +472,9 @@ const authSlice = createSlice({
       state.authStates.isCodeSentForForgotPassInProfile = null;
       state.authStates.isPasswordUpdatedForgotProfile = null;
     },
+    setIsMobileOTPVerified: (state, action) => {
+      state.authStates.isMobileOTPVerified = action.payload;
+    },
 
   },
   extraReducers: (builder) => {
@@ -751,10 +754,12 @@ const authSlice = createSlice({
           );
         }
       })
-      .addCase(requestForEmailChange.rejected, (state, { payload }) => {
+      .addCase(requestForEmailChange.rejected, (state, action) => {
+        const { payload } = action;
+        // console.log("requestForEmailChange rejected - request payload:", action.meta.arg);
         state.authStates.isEmailChangeRequested = false;
         state.authStates.isOTPSentForEmailChange = false;
-        if (payload?.status === 401) {
+        if (payload?.status === 400) {
           triggerToast(
             "Invalid password",
             "The password you entered is incorrect.",
@@ -764,7 +769,7 @@ const authSlice = createSlice({
         } else if (payload?.status === 422) {
           triggerToast(
             "Email already in use",
-            "This email is already registered with another account.",
+            "This email is already registered, try with another email",
             "error",
             3000
           );
@@ -931,7 +936,8 @@ export const {
   setIsOTPReceivedForMobileVerification,
   setIsOTPReceivedForAccountRecovery,
   setIsEmailChangeRequestedToFalse,
-  setForgotPasswordProfileStatesToNull
+  setForgotPasswordProfileStatesToNull,
+  setIsMobileOTPVerified,
 } = authSlice.actions;
 
 export default authSlice.reducer;

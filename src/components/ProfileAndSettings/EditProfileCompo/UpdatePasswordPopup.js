@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",

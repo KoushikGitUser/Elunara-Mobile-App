@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getOTPForMobileNumber,
   setIsOTPReceivedForMobileVerification,
+  setIsMobileOTPVerified,
   verifyOTPForMobileNumber,
 } from "../../redux/slices/authSlice";
 import { setUserMobileNumberForMobileVerification } from "../../redux/slices/globalDataSlice";
@@ -44,7 +45,7 @@ const MobileVerificationPopup = ({
   const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isCodeSent, setIsCodeSent] = useState(true);
   const [resendTimer, setResendTimer] = useState(0);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -75,6 +76,7 @@ const MobileVerificationPopup = ({
     }
     if (authStates.isMobileOTPVerified == true) {
       AsyncStorage.setItem("isMobileNumberVerifiedByOTP", "true");
+      dispatch(setIsMobileOTPVerified(null));
       close(false);
       navigation.goBack();
       triggerToast(
@@ -202,7 +204,7 @@ const MobileVerificationPopup = ({
           reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
         />
         <View style={styles.androidBlur} />
-        <View style={styles.gapFiller} />
+<View style={styles.gapFiller} />
 
         <TouchableOpacity
           style={styles.backdrop}
@@ -217,7 +219,7 @@ const MobileVerificationPopup = ({
             transform: [
               {
                 translateY: animatedValue.interpolate({
-                  inputRange: [0, 400], // average keyboard height
+                  inputRange: [0, 350], // average keyboard height
                   outputRange: [
                     0,
                     isCodeSent
@@ -368,8 +370,8 @@ const MobileVerificationPopup = ({
                   style={[
                     styles.verifyButton,
                     ((!isMobileValid && !isCodeSent) ||
-                      authStates.isOTPReceivedForMobileVerification ==
-                        "pending") &&
+                      authStates.isOTPReceivedForMobileVerification == "pending" ||
+                      (isCodeSent && authStates.isMobileOTPVerified == "pending")) &&
                       styles.verifyButtonDisabled,
                   ]}
                   onPress={() => {
@@ -378,11 +380,11 @@ const MobileVerificationPopup = ({
                   activeOpacity={0.8}
                   disabled={
                     (!isCodeSent && !isMobileValid) ||
-                    authStates.isOTPReceivedForMobileVerification == "pending"
+                    authStates.isOTPReceivedForMobileVerification == "pending" ||
+                    (isCodeSent && authStates.isMobileOTPVerified == "pending")
                   }
                 >
-                  {authStates.isOTPReceivedForMobileVerification ==
-                  "pending" ? (
+                  {(isCodeSent ? authStates.isMobileOTPVerified == "pending" : authStates.isOTPReceivedForMobileVerification == "pending") ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <Text style={styles.verifyButtonText}>
@@ -422,7 +424,7 @@ const MobileVerificationPopup = ({
 
                 {/* Note */}
                 {!isCodeSent && (
-                  <View style={[styles.noteContainer, { marginBottom: 50 }]}>
+                  <View style={[styles.noteContainer, { marginBottom: 70 }]}>
                     <Text style={styles.noteText}>
                       <Text style={styles.noteBold}>Note:</Text> You can skip
                       this step for now — but verification will be required
@@ -464,7 +466,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "40%",
+    height: "30%",
     backgroundColor: "white",
   },
   backdrop: {
@@ -620,7 +622,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 20,
+    marginTop:20
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",

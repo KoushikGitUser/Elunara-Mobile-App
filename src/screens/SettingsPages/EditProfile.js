@@ -28,20 +28,18 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import UpdateEmailPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateEmailPopup";
 import UpdatePasswordPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdatePasswordPopup";
 import ForgotPasswordPopupProfile from "../../components/ProfileAndSettings/EditProfileCompo/ForgotPasswordPopupProfile";
-
+import UpdateMobileNumberPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateMobileNumberPopup";
 
 const EditProfile = () => {
   const [isMobileVerified, setIsMobileVerified] = useState(true);
 
   useEffect(() => {
     const checkMobileVerification = async () => {
-      const verified = await AsyncStorage.getItem(
-        "isMobileNumberVerifiedByOTP"
-      );
-      setIsMobileVerified(verified === "true");
+      setIsMobileVerified(settingsStates?.allProfileInfos?.phone_verified);
+      console.log(settingsStates?.allProfileInfos);
     };
     checkMobileVerification();
-  }, []);
+  }, [settingsStates?.allProfileInfos?.phone_verified]);
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -53,9 +51,12 @@ const EditProfile = () => {
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [originalFirstName, setOriginalFirstName] = useState("");
   const [originalLastName, setOriginalLastName] = useState("");
-  const [updateEmailPopup,setUpdateEmailPopup] = useState(false);
-  const [updatePasswordPopup,setUpdatePasswordPopup] = useState(false);
-  const [forgotPassProfilePopup,setForgotPassProfilePopup] = useState(false);
+  const [updateEmailPopup, setUpdateEmailPopup] = useState(false);
+  const [updatePasswordPopup, setUpdatePasswordPopup] = useState(false);
+  const [updateMobileNumberPopup,setUpdateMobileNumberPopup] = useState(false);
+  const [forgotPassProfilePopup, setForgotPassProfilePopup] = useState(false);
+  const [hasMobileNumber, setHasMobileNumber] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState("");
   const firstNameInputRef = React.useRef(null);
   const lastNameInputRef = React.useRef(null);
   const emailInputRef = React.useRef(null);
@@ -83,13 +84,22 @@ const EditProfile = () => {
     const profileData = settingsStates?.allProfileInfos;
     if (profileData) {
       // Set profile image based on avatar_type and profile_image
-      if (profileData.avatar_type === null && profileData.profile_image === null) {
+      if (
+        profileData.avatar_type === null &&
+        profileData.profile_image === null
+      ) {
         // Default from local asset (already null, will use profilePic in Image)
         setSelectedImage(null);
-      } else if (profileData.avatar_type === null && profileData.profile_image) {
+      } else if (
+        profileData.avatar_type === null &&
+        profileData.profile_image
+      ) {
         // Profile image from API
         setSelectedImage(profileData.profile_image);
-      } else if (profileData.profile_image === null && profileData.avatar_type) {
+      } else if (
+        profileData.profile_image === null &&
+        profileData.avatar_type
+      ) {
         // Set respective avatar from local assets
         switch (profileData.avatar_type) {
           case "corporate":
@@ -121,6 +131,8 @@ const EditProfile = () => {
         setEmail(profileData.email);
       }
       setHasPassword(profileData.has_password);
+      setHasMobileNumber(profileData.phone_verified);
+      setMobileNumber(profileData.phone_number);
     }
   }, [settingsStates?.allProfileInfos]);
 
@@ -169,9 +181,20 @@ const EditProfile = () => {
         paddingTop: 3,
       }}
     >
-      <UpdateEmailPopup updateEmailPopup={updateEmailPopup} close={setUpdateEmailPopup}  />
-      <UpdatePasswordPopup close={setUpdatePasswordPopup} updatePassPopup={updatePasswordPopup} />
-      <ForgotPasswordPopupProfile visible={forgotPassProfilePopup} close={setForgotPassProfilePopup}  />
+      <UpdateEmailPopup
+        updateEmailPopup={updateEmailPopup}
+        close={setUpdateEmailPopup}
+      />
+      <UpdatePasswordPopup
+        close={setUpdatePasswordPopup}
+        updatePassPopup={updatePasswordPopup}
+        setForgotPassProfilePopup={setForgotPassProfilePopup}
+      />
+      <ForgotPasswordPopupProfile
+        visible={forgotPassProfilePopup}
+        close={setForgotPassProfilePopup}
+      />
+      <UpdateMobileNumberPopup close={setUpdateMobileNumberPopup} mobileVerificationPopup={updateMobileNumberPopup} />
       <MobileVerificationPopup
         close={setMobileVerificationPopup}
         mobileVerificationPopup={mobileVerificationPopup}
@@ -252,9 +275,7 @@ const EditProfile = () => {
             onChangeText={(text) => setEmail(text)}
             returnKeyType="done"
           />
-          <TouchableOpacity
-            onPress={() => setUpdateEmailPopup(true)}
-          >
+          <TouchableOpacity onPress={() => setUpdateEmailPopup(true)}>
             <PencilIcon />
           </TouchableOpacity>
         </View>
@@ -274,9 +295,38 @@ const EditProfile = () => {
               onChangeText={(text) => setPassword(text)}
               returnKeyType="done"
             />
-            <TouchableOpacity
-              onPress={() => setUpdatePasswordPopup(true)}
-            >
+            <TouchableOpacity onPress={() => setUpdatePasswordPopup(true)}>
+              <PencilIcon />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {hasMobileNumber && (
+        <View style={[styles.inputSection, { width: "100%" }]}>
+          <Text style={styles.inputLabel}>Mobile number</Text>
+          <View style={styles.input}>
+            <View style={{flexDirection:"row",gap:10}}> 
+              <TouchableOpacity
+                style={styles.countrySection}
+                disabled={true}
+                activeOpacity={1}
+              >
+                <Text style={styles.countryText}>IN</Text>
+              </TouchableOpacity>
+              <TextInput
+                editable={false}
+                ref={passwordInputRef}
+                style={[styles.inputText]}
+                placeholder="Your password"
+                placeholderTextColor="#9CA3AF"
+                value={mobileNumber}
+                onChangeText={(text) => setMobileNumber(text)}
+                returnKeyType="done"
+              />
+            </View>
+
+            <TouchableOpacity onPress={() => setUpdateMobileNumberPopup(true)}>
               <PencilIcon />
             </TouchableOpacity>
           </View>
@@ -335,6 +385,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: "48%",
   },
+  countrySection: {
+    paddingLeft: 14,
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  countryText: {
+    fontSize: scaleFont(14),
+    color: "#acacacff",
+    fontFamily: "Mukta-Medium",
+    borderRightWidth: 1,
+    borderRightColor: "#D4D4D4",
+    paddingRight: 10,
+  },
   inputLabel: {
     fontSize: scaleFont(12),
     fontWeight: "400",
@@ -349,7 +413,6 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
     borderRadius: 16,
     paddingHorizontal: 10,
-    paddingVertical: 5,
     color: "#1F2937",
     letterSpacing: 0.2,
     flexDirection: "row",
