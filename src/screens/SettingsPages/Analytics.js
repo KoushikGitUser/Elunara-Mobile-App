@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, StyleSheet, } from "react-native";
-import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
 import { Droplet, Flame, Image, Info } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import AnalyticsFlameIcon from "../../../assets/SvgIconsComponent/AnalyticsIcons/AnalyticsFlameIcon";
@@ -7,9 +7,18 @@ import YourStatisticsCard from "../../components/ProfileAndSettings/AnalyticsCom
 import TopicsCoveredCompo from "../../components/ProfileAndSettings/AnalyticsCompo/TopicsCoveredCompo";
 import AnalyticsGraphCompo from "../../components/ProfileAndSettings/AnalyticsCompo/AnalyticsGraphCompo";
 import WhatIsStreakPopup from "../../components/ProfileAndSettings/AnalyticsCompo/WhatIsStreakPopup";
+import { useDispatch, useSelector } from "react-redux";
+import { getAnalyticsDashboard } from "../../redux/slices/analyticsSlice";
 
 const Analytics = ({ handleScroll }) => {
-  const [whatIsStreakPopup,setWhatIsStreakPopup] = useState(false);
+  const [whatIsStreakPopup, setWhatIsStreakPopup] = useState(false);
+  const dispatch = useDispatch();
+  const { dashboard } = useSelector((state) => state.Analytics);
+
+  useEffect(() => {
+    // fetch dashboard data on component mount
+    dispatch(getAnalyticsDashboard());
+  }, []);
   return (
     <ScrollView
       onScroll={handleScroll}
@@ -26,7 +35,10 @@ const Analytics = ({ handleScroll }) => {
         },
       ]}
     >
-      <WhatIsStreakPopup close={setWhatIsStreakPopup} verificationMailSent={whatIsStreakPopup} />
+      <WhatIsStreakPopup
+        close={setWhatIsStreakPopup}
+        verificationMailSent={whatIsStreakPopup}
+      />
       <View style={styles.container}>
         <View style={styles.content}>
           {/* Left side - Number and Day Streak */}
@@ -36,10 +48,15 @@ const Analytics = ({ handleScroll }) => {
               { flexDirection: "column", justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.number}>10</Text>
+            <Text style={styles.number}>{dashboard?.day_streak || 0}</Text>
             <View style={styles.streakContainer}>
               <Text style={styles.streakText}>Day Streak</Text>
-              <Info onPress={()=>setWhatIsStreakPopup(true)} size={22} color="#666666" strokeWidth={2} />
+              <Info
+                onPress={() => setWhatIsStreakPopup(true)}
+                size={22}
+                color="#666666"
+                strokeWidth={2}
+              />
             </View>
           </View>
 
@@ -49,17 +66,26 @@ const Analytics = ({ handleScroll }) => {
           </View>
         </View>
       </View>
-      
-      <YourStatisticsCard isFilled={false}/>
+
+      <YourStatisticsCard isFilled={false} />
       <YourStatisticsCard isFilled={true} />
-       
-       <Text style={{fontSize:scaleFont(18),fontWeight:600,fontFamily:"Mukta-Medium",textAlign:"left",width:"100%",marginTop:30}}>
+
+      <Text
+        style={{
+          fontSize: scaleFont(18),
+          fontWeight: 600,
+          fontFamily: "Mukta-Medium",
+          textAlign: "left",
+          width: "100%",
+          marginTop: 30,
+        }}
+      >
         Topics covered
-       </Text>
-      <TopicsCoveredCompo isFilled={false}/>
+      </Text>
+      <TopicsCoveredCompo isFilled={false} />
       <TopicsCoveredCompo isFilled={true} />
 
-      <AnalyticsGraphCompo isFilled={false}/>
+      <AnalyticsGraphCompo isFilled={false} />
     </ScrollView>
   );
 };
@@ -95,8 +121,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  
-
 });
 
 export default Analytics;

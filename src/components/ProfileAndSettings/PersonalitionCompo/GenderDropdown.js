@@ -30,7 +30,9 @@ const GenderDropdown = ({ triggerAPICall }) => {
 
   useEffect(() => {
     if (settingsStates.allPersonalisationsSettings.personalInfos.gender?.name) {
-      setSelected(settingsStates.allPersonalisationsSettings.personalInfos.gender?.name);
+      setSelected(
+        settingsStates.allPersonalisationsSettings.personalInfos.gender?.name
+      );
     }
   }, [settingsStates.allPersonalisationsSettings.personalInfos.gender?.name]);
 
@@ -48,7 +50,7 @@ const GenderDropdown = ({ triggerAPICall }) => {
   };
 
   const handleSelect = (item) => {
-    setSelected(item);
+    setSelected(item.name);
     setVisible(false);
     triggerAPICall(item?.id);
   };
@@ -116,7 +118,7 @@ const GenderDropdown = ({ triggerAPICall }) => {
                       onPress={() => handleSelect(item)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.description}>{item}</Text>
+                      <Text style={styles.description}>{item.name}</Text>
                     </TouchableOpacity>
                   );
                 }

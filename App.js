@@ -25,8 +25,8 @@ export default function App() {
   return (
     <>
       <Provider store={Store}>
-        <Toaster />
         <AppNavigator />
+        <Toaster />
       </Provider>
     </>
   );

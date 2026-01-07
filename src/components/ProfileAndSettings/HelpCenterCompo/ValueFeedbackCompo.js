@@ -19,6 +19,7 @@ import { AntDesign } from "@expo/vector-icons";
 import ToolsContainers from "../../ChatScreen/ChatInputCompos/ToolsContainers";
 import { feedbackOptions } from "../../../data/datas";
 import { triggerToast } from "../../../services/toast";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const screenHeight = Dimensions.get("window").height;
 const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
@@ -26,6 +27,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(null);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -108,7 +110,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                 return (
                   <React.Fragment key={optionIndex}>
                     <TouchableOpacity
-                      style={[styles.card,]}
+                      style={[styles.card]}
                       onPress={() => setSelectedStyle(optionIndex)}
                       activeOpacity={0.7}
                     >
@@ -154,15 +156,17 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                       >
                         <TextInput
                           style={styles.inputText}
+                          value={feedbackMessage}
+                          onChangeText={setFeedbackMessage}
                           placeholder="Share your dream career, ambitions, 
                           or anything else you'd like us to know about you..."
                           placeholderTextColor="#9CA3AF"
                           returnKeyType="done"
+                          multiline
                         />
                       </View>
-                      
                     )}
-                    {optionIndex == 2 && <View style={{height:20}} />}
+                    {optionIndex == 2 && <View style={{ height: 20 }} />}
                   </React.Fragment>
                 );
               })}
@@ -172,8 +176,94 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                  triggerToast("Submitted","Your Feedback submitted successfully","success",3000)
-                  setPopupState(false)
+                  const typeMap = { 0: "bug", 1: "feature", 2: "general" };
+                  const feedbackType = typeMap[selectedStyle];
+
+                  if (selectedStyle === null) {
+                    triggerToast(
+                      "Error",
+                      "Please select a feedback type",
+                      "error",
+                      3000
+                    );
+                    return;
+                  }
+
+                  if (!feedbackMessage || feedbackMessage.trim().length < 10) {
+                    triggerToast(
+                      "Error",
+                      "Please provide detailed feedback (at least 10 characters)",
+                      "error",
+                      3000
+                    );
+                    return;
+                  }
+
+                  console.log("=== FEEDBACK SUBMISSION START ===");
+                  console.log("Type:", feedbackType);
+                  console.log("Message:", feedbackMessage.trim());
+
+                  // api expects json format per documentation
+                  const requestData = {
+                    type: feedbackType,
+                    message: feedbackMessage.trim(),
+                  };
+                  console.log("Request JSON:", JSON.stringify(requestData));
+
+                  dispatch(
+                    commonFunctionForAPICalls({
+                      method: "post",
+                      url: "/settings/help-center/feedback",
+                      data: requestData, // json object, not FormData
+                    })
+                  )
+                    .then((response) => {
+                      console.log("=== FEEDBACK API RESPONSE ===");
+                      console.log(
+                        "Full Response:",
+                        JSON.stringify(response, null, 2)
+                      );
+                      console.log("Response Type:", response.type);
+
+                      // ekhane closing modal first to fix toast stacking
+                      setPopupState(false);
+                      setSelectedStyle(null);
+                      setFeedbackMessage("");
+
+                      // Then show toast (will appear at top now), otherwise background e theke jabe
+                      if (response.type.includes("fulfilled")) {
+                        console.log("Feedback submitted successfully");
+                        setTimeout(() => {
+                          triggerToast(
+                            "Submitted",
+                            "Your feedback submitted successfully",
+                            "success",
+                            3000
+                          );
+                        }, 300);
+                      } else {
+                        const errorMsg =
+                          response.payload?.message ||
+                          response.error?.message ||
+                          "Failed to submit feedback";
+                        console.error("Feedback submission error:", errorMsg);
+                        console.error("Error payload:", response.payload);
+                        console.error("Error:", response.error);
+                        setTimeout(() => {
+                          triggerToast("Error", errorMsg, "error", 3000);
+                        }, 300);
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("=== FEEDBACK SUBMISSION CATCH ERROR ===");
+                      console.error(error);
+                      triggerToast(
+                        "Error",
+                        "Network error. Please try again.",
+                        "error",
+                        3000
+                      );
+                    });
                 }}
                 activeOpacity={0.8}
               >
@@ -253,7 +343,7 @@ const styles = StyleSheet.create({
   mainOptionsContainer: {
     width: "100%",
     paddingVertical: 20,
-    paddingBottom:50,
+    paddingBottom: 50,
     flexDirection: "column",
     maxHeight: screenHeight * 0.5,
   },
@@ -279,10 +369,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    
   },
-    btnsMain: {
-    paddingTop:20
+  btnsMain: {
+    paddingTop: 20,
   },
   buttonText: {
     color: "#FFFFFF",

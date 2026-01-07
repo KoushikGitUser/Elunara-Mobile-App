@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SwayamIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/SwayamIcon";
 import {
   ArrowUpRightIcon,
@@ -22,28 +22,68 @@ import { triggerToast } from "../../services/toast";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const AcademicLinks = () => {
   const [activePopupIndex, setActivePopupIndex] = useState(null);
+  const [userLinks, setUserLinks] = useState([]);
+  const [defaultLinks, setDefaultLinks] = useState([]);
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
 
+  // Fetch academic links on component mount
+  useEffect(() => {
+    fetchAcademicLinks();
+  }, []);
+
+  const fetchAcademicLinks = () => {
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "get",
+        url: "/settings/academic-links",
+      })
+    ).then((response) => {
+      if (response.type.includes("fulfilled")) {
+        const data = response.payload.data;
+        setDefaultLinks(data.default_links || []);
+        setUserLinks(data.user_links || []);
+      }
+    });
+  };
 
   const handleMorePress = (index) => {
     setActivePopupIndex(activePopupIndex === index ? null : index);
   };
 
   const handleDelete = (index) => {
-    // Handle delete logic here
-    console.log("Delete link at index:", index);
-    setActivePopupIndex(null);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "delete",
+        url: `/settings/academic-links/${index}`,
+      })
+    ).then((response) => {
+      if (response.type.includes("fulfilled")) {
+        triggerToast(
+          "Link deleted",
+          "Link has been deleted successfully",
+          "success",
+          3000
+        );
+        fetchAcademicLinks();
+      } else {
+        triggerToast("Error", "Failed to delete link", "error", 3000);
+      }
+      setActivePopupIndex(null);
+    });
   };
 
   return (
     <View style={styles.container}>
-      {toggleStates.toggleAddLinkPopup && <AddLinkPopup/>}
+      {toggleStates.toggleAddLinkPopup && (
+        <AddLinkPopup onLinkAdded={fetchAcademicLinks} />
+      )}
 
       <View style={styles.card}>
         {/* Header Section */}
@@ -94,7 +134,7 @@ const AcademicLinks = () => {
 
       <View style={styles.divider} />
 
-      {academicLinks.map((links, linkIndex) => {
+      {userLinks.map((links, linkIndex) => {
         return (
           <View key={linkIndex} style={styles.linksMain}>
             {/* Link Icon */}

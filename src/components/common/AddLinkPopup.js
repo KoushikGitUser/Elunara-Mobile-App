@@ -18,11 +18,13 @@ import { scaleFont } from "../../utils/responsive";
 import { triggerToast } from "../../services/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
-const AddLinkPopup = () => {
+const AddLinkPopup = ({ onLinkAdded }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [link, setLink] = useState("");
+  const [url, setUrl] = useState("");
+  const [description, setDescription] = useState("");
   const animatedValue = useState(new Animated.Value(0))[0];
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
@@ -84,7 +86,7 @@ const AddLinkPopup = () => {
           style={styles.backdrop}
           activeOpacity={0.5}
           onPress={() => {
-            dispatch(setToggleAddLinkPopup(false))
+            dispatch(setToggleAddLinkPopup(false));
             Keyboard.dismiss();
           }}
         />
@@ -123,11 +125,23 @@ const AddLinkPopup = () => {
                 <View style={styles.inputSection}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Add your domain (i.e. example.com)"
+                    placeholder="Add your link URL (https://example.com)"
                     placeholderTextColor="#9CA3AF"
-                    value={link}
-                    onChangeText={setLink}
-                    keyboardType="text"
+                    value={url}
+                    onChangeText={setUrl}
+                    keyboardType="url"
+                    returnKeyType="next"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <View style={styles.inputSection}>
+                  <TextInput
+                    style={[styles.input, { height: 80 }]}
+                    placeholder="Add description (optional)"
+                    placeholderTextColor="#9CA3AF"
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
                     returnKeyType="done"
                   />
                 </View>
@@ -135,20 +149,56 @@ const AddLinkPopup = () => {
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    !link && styles.verifyButtonDisabled,
+                    !url && styles.verifyButtonDisabled,
                     { marginBottom: 85 },
                   ]}
                   onPress={() => {
-                   dispatch(setToggleAddLinkPopup(false))
-                    triggerToast(
-                      "Link Added",
-                      "Link has been added successfully",
-                      "success",
-                      3000
-                    );
+                    // Basic URL validation
+                    const urlPattern = /^https?:\/\/.+/i;
+                    if (!urlPattern.test(url)) {
+                      triggerToast(
+                        "Invalid URL",
+                        "Please enter a valid URL starting with http:// or https://",
+                        "error",
+                        3000
+                      );
+                      return;
+                    }
+
+                    dispatch(
+                      commonFunctionForAPICalls({
+                        method: "post",
+                        url: "/settings/academic-links",
+                        data: {
+                          url: url.trim(),
+                          description: description.trim() || undefined,
+                        },
+                      })
+                    ).then((response) => {
+                      if (response.type.includes("fulfilled")) {
+                        dispatch(setToggleAddLinkPopup(false));
+                        triggerToast(
+                          "Link Added",
+                          "Link has been added successfully",
+                          "success",
+                          3000
+                        );
+                        setUrl("");
+                        setDescription("");
+                        // Notify parent to refresh
+                        if (onLinkAdded) onLinkAdded();
+                      } else {
+                        triggerToast(
+                          "Error",
+                          "Failed to add link. Please try again.",
+                          "error",
+                          3000
+                        );
+                      }
+                    });
                   }}
                   activeOpacity={0.8}
-                  disabled={!link}
+                  disabled={!url}
                 >
                   <Text style={styles.verifyButtonText}>Add Link</Text>
                 </TouchableOpacity>
