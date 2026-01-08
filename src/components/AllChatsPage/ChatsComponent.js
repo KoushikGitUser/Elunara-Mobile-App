@@ -1,25 +1,28 @@
 import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { MessageCircle, MoreVertical } from "lucide-react-native";
 import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
-import OptionsPopup from "./OptionsPopup";
 
-const ChatsComponent = ({ title, subject, roomName, onPress,index  }) => {
+const ChatsComponent = ({ title, subject, roomName, onPress, setPopupPosition }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const dispatch = useDispatch();
   const menuButtonRef = React.useRef(null);
-  const { toggleStates } = useSelector((state) => state.Toggle);
-   const [optionsIndex,setOptionsIndex] = useState(null)
+
+  const handleMenuPress = () => {
+    menuButtonRef.current?.measureInWindow((x, y, width, height) => {
+      setPopupPosition({ x: x + width, y: y + height });
+      dispatch(setToggleAllChatsOptionsPopup(true));
+    });
+  };
 
   return (
     <TouchableOpacity
       style={styles.cardContainer}
       onPress={onPress}
     >
-      {(toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index) && <OptionsPopup/>}
       <View style={styles.cardContent}>
         {/* Chat Icon */}
         <View style={styles.iconContainer}>
@@ -47,9 +50,7 @@ const ChatsComponent = ({ title, subject, roomName, onPress,index  }) => {
             styles.menuButton,
             pressed && styles.menuPressed,
           ]}
-         onPress={() => {dispatch(setToggleAllChatsOptionsPopup(true));
-             setOptionsIndex(index);
-          }}
+          onPress={handleMenuPress}
         >
           <MoreVertical size={24} color="#000000ff" strokeWidth={2} />
         </Pressable>

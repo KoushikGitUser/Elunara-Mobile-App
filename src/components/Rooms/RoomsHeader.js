@@ -14,7 +14,7 @@ import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
 import { Feather } from "@expo/vector-icons";
 import { EllipsisVertical, Plus } from "lucide-react-native";
 import PlusButtonPopup from "../Modals/Rooms/PlusButtonPopup";
-import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
+import RoomsHeaderOptionsPopup from "../Modals/Rooms/RoomsHeaderOptionsPopup";
 
 const RoomsHeader = ({ translateX }) => {
   const styleProps = {};
@@ -44,7 +44,7 @@ const RoomsHeader = ({ translateX }) => {
   return (
     <View style={[styles.roomsHeader, isKeyboardVisible && { borderBottomWidth: 1, borderBottomColor: '#D3DAE5' }]}>
       {addOptionsPopup && <PlusButtonPopup setAddOptionsPopup={setAddOptionsPopup} />}
-      {roomOptionsPopup && <RoomsOptionsPopup setRoomOptionsPopup={setRoomOptionsPopup} />}
+      {roomOptionsPopup && <RoomsHeaderOptionsPopup close={setRoomOptionsPopup} />}
       <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {

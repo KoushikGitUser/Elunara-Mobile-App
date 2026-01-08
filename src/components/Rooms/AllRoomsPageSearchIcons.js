@@ -29,8 +29,8 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
     <View
       style={[styles.searchAndIcons, { paddingHorizontal: 20, marginTop: 15 }]}
     >
-      {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} />}
-      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
+      {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} />}
+      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} top={50} right={30} />}
       <View
         style={[
           styles.searchInputMain,
@@ -54,10 +54,10 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
-        <TouchableOpacity onPress={()=>setToggleSortingPopup(true)}>
+        <TouchableOpacity onPress={()=>{setToggleFilterPopup(false); setToggleSortingPopup(true);}}>
           <ArrowUpDownIcon />
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>setToggleFilterPopup(true)}>
+        <TouchableOpacity onPress={()=>{setToggleSortingPopup(false); setToggleFilterPopup(true);}}>
           <FilterIcon />
         </TouchableOpacity>
         <TouchableOpacity>

@@ -22,7 +22,7 @@ import { useFonts } from "expo-font";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
 
 const Rooms = ({ route }) => {
-  const { roomName } = route.params;
+  const { roomName } = route.params || "Room name";
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();

@@ -19,6 +19,7 @@ import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
+import RoomsOptionsPopup from "../../components/Modals/Rooms/RoomsOptionsPopup";
 
 const AllRoomsLandingPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
@@ -26,7 +27,8 @@ const AllRoomsLandingPage = () => {
   const [selectedArray, setSelectedArray] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [checked, setChecked] = useState(false);
-    const { toggleStates } = useSelector((state) => state.Toggle);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
 
   const handleSelectAll = () => {
@@ -117,11 +119,13 @@ const AllRoomsLandingPage = () => {
                 selectedArray={selectedArray}
                 setIsSelecting={setIsSelecting}
                 setSelectedArray={setSelectedArray}
+                setPopupPosition={setPopupPosition}
               />
             );
           })}
         </ScrollView>
       </Animated.View>
+      <RoomsOptionsPopup popupPosition={popupPosition} />
     </SafeAreaView>
   );
 };

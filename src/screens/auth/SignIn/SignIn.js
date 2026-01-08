@@ -398,7 +398,7 @@ const SignIn = () => {
           </TouchableOpacity>
 
           {/* Apple Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               Linking.openURL(
                 "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
@@ -409,7 +409,7 @@ const SignIn = () => {
           >
             <Image source={apple} style={styles.socialIcons} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
     </SafeAreaView>

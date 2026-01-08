@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   StyleSheet,
+  Modal,
 } from "react-native";
 import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
@@ -18,7 +19,7 @@ import {
 import { allChatsOptionsPopupData } from "../../data/datas";
 import { moderateScale } from "../../utils/responsive";
 
-const OptionsPopup = () => {
+const OptionsPopup = ({ popupPosition }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -36,34 +37,45 @@ const OptionsPopup = () => {
     }
   };
 
+  const closePopup = () => {
+    dispatch(setToggleAllChatsOptionsPopup(false));
+  };
+
   return (
-    <>
+    <Modal
+      visible={toggleStates.toggleAllChatsOptionsPopup}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={closePopup}
+    >
       <TouchableOpacity
-        onPress={() => dispatch(setToggleAllChatsOptionsPopup(false))}
+        onPress={closePopup}
         style={styles.optionsPopupWrapper}
-      ></TouchableOpacity>
-      <View style={styles.notesPopup}>
-        {allChatsOptionsPopupData?.map((options,optionIndex)=>{
-          return(
-        <Pressable
-        key={optionIndex}
-          onPress={() => {
-            setSharePopup(false);
-          }}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          {options?.icon}
-          <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>{options.title} </Text>
-        </Pressable>
-          )
-        })}
-      </View>
-    </>
+        activeOpacity={1}
+      >
+        <View style={[styles.notesPopup, popupPosition && { top: popupPosition.y, right: width - popupPosition.x }]}>
+          {allChatsOptionsPopupData?.map((options, optionIndex) => {
+            return (
+              <Pressable
+                key={optionIndex}
+                onPress={() => {
+                  closePopup();
+                }}
+                style={({ pressed }) => [
+                  {
+                    backgroundColor: pressed ? "#EEF4FF" : "transparent",
+                  },
+                  styles.notesPopupOptions,
+                ]}
+              >
+                {options?.icon}
+                <Text style={{ fontFamily: "Mukta-Regular", fontSize: 17 }}>{options.title} </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
@@ -78,10 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     padding: 7,
     width: "auto",
-    top: 33,
-    right: 0,
-    zIndex: 9999,
-    elevation: 9999,
+    right: 20,
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -99,13 +108,7 @@ const styles = StyleSheet.create({
     paddingRight: 40,
   },
   optionsPopupWrapper: {
-    position: "absolute",
-    bottom: 0,
-    left: -20,
-    width,
-    height,
-    zIndex: 9998,
-    elevation: 9998,
+    flex: 1,
     backgroundColor: "transparent",
   },
 });

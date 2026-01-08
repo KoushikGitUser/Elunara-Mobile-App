@@ -4,33 +4,35 @@ import {
   Pressable,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from "react-native";
-import React, { useState } from "react";
-import { Check, MessageCircle, MoreVertical } from "lucide-react-native";
-import { scaleFont, verticalScale } from "../../utils/responsive";
-import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import React, { useRef } from "react";
+import { Check, MoreVertical } from "lucide-react-native";
+import { scaleFont } from "../../utils/responsive";
+import { useDispatch } from "react-redux";
 import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
-import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
+import { setToggleAllRoomsOptionsPopup } from "../../redux/slices/toggleSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const ChatsScrollForAllRoomsPage = ({
   title,
   subject,
-  roomName,
-  onPress,
   index,
   isSelecting,
   setIsSelecting,
   selectedArray,
-  setSelectedArray
+  setSelectedArray,
+  setPopupPosition,
 }) => {
-  const navigation = useNavigation();
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
-  const [optionsIndex, setOptionsIndex] = useState(null);
+  const navigation = useNavigation();
+  const menuButtonRef = useRef(null);
+
+  const handleMenuPress = () => {
+    menuButtonRef.current?.measureInWindow((x, y, width, height) => {
+      setPopupPosition({ x: x + width, y: y + height });
+      dispatch(setToggleAllRoomsOptionsPopup(true));
+    });
+  };
 
 
   const CheckBox = ({ selected }) => {
@@ -60,19 +62,13 @@ const ChatsScrollForAllRoomsPage = ({
           }
         }
       }
+      else{
+        navigation.navigate("rooms",{roomName:title})
+      }
     }}>
-      <View
-        style={[
-          styles.cardContent,
-          { zIndex: optionsIndex == index ? 99999 : 9 },
-        ]}
-      >
-        {toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index && (
-          <RoomsOptionsPopup setRoomOptionsPopup={setOptionsIndex} />
-        )}
-        
+      <View style={styles.cardContent}>
         {isSelecting && <CheckBox selected={selectedArray.includes(index)} />}
-        
+
         {/* Chat Icon */}
         <View style={styles.iconContainer}>
           <FolderIcon />
@@ -88,13 +84,14 @@ const ChatsScrollForAllRoomsPage = ({
 
         {/* Menu Icon */}
         <Pressable
+          ref={menuButtonRef}
           style={({ pressed }) => [
             styles.menuButton,
             pressed && styles.menuPressed,
           ]}
-          onPress={() => {
-            dispatch(setToggleAllChatsOptionsPopup(true));
-            setOptionsIndex(index);
+          onPress={(e) => {
+            e.stopPropagation();
+            handleMenuPress();
           }}
         >
           <MoreVertical size={24} color="#000000ff" strokeWidth={2} />

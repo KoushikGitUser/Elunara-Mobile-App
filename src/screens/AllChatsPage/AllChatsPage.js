@@ -82,16 +82,18 @@ const AllChatsPage = () => {
           {allChatsData.map((chat, chatsIndex) => {
             return (
               <ChatsComponent
-              key={chatsIndex}
-              index={chat.id}
-              title={chat.title}
-              subject={chat.subject}
-              roomName={chat.roomName}
-            />
+                key={chatsIndex}
+                index={chat.id}
+                title={chat.title}
+                subject={chat.subject}
+                roomName={chat.roomName}
+                setPopupPosition={setPopupPosition}
+              />
             );
           })}
         </ScrollView>
       </Animated.View>
+      <OptionsPopup popupPosition={popupPosition} />
     </SafeAreaView>
   );
 };

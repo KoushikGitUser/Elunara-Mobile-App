@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Pressable,
   StyleSheet,
+  Modal,
 } from "react-native";
 import React from "react";
 import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
@@ -13,84 +14,96 @@ import PinIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/P
 import TrashIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup } from "../../../redux/slices/toggleSlice";
+import { setToggleAllRoomsOptionsPopup, setToggleDeleteChatConfirmPopup, setToggleRenameChatPopup } from "../../../redux/slices/toggleSlice";
 import { triggerToast } from "../../../services/toast";
 
 const { width, height } = Dimensions.get("window");
 
-const RoomsOptionsPopup = ({ setRoomOptionsPopup }) => {
+const RoomsOptionsPopup = ({ popupPosition }) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
 
+  const closePopup = () => {
+    dispatch(setToggleAllRoomsOptionsPopup(false));
+  };
+
   return (
-    <>
+    <Modal
+      visible={toggleStates.toggleAllRoomsOptionsPopup}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={closePopup}
+    >
       <TouchableOpacity
-        onPress={() => setRoomOptionsPopup(false)}
+        onPress={closePopup}
         style={styles.optionsPopupWrapper}
-      ></TouchableOpacity>
-      <View style={styles.notesPopup}>
-        <Pressable
-          onPress={() => {
-            setRoomOptionsPopup(false);
-            dispatch(setToggleRenameChatPopup(true))
-          }}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          <RenameIcon />
-          <Text style={{fontFamily:"Mukta-Regular"}}>Rename</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setRoomOptionsPopup(false);
-            navigation.navigate("roomDetails")
-          }}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          <FilesIcon />
-          <Text style={{fontFamily:"Mukta-Regular"}}>Edit Details</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setRoomOptionsPopup(false);
-            triggerToast("Room pinned","Room pinned successfully","success",3000)
-          }}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          <PinIcon />
-          <Text style={{fontFamily:"Mukta-Regular"}}>Pin</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {setRoomOptionsPopup(false);
-            dispatch(setToggleDeleteChatConfirmPopup(true))
-          }}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          <TrashIcon />
-          <Text style={{fontFamily:"Mukta-Regular"}}>Delete</Text>
-        </Pressable>
-      </View>
-    </>
+        activeOpacity={1}
+      >
+        <View style={[styles.notesPopup, popupPosition && { top: popupPosition.y, right: width - popupPosition.x }]}>
+          <Pressable
+            onPress={() => {
+              closePopup();
+              dispatch(setToggleRenameChatPopup(true))
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? "#EEF4FF" : "transparent",
+              },
+              styles.notesPopupOptions,
+            ]}
+          >
+            <RenameIcon />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Rename</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              closePopup();
+              navigation.navigate("roomDetails")
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? "#EEF4FF" : "transparent",
+              },
+              styles.notesPopupOptions,
+            ]}
+          >
+            <FilesIcon />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Edit Details</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              closePopup();
+              triggerToast("Room pinned", "Room pinned successfully", "success", 3000)
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? "#EEF4FF" : "transparent",
+              },
+              styles.notesPopupOptions,
+            ]}
+          >
+            <PinIcon />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Pin</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              closePopup();
+              dispatch(setToggleDeleteChatConfirmPopup(true))
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? "#EEF4FF" : "transparent",
+              },
+              styles.notesPopupOptions,
+            ]}
+          >
+            <TrashIcon />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Delete</Text>
+          </Pressable>
+        </View>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
@@ -103,9 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     padding: 7,
     width: "auto",
-    top: 60,
-    right: 0,
-    zIndex: 999,
+    right: 20,
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -123,12 +134,7 @@ const styles = StyleSheet.create({
     paddingRight: 40,
   },
   optionsPopupWrapper: {
-    position: "absolute",
-    top: 0,
-    left: -20,
-    width,
-    height,
-    zIndex: 99,
+    flex: 1,
     backgroundColor: "transparent",
   },
 });

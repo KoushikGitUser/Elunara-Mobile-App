@@ -28,8 +28,8 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
 
   return (
     <View style={styles.searchAndIcons}>
-       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} />}
-      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
+       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} />}
+      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} top={50} right={30} />}
       <View
         style={[
           styles.searchInputMain,
