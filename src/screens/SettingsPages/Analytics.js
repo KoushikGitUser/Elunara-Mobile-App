@@ -8,16 +8,21 @@ import TopicsCoveredCompo from "../../components/ProfileAndSettings/AnalyticsCom
 import AnalyticsGraphCompo from "../../components/ProfileAndSettings/AnalyticsCompo/AnalyticsGraphCompo";
 import WhatIsStreakPopup from "../../components/ProfileAndSettings/AnalyticsCompo/WhatIsStreakPopup";
 import { useDispatch, useSelector } from "react-redux";
-import { getAnalyticsDashboard } from "../../redux/slices/analyticsSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const Analytics = ({ handleScroll }) => {
   const [whatIsStreakPopup, setWhatIsStreakPopup] = useState(false);
   const dispatch = useDispatch();
-  const { dashboard } = useSelector((state) => state.Analytics);
+  const { settingsStates } = useSelector((state) => state.API);
 
   useEffect(() => {
-    // fetch dashboard data on component mount
-    dispatch(getAnalyticsDashboard());
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/analytics/dashboard",
+        name: "getAnalyticsDashboard",
+      })
+    );
   }, []);
   return (
     <ScrollView
@@ -48,7 +53,9 @@ const Analytics = ({ handleScroll }) => {
               { flexDirection: "column", justifyContent: "flex-start" },
             ]}
           >
-            <Text style={styles.number}>{dashboard?.day_streak || 0}</Text>
+            <Text style={styles.number}>
+              {settingsStates.analyticsDashboard?.day_streak || 0}
+            </Text>
             <View style={styles.streakContainer}>
               <Text style={styles.streakText}>Day Streak</Text>
               <Info

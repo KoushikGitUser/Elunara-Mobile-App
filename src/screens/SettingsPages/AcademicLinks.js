@@ -28,30 +28,36 @@ const { width, height } = Dimensions.get("window");
 
 const AcademicLinks = () => {
   const [activePopupIndex, setActivePopupIndex] = useState(null);
-  const [userLinks, setUserLinks] = useState([]);
-  const [defaultLinks, setDefaultLinks] = useState([]);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
   // Fetch academic links on component mount
   useEffect(() => {
-    fetchAcademicLinks();
-  }, []);
-
-  const fetchAcademicLinks = () => {
     dispatch(
       commonFunctionForAPICalls({
-        method: "get",
+        method: "GET",
         url: "/settings/academic-links",
+        name: "getAcademicLinks",
       })
-    ).then((response) => {
-      if (response.type.includes("fulfilled")) {
-        const data = response.payload.data;
-        setDefaultLinks(data.default_links || []);
-        setUserLinks(data.user_links || []);
-      }
-    });
-  };
+    );
+  }, []);
+
+  // Refetch when link is added or deleted
+  useEffect(() => {
+    if (
+      settingsStates.academicLinkAdded ||
+      settingsStates.academicLinkDeleted
+    ) {
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: "/settings/academic-links",
+          name: "getAcademicLinks",
+        })
+      );
+    }
+  }, [settingsStates.academicLinkAdded, settingsStates.academicLinkDeleted]);
 
   const handleMorePress = (index) => {
     setActivePopupIndex(activePopupIndex === index ? null : index);
@@ -60,30 +66,17 @@ const AcademicLinks = () => {
   const handleDelete = (index) => {
     dispatch(
       commonFunctionForAPICalls({
-        method: "delete",
+        method: "DELETE",
         url: `/settings/academic-links/${index}`,
+        name: "deleteAcademicLink",
       })
-    ).then((response) => {
-      if (response.type.includes("fulfilled")) {
-        triggerToast(
-          "Link deleted",
-          "Link has been deleted successfully",
-          "success",
-          3000
-        );
-        fetchAcademicLinks();
-      } else {
-        triggerToast("Error", "Failed to delete link", "error", 3000);
-      }
-      setActivePopupIndex(null);
-    });
+    );
+    setActivePopupIndex(null);
   };
 
   return (
     <View style={styles.container}>
-      {toggleStates.toggleAddLinkPopup && (
-        <AddLinkPopup onLinkAdded={fetchAcademicLinks} />
-      )}
+      {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
 
       <View style={styles.card}>
         {/* Header Section */}
@@ -134,69 +127,71 @@ const AcademicLinks = () => {
 
       <View style={styles.divider} />
 
-      {userLinks.map((links, linkIndex) => {
-        return (
-          <View key={linkIndex} style={styles.linksMain}>
-            {/* Link Icon */}
-            <View style={styles.iconContainer}>
-              <LinkIcon />
-            </View>
+      {(settingsStates.academicLinks?.userLinks || []).map(
+        (links, linkIndex) => {
+          return (
+            <View key={linkIndex} style={styles.linksMain}>
+              {/* Link Icon */}
+              <View style={styles.iconContainer}>
+                <LinkIcon />
+              </View>
 
-            {/* Link Details */}
-            <View style={styles.linkDetails}>
-              <Text style={styles.url}>{links.link} </Text>
-              <Text style={styles.description}>{links.linkDesc} </Text>
-            </View>
+              {/* Link Details */}
+              <View style={styles.linkDetails}>
+                <Text style={styles.url}>{links.link} </Text>
+                <Text style={styles.description}>{links.linkDesc} </Text>
+              </View>
 
-            {/* More Options Button */}
-            <View style={styles.moreButtonContainer}>
-              <TouchableOpacity
-                style={styles.moreButton}
-                onPress={() => handleMorePress(linkIndex)}
-              >
-                <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
-              </TouchableOpacity>
+              {/* More Options Button */}
+              <View style={styles.moreButtonContainer}>
+                <TouchableOpacity
+                  style={styles.moreButton}
+                  onPress={() => handleMorePress(linkIndex)}
+                >
+                  <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
+                </TouchableOpacity>
 
-              {/* Delete Popup */}
-              {activePopupIndex === linkIndex && (
-                <>
-                  <TouchableOpacity
-                    style={styles.popupOverlay}
-                    onPress={() => {
-                      setActivePopupIndex(null);
-                      triggerToast(
-                        "Link deleted",
-                        "Link has been deleted successfully",
-                        "success",
-                        3000
-                      );
-                    }}
-                  ></TouchableOpacity>
-                  <Pressable style={styles.popup}>
-                    <View style={styles.deletePopup}>
-                      <TouchableOpacity
-                        style={styles.deleteOption}
-                        onPress={() => {
-                          setActivePopupIndex(null);
-                          triggerToast(
-                            "Link deleted",
-                            "Link has been deleted successfully",
-                            "success",
-                            3000
-                          );
-                        }}
-                      >
-                        <Trash2 size={18} color="#3A3A3A" strokeWidth={2} />
-                        <Text style={styles.deleteText}>Delete</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Pressable>
-                </>
-              )}
+                {/* Delete Popup */}
+                {activePopupIndex === linkIndex && (
+                  <>
+                    <TouchableOpacity
+                      style={styles.popupOverlay}
+                      onPress={() => {
+                        setActivePopupIndex(null);
+                        triggerToast(
+                          "Link deleted",
+                          "Link has been deleted successfully",
+                          "success",
+                          3000
+                        );
+                      }}
+                    ></TouchableOpacity>
+                    <Pressable style={styles.popup}>
+                      <View style={styles.deletePopup}>
+                        <TouchableOpacity
+                          style={styles.deleteOption}
+                          onPress={() => {
+                            setActivePopupIndex(null);
+                            triggerToast(
+                              "Link deleted",
+                              "Link has been deleted successfully",
+                              "success",
+                              3000
+                            );
+                          }}
+                        >
+                          <Trash2 size={18} color="#3A3A3A" strokeWidth={2} />
+                          <Text style={styles.deleteText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </Pressable>
+                  </>
+                )}
+              </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        }
+      )}
     </View>
   );
 };

@@ -198,10 +198,10 @@ export const handleUpdateProfileImage = {
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
-        console.log("success",action.payload?.data.message);
+    console.log("success", action.payload?.data.message);
   },
   rejected: (state, action) => {
-        console.log("error",action.payload?.data.message);
+    console.log("error", action.payload?.data.message);
   },
 };
 
@@ -211,8 +211,145 @@ export const handleUpdateProfileAvatarImage = {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
   },
-  rejected: (state, action) => {
+  rejected: (state, action) => {},
+};
 
-    
+// Help Center Feedback
+export const handleSubmitHelpCenterFeedback = {
+  pending: (state) => {
+    state.settingsStates.isSubmittingFeedback = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.isSubmittingFeedback = false;
+    state.settingsStates.feedbackSubmitted = true;
+    triggerToast(
+      "Submitted",
+      "Your feedback submitted successfully",
+      "success",
+      3000
+    );
+  },
+  rejected: (state, action) => {
+    state.settingsStates.isSubmittingFeedback = false;
+    state.settingsStates.feedbackSubmitted = false;
+    triggerToast(
+      "Error",
+      action.payload?.message || "Failed to submit feedback",
+      "error",
+      3000
+    );
+  },
+};
+
+// Academic Links - GET
+export const handleGetAcademicLinks = {
+  pending: (state) => {
+    state.settingsStates.fetchingAcademicLinks = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingAcademicLinks = false;
+    state.settingsStates.academicLinks = {
+      defaultLinks: action.payload?.data?.data?.default_links || [],
+      userLinks: action.payload?.data?.data?.user_links || [],
+    };
+  },
+  rejected: (state, action) => {
+    state.settingsStates.fetchingAcademicLinks = false;
+  },
+};
+
+// Academic Links - POST (Add)
+export const handleAddAcademicLink = {
+  pending: (state) => {
+    state.settingsStates.addingAcademicLink = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.addingAcademicLink = false;
+    state.settingsStates.academicLinkAdded = true;
+    triggerToast(
+      "Link Added",
+      "Link has been added successfully",
+      "success",
+      3000
+    );
+  },
+  rejected: (state, action) => {
+    state.settingsStates.addingAcademicLink = false;
+    state.settingsStates.academicLinkAdded = false;
+    triggerToast(
+      "Error",
+      action.payload?.message || "Failed to add link",
+      "error",
+      3000
+    );
+  },
+};
+
+// Academic Links - DELETE
+export const handleDeleteAcademicLink = {
+  pending: (state) => {
+    state.settingsStates.deletingAcademicLink = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.deletingAcademicLink = false;
+    state.settingsStates.academicLinkDeleted = true;
+    triggerToast(
+      "Link Deleted",
+      "Link has been deleted successfully",
+      "success",
+      3000
+    );
+  },
+  rejected: (state, action) => {
+    state.settingsStates.deletingAcademicLink = false;
+    state.settingsStates.academicLinkDeleted = false;
+    triggerToast(
+      "Error",
+      action.payload?.message || "Failed to delete link",
+      "error",
+      3000
+    );
+  },
+};
+
+// Analytics Dashboard
+export const handleGetAnalyticsDashboard = {
+  pending: (state) => {
+    state.settingsStates.fetchingAnalyticsDashboard = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingAnalyticsDashboard = false;
+    state.settingsStates.analyticsDashboard = action.payload?.data?.data || {};
+  },
+  rejected: (state, action) => {
+    state.settingsStates.fetchingAnalyticsDashboard = false;
+  },
+};
+
+// Analytics Topics
+export const handleGetAnalyticsTopics = {
+  pending: (state) => {
+    state.settingsStates.fetchingAnalyticsTopics = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingAnalyticsTopics = false;
+    state.settingsStates.analyticsTopics = action.payload?.data?.data || [];
+  },
+  rejected: (state, action) => {
+    state.settingsStates.fetchingAnalyticsTopics = false;
+  },
+};
+
+// Analytics Subjects
+export const handleGetAnalyticsSubjects = {
+  pending: (state) => {
+    state.settingsStates.fetchingAnalyticsSubjects = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingAnalyticsSubjects = false;
+    state.settingsStates.analyticsSubjects = action.payload?.data?.data || [];
+  },
+  rejected: (state, action) => {
+    state.settingsStates.fetchingAnalyticsSubjects = false;
   },
 };

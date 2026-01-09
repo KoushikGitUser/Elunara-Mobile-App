@@ -199,71 +199,21 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                     return;
                   }
 
-                  console.log("=== FEEDBACK SUBMISSION START ===");
-                  console.log("Type:", feedbackType);
-                  console.log("Message:", feedbackMessage.trim());
-
-                  // api expects json format per documentation
-                  const requestData = {
-                    type: feedbackType,
-                    message: feedbackMessage.trim(),
-                  };
-                  console.log("Request JSON:", JSON.stringify(requestData));
-
                   dispatch(
                     commonFunctionForAPICalls({
-                      method: "post",
+                      method: "POST",
                       url: "/settings/help-center/feedback",
-                      data: requestData, // json object, not FormData
+                      data: {
+                        type: feedbackType,
+                        message: feedbackMessage.trim(),
+                      },
+                      name: "submitHelpCenterFeedback",
                     })
-                  )
-                    .then((response) => {
-                      console.log("=== FEEDBACK API RESPONSE ===");
-                      console.log(
-                        "Full Response:",
-                        JSON.stringify(response, null, 2)
-                      );
-                      console.log("Response Type:", response.type);
+                  );
 
-                      // ekhane closing modal first to fix toast stacking
-                      setPopupState(false);
-                      setSelectedStyle(null);
-                      setFeedbackMessage("");
-
-                      // Then show toast (will appear at top now), otherwise background e theke jabe
-                      if (response.type.includes("fulfilled")) {
-                        console.log("Feedback submitted successfully");
-                        setTimeout(() => {
-                          triggerToast(
-                            "Submitted",
-                            "Your feedback submitted successfully",
-                            "success",
-                            3000
-                          );
-                        }, 300);
-                      } else {
-                        const errorMsg =
-                          response.payload?.message ||
-                          response.error?.message ||
-                          "Failed to submit feedback";
-                        console.error("Feedback submission error:", errorMsg);
-                        console.error("Error payload:", response.payload);
-                        console.error("Error:", response.error);
-                        setTimeout(() => {
-                          triggerToast("Error", errorMsg, "error", 3000);
-                        }, 300);
-                      }
-                    })
-                    .catch((error) => {
-                      console.error("=== FEEDBACK SUBMISSION CATCH ERROR ===");
-                      console.error(error);
-                      triggerToast(
-                        "Error",
-                        "Network error. Please try again.",
-                        "error",
-                        3000
-                      );
-                    });
+                  setPopupState(false);
+                  setSelectedStyle(null);
+                  setFeedbackMessage("");
                 }}
                 activeOpacity={0.8}
               >

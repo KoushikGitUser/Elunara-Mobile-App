@@ -3,7 +3,6 @@ import AuthSlice from "../slices/authSlice";
 import ToggleSlice from "../slices/toggleSlice";
 import GlobalDataSlice from "../slices/globalDataSlice";
 import apiCommonSlice from "../slices/apiCommonSlice";
-import analyticsSlice from "../slices/analyticsSlice";
 
 export const Store = configureStore({
   reducer: {
@@ -11,7 +10,6 @@ export const Store = configureStore({
     Toggle: ToggleSlice,
     Global: GlobalDataSlice,
     API: apiCommonSlice,
-    Analytics: analyticsSlice,
   },
 });
 

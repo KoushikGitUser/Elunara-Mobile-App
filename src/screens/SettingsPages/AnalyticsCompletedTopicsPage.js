@@ -24,16 +24,16 @@ import { ArrowUpRight, Book, Search } from "lucide-react-native";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
 import GradientText from "../../components/common/GradientText";
 import serachIcon from "../../assets/images/searchtopic.png";
-import { getAnalyticsTopics } from "../../redux/slices/analyticsSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const AnalyticsCompletedTopicsPage = ({
   scrollY,
   isSearching,
   setIsSearching,
-  subjectId = 1, // defauting to financr
+  subjectId = 1,
 }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { topics, loading } = useSelector((state) => state.Analytics);
+  const { settingsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
   const inputRef = useRef();
@@ -44,10 +44,10 @@ const AnalyticsCompletedTopicsPage = ({
 
   useEffect(() => {
     dispatch(
-      getAnalyticsTopics({
-        subject_id: subjectId,
-        sort_by: sortBy,
-        sort_order: sortOrder,
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: `/analytics/topics?subject_id=${subjectId}&sort_by=${sortBy}&sort_order=${sortOrder}`,
+        name: "getAnalyticsTopics",
       })
     );
   }, [subjectId, sortBy, sortOrder]);
@@ -133,7 +133,7 @@ const AnalyticsCompletedTopicsPage = ({
               color: "#5E5E5E",
             }}
           >
-            12/{topics.length || 14} topics explored
+            12/{settingsStates.analyticsTopics?.length || 14} topics explored
           </Text>
         </View>
         <View
@@ -174,8 +174,9 @@ const AnalyticsCompletedTopicsPage = ({
       </View>
 
       <ScrollView style={styles.scroll}>
-        {topics && topics.length > 0 ? (
-          topics.map((topic, topicIndex) => (
+        {settingsStates.analyticsTopics &&
+        settingsStates.analyticsTopics.length > 0 ? (
+          settingsStates.analyticsTopics.map((topic, topicIndex) => (
             <TouchableOpacity key={topicIndex} style={styles.container}>
               <View
                 style={[

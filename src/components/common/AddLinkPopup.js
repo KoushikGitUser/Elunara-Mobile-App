@@ -167,35 +167,19 @@ const AddLinkPopup = ({ onLinkAdded }) => {
 
                     dispatch(
                       commonFunctionForAPICalls({
-                        method: "post",
+                        method: "POST",
                         url: "/settings/academic-links",
                         data: {
                           url: url.trim(),
                           description: description.trim() || undefined,
                         },
+                        name: "addAcademicLink",
                       })
-                    ).then((response) => {
-                      if (response.type.includes("fulfilled")) {
-                        dispatch(setToggleAddLinkPopup(false));
-                        triggerToast(
-                          "Link Added",
-                          "Link has been added successfully",
-                          "success",
-                          3000
-                        );
-                        setUrl("");
-                        setDescription("");
-                        // Notify parent to refresh
-                        if (onLinkAdded) onLinkAdded();
-                      } else {
-                        triggerToast(
-                          "Error",
-                          "Failed to add link. Please try again.",
-                          "error",
-                          3000
-                        );
-                      }
-                    });
+                    );
+
+                    dispatch(setToggleAddLinkPopup(false));
+                    setUrl("");
+                    setDescription("");
                   }}
                   activeOpacity={0.8}
                   disabled={!url}
