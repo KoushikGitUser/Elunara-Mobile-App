@@ -73,7 +73,7 @@ const HelpCenter = ({ handleScroll }) => {
           />
           <TextInput
             onFocus={() => {
-              navigation.navigate("settingsInnerPages", { page: 10 });
+              navigation.navigate("settingsInnerPages", { page: 9 });
               dispatch(setSettingsInnerPageHeaderTitle("Search"));
             }}
             placeholder="Search"

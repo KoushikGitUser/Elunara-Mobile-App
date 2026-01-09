@@ -77,6 +77,12 @@ const globalDataSlice = createSlice({
     setLearningLabsGuideTourSteps: (state, action) => {
       state.globalDataStates.learningLabsGuideTourSteps = action.payload;
     },
+    resetAllGuidedTourSteps: (state) => {
+      state.globalDataStates.manualGuidedTourRunning = false;
+      state.globalDataStates.navigationBasicsGuideTourSteps = 0;
+      state.globalDataStates.chatFunctionsGuideTourSteps = 0;
+      state.globalDataStates.learningLabsGuideTourSteps = 0;
+    },
   },
 });
 
@@ -104,6 +110,7 @@ export const {
   setNavigationBasicsGuideTourSteps,
   setChatFunctionsGuideTourSteps,
   setLearningLabsGuideTourSteps,
+  resetAllGuidedTourSteps,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

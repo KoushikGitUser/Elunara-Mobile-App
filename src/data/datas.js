@@ -826,14 +826,13 @@ export const allChatsOptionsPopupData = [
 export const profileAndSettingsOptions = [
   { id: 1, title: "General Settings", icon: <SettingsIcon /> },
   { id: 2, title: "Personalisation", icon: <PersonIcon /> },
-  { id: 3, title: "Analytics Dashboard", icon: <ChartLineIcon /> },
-  { id: 4, title: "Payment & Billings", icon: <MoneyIcon /> },
-  { id: 5, title: "Academic Links", icon: <GradCapIcon /> },
-  { id: 6, title: "About", icon: <InfoIcon /> },
-  { id: 7, title: "Help Center", icon: <HelpIcon /> },
-  { id: 8, title: "Terms of Use", icon: <FilesIcon /> },
-  { id: 9, title: "Privacy Policy", icon: <PrivacyIcon /> },
-  { id: 10, title: "Log Out", icon: <SignOutIcon /> },
+  { id: 3, title: "Payment & Billings", icon: <MoneyIcon /> },
+  { id: 4, title: "Academic Links", icon: <GradCapIcon /> },
+  { id: 5, title: "About", icon: <InfoIcon /> },
+  { id: 6, title: "Help Center", icon: <HelpIcon /> },
+  { id: 7, title: "Terms of Use", icon: <FilesIcon /> },
+  { id: 8, title: "Privacy Policy", icon: <PrivacyIcon /> },
+  { id: 9, title: "Log Out", icon: <SignOutIcon /> },
 ];
 
 export const faqData = [

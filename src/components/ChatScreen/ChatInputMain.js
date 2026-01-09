@@ -9,7 +9,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -53,7 +53,7 @@ import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
 
-const ChatInputMain = () => {
+const ChatInputMain = forwardRef((props, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -66,6 +66,36 @@ const ChatInputMain = () => {
   const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL; // ~36px for 1 line
   const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL; // ~76px for 3 lines
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
+
+  // Refs for guided tour measurement
+  const inputSectionRef = useRef(null);
+  const toolsIconRef = useRef(null);
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measureInputSection: () => {
+      return new Promise((resolve) => {
+        if (inputSectionRef.current) {
+          inputSectionRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    measureToolsIcon: () => {
+      return new Promise((resolve) => {
+        if (toolsIconRef.current) {
+          toolsIconRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+  }));
 
   // Initialize line count on mount
   useEffect(() => {
@@ -148,6 +178,7 @@ const ChatInputMain = () => {
       ]}
     >
       <View
+        ref={inputSectionRef}
         style={[
           styles.chatInputMain,
           { paddingTop: globalDataStates.selectedFiles.length > 0 ? 0 : 10 },
@@ -252,6 +283,7 @@ const ChatInputMain = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
+              ref={toolsIconRef}
               style={
                 toggleStates.toggleChatScreenGuideStart &&
                 globalDataStates.guidedTourStepsCount == 1
@@ -308,6 +340,6 @@ const ChatInputMain = () => {
       </View>
     </View>
   );
-};
+});
 
 export default ChatInputMain;

@@ -6,7 +6,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreenCompo.styles";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -33,7 +33,7 @@ import { triggerToast, triggerToastWithAction } from "../../services/toast";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ChatHeader = ({ translateX }) => {
+const ChatHeader = forwardRef(({ translateX }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -41,6 +41,37 @@ const ChatHeader = ({ translateX }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  // Refs for guided tour measurement
+  const menuIconRef = useRef(null);
+  const chatOptionsIconRef = useRef(null);
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measureMenuIcon: () => {
+      return new Promise((resolve) => {
+        if (menuIconRef.current) {
+          menuIconRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    measureChatOptionsIcon: () => {
+      return new Promise((resolve) => {
+        if (chatOptionsIconRef.current) {
+          chatOptionsIconRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+  }));
+
   const action = () => {
     console.log("action");
   };
@@ -61,7 +92,8 @@ const ChatHeader = ({ translateX }) => {
     >
       <View style={styles.rightChatHeaderIcons}>
         <TouchableOpacity
-        style={toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2?styles.menuIconGuide:styles.menuIcon}
+          ref={menuIconRef}
+          style={toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2?styles.menuIconGuide:styles.menuIcon}
           onPress={() => {
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
@@ -150,6 +182,7 @@ const ChatHeader = ({ translateX }) => {
         </TouchableOpacity>
         {toggleStates.toggleIsChattingWithAI && (
           <TouchableOpacity
+            ref={chatOptionsIconRef}
             style={{
               backgroundColor: toggleStates.toggleChatMenuPopup
                 ? "#E7ECF5"
@@ -169,6 +202,6 @@ const ChatHeader = ({ translateX }) => {
       </View>
     </View>
   );
-};
+});
 
 export default ChatHeader;

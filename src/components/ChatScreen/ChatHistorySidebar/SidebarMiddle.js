@@ -7,7 +7,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, forwardRef, useImperativeHandle } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -31,7 +31,7 @@ import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIc
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 
-const SidebarMiddle = ({ translateX }) => {
+const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
   const [pinnedChatsOpened, setPinnedChatsOpened] = useState(false);
   const [pinnedRoomsOpened, setPinnedRoomsOpened] = useState(false);
@@ -43,9 +43,39 @@ const SidebarMiddle = ({ translateX }) => {
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
+  // Refs for guided tour measurement
+  const pinnedSectionRef = useRef(null);
+  const recentChatsSectionRef = useRef(null);
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measurePinnedSection: () => {
+      return new Promise((resolve) => {
+        if (pinnedSectionRef.current) {
+          pinnedSectionRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    measureRecentChatsSection: () => {
+      return new Promise((resolve) => {
+        if (recentChatsSectionRef.current) {
+          recentChatsSectionRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+  }));
+
   return (
     <ScrollView style={styles.chatHistorySidebarMiddle}>
-      <View style={styles.pinnedSectionMain}>
+      <View ref={pinnedSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
           onPress={() => setPinnedChatsOpened(!pinnedChatsOpened)}
           style={styles.pinnedBtn}
@@ -113,7 +143,7 @@ const SidebarMiddle = ({ translateX }) => {
           </View>
         )}
       </View>
-      <View style={styles.pinnedSectionMain}>
+      <View ref={recentChatsSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
           onPress={() => setRecentChatsOpened(!recentChatsOpened)}
           style={[styles.pinnedBtn, { paddingLeft: 0 }]}
@@ -232,6 +262,6 @@ const SidebarMiddle = ({ translateX }) => {
       </View>
     </ScrollView>
   );
-};
+});
 
 export default SidebarMiddle;

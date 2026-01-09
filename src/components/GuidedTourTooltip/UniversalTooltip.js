@@ -13,6 +13,7 @@ import { scaleFont } from "../../utils/responsive";
 import { setToggleChatScreenGuideStart } from "../../redux/slices/toggleSlice";
 import { setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SpotlightOverlay from "./SpotlightOverlay";
 
 const { height, width } = Dimensions.get("window");
 
@@ -35,15 +36,185 @@ const UniversalTooltip = ({
   bottom,
   left,
   right,
-
+  // New props for manual guided tour
+  isManualTour = false,
+  currentStep,
+  totalSteps,
+  onNextPress,
+  onBackPress,
+  showBackButton = true,
+  showUnlockButton = false,
+  onUnlockPress,
+  spotlightRect,
 }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const dispatch = useDispatch();
- 
+
+  // Determine if we should show based on manual tour or automatic new user tour
+  const isVisible = isManualTour
+    ? globalDataStates.manualGuidedTourRunning
+    : toggleStates.toggleChatScreenGuideStart;
+
+  const handleBackdropPress = async () => {
+    if (isManualTour) {
+      // Don't advance on backdrop tap for manual tour
+      return;
+    }
+    // Original behavior for new user tour
+    dispatch(setGuidedTourStepsCount(globalDataStates.guidedTourStepsCount + 1));
+    if (globalDataStates.guidedTourStepsCount == 2) {
+      dispatch(setToggleChatScreenGuideStart(false));
+      await AsyncStorage.setItem("isNewUser", "false");
+    }
+  };
+
+  const renderTooltipContent = () => (
+    <View
+      style={[
+        styles.modalSheet,
+        {
+          top: modalPosition == "up" ? top : "",
+          bottom: modalPosition == "down" ? bottom : "",
+          left: modalAlignment == "left" ? left : "",
+          right: modalAlignment == "right" ? right : "",
+        },
+      ]}
+    >
+      {/* Pointer */}
+      <View
+        style={[
+          styles.pointer,
+          {
+            transform: [{ rotate: "45deg" }],
+            bottom: pointerPosition == "up" ? "" : -5,
+            top: pointerPosition == "up" ? -5 : "",
+            left: pointerAlignment == "left" ? pointerLeft : "",
+            right: pointerAlignment == "right" ? pointerRight : "",
+          },
+        ]}
+      />
+
+      {/* Header with step counter and close button */}
+      <View style={styles.closeModalMain}>
+        <View style={{ flexDirection: "row", gap: 10, marginLeft: 17, alignItems: "center" }}>
+          {/* Step counter for manual tour */}
+          {isManualTour && currentStep && totalSteps && (
+            <Text style={styles.stepCounter}>{currentStep}/{totalSteps}</Text>
+          )}
+          <Text style={styles.title}>{title}</Text>
+        </View>
+        {!isManualTour && (
+          <AntDesign
+            style={{ marginRight: 17 }}
+            onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
+            name="close"
+            size={16}
+            color="white"
+          />
+        )}
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        {/* Description */}
+        <Text style={styles.description}>{description}</Text>
+
+        {/* Manual Tour Buttons */}
+        {isManualTour && (
+          <View style={styles.manualTourButtonsContainer}>
+            {showUnlockButton ? (
+              // Learning Labs - Unlock + Back buttons
+              <>
+                <TouchableOpacity
+                  style={styles.outlineButton}
+                  onPress={onBackPress}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.outlineButtonText}>Back</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.unlockButton}
+                  onPress={onUnlockPress}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.unlockButtonText}>Unlock</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              // Regular Next + Back buttons
+              <>
+                {showBackButton && currentStep > 1 && (
+                  <TouchableOpacity
+                    style={styles.outlineButton}
+                    onPress={onBackPress}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.outlineButtonText}>Back</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={[
+                    styles.outlineButton,
+                    !showBackButton || currentStep === 1 ? { flex: 1 } : {},
+                  ]}
+                  onPress={onNextPress}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.outlineButtonText}>Next</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        )}
+
+        {/* Original button for non-manual tour */}
+        {!isManualTour && isBelowButtonPresent && (
+          <View style={styles.btnsMain}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>Start Exploring</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+
+  // For manual tour with spotlight
+  if (isManualTour) {
+    return (
+      <Modal
+        visible={isVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <SpotlightOverlay
+          targetRect={spotlightRect}
+          borderColor="#FFFFFF"
+          borderRadius={12}
+          borderWidth={2}
+          blurAmount={7}
+        >
+          <TouchableOpacity
+            style={styles.backdrop}
+            activeOpacity={1}
+            onPress={handleBackdropPress}
+          />
+          {renderTooltipContent()}
+        </SpotlightOverlay>
+      </Modal>
+    );
+  }
+
+  // Original behavior for non-manual tour
   return (
     <Modal
-      visible={toggleStates.toggleChatScreenGuideStart}
+      visible={isVisible}
       transparent={true}
       animationType="fade"
       onRequestClose={() => dispatch(setToggleChatScreenGuideStart(false))}
@@ -53,63 +224,9 @@ const UniversalTooltip = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={async () => {dispatch(setGuidedTourStepsCount(globalDataStates.guidedTourStepsCount + 1));
-            if(globalDataStates.guidedTourStepsCount == 2){
-              dispatch(setToggleChatScreenGuideStart(false));
-              await AsyncStorage.setItem("isNewUser", "false");
-            }
-          }}
+          onPress={handleBackdropPress}
         />
-
-        {/* Modal Sheet */}
-        <View style={[styles.modalSheet,{top:modalPosition == "up"?top:"",bottom:modalPosition == "down"?bottom:"",left:modalAlignment == "left"?left:"",right:modalAlignment == "right"?right:""}]}>
-          {/* Handle Bar */}
-
-          <View
-            style={[
-              styles.pointer,
-              {
-                transform: [{ rotate: "45deg" }],
-                bottom: pointerPosition == "up" ? "" : -5,
-                top: pointerPosition == "up" ? -5 : "",
-                left:pointerAlignment == "left"?pointerLeft:"", 
-                right:pointerAlignment == "right"?pointerRight:""
-              },
-            ]}
-          />
-          <View style={styles.closeModalMain}>
-            {/* Title */}
-            <View style={{ flexDirection: "row", gap: 10,marginLeft:17}}>
-              <Text style={styles.title}>{title} </Text>
-            </View>
-            <AntDesign
-              style={{ marginRight: 17 }}
-              onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
-              name="close"
-              size={16}
-              color="white"
-            />
-          </View>
-
-          {/* Content */}
-          <View style={styles.content}>
-            {/* Description */}
-            <Text style={styles.description}>{description}</Text>
-
-            {/* Button */}
-            {isBelowButtonPresent && (
-              <View style={styles.btnsMain}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.buttonText}>Start Exploring</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        </View>
+        {renderTooltipContent()}
       </View>
     </Modal>
   );
@@ -145,30 +262,24 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
-  },
   content: {
     paddingHorizontal: 17,
-    paddingVertical:5,
-  },
-  iconContainer: {
-    marginBottom: 10,
+    paddingVertical: 5,
+    paddingBottom: 15,
   },
   title: {
     fontSize: scaleFont(14),
     fontWeight: "600",
     color: "#ffffffff",
-
+    fontFamily: "Mukta-Bold",
   },
   description: {
     fontSize: scaleFont(12),
     lineHeight: 18,
     color: "#ffffffff",
     letterSpacing: 0.2,
-    marginBottom:10
+    marginBottom: 10,
+    fontFamily: "Mukta-Regular",
   },
   button: {
     width: "100%",
@@ -184,109 +295,58 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 0.3,
   },
-  featuresList: {
-    gap: 10,
-    marginBottom: 30,
-  },
-  featureItem: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 12,
-  },
-  featureText: {
-    fontSize: scaleFont(13),
-    lineHeight: 24,
-    color: "#1F2937",
-    fontWeight: "500",
-    flex: 1,
-    paddingTop: 1,
-  },
-  cardsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    width: "100%",
-    marginBottom: 55,
-  },
-  priceCard: {
-    flex: 1,
-    backgroundColor: "#F9FAFB",
-    borderRadius: 20,
-    padding: 13,
-    borderWidth: 2,
-    borderColor: "#D3DAE5",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectedCard: {
-    backgroundColor: "#EEF4FF",
-    borderColor: "#081A35",
-  },
-  checkBadge: {
-    position: "absolute",
-    top: -17,
-    right: 20,
-    transform: [{ translateX: 12 }],
-    width: 27,
-    height: 27,
-    borderRadius: 16,
-    backgroundColor: "#081A35",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#ffffff",
-  },
-  saveBadge: {
-    position: "absolute",
-    top: -15,
-    right: 15,
-    backgroundColor: "#F3ECFF",
-    borderWidth: 1,
-    borderColor: "#7D1DE4",
-    paddingHorizontal: 14,
-    paddingVertical: 2,
-    borderRadius: 20,
-  },
-  saveText: {
-    color: "#7D1DE4",
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  priceText: {
-    fontSize: scaleFont(12.5),
-    fontWeight: "600",
-    color: "#1F2937",
-    textAlign: "center",
-  },
-  periodText: {
-    fontSize: scaleFont(12.5),
-    fontWeight: "600",
-    color: "#1F2937",
-    textAlign: "center",
-  },
   closeModalMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-  },
-  categorySections: {
-    width: "100%",
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
   },
-  sectionText: {
-    color: "#757575",
+  // New styles for manual tour
+  stepCounter: {
+    fontSize: scaleFont(12),
+    fontWeight: "600",
+    color: "#FFFFFF",
+    fontFamily: "Mukta-Regular",
   },
-  sections: {
-    width: "50%",
+  manualTourButtonsContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 2,
-    borderColor: "lightgrey",
+    gap: 10,
+    marginTop: 5,
+  },
+  outlineButton: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
+    backgroundColor: "transparent",
     paddingVertical: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  outlineButtonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(13),
+    fontWeight: "500",
+    letterSpacing: 0.3,
+    fontFamily: "Mukta-Bold",
+  },
+  unlockButton: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  unlockButtonText: {
+    color: "#24487C",
+    fontSize: scaleFont(13),
+    fontWeight: "600",
+    letterSpacing: 0.3,
+    fontFamily: "Mukta-Bold",
   },
 });
 
