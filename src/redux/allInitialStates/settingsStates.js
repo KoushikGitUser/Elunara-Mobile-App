@@ -23,6 +23,7 @@ export const settingsStates = {
   },
   allPersonalisationsSettings:{
     personalInfos:{},
+    isPersonalInfosFetched:null,
     academicCareer:{},
     learningDevices:{},
     isAnythingChangedInPersonalisationSettings:false,

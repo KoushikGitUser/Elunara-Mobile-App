@@ -172,11 +172,14 @@ export const handleGetAllProfileInfos = {
   pending: (state) => {},
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos = action.payload.data.data;
+    state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = true;
   },
-  rejected: (state, action) => {},
+  rejected: (state, action) => {
+     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
+  },
 };
 
-export const handleUpdateProfileName = {
+export const handleUpdateProfileName = { 
   pending: (state) => {},
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos.first_name =

@@ -71,7 +71,7 @@ const EditProfile = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     const payload = {
       method: "GET",
       url: "/settings/profile",
@@ -79,6 +79,9 @@ const EditProfile = () => {
     };
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
+
+
+  
 
   useEffect(() => {
     const profileData = settingsStates?.allProfileInfos;

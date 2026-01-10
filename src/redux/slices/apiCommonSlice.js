@@ -50,6 +50,9 @@ const apiCommonSlice = createSlice({
     setIsGeneralSettingsRestored:(state,action)=>{
       state.settingsStates.isGeneralSettingsRestored = action.payload;
     },
+    setIsPersonalInfosFetched:(state,action)=>{
+      state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -68,7 +71,7 @@ const apiCommonSlice = createSlice({
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings} =
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched} =
   apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;
