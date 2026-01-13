@@ -20,7 +20,7 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 const UserSection = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [isMobileVerified, setIsMobileVerified] = useState(true);
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(userImg);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
@@ -64,11 +64,11 @@ const UserSection = () => {
             setProfileImage(femaleStudentAvatar);
             break;
           default:
-            setProfileImage(null);
+            setProfileImage(userImg);
         }
       } else {
         // Both are null, use default local asset
-        setProfileImage(null);
+        setProfileImage(userImg);
       }
     }
   }, [settingsStates?.allProfileInfos]);

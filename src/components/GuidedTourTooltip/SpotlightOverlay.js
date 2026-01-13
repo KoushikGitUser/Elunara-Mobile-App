@@ -72,13 +72,13 @@ const SpotlightOverlay = ({
           </Mask>
         </Defs>
 
-        {/* Dark overlay with mask applied */}
+        {/* Overlay with mask applied */}
         <Rect
           x="0"
           y="0"
           width={SCREEN_WIDTH}
           height={SCREEN_HEIGHT}
-          fill="rgba(0, 0, 0, 0.6)"
+          fill="rgba(0, 0, 0, 0.3)"
           mask="url(#spotlight-mask)"
         />
       </Svg>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   overlayBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   spotlightBorder: {
     position: "absolute",

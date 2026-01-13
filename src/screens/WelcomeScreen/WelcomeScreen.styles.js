@@ -122,7 +122,7 @@ export const createStyles = (props = {}) =>
       justifyContent: "center",
       backgroundColor: props.socialButtonBg || "#FFFFFF",
       borderWidth: 1.5,
-      borderColor: "#999999ff",
+      borderColor: "#081A35",
       height: verticalScale(44),
       borderRadius: moderateScale(100),
       marginBottom: 15,

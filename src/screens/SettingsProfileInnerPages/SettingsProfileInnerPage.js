@@ -41,7 +41,7 @@ const SettingsProfileInnerPage = ({ route, navigation }) => {
       if (fontsLoaded) {
       }
     }, [fontsLoaded]);
-
+ 
 
   const pagesArray = [
     <GeneralSettings handleScroll={handleScroll} />,
