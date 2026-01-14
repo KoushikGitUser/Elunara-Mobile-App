@@ -58,7 +58,7 @@ const Topics = ({ item, index }) => {
         </View>
 
         <Text style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}>
-          {item?.title}
+          {item?.name}
         </Text>
         <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}>
           {item.description}

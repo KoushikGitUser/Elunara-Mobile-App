@@ -16,6 +16,7 @@ import {
   setToggleTopicsPopup,
 } from "../../../redux/slices/toggleSlice";
 import { useFonts } from "expo-font";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SubTopicsCard = ({ item }) => {
 
@@ -23,16 +24,32 @@ const SubTopicsCard = ({ item }) => {
   const dispatch = useDispatch();
   const { globalDataStates } = useSelector((state) => state.Global);
 
+  const createChatWithAIFunction = ()=>{
+    const data = {
+      title:"New Chat",
+      subject_id:globalDataStates.selectedSubjectID,
+      topic_id:item?.id,
+    }
+    const payload = {
+      method:"POST",
+      url:"/chats",
+      data,
+      name:"createChatWithAI"
+    }
+    dispatch(commonFunctionForAPICalls(payload))
+  }
+
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
+        createChatWithAIFunction();
         dispatch(
           setChatMessagesArray([
             ...globalDataStates.chatMessagesArray,
             {
               role: "user",
-              message: item.title,
+              message: item.name,
               file: globalDataStates.selectedFiles
                 ? globalDataStates.selectedFiles[0]
                 : null,
@@ -51,7 +68,7 @@ const SubTopicsCard = ({ item }) => {
       <View style={styles.cardContent}>
         <View style={styles.leftContent}>
           <File size={22} strokeWidth={1.5} color="#888888" />
-          <Text style={[styles.cardTitle,{fontFamily:'Mukta-Regular'}]}>{item.title}</Text>
+          <Text style={[styles.cardTitle,{fontFamily:'Mukta-Regular'}]}>{item.name}</Text>
         </View>
         <ArrowUpRight strokeWidth={1.5} />
       </View>

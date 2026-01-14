@@ -30,13 +30,13 @@ const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [expandTextInput, setExpandTextInput] = useState(false);
-
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -74,9 +74,13 @@ const SubTopicsCompo = () => {
         />
       </View>
       {/* Title */}
-      <Text style={[styles.title,{fontFamily:'Mukta-Bold'}]}>{globalDataStates.currentSelectedTopic} </Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+        {globalDataStates.currentSelectedTopic}{" "}
+      </Text>
       {/* Description */}
-      <Text style={[styles.description,{fontFamily:'Mukta-Regular'}]}>Popular Topics</Text>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+        Popular Topics
+      </Text>
       <View style={styles.input}>
         <Search color="#B5BECE" strokeWidth={1.5} />
         <TextInput
@@ -88,7 +92,7 @@ const SubTopicsCompo = () => {
           }}
           keyboardType="text"
           returnKeyType="done"
-          style={{fontFamily:"Mukta-Regular",fontSize:17}}
+          style={{ fontFamily: "Mukta-Regular", fontSize: 17 }}
         />
       </View>
 
@@ -98,7 +102,7 @@ const SubTopicsCompo = () => {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.grid}>
-          {subTopics.map((topics, topicIndex) => {
+          {chatsStates.allChatsDatas.allTopicsOfSelectedSubjects?.map((topics, topicIndex) => {
             return <SubTopicsCard key={topicIndex} item={topics} />;
           })}
         </View>
@@ -124,7 +128,10 @@ const SubTopicsCompo = () => {
               <TextInput
                 style={[
                   styles.belowInput,
-                  { alignSelf: expandTextInput ? "flex-start" : "center",fontFamily:"Mukta-Regular" },
+                  {
+                    alignSelf: expandTextInput ? "flex-start" : "center",
+                    fontFamily: "Mukta-Regular",
+                  },
                 ]}
                 onFocus={() => setExpandTextInput(true)}
                 onBlur={() => setExpandTextInput(false)}

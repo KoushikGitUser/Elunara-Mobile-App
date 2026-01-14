@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,9 +25,37 @@ import { useFonts } from "expo-font";
 const screenHeight = Dimensions.get("window").height;
 const TopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [currentSubTopic, setCurrentSubTopic] = useState("Finance");
+
+  // Take first 7 items from API data and merge with icons from topicsSheet
+  const dynamicTopics = useMemo(() => {
+    const apiTopics = chatsStates.allChatsDatas.allSubjectsAvailable.slice(0, 7);
+
+    const topicsWithIcons = apiTopics.map((topic, index) => ({
+      title: topic.name,
+      id:topic.id,
+      description: topic.description,
+      icon: topicsSheet[index]?.icon,
+      iconBg: topicsSheet[index]?.iconBg,
+      borderColor: topicsSheet[index]?.borderColor,
+      popularTopics: topic.topics_count,
+    }));
+
+    // Add static 8th item - "Others"
+    const othersItem = {
+      title: "Others",
+      description: "Tech, ethics, change & communication",
+      icon: topicsSheet[7]?.icon,
+      iconBg: topicsSheet[7]?.iconBg,
+      borderColor: topicsSheet[7]?.borderColor,
+      popularTopics: topicsSheet[7]?.popularTopics,
+    };
+
+    return [...topicsWithIcons, othersItem];
+  }, [chatsStates.allChatsDatas.allSubjectsAvailable]);
 
 
   return (
@@ -84,7 +112,7 @@ const TopicsCompo = () => {
                 contentContainerStyle={styles.scrollContent}
               >
                 <View style={styles.grid}>
-                  {topicsSheet.map((topics, topicIndex) => {
+                  {dynamicTopics.map((topics, topicIndex) => {
                     return <TopicsCards key={topicIndex} item={topics} />;
                   })}
                 </View>

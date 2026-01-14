@@ -22,7 +22,11 @@ export const globalDataStates = {
   manualGuidedTourRunning:false,
   navigationBasicsGuideTourSteps:0,
   chatFunctionsGuideTourSteps:0,
-  learningLabsGuideTourSteps:0
+  learningLabsGuideTourSteps:0,
+
+  // chats states
+  selectedSubjectID:1,
+  selectedTopicsID:1,
 };
 
 export const demoChatMessages = [

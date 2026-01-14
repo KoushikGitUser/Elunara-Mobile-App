@@ -19,25 +19,39 @@ import {
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { scaleFont } from "../../../utils/responsive";
 import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
-const IndividualRecentChat = ({ title, translateX }) => {
+const IndividualRecentChat = ({ item, translateX }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
 
   const truncateTitle = (title, limit = 20) => {
-    if (title.length <= limit) return title;
-    return title.slice(0, limit) + "...";
+    if (title?.length <= limit) return title;
+    return title?.slice(0, limit) + "...";
   };
+
+  const fetchAllMessagesOfChat = ()=>{
+     const payload = {
+      method:"GET",
+      url:`/chats/${item?.uuid}`,
+      name:"getAllDetailsOfChatByID"
+     }    
+     dispatch(commonFunctionForAPICalls(payload));
+  }
 
   return (
     <TouchableOpacity
+    onPress={()=>{
+      fetchAllMessagesOfChat();
+    }}
       onLongPress={() => {
         dispatch(setToggleChatActionsPopupOnLongPress(true));
-        dispatch(setChatTitleOnLongPress(title));
+        dispatch(setChatTitleOnLongPress(item?.name));
         dispatch(setToggleChatHistorySidebar(false));
         Animated.timing(translateX, {
           toValue: toggleStates.toggleChatHistorySidebar
@@ -52,7 +66,7 @@ const IndividualRecentChat = ({ title, translateX }) => {
       <ChatIcon />
 
       <Text style={{ fontFamily: "Mukta-Regular", fontSize: scaleFont(14) }}>
-        {truncateTitle(title)}{" "}
+        {truncateTitle(item?.name)}{" "}
       </Text>
     </TouchableOpacity>
   );

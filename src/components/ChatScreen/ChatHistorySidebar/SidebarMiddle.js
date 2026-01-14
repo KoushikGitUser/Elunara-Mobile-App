@@ -6,14 +6,23 @@ import {
   Image,
   Animated,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import React, { useMemo, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   ChevronDown,
   ChevronRight,
   ChevronUp,
   Folder,
   Pin,
+  RefreshCw,
+  RotateCw,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
@@ -30,6 +39,7 @@ import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarI
 import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
@@ -37,6 +47,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const [pinnedRoomsOpened, setPinnedRoomsOpened] = useState(false);
   const [roomsOpened, setRoomsOpened] = useState(false);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -46,6 +57,15 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   // Refs for guided tour measurement
   const pinnedSectionRef = useRef(null);
   const recentChatsSectionRef = useRef(null);
+
+  const fetchAllRecentChats = () => {
+    const payload = {
+      method: "GET",
+      url: "/chats/recent?limit=10",
+      name: "getAllRecentChats",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   // Expose measurement methods via ref
   useImperativeHandle(ref, () => ({
@@ -63,9 +83,11 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
     measureRecentChatsSection: () => {
       return new Promise((resolve) => {
         if (recentChatsSectionRef.current) {
-          recentChatsSectionRef.current.measureInWindow((x, y, width, height) => {
-            resolve({ x, y, width, height });
-          });
+          recentChatsSectionRef.current.measureInWindow(
+            (x, y, width, height) => {
+              resolve({ x, y, width, height });
+            }
+          );
         } else {
           resolve(null);
         }
@@ -145,7 +167,10 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
       </View>
       <View ref={recentChatsSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
-          onPress={() => setRecentChatsOpened(!recentChatsOpened)}
+          onPress={() => {
+            setRecentChatsOpened(!recentChatsOpened);
+            fetchAllRecentChats();
+          }}
           style={[styles.pinnedBtn, { paddingLeft: 0 }]}
         >
           <Text
@@ -165,11 +190,64 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
         </TouchableOpacity>
         {recentChatsOpened && (
           <View style={styles.individualRecentChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
-                <IndividualRecentChat translateX={translateX} key={chatIndex} title={chat?.title} />
-              );
-            })}
+            {chatsStates.loaderStates.isAllRecentChatsFetched == true ? (
+              chatsStates.allChatsDatas.allRecentChats?.length > 0 ? (
+                chatsStates.allChatsDatas.allRecentChats.map(
+                  (chat, chatIndex) => {
+                    return (
+                      <IndividualRecentChat
+                        translateX={translateX}
+                        key={chatIndex}
+                        item={chat}
+                      />
+                    );
+                  }
+                )
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <Text style={{ color: "#081A35" }}>
+                    No chats to show{"   "}
+                  </Text>
+                </View>
+              )
+            ) : chatsStates.loaderStates.isAllRecentChatsFetched ==
+              "pending" ? (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <ActivityIndicator color="#081A35" size="small" />
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <Text style={{ color: "#ff7474ff" }}>
+                  Something went wrong{"   "}
+                </Text>
+                <RotateCw onPress={fetchAllRecentChats} color="#081A35" />
+              </View>
+            )}
+            {}
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("allchats");

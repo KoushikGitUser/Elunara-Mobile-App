@@ -77,6 +77,12 @@ const globalDataSlice = createSlice({
     setLearningLabsGuideTourSteps: (state, action) => {
       state.globalDataStates.learningLabsGuideTourSteps = action.payload;
     },
+    setSelectedSubjectID: (state, action) => {
+      state.globalDataStates.selectedSubjectID = action.payload;
+    },
+    setSelectedTopicsID: (state, action) => {
+      state.globalDataStates.selectedTopicsID = action.payload;
+    },
     resetAllGuidedTourSteps: (state) => {
       state.globalDataStates.manualGuidedTourRunning = false;
       state.globalDataStates.navigationBasicsGuideTourSteps = 0;
@@ -111,6 +117,8 @@ export const {
   setChatFunctionsGuideTourSteps,
   setLearningLabsGuideTourSteps,
   resetAllGuidedTourSteps,
+  setSelectedSubjectID,
+  setSelectedTopicsID,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

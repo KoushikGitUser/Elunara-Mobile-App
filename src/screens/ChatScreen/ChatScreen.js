@@ -46,6 +46,7 @@ import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQ
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 // Mock chat messages for Chat Functions tour step 2
 const mockChatMessages = [
@@ -92,8 +93,17 @@ const ChatScreen = () => {
 
   useEffect(() => {
     if (fontsLoaded) {
-    }
+    } 
   }, [fontsLoaded]);
+
+  useEffect(()=>{
+    const payload = {
+      method:"GET",
+      url:"/master/subjects",
+      name:"getAllSubjectsForChat",
+    }
+    dispatch(commonFunctionForAPICalls(payload));
+  },[])
 
   useEffect(() => {
     const checkNewUser = async () => {
