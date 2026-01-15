@@ -499,12 +499,15 @@ const ChatScreen = () => {
     } else if (alignment === "center") {
       // Center-aligned tooltip
       const spotlightCenter = spotlightRect.x + spotlightRect.width / 2;
-      result.left = Math.max(10, spotlightCenter - tooltipWidth / 2);
+      result.left = Math.max(10, spotlightCenter -  tooltipWidth / 2);
       result.pointerLeft = tooltipWidth / 2 - 8; // Center pointer
     }
 
     return result;
   };
+
+ 
+  
 
   return (
     <SafeAreaView

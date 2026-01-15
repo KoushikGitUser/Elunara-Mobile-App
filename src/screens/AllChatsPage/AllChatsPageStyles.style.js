@@ -161,4 +161,16 @@ export const createStyles = (props = {}) =>
       zIndex: 9,
       backgroundColor:"transparent"
     },
+    radioOuter: {
+      width: 25,
+      height: 25,
+      borderRadius: 2,
+      borderWidth: 2,
+      borderColor: "#D3DAE5",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#ffffff",
+      padding: 5,
+      marginRight: 20,
+    },
   });

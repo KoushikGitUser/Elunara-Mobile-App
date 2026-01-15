@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -10,38 +10,37 @@ import {
   Image,
 } from "react-native";
 import { BlurView } from "@react-native-community/blur";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import deleteBin from "../../../../assets/images/deleteBin.png";
-import { scaleFont } from "../../../../utils/responsive";
+import deleteBin from "../../assets/images/deleteBin.png";
+import { scaleFont } from "../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleDeleteChatConfirmPopup } from "../../../../redux/slices/toggleSlice";
-import { triggerToast, triggerToastWithAction } from "../../../../services/toast";
-import { commonFunctionForAPICalls, resetChatDeleted, resetChatDeleteUndone, resetBulkOperationCompleted } from "../../../../redux/slices/apiCommonSlice";
-import Toaster from "../../../UniversalToaster/Toaster";
+import { setToggleDeleteChatPopup } from "../../redux/slices/toggleSlice";
+import { triggerToastWithAction } from "../../services/toast";
+import { commonFunctionForAPICalls, resetChatDeleted, resetChatDeleteUndone } from "../../redux/slices/apiCommonSlice";
+import Toaster from "../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
 
-const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
+const DeleteChatPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates } = useSelector((state) => state.API);
 
   const dispatch = useDispatch();
 
-  const isSingleDelete = from === "chat";
-  const isBulkDelete = from === "allChats";
-  const chatCount = selectedChatIds.length;
-
-  const isLoading = isBulkDelete
-    ? chatsStates.loaderStates.isBulkOperationCompleted === "pending"
-    : chatsStates.loaderStates.isChatDeleted === "pending";
+  const isLoading = chatsStates.loaderStates.isChatDeleted === "pending";
 
   // Handle delete success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatDeleted === true) {
-      dispatch(setToggleDeleteChatConfirmPopup(false));
+      dispatch(setToggleDeleteChatPopup(false));
 
       const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+      // Refetch all chats
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats?page=1&per_page=20",
+        name: "fetchAllUserChatsAvailable"
+      }));
 
       // Show toast with undo action
       setTimeout(() => {
@@ -69,31 +68,30 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
     }
   }, [chatsStates.loaderStates.isChatDeleted]);
 
-  // Handle bulk delete success case
-  useEffect(() => {
-    if (chatsStates.loaderStates.isBulkOperationCompleted === true) {
-      dispatch(setToggleDeleteChatConfirmPopup(false));
-    }
-  }, [chatsStates.loaderStates.isBulkOperationCompleted]);
-
   // Handle undo delete success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatDeleteUndone === true) {
+      // Refetch all chats after undo
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats?page=1&per_page=20",
+        name: "fetchAllUserChatsAvailable"
+      }));
+
       dispatch(resetChatDeleteUndone());
     }
   }, [chatsStates.loaderStates.isChatDeleteUndone]);
 
   return (
     <Modal
-      visible={toggleStates.toggleDeleteChatConfirmPopup}
+      visible={toggleStates.toggleDeleteChatPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
+      onRequestClose={() => dispatch(setToggleDeleteChatPopup(false))}
     >
       <Toaster />
       <View style={styles.container}>
         {/* Blur Background */}
-
         <BlurView
           style={styles.blurView}
           blurType="light"
@@ -105,7 +103,7 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
+          onPress={() => dispatch(setToggleDeleteChatPopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -124,17 +122,13 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
 
             {/* Title */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-              {isBulkDelete
-                ? `Delete ${chatCount} chat${chatCount > 1 ? 's' : ''}?`
-                : "Delete Chat?"}
+              Delete Chat?
             </Text>
 
             {/* Description */}
-            {isBulkDelete && (
-              <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
-                Confirm chat deletion{"\n"}Once deleted, this chat can't be recovered.
-              </Text>
-            )}
+            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+              This action cannot be undone.
+            </Text>
 
             {/* Button */}
             <View style={styles.btnsMain}>
@@ -147,7 +141,7 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                     borderColor: "black",
                   },
                 ]}
-                onPress={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
+                onPress={() => dispatch(setToggleDeleteChatPopup(false))}
                 activeOpacity={0.8}
               >
                 <Text
@@ -160,43 +154,21 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.button}
+                style={[styles.button, { opacity: isLoading ? 0.6 : 1 }]}
                 onPress={() => {
-                  if (isBulkDelete) {
-                    // Bulk delete operation
-                    if (!selectedChatIds || selectedChatIds.length === 0) {
-                      triggerToast("Error", "No chats selected", "error", 3000);
-                      return;
-                    }
+                  const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
 
-                    const payload = {
-                      method: "POST",
-                      url: "/chats/bulk",
-                      data: {
-                        action: "delete",
-                        chat_ids: selectedChatIds
-                      },
-                      name: "bulkOperationsForChats"
-                    };
-
-                    dispatch(commonFunctionForAPICalls(payload));
-                  } else {
-                    // Single delete operation
-                    const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
-
-                    if (!chatId) {
-                      triggerToast("Error", "Chat ID not found", "error", 3000);
-                      return;
-                    }
-
-                    const payload = {
-                      method: "DELETE",
-                      url: `/chats/${chatId}`,
-                      name: "deleteChat"
-                    };
-
-                    dispatch(commonFunctionForAPICalls(payload));
+                  if (!chatId) {
+                    return;
                   }
+
+                  const payload = {
+                    method: "DELETE",
+                    url: `/chats/${chatId}`,
+                    name: "deleteChat"
+                  };
+
+                  dispatch(commonFunctionForAPICalls(payload));
                 }}
                 activeOpacity={0.8}
                 disabled={isLoading}
@@ -204,7 +176,7 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                 <Text
                   style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
                 >
-                  {isLoading ? "Deleting..." : "Done"}
+                  {isLoading ? "Deleting..." : "Delete"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -256,16 +228,22 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 20,
   },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D1D5DB",
+  },
   btnsMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
   },
   content: {
     paddingHorizontal: 24,
@@ -275,18 +253,16 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginBottom: 24,
   },
+  verifiedIcon: {
+    height: 55,
+    width: 50,
+    objectFit: "contain",
+  },
   title: {
     fontSize: scaleFont(26),
     color: "#1F2937",
-    marginBottom: 16,
-    letterSpacing: -0.5,
-  },
-  description: {
-    fontSize: scaleFont(13),
-    lineHeight: 24,
-    color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+    letterSpacing: -0.5,
   },
   button: {
     width: "48%",
@@ -305,4 +281,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DeleteConfirmPopup;
+export default DeleteChatPopup;

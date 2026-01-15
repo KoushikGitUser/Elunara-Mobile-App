@@ -39,6 +39,15 @@ const toggleSlice = createSlice({
     setToggleDeleteChatConfirmPopup: (state, action) => {
       state.toggleStates.toggleDeleteChatConfirmPopup = action.payload;
     },
+    setToggleArchiveChatConfirmPopup: (state, action) => {
+      state.toggleStates.toggleArchiveChatConfirmPopup = action.payload;
+    },
+    setToggleDeleteChatPopup: (state, action) => {
+      state.toggleStates.toggleDeleteChatPopup = action.payload;
+    },
+    setToggleArchiveChatPopup: (state, action) => {
+      state.toggleStates.toggleArchiveChatPopup = action.payload;
+    },
     setToggleRenameChatPopup: (state, action) => {
       state.toggleStates.toggleRenameChatPopup = action.payload;
     },
@@ -144,6 +153,9 @@ export const {
   setToggleIsWaitingForResponse,
   setToggleSubTopics,
   setToggleDeleteChatConfirmPopup,
+  setToggleArchiveChatConfirmPopup,
+  setToggleDeleteChatPopup,
+  setToggleArchiveChatPopup,
   setToggleRenameChatPopup,
   setToggleUserMessageActionPopup,
   setToggleChatActionsPopupOnLongPress,

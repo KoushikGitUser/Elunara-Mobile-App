@@ -7,7 +7,7 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AllRoomsPageHeader from "../../components/Rooms/AllRoomsPageHeader";
 import AllRoomsPageSearchIcons from "../../components/Rooms/AllRoomsPageSearchIcons";
@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
 import RoomsOptionsPopup from "../../components/Modals/Rooms/RoomsOptionsPopup";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const AllRoomsLandingPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
@@ -30,6 +31,15 @@ const AllRoomsLandingPage = () => {
   const [popupPosition, setPopupPosition] = useState(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
+
+    useEffect(() => {
+      const payload = {
+        method: "GET",
+        url: "/rooms?page=1&per_page=20",
+        name: "fetchAllUserRoomsAvailable"
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }, []);
 
   const handleSelectAll = () => {
     setChecked(!checked);

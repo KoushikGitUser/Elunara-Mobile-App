@@ -9,17 +9,15 @@ import {
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import {
-  ArrowDownWideNarrow,
-  ArrowUpNarrowWide,
-  CalendarCheck,
-  CalendarX,
-} from "lucide-react-native";
+import SparkleIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
+import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
+import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
+import { appColors } from "../../themes/appColors";
 
-const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) => {
+const ChatFilterPopup = ({close, top, right, onFilterSelect}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [selectedStyle, setSelectedStyle] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState(null);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -27,10 +25,10 @@ const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) =>
     </View>
   );
 
-  const handleSortOption = (index, sortValue) => {
-    setSelectedStyle(index);
-    if (onSortSelect) {
-      onSortSelect(sortValue);
+  const handleFilterOption = (index, filterValue) => {
+    setSelectedFilter(index);
+    if (onFilterSelect) {
+      onFilterSelect(filterValue);
     }
     close(false);
   };
@@ -43,7 +41,7 @@ const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) =>
       ></TouchableOpacity>
       <View style={[styles.notesPopup,{top:top,right:right}]}>
         <Pressable
-          onPress={() => handleSortOption(0, "newest")}
+          onPress={() => handleFilterOption(0, "active")}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",
@@ -52,13 +50,13 @@ const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) =>
           ]}
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <CalendarCheck size={22} strokeWidth={1.25} />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>Newest First</Text>
+            <SparkleIcon color={appColors.navyBlueShade} />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Active</Text>
           </View>
-          <RadioButton selected={selectedStyle === 0} />
+          <RadioButton selected={selectedFilter === 0} />
         </Pressable>
         <Pressable
-          onPress={() => handleSortOption(1, "oldest")}
+          onPress={() => handleFilterOption(1, "pinned")}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",
@@ -67,13 +65,13 @@ const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) =>
           ]}
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <CalendarX size={22} strokeWidth={1.25} />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>Oldest First</Text>
+            <PinIcon color={appColors.navyBlueShade} />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Pinned</Text>
           </View>
-          <RadioButton selected={selectedStyle === 1}  />
+          <RadioButton selected={selectedFilter === 1}  />
         </Pressable>
         <Pressable
-          onPress={() => handleSortOption(2, "a-z")}
+          onPress={() => handleFilterOption(2, "archived")}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",
@@ -82,25 +80,10 @@ const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) =>
           ]}
         >
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <ArrowDownWideNarrow strokeWidth={1.25} />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>A-Z</Text>
+            <ArchiveDarkIcon />
+            <Text style={{ fontFamily: "Mukta-Regular" }}>Archived</Text>
           </View>
-          <RadioButton selected={selectedStyle === 2}  />
-        </Pressable>
-        <Pressable
-          onPress={() => handleSortOption(3, "z-a")}
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "#EEF4FF" : "transparent",
-            },
-            styles.notesPopupOptions,
-          ]}
-        >
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <ArrowUpNarrowWide strokeWidth={1.25} />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>Z-A</Text>
-          </View>
-          <RadioButton selected={selectedStyle === 3} />
+          <RadioButton selected={selectedFilter === 2}  />
         </Pressable>
       </View>
     </>
@@ -120,7 +103,7 @@ const styles = StyleSheet.create({
     padding: 7,
     width: "auto",
     top: 50,
-    right: 90,
+    right: 30,
     zIndex: 999,
     flexDirection: "column",
     alignItems: "flex-start",
@@ -165,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RoomsSortingPopup;
+export default ChatFilterPopup;

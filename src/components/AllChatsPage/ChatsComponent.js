@@ -2,28 +2,79 @@ import { View, Text, Pressable, TouchableOpacity } from "react-native";
 import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useDispatch } from "react-redux";
-import { MessageCircle, MoreVertical } from "lucide-react-native";
+import { MessageCircle, MoreVertical, Check } from "lucide-react-native";
 import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
+import { useNavigation } from "@react-navigation/native";
+import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
+import { appColors } from "../../themes/appColors";
+import { setCurrentActionChatDetails } from "../../redux/slices/apiCommonSlice";
 
-const ChatsComponent = ({ title, subject, roomName, onPress, setPopupPosition }) => {
+const ChatsComponent = ({
+  title,
+  subject,
+  roomName,
+  index,
+  isPinned,
+  isSelecting,
+  setIsSelecting,
+  selectedArray,
+  setSelectedArray,
+  setPopupPosition,
+  chatData
+}) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const menuButtonRef = React.useRef(null);
 
   const handleMenuPress = () => {
     menuButtonRef.current?.measureInWindow((x, y, width, height) => {
       setPopupPosition({ x: x + width, y: y + height });
+      dispatch(setCurrentActionChatDetails(chatData));
       dispatch(setToggleAllChatsOptionsPopup(true));
     });
+  };  
+
+  const CheckBox = ({ selected }) => {
+    return (
+      <View
+        style={[styles.radioOuter, { borderColor: selected ? "black" : "", backgroundColor: selected ? "black" : "transparent" }]}
+      >
+        {selected && <Check size={19} color="white" strokeWidth={1.75} />}
+      </View>
+    );
   };
 
   return (
     <TouchableOpacity
-      style={styles.cardContainer}
-      onPress={onPress}
+      style={[styles.cardContainer, { backgroundColor: selectedArray.includes(index) ? "#EEF4FF" : "transparent", paddingLeft: isSelecting ? 10 : 0 }]}
+      onLongPress={() => {
+        setIsSelecting(true);
+        setSelectedArray([...selectedArray, index])
+      }}
+      onPress={() => {
+        if (isSelecting) {
+          if (!selectedArray.includes(index)) {
+            setSelectedArray([...selectedArray, index])
+          }
+          else {
+            const newArray = [...selectedArray]
+            newArray.splice(selectedArray.indexOf(index), 1)
+            setSelectedArray(newArray);
+            if (selectedArray.length == 1) {
+              setIsSelecting(false)
+            }
+          }
+        }
+        else {
+          navigation.navigate("chat")
+        }
+      }}
     >
       <View style={styles.cardContent}>
+        {isSelecting && <CheckBox selected={selectedArray.includes(index)} />}
+
         {/* Chat Icon */}
         <View style={styles.iconContainer}>
           <MessageCircle size={25} color="#9CA3AF" strokeWidth={1.5} />
@@ -43,6 +94,13 @@ const ChatsComponent = ({ title, subject, roomName, onPress, setPopupPosition })
           </View>
         </View>
 
+        {/* Pin Icon */}
+        {isPinned && (
+          <View style={{ marginRight: 12 }}>
+            <PinIcon color={appColors.navyBlueShade} />
+          </View>
+        )}
+
         {/* Menu Icon */}
         <Pressable
           ref={menuButtonRef}
@@ -50,7 +108,10 @@ const ChatsComponent = ({ title, subject, roomName, onPress, setPopupPosition })
             styles.menuButton,
             pressed && styles.menuPressed,
           ]}
-          onPress={handleMenuPress}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleMenuPress();
+          }}
         >
           <MoreVertical size={24} color="#000000ff" strokeWidth={2} />
         </Pressable>

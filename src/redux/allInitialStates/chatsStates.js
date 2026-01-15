@@ -5,9 +5,20 @@ export const chatsStates = {
     allSubjectsAvailable:[],
     allTopicsOfSelectedSubjects:[],
     createdChatDetails:{},
+    allUserChatsAvailable:[],
+    allUserRoomsAvailable:[],
+    lastBulkOperationInfo:null,
     },
     loaderStates:{
         isAllRecentChatsFetched:null,
         isChatCreatedWithAI:null,
+        isChatTitleUpdated:null,
+        isChatPinUnpinUpdated:null,
+        isChatArchiveUnarchiveUpdated:null,
+        isChatDeleted:null,
+        isChatDeleteUndone:null,
+        isAllUserChatsFetched:null,
+        isAllUserRoomsFetched:null,
+        isBulkOperationCompleted:null,
     }
 }

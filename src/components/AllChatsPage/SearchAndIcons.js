@@ -7,9 +7,11 @@ import { MessageCirclePlus, Search } from "lucide-react-native";
 import ArrowUpDownIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/ArrowUpDownIcon";
 import FilterIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FilterIcon";
 import RoomsSortingPopup from "../Modals/Rooms/RoomsSortingPopup";
-import RoomsFilterPopup from "../Modals/Rooms/RoomsFilterPopup";
+import ChatFilterPopup from "./ChatFilterPopup";
+import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
+import { setUserMessagePrompt, setSelecetdFiles, setChatInputContentLinesNumber } from "../../redux/slices/globalDataSlice";
 
-const SearchAndIcons = ({ isSearching, setIsSearching }) => {
+const SearchAndIcons = ({ isSearching, setIsSearching, onSortSelect, onFilterSelect, onSearch }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -17,19 +19,41 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
   const inputRef = useRef();
+  const debounceTimeout = useRef(null);
   const [toggleSortingPopup, setToggleSortingPopup] = useState(false);
   const [toggleFilterPopup, setToggleFilterPopup] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     if (!isSearching) {
       inputRef.current.blur();
+      setSearchText("");
     }
   }, [isSearching]);
 
+  // Debounced search
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      if (onSearch) {
+        onSearch(searchText);
+      }
+    }, 500);
+
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+  }, [searchText]);
+
   return (
     <View style={styles.searchAndIcons}>
-       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} />}
-      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} top={50} right={30} />}
+       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} onSortSelect={onSortSelect} from="chats" />}
+      {toggleFilterPopup && <ChatFilterPopup close={setToggleFilterPopup} top={50} right={30} onFilterSelect={onFilterSelect} />}
       <View
         style={[
           styles.searchInputMain,
@@ -48,6 +72,8 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
           placeholder="Search"
           placeholderTextColor="#B5BECE"
           style={[styles.searchInput, { outlineWidth: isSearching ? 1 : 0 }]}
+          value={searchText}
+          onChangeText={setSearchText}
         />
       </View>
       <View
@@ -61,7 +87,18 @@ const SearchAndIcons = ({ isSearching, setIsSearching }) => {
         <FilterIcon />
         </TouchableOpacity>
 
-        <MessageCirclePlus strokeWidth={1.25} />
+        <TouchableOpacity onPress={() => {
+          // Reset all input states
+          dispatch(setUserMessagePrompt(""));
+          dispatch(setSelecetdFiles([]));
+          dispatch(setChatInputContentLinesNumber(0));
+          dispatch(setToggleIsChattingWithAI(false));
+
+          // Navigate to chat screen
+          navigation.navigate("chat");
+        }}>
+          <MessageCirclePlus strokeWidth={1.25} />
+        </TouchableOpacity>
       </View>
     </View>
   );
