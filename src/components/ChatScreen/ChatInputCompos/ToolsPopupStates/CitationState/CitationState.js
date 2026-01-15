@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     setToggleToolsPopup,
   setToggleToolsPopupStates,
@@ -22,6 +22,7 @@ import PenNib from '../../../../../assets/images/penNib2.svg'
 const CitationState = () => {
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -54,7 +55,7 @@ const CitationState = () => {
           submissions.
         </Text>
         <View style={{ flexDirection: "column", gap: 25 }}>
-          {citationStyles.map((styleOptions, optionsIndex) => (
+          {(settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable?.length > 0 ? settingsStates.settingsMasterDatas.allCitationFormatsAvailable : citationStyles).map((styleOptions, optionsIndex) => (
             <TouchableOpacity
               key={optionsIndex} 
               style={[

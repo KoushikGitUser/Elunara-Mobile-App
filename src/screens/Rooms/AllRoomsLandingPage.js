@@ -13,7 +13,6 @@ import AllRoomsPageHeader from "../../components/Rooms/AllRoomsPageHeader";
 import AllRoomsPageSearchIcons from "../../components/Rooms/AllRoomsPageSearchIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { scaleFont, verticalScale } from "../../utils/responsive";
-import { allChatsData } from "../../data/datas";
 import ChatsScrollForAllRoomsPage from "../../components/Rooms/ChatsScrollForAllRoomsPage";
 import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,7 +29,9 @@ const AllRoomsLandingPage = () => {
   const [checked, setChecked] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
+  const allUserRooms = chatsStates.allChatsDatas.allUserRoomsAvailable;
 
     useEffect(() => {
       const payload = {
@@ -44,7 +45,7 @@ const AllRoomsLandingPage = () => {
   const handleSelectAll = () => {
     setChecked(!checked);
     if (!checked) {
-      const allIds = allChatsData.map((chat) => chat.id);
+      const allIds = allUserRooms.map((room) => room.id);
       setSelectedArray(allIds);
     } else {
       setSelectedArray([]);
@@ -118,13 +119,13 @@ const AllRoomsLandingPage = () => {
           }}
           style={styles.allChatsScrollMain}
         >
-          {allChatsData.map((chat, chatsIndex) => {
+          {allUserRooms.map((room, roomIndex) => {
             return (
               <ChatsScrollForAllRoomsPage
-                key={chatsIndex}
-                index={chat.id}
-                title={chat.title}
-                subject={chat.subject}
+                key={roomIndex}
+                index={room.id}
+                title={room.name}
+                subject={room.subject}
                 isSelecting={isSelecting}
                 selectedArray={selectedArray}
                 setIsSelecting={setIsSelecting}

@@ -1,5 +1,5 @@
 import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable } from "./apiExtraReducerHandlers/chatsHandlers";
-import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage } from "./apiExtraReducerHandlers/settingsHandlers";
+import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage, handleFetchResponseStylesAvailable, handleFetchCitationFormatsAvailable } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
   // get all settings of sections
@@ -15,6 +15,8 @@ export const settingsHandlersFunctions = {
   getAllUniversitiesAvailable:handleGetAllUniversitiesAvailable,
   getAllDegreeProgramsAvailable:handleGetAllDegreeProgramsAvailable,
   getAllSpecializationsAvailable:handleGetAllSpecializationsAvailable,
+  fetchResponseStylesAvailable:handleFetchResponseStylesAvailable,
+  fetchCitationFormatsAvailable:handleFetchCitationFormatsAvailable,
   // update or change settings
   updateGeneralSettings:handleUpdateGeneralSettings,
   restoreAllGeneralSettings:handleRestoreAllGeneralSettings,

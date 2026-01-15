@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import { scaleFont, verticalScale } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
@@ -24,6 +24,7 @@ const screenHeight = Dimensions.get("window").height;
 const ResponseStyleState = () => {
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -62,7 +63,7 @@ const ResponseStyleState = () => {
           style={styles.optionsContainer}
         >
           <View style={{ flexDirection: "column",}}>
-            {responseStyles.map((styleOptions, optionsIndex) => {
+            {(settingsStates?.settingsMasterDatas?.allResponseStylesAvailable?.length > 0 ? settingsStates.settingsMasterDatas.allResponseStylesAvailable : responseStyles).map((styleOptions, optionsIndex) => {
               return (
                 <React.Fragment key={optionsIndex}>
                   <TouchableOpacity  

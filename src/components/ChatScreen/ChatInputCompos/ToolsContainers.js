@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ChevronRight,
   CircleUserRound,
@@ -13,10 +13,27 @@ import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
 } from "../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { toolsArrayOptions } from "../../../data/datas";
 
 const ToolsContainers = () => {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const responseStylesPayload = {
+      method: "GET",
+      url: "/master/response-styles",
+      name: "fetchResponseStylesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(responseStylesPayload));
+
+    const citationFormatsPayload = {
+      method: "GET",
+      url: "/master/citation-formats",
+      name: "fetchCitationFormatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(citationFormatsPayload));
+  }, []);
   return (
     <View>
       {toolsArrayOptions?.map((tools, toolIndex) => {
