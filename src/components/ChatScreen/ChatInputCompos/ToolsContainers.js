@@ -8,7 +8,7 @@ import {
   Languages,
 } from "lucide-react-native";
 import { moderateScale } from "../../../utils/responsive";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
@@ -18,6 +18,7 @@ import { toolsArrayOptions } from "../../../data/datas";
 
 const ToolsContainers = () => {
   const dispatch = useDispatch();
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
   useEffect(() => {
     const responseStylesPayload = {
@@ -34,6 +35,22 @@ const ToolsContainers = () => {
     };
     dispatch(commonFunctionForAPICalls(citationFormatsPayload));
   }, []);
+
+  // Get the selected value based on tool index
+  const getSelectedValue = (toolIndex) => {
+    switch (toolIndex) {
+      case 0: // LLM Preference
+        return chatCustomisationStates?.selectedLLM?.name || "Auto";
+      case 1: // Response Style
+        return chatCustomisationStates?.selectedResponseStyle?.name || "Auto";
+      case 2: // Response Language
+        return chatCustomisationStates?.selectedLanguage?.name || "English";
+      case 3: // Citation Format
+        return chatCustomisationStates?.selectedCitationFormat?.name || "Harvard";
+      default:
+        return "";
+    }
+  };
   return (
     <View>
       {toolsArrayOptions?.map((tools, toolIndex) => {
@@ -70,7 +87,7 @@ const ToolsContainers = () => {
             >
               <View style={styles.selectedOption}>
                 <Text style={{ fontSize: moderateScale(12),fontFamily:"Mukta-Regular" }}>
-                  {tools.selection}{" "}
+                  {getSelectedValue(toolIndex)}{" "}
                 </Text>
               </View>
               <ChevronRight size={30} strokeWidth={1.5} />

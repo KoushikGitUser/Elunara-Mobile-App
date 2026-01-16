@@ -9,32 +9,121 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRightLeft, ChevronRight } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
+  setSelectedLLM,
 } from "../../../../../redux/slices/toggleSlice";
 import {
   moderateScale,
   scaleFont,
   verticalScale,
 } from "../../../../../utils/responsive";
-import { savedLLMOptions } from "../../../../../data/datas";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import gemini from "../../../../../assets/images/gemini.png";
+import anthropic from "../../../../../assets/images/antropic.png";
+import mistral from "../../../../../assets/images/mistral.png";
+import chatgpt from "../../../../../assets/images/chatgpt.png";
+import chakraLogo from "../../../../../assets/images/chakraFull.png";
 
 const screenHeight = Dimensions.get("window").height;
 
+// Helper function to map provider names to icons
+const providerImages = {
+  google: gemini,
+  anthropic: anthropic,
+  "mistral ai": mistral,
+  "open ai": chatgpt,
+  openai: chatgpt,
+};
+
+const getProviderImage = (provider) => {
+  const key = provider?.toLowerCase();
+  return providerImages[key] || anthropic;
+};
+
+// Helper function to generate badge text based on provider
+const getBadgeText = (provider) => {
+  const key = provider?.toLowerCase();
+  const badgeMap = {
+    google: "The Knowledge Engine",
+    openai: "The Idea Engine",
+    "open ai": "The Idea Engine",
+    anthropic: "The Thoughtful Engine",
+    "mistral ai": "The Logic Engine",
+    mistral: "The Logic Engine",
+  };
+  return badgeMap[key] || "";
+};
+
 const LLMSavedState = ({ setToggleIntegrateAi }) => {
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/llms",
+      name: "getAllLLMsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Initialize selected LLM from Redux state
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedLLM?.id) {
+      // Find the index of the selected LLM
+      const index = allLLMOptions.findIndex(
+        (option) => option.id === chatCustomisationStates.selectedLLM.id
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      // Default to Auto (index 0)
+      setSelectedStyle(0);
+    }
+  }, [chatCustomisationStates?.selectedLLM, allLLMOptions?.length]);
+
+  // Handle LLM selection
+  const handleLLMSelection = (llmOption, index) => {
+    setSelectedStyle(index);
+
+    // Update Redux state with selected LLM
+    const selectedData = {
+      id: llmOption.id === "auto" ? null : llmOption.id,
+      name: llmOption.name,
+    };
+
+    dispatch(setSelectedLLM(selectedData));
+  };
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
       {selected && <View style={styles.radioInner} />}
     </View>
   );
-  const dispatch = useDispatch();
+
+  // Combine Auto option with LLMs from API
+  const allLLMOptions = [
+    {
+      id: "auto",
+      icon: chakraLogo,
+      name: "Auto",
+      description:
+        "Elunara adjusts tone and style based on your query — from formal to friendly.",
+      provider: "chakra",
+    },
+    ...(settingsStates.settingsMasterDatas.allLLMsAvailable || []),
+  ];
 
   return (
     <View style={styles.content}>
@@ -66,11 +155,14 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
         style={{ maxHeight: screenHeight * 0.55 }}
       >
         <View style={styles.optionsMain}>
-          {savedLLMOptions?.map((option, optionsIndex) => {
+          {allLLMOptions?.map((option, optionsIndex) => {
+            const isAuto = option.id === "auto";
+            const icon = isAuto ? option.icon : getProviderImage(option.provider);
+            const badgeText = isAuto ? "" : getBadgeText(option.provider);
+
             return (
-              <>
+              <React.Fragment key={option.id || optionsIndex}>
                 <TouchableOpacity
-                  key={optionsIndex}
                   style={[
                     styles.card,
                     {
@@ -80,13 +172,13 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                         selectedStyle == optionsIndex ? "black" : "#D3DAE5",
                     },
                   ]}
-                  onPress={() => setSelectedStyle(optionsIndex)}
+                  onPress={() => handleLLMSelection(option, optionsIndex)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.contentMain}>
                     <View style={styles.iconContainer}>
                       <Image
-                        source={option.icon}
+                        source={icon}
                         style={{ height: 23, width: 23 }}
                       />
                     </View>
@@ -94,10 +186,10 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                       <Text
                         style={[
                           styles.optionTitle,
-                          { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
+                          { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
                         ]}
                       >
-                        {option.title}
+                        {option.name}
                       </Text>
                       <Text
                         style={[
@@ -106,23 +198,23 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                             fontSize: scaleFont(14),
                             fontWeight: 400,
                             color: "#8F8F8F",
-                            fontFamily:"Mukta-Regular"
+                            fontFamily: "Mukta-Regular"
                           },
                         ]}
                       >
-                        {option.desc}
+                        {option.description}
                       </Text>
-                      {optionsIndex !== 0 && (
+                      {!isAuto && badgeText && (
                         <View style={styles.buttonContainer}>
                           <Text
                             style={{
                               fontSize: scaleFont(12.5),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily:"Mukta-Regular"
+                              fontFamily: "Mukta-Regular"
                             }}
                           >
-                            {option.buttonText}
+                            {badgeText}
                           </Text>
                         </View>
                       )}
@@ -130,21 +222,21 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                   </View>
                   <RadioButton selected={selectedStyle === optionsIndex} />
                 </TouchableOpacity>
-                {optionsIndex == 0 && (
+                {isAuto && (
                   <View style={{ width: "100%" }}>
                     <Text
                       style={{
                         textAlign: "center",
                         color: "#757575",
                         fontSize: scaleFont(15),
-                        fontFamily:"Mukta-Regular"
+                        fontFamily: "Mukta-Regular"
                       }}
                     >
                       Or Select Manually
                     </Text>
                   </View>
                 )}
-              </>
+              </React.Fragment>
             );
           })}
         </View>
@@ -209,7 +301,13 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              <Pressable style={{borderBottomWidth:2}}>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleToolsPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
                 <Text style={{
                   fontSize: moderateScale(13),
                   lineHeight:15,

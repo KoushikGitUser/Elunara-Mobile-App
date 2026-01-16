@@ -69,7 +69,14 @@ const  ChatMiddleWrapper = () => {
                 <UserMessageBox chat={chats} key={chatsIndex} />
               );
             } else {
-              return <AIMessageBox message={chats.message} key={chatsIndex} />;
+              return (
+                <AIMessageBox
+                  message={chats.message}
+                  messageUuid={chats.uuid}
+                  isSavedToNotes={chats.is_saved_to_notes}
+                  key={chatsIndex}
+                />
+              );
             }
           })}
           {toggleStates.toggleIsWaitingForResponse && (

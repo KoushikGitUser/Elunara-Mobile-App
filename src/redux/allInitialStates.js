@@ -3,6 +3,7 @@ import { chatsStates } from "./allInitialStates/chatsStates";
 import { globalDataStates } from "./allInitialStates/globalDataStates";
 import { settingsStates } from "./allInitialStates/settingsStates";
 import { toggleStates } from "./allInitialStates/toggleStates";
+import { chatCustomisationStates } from "./allInitialStates/chatCustomisationStates";
 
 export const allInitialStates = {
     toggleStates,
@@ -10,4 +11,5 @@ export const allInitialStates = {
     authStates,
     settingsStates,
     chatsStates,
+    chatCustomisationStates,
 }

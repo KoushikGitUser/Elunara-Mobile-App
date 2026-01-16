@@ -20,5 +20,8 @@ export const chatsStates = {
         isAllUserChatsFetched:null,
         isAllUserRoomsFetched:null,
         isBulkOperationCompleted:null,
+        isAddToNotesPending:null,
+        isRemoveFromNotesPending:null,
+        isMessagesFetched:null,
     }
 }

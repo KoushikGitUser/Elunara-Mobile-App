@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import React from "react";
 import { ArrowUpRight, File } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,30 +19,30 @@ import { useFonts } from "expo-font";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SubTopicsCard = ({ item }) => {
-
-
   const dispatch = useDispatch();
   const { globalDataStates } = useSelector((state) => state.Global);
 
-  const createChatWithAIFunction = ()=>{
+  const createChatWithAIFunction = () => {
+    Alert.alert("SubTopicsCard", "Creating chat with subject_id: " + globalDataStates.selectedSubjectID + ", topic_id: " + item?.id);
     const data = {
       title:item.name,
       subject_id:globalDataStates.selectedSubjectID,
       topic_id:item?.id,
     }
     const payload = {
-      method:"POST",
-      url:"/chats",
+      method: "POST",
+      url: "/chats",
       data,
-      name:"createChatWithAI"
-    }
-    dispatch(commonFunctionForAPICalls(payload))
-  }
+      name: "createChatWithAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
+        Alert.alert("Click", "SubTopicsCard clicked!");
         createChatWithAIFunction();
         dispatch(
           setChatMessagesArray([

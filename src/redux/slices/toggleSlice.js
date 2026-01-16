@@ -138,6 +138,19 @@ const toggleSlice = createSlice({
     setToggleUpdateProfilePicPopup: (state, action) => {
       state.toggleStates.toggleUpdateProfilePicPopup = action.payload;
     },
+    // Chat Customisation Actions
+    setSelectedLLM: (state, action) => {
+      state.chatCustomisationStates.selectedLLM = action.payload;
+    },
+    setSelectedResponseStyle: (state, action) => {
+      state.chatCustomisationStates.selectedResponseStyle = action.payload;
+    },
+    setSelectedLanguage: (state, action) => {
+      state.chatCustomisationStates.selectedLanguage = action.payload;
+    },
+    setSelectedCitationFormat: (state, action) => {
+      state.chatCustomisationStates.selectedCitationFormat = action.payload;
+    },
   },
 });
 
@@ -185,7 +198,11 @@ export const {
   setToggleAddExistingChatToRoomPopup,
   setToggleAddChatToLearningLabPopup,
   setToggleAddLinkPopup,
-  setToggleUpdateProfilePicPopup
+  setToggleUpdateProfilePicPopup,
+  setSelectedLLM,
+  setSelectedResponseStyle,
+  setSelectedLanguage,
+  setSelectedCitationFormat
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

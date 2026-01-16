@@ -1,4 +1,4 @@
-import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable } from "./apiExtraReducerHandlers/chatsHandlers";
+import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable, handlePostAddToNotes, handlePostRemoveFromNotes, handleSendPromptAndGetMessageFromAI } from "./apiExtraReducerHandlers/chatsHandlers";
 import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage, handleFetchResponseStylesAvailable, handleFetchCitationFormatsAvailable } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
@@ -36,6 +36,10 @@ export const chatsHandlersFunctions = {
   getAllTopicsOfSelectedSubjects:handleGetAllTopicsOfSelectedSubjects,
 
   createChatWithAI:handleCreateChatWithAI,
+  sendPromptAndGetMessageFromAI: handleSendPromptAndGetMessageFromAI,
+  //Chat Notes
+  postAddToNotes: handlePostAddToNotes,
+  postRemoveFromNotes: handlePostRemoveFromNotes,
   renameAndUpdateChatTitle:handleRenameAndUpdateChatTitle,
   pinOrUnpinChat:handlePinOrUnpinChat,
   archiveOrUnarchiveChat:handleArchiveOrUnarchiveChat,

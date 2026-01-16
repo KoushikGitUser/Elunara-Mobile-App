@@ -20,6 +20,7 @@ import { ArrowLeft } from "lucide-react-native";
 import DropDowns from "../DropDowns";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
@@ -36,6 +37,7 @@ const LLMState = () => {
   const [toggleIntegrateAi, setToggleIntegrateAi] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { settingsStates, loading } = useSelector((state) => state.API);
 
   useEffect(() => {
@@ -255,7 +257,13 @@ const LLMState = () => {
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              <Pressable style={{borderBottomWidth:2}}>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleToolsPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
                 <Text style={{
                   fontSize: moderateScale(13),
                   lineHeight:15,
