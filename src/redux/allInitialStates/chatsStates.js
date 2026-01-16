@@ -10,6 +10,7 @@ export const chatsStates = {
     lastBulkOperationInfo:null,
     chatMessages:{},
     aiMessageContent:null,
+    regeneratedResponse:{},
     },
     loaderStates:{
         isAllRecentChatsFetched:null,
@@ -26,5 +27,8 @@ export const chatsStates = {
         isRemoveFromNotesPending:null,
         isMessagesFetched:null,
         isTopicsOfSelectedSubjectsFetched:null,
+        isUserMessageUpdated:null,
+        isAIResponseRegenerated:null,
+        isAllMessagesOfChatFetched:null,
     }
 }

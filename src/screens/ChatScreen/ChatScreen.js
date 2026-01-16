@@ -7,6 +7,8 @@ import {
   StatusBar,
   BackHandler,
   Alert,
+  Image,
+  Modal,
 } from "react-native";
 import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -89,6 +91,7 @@ const ChatScreen = () => {
   const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
   const isMessagesFetched = chatsStates?.loaderStates?.isMessagesFetched;
   const chatMessages = chatsStates?.allChatsDatas?.chatMessages;
+  const isAllMessagesOfChatFetched = chatsStates?.loaderStates?.isAllMessagesOfChatFetched;
 
   // Refs for guided tour measurements
   const chatHeaderRef = useRef(null);
@@ -577,6 +580,25 @@ const ChatScreen = () => {
     <SafeAreaView
       style={{ flex: 1, width: "100%", marginTop: -StatusBar.currentHeight }}
     >
+      {/* Full-screen loader for fetching messages */}
+      {isAllMessagesOfChatFetched === "pending" && (
+        <Modal visible={true} transparent={true} animationType="fade">
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(255, 255, 255, 0.95)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../assets/images/authLoader.gif")}
+              style={{ width: 150, height: 150 }}
+            />
+          </View>
+        </Modal>
+      )}
+
       <ChatHistorySidebar ref={sidebarRef} translateX={translateX} />
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <View

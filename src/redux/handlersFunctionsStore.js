@@ -1,4 +1,4 @@
-import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable, handlePostAddToNotes, handlePostRemoveFromNotes, handleSendPromptAndGetMessageFromAI } from "./apiExtraReducerHandlers/chatsHandlers";
+import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable, handlePostAddToNotes, handlePostRemoveFromNotes, handleSendPromptAndGetMessageFromAI, handleUpdateUserMessageForRegeneration, handleRegenerateAIResponse, handleGetAllMessagesOfParticularChat } from "./apiExtraReducerHandlers/chatsHandlers";
 import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage, handleFetchResponseStylesAvailable, handleFetchCitationFormatsAvailable } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
@@ -37,6 +37,7 @@ export const chatsHandlersFunctions = {
 
   createChatWithAI:handleCreateChatWithAI,
   sendPromptAndGetMessageFromAI: handleSendPromptAndGetMessageFromAI,
+  getAllMessagesOfParticularChat:handleGetAllMessagesOfParticularChat,
   //Chat Notes
   postAddToNotes: handlePostAddToNotes,
   postRemoveFromNotes: handlePostRemoveFromNotes,
@@ -47,6 +48,9 @@ export const chatsHandlersFunctions = {
   undoDeleteChat:handleUndoDeleteChat,
   fetchAllUserChatsAvailable:handleFetchAllUserChatsAvailable,
   bulkOperationsForChats:handleBulkOperationsForChats,
-  fetchAllUserRoomsAvailable:handleFetchAllUserRoomsAvailable
+  fetchAllUserRoomsAvailable:handleFetchAllUserRoomsAvailable,
+  //Message editing and regeneration
+  updateUserMessageForRegeneration:handleUpdateUserMessageForRegeneration,
+  regenerateAIResponse:handleRegenerateAIResponse
 }
 

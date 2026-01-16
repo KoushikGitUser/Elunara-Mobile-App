@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatActionsPopupOnLongPress,
   setToggleChatHistorySidebar,
+  setToggleIsChattingWithAI,
 } from "../../../redux/slices/toggleSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { scaleFont } from "../../../utils/responsive";
@@ -38,10 +39,11 @@ const IndividualRecentChat = ({ item, translateX }) => {
   const fetchAllMessagesOfChat = () => {
     const payload = {
       method: "GET",
-      url: `/chats/${item?.id}`,
-      name: "getAllDetailsOfChatByID",
+      url: `/chats/${item?.id}/messages`,
+      name: "getAllMessagesOfParticularChat",
     };
     dispatch(commonFunctionForAPICalls(payload));
+    dispatch(setToggleIsChattingWithAI(true));
   };
 
   return (

@@ -249,12 +249,10 @@ export const handleSendPromptAndGetMessageFromAI = {
     const userMessageId = responseData?.user_message?.id;
     const aiMessageId = responseData?.assistant_message?.id;
 
-    if (userMessageId && aiMessageId) {
       // Get current messageIDsArray from globalDataStates
       const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
       // Add both user and AI message IDs
       state.globalDataStates.messageIDsArray = [...currentMessageIds, userMessageId, aiMessageId];
-    }
 
     state.chatsStates.loaderStates.isMessagesFetched = true;
   },
@@ -287,5 +285,98 @@ export const handlePostRemoveFromNotes = {
   },
   rejected: (state, {payload}) => {
     state.chatsStates.loaderStates.isRemoveFromNotesPending = false;
+  },
+};
+
+export const handleUpdateUserMessageForRegeneration = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isUserMessageUpdated = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isUserMessageUpdated = true;
+    console.log("User message updated:", action?.payload.data);
+  },
+  rejected: (state, {payload}) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isUserMessageUpdated = false;
+  },
+};
+
+export const handleRegenerateAIResponse = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAIResponseRegenerated = "pending";
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    state.chatsStates.allChatsDatas.regeneratedResponse = responseData;
+
+    // Store AI message content separately
+    state.chatsStates.allChatsDatas.aiMessageContent = responseData?.assistant_message?.content || null;
+
+    // Store message IDs in the messageIDsArray
+    const userMessageId = responseData?.user_message?.id;
+    const aiMessageId = responseData?.assistant_message?.id;
+
+    if (userMessageId && aiMessageId) {
+      // Get current messageIDsArray from globalDataStates
+      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      // Add both user and AI message IDs
+      state.globalDataStates.messageIDsArray = [...currentMessageIds, userMessageId, aiMessageId];
+    }
+
+    state.chatsStates.loaderStates.isAIResponseRegenerated = true;
+    console.log("AI response regenerated:", responseData);
+  },
+  rejected: (state, {payload}) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isAIResponseRegenerated = false;
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+  },
+};
+
+export const handleGetAllMessagesOfParticularChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    const messages = responseData?.messages || [];
+
+    // Transform messages to chatMessagesArray format
+    const chatMessagesArray = messages.map((msg) => ({
+      role: msg.role === "assistant" ? "ai" : msg.role,
+      message: msg.content,
+      uuid: msg.uuid,
+      is_saved_to_notes: false, // Default value, can be updated if available in response
+    }));
+
+    // Store in globalDataStates
+    state.globalDataStates.chatMessagesArray = chatMessagesArray;
+
+    // Extract and store message IDs in messageIDsArray
+    const messageIDsArray = [];
+    for (let i = 0; i < messages.length; i += 2) {
+      // Assuming messages come in pairs: user, assistant, user, assistant...
+      const userMsg = messages[i];
+      const aiMsg = messages[i + 1];
+
+      if (userMsg && userMsg.uuid) {
+        messageIDsArray.push(userMsg.uuid);
+      }
+      if (aiMsg && aiMsg.uuid) {
+        messageIDsArray.push(aiMsg.uuid);
+      }
+    }
+
+    state.globalDataStates.messageIDsArray = messageIDsArray;
+
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = true;
+    console.log("All messages fetched:", chatMessagesArray);
+    console.log("Message IDs array:", messageIDsArray);
+  },
+  rejected: (state, {payload}) => {
+    console.log(payload?.message || "Failed to fetch messages");
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = false;
   },
 };

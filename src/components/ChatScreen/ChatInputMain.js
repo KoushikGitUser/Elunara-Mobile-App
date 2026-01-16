@@ -37,6 +37,7 @@ import {
   setToggleToolsPopup,
   setToggleTopicsPopup,
   setToggleUnlockPersonalisationLimitPopup,
+  setIsEditingUserMessage,
 } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
@@ -52,6 +53,8 @@ import {
   setChatMessagesArray,
   setSelecetdFiles,
   setCurrentSelectedTopic,
+  setMessageIDsArray,
+  setEditingMessageData,
 } from "../../redux/slices/globalDataSlice";
 import ImageFile from "./ChatInputCompos/SelectedFilesCompo/ImageFile";
 import PdfFile from "./ChatInputCompos/SelectedFilesCompo/PdfFile";
@@ -177,6 +180,71 @@ const ChatInputMain = forwardRef((props, ref) => {
     dispatch(commonFunctionForAPICalls(payload));
   };
 
+  const handleEditingModeSend = () => {
+    const editingMessageData = globalDataStates.editingMessageData;
+    if (!editingMessageData) return;
+
+    const editingIndex = editingMessageData.messageIndex;
+    const updatedMessage = globalDataStates.userMessagePrompt;
+
+    // Get user message ID BEFORE updating arrays
+    const userMessageId = globalDataStates.messageIDsArray[editingIndex * 2];
+
+    if (!userMessageId) {
+      Alert.alert("Error", "Message ID not found");
+      return;
+    }
+
+    // Delete messages below the editing point from chatMessagesArray
+    const updatedChatMessagesArray = globalDataStates.chatMessagesArray.slice(0, editingIndex);
+
+    // Update the user message at the editing index
+    updatedChatMessagesArray[editingIndex] = {
+      ...editingMessageData.chat,
+      message: updatedMessage,
+    };
+
+    // Delete corresponding message IDs from messageIDsArray
+    // Each message pair has 2 IDs (user + AI), so delete from (editingIndex * 2)
+    const updatedMessageIDsArray = globalDataStates.messageIDsArray.slice(0, editingIndex * 2);
+
+    // Update arrays
+    dispatch(setChatMessagesArray(updatedChatMessagesArray));
+    dispatch(setMessageIDsArray(updatedMessageIDsArray));
+
+    // Call both APIs
+    const updatePayload = {
+      method: "PUT",
+      url: `/messages/${userMessageId}`,
+      data: {
+        content: updatedMessage,
+      },
+      name: "updateUserMessageForRegeneration",
+    };
+
+    const regeneratePayload = {
+      method: "POST",
+      url: `/messages/${userMessageId}/regenerate`,
+      data: {
+        content: updatedMessage,
+      },
+      name: "regenerateAIResponse",
+    };
+
+    // Dispatch both API calls
+    dispatch(commonFunctionForAPICalls(updatePayload));
+    dispatch(commonFunctionForAPICalls(regeneratePayload));
+
+    // Set waiting state
+    dispatch(setToggleIsWaitingForResponse(true));
+
+    // Clear input and reset editing state
+    dispatch(setUserMessagePrompt(""));
+    dispatch(setChatInputContentLinesNumber(1));
+    dispatch(setIsEditingUserMessage(false));
+    dispatch(setEditingMessageData(null));
+  };
+
   const handleContentSizeChange = (event) => {
     const contentHeight = event.nativeEvent.contentSize.height;
 
@@ -245,6 +313,37 @@ const ChatInputMain = forwardRef((props, ref) => {
       dispatch(setChatInputContentLinesNumber(1));
     }
   }, [globalDataStates.userMessagePrompt]);
+
+  // Pre-fill input when editing mode is active
+  useEffect(() => {
+    if (toggleStates.isEditingUserMessage && globalDataStates.editingMessageData) {
+      dispatch(setUserMessagePrompt(globalDataStates.editingMessageData.message));
+    }
+  }, [toggleStates.isEditingUserMessage, globalDataStates.editingMessageData]);
+
+  // Handle regenerated AI response
+  useEffect(() => {
+    const isAIResponseRegenerated = chatsStates.loaderStates.isAIResponseRegenerated;
+
+    if (isAIResponseRegenerated === true && aiMessageContent) {
+      // Add regenerated AI message to chat messages array
+      dispatch(
+        setChatMessagesArray([
+          ...globalDataStates.chatMessagesArray,
+          {
+            role: "ai",
+            message: aiMessageContent,
+          },
+        ])
+      );
+      dispatch(setToggleIsWaitingForResponse(false));
+    }
+
+    // Handle error case
+    if (isAIResponseRegenerated === false) {
+      dispatch(setToggleIsWaitingForResponse(false));
+    }
+  }, [chatsStates.loaderStates.isAIResponseRegenerated, aiMessageContent]);
 
   return (
     <View
@@ -395,6 +494,12 @@ const ChatInputMain = forwardRef((props, ref) => {
               globalDataStates.selectedFiles.length > 0) && (
               <TouchableOpacity
                 onPress={() => {
+                  // Check if in editing mode
+                  if (toggleStates.isEditingUserMessage) {
+                    handleEditingModeSend();
+                    return;
+                  }
+
                   // Add user message to chat array
                   dispatch(
                     setChatMessagesArray([
