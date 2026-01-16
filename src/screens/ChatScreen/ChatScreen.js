@@ -69,6 +69,7 @@ const ChatScreen = () => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -76,6 +77,15 @@ const ChatScreen = () => {
 
   // Store original chat messages before mock injection
   const [originalChatMessages, setOriginalChatMessages] = useState([]);
+
+  // States for tracking chat creation and messages fetching
+  const [isWaitingForChat, setIsWaitingForChat] = useState(false);
+  const [isWaitingForMessages, setIsWaitingForMessages] = useState(false);
+
+  const isChatCreatedWithAI = chatsStates?.loaderStates?.isChatCreatedWithAI;
+  const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
+  const isMessagesFetched = chatsStates?.loaderStates?.isMessagesFetched;
+  const chatMessages = chatsStates?.allChatsDatas?.chatMessages;
 
   // Refs for guided tour measurements
   const chatHeaderRef = useRef(null);
@@ -104,6 +114,47 @@ const ChatScreen = () => {
     }
     dispatch(commonFunctionForAPICalls(payload));
   },[])
+
+  // Track previous chat UUID to detect new chat creation
+  const previousChatUuidRef = useRef(null);
+
+  // When chat is created, send message to get AI response
+  useEffect(() => {
+    if (isChatCreatedWithAI === true && createdChatDetails?.id) {
+      // Only proceed if this is a new chat (different ID)
+      if (previousChatUuidRef.current !== createdChatDetails.id) {
+        previousChatUuidRef.current = createdChatDetails.id;
+        setIsWaitingForMessages(true);
+        const chatId = createdChatDetails.id;
+        Alert.alert("Chat Created", "ID: " + chatId + "\nNow sending message...");
+        const payload = {
+          method: "POST",
+          url: `/chats/${chatId}/messages`,
+          data: {
+            content: globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1]?.message || "Hello",
+          },
+          name: "getMessagesByChatUuid",
+        };
+        dispatch(commonFunctionForAPICalls(payload));
+      }
+    }
+  }, [isChatCreatedWithAI, createdChatDetails]);
+
+  // When messages are fetched, show alert
+  useEffect(() => {
+    if (isWaitingForMessages && isMessagesFetched === true) {
+      setIsWaitingForMessages(false);
+      const userMessage = chatMessages?.user_message;
+      const id = userMessage?.id || "none";
+      const content = userMessage?.content || "No content";
+      Alert.alert("User Message", "ID: " + id + "\nContent: " + content);
+    }
+    // Handle rejected case
+    if (isWaitingForMessages && isMessagesFetched === false) {
+      setIsWaitingForMessages(false);
+      Alert.alert("Messages API Failed", "getMessagesByChatUuid was rejected");
+    }
+  }, [isMessagesFetched, chatMessages, isWaitingForMessages]);
 
   useEffect(() => {
     const checkNewUser = async () => {
@@ -315,6 +366,17 @@ const ChatScreen = () => {
 
     return () => backHandler.remove(); // clean up
   }, [toggleExitAppConfirmPopup]);
+
+  // Note: postAddToNotes should be called with actual message uuid when user clicks "Add to Notes"
+  // Example usage:
+  const handleAddToNotes = (messageUuid) => {
+    const payload = {
+      method: "POST",
+      url: `/messages/${messageUuid}/add-to-notes`,
+      name: "postAddToNotes",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   // Helper function to close sidebar
   const closeSidebar = () => {

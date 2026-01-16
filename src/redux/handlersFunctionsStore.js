@@ -1,4 +1,4 @@
-import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects } from "./apiExtraReducerHandlers/chatsHandlers";
+import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handlePostAddToNotes, handlePostRemoveFromNotes, handleGetMessagesByChatUuid } from "./apiExtraReducerHandlers/chatsHandlers";
 import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
@@ -31,7 +31,11 @@ export const chatsHandlersFunctions = {
   getAllDetailsOfChatByID:handleGetAllDetailsOfChatByID,
   //get master datas
   getAllSubjectsForChat:handleGetAllSubjectsForChat,
-  getAllTopicsOfSelectedSubjects:handleGetAllTopicsOfSelectedSubjects, 
+  getAllTopicsOfSelectedSubjects:handleGetAllTopicsOfSelectedSubjects,
 
   createChatWithAI:handleCreateChatWithAI,
+  getMessagesByChatUuid: handleGetMessagesByChatUuid,
+  //Chat Notes
+  postAddToNotes: handlePostAddToNotes,
+  postRemoveFromNotes: handlePostRemoveFromNotes,
 }
