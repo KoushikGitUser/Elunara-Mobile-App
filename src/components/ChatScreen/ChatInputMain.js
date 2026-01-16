@@ -218,15 +218,37 @@ const ChatInputMain = forwardRef((props, ref) => {
     };
   }, []);
 
-  // Real API flow - when AI message is fetched, add it to chat messages array
+  // Get latest message data from API response
+  const latestUserMessageData = chatsStates.allChatsDatas.latestUserMessageData;
+  const latestAiMessageData = chatsStates.allChatsDatas.latestAiMessageData;
+
+  // Real API flow - when AI message is fetched, add it to chat messages array with uuid
   useEffect(() => {
     if (isMessagesFetched === true && aiMessageContent) {
+      // Update the last user message with uuid if available
+      let updatedMessages = [...globalDataStates.chatMessagesArray];
+
+      // Find and update the last user message with uuid
+      if (latestUserMessageData && updatedMessages.length > 0) {
+        const lastIndex = updatedMessages.length - 1;
+        if (updatedMessages[lastIndex].role === "user") {
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            uuid: latestUserMessageData.uuid,
+            is_saved_to_notes: latestUserMessageData.is_saved_to_notes,
+          };
+        }
+      }
+
+      // Add AI message with uuid
       dispatch(
         setChatMessagesArray([
-          ...globalDataStates.chatMessagesArray,
+          ...updatedMessages,
           {
             role: "ai",
             message: aiMessageContent,
+            uuid: latestAiMessageData?.uuid || null,
+            is_saved_to_notes: latestAiMessageData?.is_saved_to_notes || false,
           },
         ])
       );
@@ -236,7 +258,7 @@ const ChatInputMain = forwardRef((props, ref) => {
     if (isMessagesFetched === false && toggleStates.toggleIsWaitingForResponse) {
       dispatch(setToggleIsWaitingForResponse(false));
     }
-  }, [isMessagesFetched, aiMessageContent]);
+  }, [isMessagesFetched, aiMessageContent, latestUserMessageData, latestAiMessageData]);
 
   // Reset input height when text is cleared
   useEffect(() => {

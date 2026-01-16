@@ -2,17 +2,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, verticalScale } from "../../../utils/responsive";
-import { EvilIcons, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ChevronDown } from "lucide-react-native";
-import copy from "../../../assets/images/copy.png";
-import share from "../../../assets/images/Share.png";
-import bookmark from "../../../assets/images/Bookmarks.png";
-import feedback from "../../../assets/images/Feedback.png";
-import repeat from "../../../assets/images/Repeat.png";
 import * as Clipboard from 'expo-clipboard';
 import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
 import ShareIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/ShareIcon";
-import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
 import BookMarkIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookMarkIcon";
 import FeedbackIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/FeedbackIcon";
 import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
@@ -22,10 +15,12 @@ import MessageSharePopup from "../../Modals/ChatScreen/Messages/MessageSharePopu
 import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookmarkFilledIcon";
 import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { setChatMessagesArray } from "../../../redux/slices/globalDataSlice";
 
 const AIMessageBox = ({ message, messageUuid, isSavedToNotes = false }) => {
   const dispatch = useDispatch();
   const { chatsStates } = useSelector((state) => state.API);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const [changeResponsePopup,setChangeResponsePopup] = useState(false);
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
@@ -35,24 +30,38 @@ const AIMessageBox = ({ message, messageUuid, isSavedToNotes = false }) => {
 
   const isAddToNotesPending = chatsStates?.loaderStates?.isAddToNotesPending;
   const isRemoveFromNotesPending = chatsStates?.loaderStates?.isRemoveFromNotesPending;
+  const lastNotesActionMessageUuid = chatsStates?.allChatsDatas?.lastNotesActionMessageUuid;
 
-  // Watch for add to notes success
+  // Helper function to update message's is_saved_to_notes in chatMessagesArray
+  const updateMessageNotesStatus = (isSaved) => {
+    const updatedMessages = globalDataStates.chatMessagesArray.map((msg) => {
+      if (msg.uuid === messageUuid) {
+        return { ...msg, is_saved_to_notes: isSaved };
+      }
+      return msg;
+    });
+    dispatch(setChatMessagesArray(updatedMessages));
+  };
+
+  // Watch for add to notes success - only update if this message was the one acted upon
   useEffect(() => {
-    if (isAddingToNotes && isAddToNotesPending === true) {
+    if (isAddingToNotes && isAddToNotesPending === true && lastNotesActionMessageUuid === messageUuid) {
       setSavedToNotes(true);
+      updateMessageNotesStatus(true);
       triggerToastWithAction("Response saved in note", "Response saved in note", "success", 5000, "View", () => console.log("View"));
       setIsAddingToNotes(false);
     }
-  }, [isAddToNotesPending, isAddingToNotes]);
+  }, [isAddToNotesPending, isAddingToNotes, lastNotesActionMessageUuid, messageUuid]);
 
-  // Watch for remove from notes success
+  // Watch for remove from notes success - only update if this message was the one acted upon
   useEffect(() => {
-    if (isRemovingFromNotes && isRemoveFromNotesPending === true) {
+    if (isRemovingFromNotes && isRemoveFromNotesPending === true && lastNotesActionMessageUuid === messageUuid) {
       setSavedToNotes(false);
+      updateMessageNotesStatus(false);
       triggerToast("Response removed from notes", "", "normal", 3000);
       setIsRemovingFromNotes(false);
     }
-  }, [isRemoveFromNotesPending, isRemovingFromNotes]);
+  }, [isRemoveFromNotesPending, isRemovingFromNotes, lastNotesActionMessageUuid, messageUuid]);
 
   const handleCopy = async() => {
     await Clipboard.setStringAsync(message);

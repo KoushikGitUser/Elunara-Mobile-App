@@ -10,6 +10,10 @@ export const chatsStates = {
     lastBulkOperationInfo:null,
     chatMessages:{},
     aiMessageContent:null,
+    latestUserMessageData:null,
+    latestAiMessageData:null,
+    addToNotes:{},
+    lastNotesActionMessageUuid:null,
     },
     loaderStates:{
         isAllRecentChatsFetched:null,

@@ -235,6 +235,8 @@ export const handleSendPromptAndGetMessageFromAI = {
   pending: (state) => {
     state.chatsStates.loaderStates.isMessagesFetched = "pending";
     state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.chatsStates.allChatsDatas.latestUserMessageData = null;
+    state.chatsStates.allChatsDatas.latestAiMessageData = null;
     // Reset isChatCreatedWithAI after using it to trigger send-message
     state.chatsStates.loaderStates.isChatCreatedWithAI = null;
   },
@@ -245,9 +247,24 @@ export const handleSendPromptAndGetMessageFromAI = {
     // Store AI message content separately
     state.chatsStates.allChatsDatas.aiMessageContent = responseData?.assistant_message?.content || null;
 
+    // Store full user and AI message data including uuid for notes functionality
+    const userMessage = responseData?.user_message;
+    const aiMessage = responseData?.assistant_message;
+
+    // Store latest message data for updating chatMessagesArray with uuid
+    state.chatsStates.allChatsDatas.latestUserMessageData = userMessage ? {
+      uuid: userMessage.uuid || userMessage.id,
+      is_saved_to_notes: userMessage.is_saved_to_notes || false,
+    } : null;
+
+    state.chatsStates.allChatsDatas.latestAiMessageData = aiMessage ? {
+      uuid: aiMessage.uuid || aiMessage.id,
+      is_saved_to_notes: aiMessage.is_saved_to_notes || false,
+    } : null;
+
     // Store message IDs in the messageIDsArray
-    const userMessageId = responseData?.user_message?.id;
-    const aiMessageId = responseData?.assistant_message?.id;
+    const userMessageId = userMessage?.id;
+    const aiMessageId = aiMessage?.id;
 
     if (userMessageId && aiMessageId) {
       // Get current messageIDsArray from globalDataStates
@@ -261,12 +278,18 @@ export const handleSendPromptAndGetMessageFromAI = {
   rejected: (state, {payload}) => {
     state.chatsStates.loaderStates.isMessagesFetched = false;
     state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.chatsStates.allChatsDatas.latestUserMessageData = null;
+    state.chatsStates.allChatsDatas.latestAiMessageData = null;
   },
 };
 
 export const handlePostAddToNotes = {
-  pending: (state) => {
+  pending: (state, action) => {
     state.chatsStates.loaderStates.isAddToNotesPending = "pending";
+    // Extract message UUID from the URL pattern /messages/{uuid}/add-to-notes
+    const url = action?.meta?.arg?.url || "";
+    const match = url.match(/\/messages\/([^/]+)\/add-to-notes/);
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = match ? match[1] : null;
   },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.addToNotes = action?.payload.data.data;
@@ -274,12 +297,17 @@ export const handlePostAddToNotes = {
   },
   rejected: (state, {payload}) => {
     state.chatsStates.loaderStates.isAddToNotesPending = false;
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = null;
   },
 };
 
 export const handlePostRemoveFromNotes = {
-  pending: (state) => {
+  pending: (state, action) => {
     state.chatsStates.loaderStates.isRemoveFromNotesPending = "pending";
+    // Extract message UUID from the URL pattern /messages/{uuid}/remove-from-notes
+    const url = action?.meta?.arg?.url || "";
+    const match = url.match(/\/messages\/([^/]+)\/remove-from-notes/);
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = match ? match[1] : null;
   },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.addToNotes = {};
@@ -287,5 +315,6 @@ export const handlePostRemoveFromNotes = {
   },
   rejected: (state, {payload}) => {
     state.chatsStates.loaderStates.isRemoveFromNotesPending = false;
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = null;
   },
 };
