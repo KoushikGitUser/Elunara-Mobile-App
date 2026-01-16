@@ -6,22 +6,74 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     setToggleToolsPopup,
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
+  setSelectedCitationFormat,
 } from "../../../../../redux/slices/toggleSlice";
-import { citationStyles } from "../../../../../data/datas";
-import PenNib from '../../../../../assets/images/penNib2.svg'
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import APAIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/APAIcon";
+import HavardIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/HavardIcon";
+
+
+// Helper function to get citation icon based on name
+const getCitationIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("apa")) {
+    return <APAIcon />;
+  } else if (key?.includes("harvard") || key?.includes("havard")) {
+    return <HavardIcon />;
+  }
+  return <APAIcon />; // Default to APA
+};
 
 const CitationState = () => {
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/citation-formats",
+      name: "fetchCitationFormatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Initialize selected citation from Redux state
+  const allCitationFormats = settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [];
+
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedCitationFormat?.id) {
+      const index = allCitationFormats.findIndex(
+        (format) => format.id === chatCustomisationStates.selectedCitationFormat.id
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      setSelectedStyle(0); // Default to first option (Harvard)
+    }
+  }, [chatCustomisationStates?.selectedCitationFormat, allCitationFormats.length]);
+
+  // Handle citation selection
+  const handleCitationSelection = (citationOption) => {
+    const selectedData = {
+      id: citationOption.id,
+      name: citationOption.name,
+    };
+
+    dispatch(setSelectedCitationFormat(selectedData));
+    setSelectedStyle(citationOption.id);
+  };
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -54,52 +106,56 @@ const CitationState = () => {
           submissions.
         </Text>
         <View style={{ flexDirection: "column", gap: 25 }}>
-          {citationStyles.map((styleOptions, optionsIndex) => (
-            <TouchableOpacity
-              key={optionsIndex} 
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    selectedStyle == styleOptions.id ? "#EEF4FF" : "white",
-                  borderColor:
-                    selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
-                },
-              ]}
-              onPress={() => setSelectedStyle(styleOptions.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.contentMain}>
-                <View style={styles.iconContainer}>
-                  {styleOptions.icon}
+          {(settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [])?.map((styleOptions, optionsIndex) => {
+            const icon = getCitationIcon(styleOptions.name);
+
+            return (
+              <TouchableOpacity
+                key={styleOptions.id || optionsIndex}
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor:
+                      selectedStyle == styleOptions.id ? "#EEF4FF" : "white",
+                    borderColor:
+                      selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
+                  },
+                ]}
+                onPress={() => handleCitationSelection(styleOptions)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.contentMain}>
+                  <View style={styles.iconContainer}>
+                    {icon}
+                  </View>
+                  <View style={styles.textContainer}>
+                    <Text
+                      style={[
+                        styles.optionTitle,
+                        { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
+                      ]}
+                    >
+                      {styleOptions.name}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.optionDescription,
+                        {
+                          fontSize: scaleFont(14),
+                          fontWeight: 400,
+                          color: "#8F8F8F",
+                          fontFamily: "Mukta-Regular"
+                        },
+                      ]}
+                    >
+                      {styleOptions.description}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.textContainer}>
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold"},
-                    ]}
-                  >
-                    {styleOptions.style}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.optionDescription,
-                      {
-                        fontSize: scaleFont(14),
-                        fontWeight: 400,
-                        color: "#8F8F8F",
-                        fontFamily:"Mukta-Regular"
-                      },
-                    ]}
-                  >
-                    {styleOptions.description}
-                  </Text>
-                </View>
-              </View>
-              <RadioButton selected={selectedStyle === styleOptions.id} />
-            </TouchableOpacity>
-          ))}
+                <RadioButton selected={selectedStyle === styleOptions.id} />
+              </TouchableOpacity>
+            );
+          })}
         </View>
         <Text style={{ fontSize: moderateScale(12), fontWeight: 400,color:"#3A3A3A",textAlign:"center",marginTop:40,marginBottom:20,fontFamily:"Mukta-Regular" }}>
           <Text style={{ fontSize: moderateScale(12), fontWeight: 600,color:"black",fontFamily:"Mukta-Bold" }}>

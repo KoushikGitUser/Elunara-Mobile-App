@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { allInitialStates } from "../allInitialStates";
 import { setUser } from "./authSlice";
+import { resetAllStates } from "../actions/resetActions";
 
 const globalDataSlice = createSlice({
   name: 'globalDatas',
@@ -23,6 +24,9 @@ const globalDataSlice = createSlice({
     setChatMessagesArray: (state, action) => {
       state.globalDataStates.chatMessagesArray = action.payload;
     },
+    setMessageIDsArray: (state, action) => {
+      state.globalDataStates.messageIDsArray = action.payload;
+    },
     setCurrentSelectedTopic: (state, action) => {
       state.globalDataStates.currentSelectedTopic = action.payload;
     },
@@ -31,6 +35,9 @@ const globalDataSlice = createSlice({
     },
     setUserMessageOnLongPress: (state, action) => {
       state.globalDataStates.userMessageOnLongPress = action.payload;
+    },
+    setEditingMessageData: (state, action) => {
+      state.globalDataStates.editingMessageData = action.payload;
     },
     setSettingsInnerPageHeaderTitle: (state, action) => {
       state.globalDataStates.settingsInnerPageHeaderTitle = action.payload;
@@ -90,6 +97,11 @@ const globalDataSlice = createSlice({
       state.globalDataStates.learningLabsGuideTourSteps = 0;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(resetAllStates, () => {
+      return allInitialStates;
+    });
+  },
 });
 
 export const {
@@ -98,9 +110,11 @@ export const {
   setUserMessagePrompt,
   setChatInputContentLinesNumber,
   setChatMessagesArray,
+  setMessageIDsArray,
   setCurrentSelectedTopic,
   setChatTitleOnLongPress,
   setUserMessageOnLongPress,
+  setEditingMessageData,
   setSettingsInnerPageHeaderTitle,
   setSettingsInnerPageComponentToRender,
   setCompareResponseStyleItemsArray,

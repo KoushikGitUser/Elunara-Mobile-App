@@ -10,6 +10,9 @@ export const toggleStates = {
       toggleIsWaitingForResponse:false,
       toggleSubTopics:false,
       toggleDeleteChatConfirmPopup:false,
+      toggleArchiveChatConfirmPopup:false,
+      toggleDeleteChatPopup:false,
+      toggleArchiveChatPopup:false,
       toggleRenameChatPopup:false,
       toggleUserMessageActionPopup:false,
       toggleChatActionsPopupOnLongPress:false,
@@ -40,4 +43,5 @@ export const toggleStates = {
       toggleAddChatToLearningLabPopup:false,
       toggleAddLinkPopup:false,
       toggleUpdateProfilePicPopup:false,
+      isEditingUserMessage:false,
 }

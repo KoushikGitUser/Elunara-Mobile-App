@@ -4,6 +4,7 @@ import { allInitialStates } from "../allInitialStates";
 import { addCasePending } from "../addCases/pending";
 import { addCaseFulfilled } from "../addCases/fulfilled";
 import { addCaseRejected } from "../addCases/rejected";
+import { resetAllStates } from "../actions/resetActions";
 
 export const commonFunctionForAPICalls = createAsyncThunk(
   "/common-api-call",
@@ -52,6 +53,27 @@ const apiCommonSlice = createSlice({
     },
     setIsPersonalInfosFetched:(state,action)=>{
       state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = action.payload;
+    },
+    resetChatTitleUpdated:(state)=>{
+      state.chatsStates.loaderStates.isChatTitleUpdated = null;
+    },
+    resetChatPinUnpinUpdated:(state)=>{
+      state.chatsStates.loaderStates.isChatPinUnpinUpdated = null;
+    },
+    resetChatArchiveUnarchiveUpdated:(state)=>{
+      state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = null;
+    },
+    resetChatDeleted:(state)=>{
+      state.chatsStates.loaderStates.isChatDeleted = null;
+    },
+    resetChatDeleteUndone:(state)=>{
+      state.chatsStates.loaderStates.isChatDeleteUndone = null;
+    },
+    resetBulkOperationCompleted:(state)=>{
+      state.chatsStates.loaderStates.isBulkOperationCompleted = null;
+    },
+    setCurrentActionChatDetails:(state,action)=>{
+      state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -67,11 +89,15 @@ const apiCommonSlice = createSlice({
       // Handle rejected API calls
       .addCase(commonFunctionForAPICalls.rejected, (state, action) => {
         addCaseRejected(state, action);
+      })
+      // Handle reset all states
+      .addCase(resetAllStates, () => {
+        return allInitialStates;
       });
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched} =
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched,resetChatTitleUpdated,resetChatPinUnpinUpdated,resetChatArchiveUnarchiveUpdated,resetChatDeleted,resetChatDeleteUndone,resetBulkOperationCompleted,setCurrentActionChatDetails} =
   apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

@@ -35,21 +35,22 @@ const IndividualRecentChat = ({ item, translateX }) => {
     return title?.slice(0, limit) + "...";
   };
 
-  const fetchAllMessagesOfChat = ()=>{
-     const payload = {
-      method:"GET",
-      url:`/chats/${item?.uuid}`,
-      name:"getAllDetailsOfChatByID"
-     }    
-     dispatch(commonFunctionForAPICalls(payload));
-  }
+  const fetchAllMessagesOfChat = () => {
+    const payload = {
+      method: "GET",
+      url: `/chats/${item?.id}`,
+      name: "getAllDetailsOfChatByID",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   return (
     <TouchableOpacity
-    onPress={()=>{
-      fetchAllMessagesOfChat();
-    }}
+      onPress={() => {
+        fetchAllMessagesOfChat();
+      }}
       onLongPress={() => {
+        fetchAllMessagesOfChat();
         dispatch(setToggleChatActionsPopupOnLongPress(true));
         dispatch(setChatTitleOnLongPress(item?.name));
         dispatch(setToggleChatHistorySidebar(false));

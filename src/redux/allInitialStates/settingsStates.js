@@ -18,6 +18,8 @@ export const settingsStates = {
     allUniversitiesAvailable:[],
     allDegreeProgramsAvailable:[],
     allSpecializationsAvailable:[],
+    allResponseStylesAvailable:[],
+    allCitationFormatsAvailable:[],
     selectedCountryCode: null,
     isCountrySelectionChanged: false,
   },

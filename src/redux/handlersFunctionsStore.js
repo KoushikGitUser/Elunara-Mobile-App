@@ -1,5 +1,5 @@
-import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handlePostAddToNotes, handlePostRemoveFromNotes, handleGetMessagesByChatUuid } from "./apiExtraReducerHandlers/chatsHandlers";
-import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage } from "./apiExtraReducerHandlers/settingsHandlers";
+import { handleCreateChatWithAI, handleGetAllDetailsOfChatByID, handleGetAllRecentChats, handleGetAllSubjectsForChat, handleGetAllTopicsOfSelectedSubjects, handleRenameAndUpdateChatTitle, handlePinOrUnpinChat, handleArchiveOrUnarchiveChat, handleDeleteChat, handleUndoDeleteChat, handleFetchAllUserChatsAvailable, handleBulkOperationsForChats, handleFetchAllUserRoomsAvailable, handlePostAddToNotes, handlePostRemoveFromNotes, handleSendPromptAndGetMessageFromAI } from "./apiExtraReducerHandlers/chatsHandlers";
+import { handleGetAllCitiesAvailable, handleGetAllCountriesAvailable, handleGetAllGendersAvailable, handleGetAllUniversitiesAvailable, handleGetAllDegreeProgramsAvailable, handleGetAllSpecializationsAvailable, handleGetAllGeneralSettings, handleGetAllLanguagesAvailable, handleGetAllLLMsAvailable, handleGetAllPersonalisationsSettings, handleRestoreAllGeneralSettings, handleUpdateGeneralSettings, handleUpdatePersonalisationsSettings, handleGetAllProfileInfos, handleUpdateProfileName, handleUpdateProfileImage, handleUpdateProfileAvatarImage, handleFetchResponseStylesAvailable, handleFetchCitationFormatsAvailable } from "./apiExtraReducerHandlers/settingsHandlers";
 
 export const settingsHandlersFunctions = {
   // get all settings of sections
@@ -15,6 +15,8 @@ export const settingsHandlersFunctions = {
   getAllUniversitiesAvailable:handleGetAllUniversitiesAvailable,
   getAllDegreeProgramsAvailable:handleGetAllDegreeProgramsAvailable,
   getAllSpecializationsAvailable:handleGetAllSpecializationsAvailable,
+  fetchResponseStylesAvailable:handleFetchResponseStylesAvailable,
+  fetchCitationFormatsAvailable:handleFetchCitationFormatsAvailable,
   // update or change settings
   updateGeneralSettings:handleUpdateGeneralSettings,
   restoreAllGeneralSettings:handleRestoreAllGeneralSettings,
@@ -34,8 +36,17 @@ export const chatsHandlersFunctions = {
   getAllTopicsOfSelectedSubjects:handleGetAllTopicsOfSelectedSubjects,
 
   createChatWithAI:handleCreateChatWithAI,
-  getMessagesByChatUuid: handleGetMessagesByChatUuid,
+  sendPromptAndGetMessageFromAI: handleSendPromptAndGetMessageFromAI,
   //Chat Notes
   postAddToNotes: handlePostAddToNotes,
   postRemoveFromNotes: handlePostRemoveFromNotes,
+  renameAndUpdateChatTitle:handleRenameAndUpdateChatTitle,
+  pinOrUnpinChat:handlePinOrUnpinChat,
+  archiveOrUnarchiveChat:handleArchiveOrUnarchiveChat,
+  deleteChat:handleDeleteChat,
+  undoDeleteChat:handleUndoDeleteChat,
+  fetchAllUserChatsAvailable:handleFetchAllUserChatsAvailable,
+  bulkOperationsForChats:handleBulkOperationsForChats,
+  fetchAllUserRoomsAvailable:handleFetchAllUserRoomsAvailable
 }
+

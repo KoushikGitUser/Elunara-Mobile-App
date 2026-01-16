@@ -16,7 +16,9 @@ import { scaleFont } from "../../../utils/responsive";
 import {
   setToggleDeleteChatConfirmPopup,
   setToggleUserMessageActionPopup,
+  setIsEditingUserMessage,
 } from "../../../redux/slices/toggleSlice";
+import { setEditingMessageData } from "../../../redux/slices/globalDataSlice";
 import copy from "../../../assets/images/copy.png";
 import * as Clipboard from 'expo-clipboard';
 import pencil from "../../../assets/images/PencilSimple.png";
@@ -39,6 +41,11 @@ const UserMessageActionPopup = () => {
   const handleCopy = async() => {
     await Clipboard.setStringAsync(globalDataStates.userMessageOnLongPress);
     triggerToast("Message copied!", "", "normal", 3000);
+  };
+
+  const handleEdit = () => {
+    dispatch(setIsEditingUserMessage(true));
+    dispatch(setToggleUserMessageActionPopup(false));
   };
 
   const truncateTitle = (title, limit = 30) => {
@@ -105,7 +112,7 @@ const UserMessageActionPopup = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => dispatch(setToggleUserMessageActionPopup(false))}
+              onPress={handleEdit}
               style={styles.actionButton}
             >
               <View style={styles.actionIcon}>

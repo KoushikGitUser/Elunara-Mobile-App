@@ -1,5 +1,7 @@
 import {
   View,
+  Text,
+  TouchableOpacity,
   Dimensions,
   Animated,
   StatusBar,
@@ -8,6 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
@@ -16,7 +19,7 @@ import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/Cha
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setToggleChatScreenGuideStart, setToggleChatHistorySidebar, setToggleChatActionsPopupOnLongPress } from "../../redux/slices/toggleSlice";
+import { setToggleChatScreenGuideStart, setToggleChatHistorySidebar, setToggleChatActionsPopupOnLongPress, setIsEditingUserMessage } from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
   setNavigationBasicsGuideTourSteps,
@@ -126,14 +129,15 @@ const ChatScreen = () => {
         previousChatUuidRef.current = createdChatDetails.id;
         setIsWaitingForMessages(true);
         const chatId = createdChatDetails.id;
-        Alert.alert("Chat Created", "ID: " + chatId + "\nNow sending message...");
         const payload = {
           method: "POST",
           url: `/chats/${chatId}/messages`,
           data: {
             content: globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1]?.message || "Hello",
+            content_type: "text",
+            attachment_ids: [],
           },
-          name: "getMessagesByChatUuid",
+          name: "sendPromptAndGetMessageFromAI",
         };
         dispatch(commonFunctionForAPICalls(payload));
       }
@@ -147,12 +151,10 @@ const ChatScreen = () => {
       const userMessage = chatMessages?.user_message;
       const id = userMessage?.id || "none";
       const content = userMessage?.content || "No content";
-      Alert.alert("User Message", "ID: " + id + "\nContent: " + content);
     }
     // Handle rejected case
     if (isWaitingForMessages && isMessagesFetched === false) {
       setIsWaitingForMessages(false);
-      Alert.alert("Messages API Failed", "getMessagesByChatUuid was rejected");
     }
   }, [isMessagesFetched, chatMessages, isWaitingForMessages]);
 
@@ -561,12 +563,15 @@ const ChatScreen = () => {
     } else if (alignment === "center") {
       // Center-aligned tooltip
       const spotlightCenter = spotlightRect.x + spotlightRect.width / 2;
-      result.left = Math.max(10, spotlightCenter - tooltipWidth / 2);
+      result.left = Math.max(10, spotlightCenter -  tooltipWidth / 2);
       result.pointerLeft = tooltipWidth / 2 - 8; // Center pointer
     }
 
     return result;
   };
+
+ 
+  
 
   return (
     <SafeAreaView
@@ -870,6 +875,40 @@ const ChatScreen = () => {
 
           {/* chatInput section */}
           <View style={{ width: "100%", marginBottom: 30 }}>
+            {/* Editing Message Banner */}
+            {toggleStates.isEditingUserMessage && (
+              <View
+                style={{
+                  width: "100%",
+                  paddingHorizontal: 20,
+                  paddingVertical: 12,
+                  backgroundColor: "#F9FAFB",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: "#374151",
+                    fontFamily: "Mukta-Medium",
+                  }}
+                >
+                  Editing message
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setIsEditingUserMessage(false));
+                  }}
+                  style={{
+                    padding: 4,
+                  }}
+                >
+                  <Feather name="x" size={20} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+            )}
             <ChatInputMain ref={chatInputRef} />
           </View>
           {/* chatInput section */}

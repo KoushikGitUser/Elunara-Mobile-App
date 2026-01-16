@@ -7,15 +7,76 @@ import {
   ScrollView,
   Dimensions,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import LanguageDropdown from "./LanguageDropdown";
 import { languages } from "../../../../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+
 const screenHeight = Dimensions.get("window").height;
 
 const FirstLanguageSetState = ({setIsLanguageSaved}) => {
   const [selectedCounts, setSelectedCounts] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  const updateResponseLanguage1 = (id) => {
+    const data = {
+      response_language_1_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateResponseLanguage2 = (id) => {
+    const data = {
+      response_language_2_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateResponseLanguage3 = (id) => {
+    const data = {
+      response_language_3_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const handleSaveLanguagePreferences = async () => {
+    setIsSaving(true);
+
+    // Refetch to ensure sync
+    const payload = {
+      method: "GET",
+      url: "/settings/general",
+      name: "getAllGeneralSettings",
+    };
+
+    await dispatch(commonFunctionForAPICalls(payload));
+    setIsSaving(false);
+    setIsLanguageSaved(true);
+  };
   return (
     <>
       {/* Title */}
@@ -31,12 +92,16 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular"
           }}
         >
           Default Language
         </Text>
         <LanguageDropdown
+          initialSetValue={
+            settingsStates.allGeneralSettings.responseLanguageSettings?.response_language_1
+          }
+          triggerAPICall={updateResponseLanguage1}
           selectedCounts={selectedCounts}
           setSelectedCounts={setSelectedCounts}
           selectOptionsArray={languages}
@@ -57,12 +122,16 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular"
           }}
         >
           Language 2
         </Text>
         <LanguageDropdown
+          initialSetValue={
+            settingsStates.allGeneralSettings.responseLanguageSettings?.response_language_2
+          }
+          triggerAPICall={updateResponseLanguage2}
           selectedCounts={selectedCounts}
           setSelectedCounts={setSelectedCounts}
           selectOptionsArray={languages}
@@ -72,12 +141,16 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular"
           }}
         >
           Language 3
         </Text>
         <LanguageDropdown
+          initialSetValue={
+            settingsStates.allGeneralSettings.responseLanguageSettings?.response_language_3
+          }
+          triggerAPICall={updateResponseLanguage3}
           selectedCounts={selectedCounts}
           setSelectedCounts={setSelectedCounts}
           selectOptionsArray={languages}
@@ -88,13 +161,18 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             styles.button,
             {
               backgroundColor:
-                selectedCounts?.length >= 3 ? "#081A35" : "#CDD5DC",
+                selectedCounts?.length >= 3 && !isSaving ? "#081A35" : "#CDD5DC",
             },
           ]}
-          onPress={() => setIsLanguageSaved(true)}
+          onPress={handleSaveLanguagePreferences}
           activeOpacity={0.8}
+          disabled={selectedCounts?.length < 3 || isSaving}
         >
-          <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save LLM Preferences</Text>
+          {isSaving ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save Language Preferences</Text>
+          )}
         </TouchableOpacity>
             <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
               <Text

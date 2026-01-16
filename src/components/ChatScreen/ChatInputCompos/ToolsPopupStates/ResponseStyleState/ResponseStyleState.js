@@ -8,22 +8,86 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont, verticalScale } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
+  setSelectedResponseStyle,
 } from "../../../../../redux/slices/toggleSlice";
-import { responseStyles } from "../../../../../data/datas";
-import chakraLogo from "../../../../../assets/images/chakraFull.png";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import ChakraIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import ConversationalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
+import DetailedIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+
 const screenHeight = Dimensions.get("window").height;
+
+// Helper function to get response style icon based on name
+const getResponseStyleIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("auto") || key?.includes("chakra")) {
+    return <ChakraIcon />;
+  } else if (key?.includes("concise")) {
+    return <ConciseIcon />;
+  } else if (key?.includes("formal")) {
+    return <FormalIcon />;
+  } else if (key?.includes("conversational")) {
+    return <ConversationalIcon />;
+  } else if (key?.includes("detailed")) {
+    return <DetailedIcon />;
+  } else if (key?.includes("creative")) {
+    return <CreativeIcon />;
+  }
+  return <ChakraIcon />; // Default to Chakra/Auto
+};
 
 const ResponseStyleState = () => {
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/response-styles",
+      name: "fetchResponseStylesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Initialize selected style from Redux state
+  const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedResponseStyle?.id) {
+      const index = allResponseStyles.findIndex(
+        (style) => style.id === chatCustomisationStates.selectedResponseStyle.id
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      setSelectedStyle(0); // Default to Auto
+    }
+  }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
+
+  // Handle response style selection
+  const handleStyleSelection = (styleOption) => {
+    const selectedData = {
+      id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
+      name: styleOption.name,
+    };
+
+    dispatch(setSelectedResponseStyle(selectedData));
+    dispatch(setSelectedStyle(styleOption.id));
+  };
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -62,10 +126,13 @@ const ResponseStyleState = () => {
           style={styles.optionsContainer}
         >
           <View style={{ flexDirection: "column",}}>
-            {responseStyles.map((styleOptions, optionsIndex) => {
+            {(settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [])?.map((styleOptions, optionsIndex) => {
+              const icon = getResponseStyleIcon(styleOptions.name);
+              const isAuto = styleOptions.name?.toLowerCase().includes("auto") || styleOptions.id === 0;
+
               return (
-                <React.Fragment key={optionsIndex}>
-                  <TouchableOpacity  
+                <React.Fragment key={styleOptions.id || optionsIndex}>
+                  <TouchableOpacity
                     style={[
                       styles.card,
                       {
@@ -79,22 +146,22 @@ const ResponseStyleState = () => {
                             : "#D3DAE5",
                       },
                     ]}
-                    onPress={() => setSelectedStyle(styleOptions.id)}
+                    onPress={() => handleStyleSelection(styleOptions)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.contentMain}>
                       <View style={styles.iconContainer}>
-                        {styleOptions.icon}
+                        {icon}
                       </View>
 
                       <View style={styles.textContainer}>
                         <Text
                           style={[
                             styles.optionTitle,
-                            { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
+                            { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
                           ]}
                         >
-                          {styleOptions.title}
+                          {styleOptions.name}
                         </Text>
                         <Text
                           style={[
@@ -103,7 +170,7 @@ const ResponseStyleState = () => {
                               fontSize: scaleFont(14),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily:"Mukta-Regular"
+                              fontFamily: "Mukta-Regular"
                             },
                           ]}
                         >
@@ -114,14 +181,14 @@ const ResponseStyleState = () => {
 
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
-                  {styleOptions.id == 0 && (
-                    <View style={{ width: "100%",marginBottom:20, }}>
+                  {isAuto && (
+                    <View style={{ width: "100%", marginBottom: 20 }}>
                       <Text
                         style={{
                           textAlign: "center",
                           color: "#757575",
                           fontSize: scaleFont(15),
-                          fontFamily:"Mukta-Regular"
+                          fontFamily: "Mukta-Regular"
                         }}
                       >
                         Or Select Manually

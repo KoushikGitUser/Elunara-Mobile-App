@@ -7,55 +7,114 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { createStyles } from "./chatModals.styles";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { menuOptions } from "../../../data/datas";
 import { moderateScale } from "../../../utils/responsive";
 import {
   setToggleAddChatToLearningLabPopup,
   setToggleChatMenuPopup,
   setToggleDeleteChatConfirmPopup,
   setToggleRenameChatPopup,
-  setToggleUnlockArchiveLimitPopup,
 } from "../../../redux/slices/toggleSlice";
 import { triggerToast } from "../../../services/toast";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
+import folder from "../../../assets/images/Folder.png";
+import archive from "../../../assets/images/Archive.png";
+import archiveBox from "../../../assets/images/ArchiveBox.png";
+import pencil from "../../../assets/images/PencilSimple.png";
+import deleteBin from "../../../assets/images/Trash.png";
+import pin from "../../../assets/images/PushPin.png";
+import pinGrey from "../../../assets/images/pinGrey.png";
 
 const ChatOptionsPopup = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const { width, height } = Dimensions.get("window");
 
-  const commonFunctions = (type) => {
-    if (type == "Open Notes") {
-       dispatch(setToggleChatMenuPopup(false))
-      navigation.navigate("notes");
-    } else if (type == "Add to Learning Lab") {
-       dispatch(setToggleChatMenuPopup(false))
+  const chatId = chatsStates.allChatsDatas.createdChatDetails?.id;
+
+  // Fetch chat details when popup opens
+  useEffect(() => {
+    if (toggleStates.toggleChatMenuPopup && chatId) {
+      const payload = {
+        method: "GET",
+        url: `/chats/${chatId}`,
+        name: "getAllDetailsOfChatByID",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  }, [toggleStates.toggleChatMenuPopup, chatId]);
+
+  // Dynamic actions based on is_pinned and is_archived states
+  const currentChatDetails = chatsStates.allChatsDatas.currentActionChatDetails;
+  const isPinned = currentChatDetails?.is_pinned;
+  const isArchived = currentChatDetails?.is_archived;
+
+  const actions = [
+    { title: "Add to Learning Lab", icon: folder },
+    { title: "Rename", icon: pencil },
+    {
+      title: isPinned ? "Unpin" : "Pin",
+      icon: isPinned ? pinGrey : pin
+    },
+    {
+      title: isArchived ? "Unarchive" : "Archive",
+      icon: isArchived ? archiveBox : archive
+    },
+    { title: "Delete", icon: deleteBin },
+  ];
+
+  const commonFunctions = (index) => {
+    if (index === 0) {
+      // Add to Learning Lab
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
-    } else if (type == "Rename") {
-       dispatch(setToggleChatMenuPopup(false))
+    } else if (index === 1) {
+      // Rename
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleRenameChatPopup(true));
-    } else if (type == "Pin") {
-       dispatch(setToggleChatMenuPopup(false))
-      setTimeout(() => {
-        triggerToast(
-          "Chat Pinned",
-          "Your chat has been successfully pinned",
-          "success",
-          3000
-        );
-      }, 200);
-    } else if (type == "Archive") {
-       dispatch(setToggleChatMenuPopup(false))
-      dispatch(setToggleUnlockArchiveLimitPopup(true));
-    } else if (type == "Delete") {
-       dispatch(setToggleChatMenuPopup(false))
+    } else if (index === 2) {
+      // Pin/Unpin
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      const action = isPinned ? "unpin" : "pin";
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/${action}`,
+        name: "pinOrUnpinChat"
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(setToggleChatMenuPopup(false));
+    } else if (index === 3) {
+      // Archive/Unarchive
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      const action = isArchived ? "unarchive" : "archive";
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/${action}`,
+        name: "archiveOrUnarchiveChat"
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(setToggleChatMenuPopup(false));
+    } else if (index === 4) {
+      // Delete
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleDeleteChatConfirmPopup(true));
+      dispatch(setDeleteConfirmPopupFrom("chatOptions"));
     }
   };
 
@@ -77,7 +136,7 @@ const ChatOptionsPopup = () => {
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
       <View style={styles.menuModalMain}>
-        {menuOptions.map((options, optionIndex) => {
+        {actions.map((action, actionIndex) => {
           return (
             <Pressable
               style={({ pressed }) => [
@@ -88,20 +147,24 @@ const ChatOptionsPopup = () => {
               ]}
               onPress={(e) => {
                 e.stopPropagation();
-                commonFunctions(options.option);
+                commonFunctions(actionIndex);
               }}
-              key={optionIndex}
+              key={actionIndex}
             >
-              {options.icon}
+              <Image
+                style={{ height: 20, width: 20, resizeMode: "contain" }}
+                source={action.icon}
+              />
               <Text
                 numberOfLines={1}
                 style={{
                   fontSize: moderateScale(16),
                   flexShrink: 1,
                   fontFamily: "Mukta-Regular",
+                  marginLeft: 12,
                 }}
               >
-                {options?.option}
+                {action.title}
               </Text>
             </Pressable>
           );

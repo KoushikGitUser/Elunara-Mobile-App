@@ -7,12 +7,44 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { setLanguages } from "../../../../../data/datas";
+import { setSelectedLanguage, setToggleToolsPopup } from "../../../../../redux/slices/toggleSlice";
 
 const SavedLanguageState = () => {
   const [selectedStyle, setSelectedStyle] = useState(0);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+
+  // Initialize from Redux state
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedLanguage?.name) {
+      const index = setLanguages.findIndex(
+        (lang) => lang.lang === chatCustomisationStates.selectedLanguage.name
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      setSelectedStyle(0); // Default to English
+    }
+  }, [chatCustomisationStates?.selectedLanguage]);
+
+  // Handle language selection
+  const handleLanguageSelection = (language, index) => {
+    setSelectedStyle(index);
+
+    const selectedData = {
+      id: index === 0 ? null : index, // null for English (default)
+      name: language.lang,
+    };
+
+    dispatch(setSelectedLanguage(selectedData));
+  };
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
       {selected && <View style={styles.radioInner} />}
@@ -32,7 +64,8 @@ const SavedLanguageState = () => {
         {setLanguages.map((langs, langIndex) => {
           return (
             <TouchableOpacity
-              onPress={() => setSelectedStyle(langIndex)}
+              key={langIndex}
+              onPress={() => handleLanguageSelection(langs, langIndex)}
               style={styles.langsMain}
             >
               <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(15)}}>{langs.lang}</Text>
@@ -52,7 +85,13 @@ const SavedLanguageState = () => {
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              <Pressable style={{borderBottomWidth:2}}>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleToolsPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
                 <Text style={{
                   fontSize: moderateScale(13),
                   lineHeight:15,

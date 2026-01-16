@@ -21,16 +21,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToggleRenameChatPopup } from "../../../../redux/slices/toggleSlice";
 import { Delete } from "lucide-react-native";
 import { triggerToast } from "../../../../services/toast";
+import { commonFunctionForAPICalls, resetChatTitleUpdated } from "../../../../redux/slices/apiCommonSlice";
+import Toaster from "../../../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
 
 const RenameChatPopup = () => {
   const inputRef = useRef(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [chatName, setChatName] = useState("");
+
+  const isLoading = chatsStates.loaderStates.isChatTitleUpdated === "pending";
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -63,6 +68,25 @@ const RenameChatPopup = () => {
     }, 500);
   }, []);
 
+  // Set initial chat name from API data when modal opens
+  useEffect(() => {
+    if (toggleStates.toggleRenameChatPopup && chatsStates.allChatsDatas.currentActionChatDetails?.name) {
+      setChatName(chatsStates.allChatsDatas.currentActionChatDetails.name);
+    }
+  }, [toggleStates.toggleRenameChatPopup]);
+
+  // Handle success case
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatTitleUpdated === true) {
+      dispatch(setToggleRenameChatPopup(false));
+      setTimeout(() => {
+        triggerToast("Renamed!", "Your chat has been successfully renamed", "success", 3000);
+      }, 300);
+      // Reset the loader state for next time
+      dispatch(resetChatTitleUpdated());
+    }
+  }, [chatsStates.loaderStates.isChatTitleUpdated]);
+
   return (
     <Modal
       visible={toggleStates.toggleRenameChatPopup}
@@ -70,6 +94,7 @@ const RenameChatPopup = () => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleRenameChatPopup(false))}
     >
+      <Toaster/>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}
@@ -124,10 +149,10 @@ const RenameChatPopup = () => {
                       <TextInput
                         ref={inputRef}
                         style={[styles.inputText,{fontFamily:"Mukta-Regular",fontSize:14}]}
-                        placeholder="Enter your mobile number"
+                        placeholder="Enter your chat name"
                         placeholderTextColor="#9CA3AF"
                         value={chatName} 
-                        onChangeText={(text) => setChatName(text)}
+                        onChangeText={setChatName}
                         returnKeyType="done"
                       />
                       <Delete
@@ -143,20 +168,32 @@ const RenameChatPopup = () => {
                   {/* Verify Button */}
                   <TouchableOpacity
                   onPress={()=>{
-                    dispatch(setToggleRenameChatPopup(false));
-                    setTimeout(() => {
-                       triggerToast("Renamed!","Your chat has been successfully renamed","success",3000)
-                    }, 500);
-                   
+                    const chatUUID = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+                    if (!chatUUID) {
+                      triggerToast("Error", "Chat UUID not found", "error", 3000);
+                      return;
+                    }
+
+                    const payload = {
+                      method: "PUT",
+                      url: `/chats/${chatUUID}`,
+                      data: { title: chatName },
+                      name: "renameAndUpdateChatTitle"
+                    };
+
+                    dispatch(commonFunctionForAPICalls(payload));
                   }}
                     style={[
                       styles.verifyButton,
-                      !chatName && styles.verifyButtonDisabled,
+                      (!chatName || isLoading) && styles.verifyButtonDisabled,
                     ]}
                     activeOpacity={0.8}
-                    disabled={!chatName}
+                    disabled={!chatName || isLoading}
                   >
-                    <Text style={[styles.verifyButtonText,{fontFamily:"Mukta-Regular"}]}>Done</Text>
+                    <Text style={[styles.verifyButtonText,{fontFamily:"Mukta-Regular"}]}>
+                      {isLoading ? "Renaming..." : "Done"}
+                    </Text>
                   </TouchableOpacity>
 
                   {/* Skip for now */}

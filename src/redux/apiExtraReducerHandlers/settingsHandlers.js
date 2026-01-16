@@ -216,6 +216,24 @@ export const handleUpdateProfileAvatarImage = {
   },
   rejected: (state, action) => {
 
-    
+
   },
+};
+
+export const handleFetchResponseStylesAvailable = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allResponseStylesAvailable =
+      action.payload.data.data;
+  },
+  rejected: (state, action) => {},
+};
+
+export const handleFetchCitationFormatsAvailable = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allCitationFormatsAvailable =
+      action.payload.data.data;
+  },
+  rejected: (state, action) => {},
 };

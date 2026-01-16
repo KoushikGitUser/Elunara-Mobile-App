@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,9 +15,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { scaleFont } from "../../../utils/responsive";
 import folder from "../../../assets/images/Folder.png";
 import archive from "../../../assets/images/Archive.png";
+import archiveBox from "../../../assets/images/ArchiveBox.png";
 import pencil from "../../../assets/images/PencilSimple.png";
 import deleteBin from "../../../assets/images/Trash.png";
 import pin from "../../../assets/images/PushPin.png";
+import pinGrey from "../../../assets/images/pinGrey.png";
 import chat from "../../../assets/images/ChatTeardrop.png";
 import {
   setToggleAddChatToLearningLabPopup,
@@ -28,18 +30,30 @@ import {
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { triggerToast } from "../../../services/toast";
 import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const ChatLongPressPopup = () => {
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
+
+  // Dynamic actions based on is_pinned and is_archived states
+  const isPinned = chatsStates.allChatsDatas.currentActionChatDetails?.is_pinned;
+  const isArchived = chatsStates.allChatsDatas.currentActionChatDetails?.is_archived;
+
   const actions = [
     { title: "Add to Learning Lab", icon: folder },
     { title: "Rename", icon: pencil },
-    { title: "Pin", icon: pin },
-    { title: "Archive", icon: archive },
+    {
+      title: isPinned ? "Unpin" : "Pin",
+      icon: isPinned ? pinGrey : pin
+    },
+    {
+      title: isArchived ? "Unarchive" : "Archive",
+      icon: isArchived ? archiveBox : archive
+    },
     { title: "Delete", icon: deleteBin },
   ];
-
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const { globalDataStates } = useSelector((state) => state.Global);
 
   const truncateTitle = (title, limit = 20) => {
     if (title.length <= limit) return title;
@@ -52,27 +66,44 @@ const ChatLongPressPopup = () => {
     } else if (title == 1) {
       dispatch(setToggleRenameChatPopup(true));
     } else if (title == 2) {
-      setTimeout(() => {
-        triggerToast(
-          "Chat Pinned",
-          "Your chat has been successfully pinned",
-          "success",
-          3000
-        );
-      }, 300);
+      // Pin/Unpin API call
+      const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+      const action = isPinned ? "unpin" : "pin";
+
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/${action}`,
+        name: "pinOrUnpinChat"
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(setToggleChatActionsPopupOnLongPress(false));
     } else if (title == 3) {
-      setTimeout(() => {
-        triggerToast(
-          "Chat Archived",
-          "Your chat has been successfully archived",
-          "success",
-          3000
-        );
-      }, 300);
-    }
-    else if(title == 4){
+      // Archive/Unarchive API call
+      const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+      const action = isArchived ? "unarchive" : "archive";
+
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/${action}`,
+        name: "archiveOrUnarchiveChat"
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(setToggleChatActionsPopupOnLongPress(false));
+    } else if (title == 4) {
       dispatch(setToggleDeleteChatConfirmPopup(true));
-      dispatch(setDeleteConfirmPopupFrom("chat"))
+      dispatch(setDeleteConfirmPopupFrom("chat"));
     }
   };
 
@@ -132,7 +163,7 @@ const ChatLongPressPopup = () => {
                   ]}
                   onPress={() => {
                     dispatch(setToggleChatActionsPopupOnLongPress(false));
-                    commonFunction(index)
+                    commonFunction(index);
                   }}
                 >
                   <View style={styles.actionIcon}>

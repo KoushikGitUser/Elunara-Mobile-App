@@ -1,45 +1,139 @@
 import {
   View,
   Text,
-  TouchableWithoutFeedback,
   Pressable,
   Dimensions,
   TouchableOpacity,
   StyleSheet,
   Modal,
 } from "react-native";
-import React, { useMemo } from "react";
-import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
+import React, { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleAllChatsOptionsPopup,
-  setToggleChatMenuPopup,
+  setToggleDeleteChatPopup,
+  setToggleArchiveChatPopup,
+  setToggleRenameChatPopup,
 } from "../../redux/slices/toggleSlice";
-import { allChatsOptionsPopupData } from "../../data/datas";
-import { moderateScale } from "../../utils/responsive";
+import FolderIconDark from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
+import RenameIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
+import PinIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon";
+import ArchiveIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
+import TrashIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
+import { commonFunctionForAPICalls, resetChatPinUnpinUpdated, resetChatTitleUpdated } from "../../redux/slices/apiCommonSlice";
+import { triggerToast } from "../../services/toast";
 
 const OptionsPopup = ({ popupPosition }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
   const { width, height } = Dimensions.get("window");
 
-  const commonFunctions = (type) => {
-    if (type == "Open Notes") {
-    } else if (type == "Add to Learning Lab") {
-    } else if (type == "Rename") {
+  const currentChat = chatsStates.allChatsDatas.currentActionChatDetails;
+  const isPinned = currentChat?.is_pinned;
+  const isArchived = currentChat?.is_archived;
+
+  // Dynamic options based on chat data
+  const dynamicOptions = [
+    {
+      title: "Add to Room",
+      icon: <FolderIconDark />,
+      action: "addToRoom"
+    },
+    {
+      title: "Rename",
+      icon: <RenameIcon />,
+      action: "rename"
+    },
+    {
+      title: isPinned ? "Unpin" : "Pin",
+      icon: <PinIcon />,
+      action: "pinUnpin"
+    },
+    {
+      title: isArchived ? "Unarchive" : "Archive",
+      icon: <ArchiveIcon />,
+      action: "archiveUnarchive"
+    },
+    {
+      title: "Delete",
+      icon: <TrashIcon />,
+      action: "delete"
+    },
+  ];
+
+  const commonFunctions = (action) => {
+    const chatId = currentChat?.id;
+
+    if (action === "addToRoom") {
+      // Handle add to room
+      closePopup();
+    } else if (action === "rename") {
       dispatch(setToggleRenameChatPopup(true));
-    } else if (type == "Pin") {
-    } else if (type == "Archive") {
-    } else if (type == "Delete") {
-      dispatch(setToggleDeleteChatConfirmPopup(true));
+      closePopup();
+    } else if (action === "pinUnpin") {
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      const apiAction = isPinned ? "unpin" : "pin";
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/${apiAction}`,
+        name: "pinOrUnpinChat"
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+      closePopup();
+    } else if (action === "archiveUnarchive") {
+      dispatch(setToggleArchiveChatPopup(true));
+      closePopup();
+    } else if (action === "delete") {
+      dispatch(setToggleDeleteChatPopup(true));
+      closePopup();
     }
   };
+
+  // Handle pin/unpin success
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatPinUnpinUpdated === true) {
+      // Refetch all chats
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats?page=1&per_page=20",
+        name: "fetchAllUserChatsAvailable"
+      }));
+
+      // Reset loader state
+      dispatch(resetChatPinUnpinUpdated());
+    }
+  }, [chatsStates.loaderStates.isChatPinUnpinUpdated]);
+
+  // Handle rename success
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatTitleUpdated === true) {
+      // Refetch all chats
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats?page=1&per_page=20",
+        name: "fetchAllUserChatsAvailable"
+      }));
+
+      // Reset loader state
+      dispatch(resetChatTitleUpdated());
+    }
+  }, [chatsStates.loaderStates.isChatTitleUpdated]);
 
   const closePopup = () => {
     dispatch(setToggleAllChatsOptionsPopup(false));
   };
+
+  if (!toggleStates.toggleAllChatsOptionsPopup || !popupPosition) {
+    return null;
+  }
 
   return (
     <Modal
@@ -53,13 +147,13 @@ const OptionsPopup = ({ popupPosition }) => {
         style={styles.optionsPopupWrapper}
         activeOpacity={1}
       >
-        <View style={[styles.notesPopup, popupPosition && { top: popupPosition.y, right: width - popupPosition.x }]}>
-          {allChatsOptionsPopupData?.map((options, optionIndex) => {
+        <View style={[styles.notesPopup, { top: popupPosition.y, right: width - popupPosition.x }]}>
+          {dynamicOptions?.map((options, optionIndex) => {
             return (
               <Pressable
                 key={optionIndex}
                 onPress={() => {
-                  closePopup();
+                  commonFunctions(options.action);
                 }}
                 style={({ pressed }) => [
                   {

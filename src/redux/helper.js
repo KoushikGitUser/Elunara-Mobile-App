@@ -30,6 +30,7 @@ const processQueue = (error, token = null) => {
 apiInstance.interceptors.request.use(
   async (config) => {
     const accessToken = await getToken();
+     console.log(accessToken,"tokennnn");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
