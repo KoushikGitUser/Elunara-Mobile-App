@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { allInitialStates } from '../allInitialStates';
+import { resetAllStates } from '../actions/resetActions';
 
 
 const toggleSlice = createSlice({
@@ -138,6 +139,9 @@ const toggleSlice = createSlice({
     setToggleUpdateProfilePicPopup: (state, action) => {
       state.toggleStates.toggleUpdateProfilePicPopup = action.payload;
     },
+    setIsEditingUserMessage: (state, action) => {
+      state.toggleStates.isEditingUserMessage = action.payload;
+    },
     // Chat Customisation Actions
     setSelectedLLM: (state, action) => {
       state.chatCustomisationStates.selectedLLM = action.payload;
@@ -151,6 +155,11 @@ const toggleSlice = createSlice({
     setSelectedCitationFormat: (state, action) => {
       state.chatCustomisationStates.selectedCitationFormat = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetAllStates, () => {
+      return allInitialStates;
+    });
   },
 });
 
@@ -199,6 +208,7 @@ export const {
   setToggleAddChatToLearningLabPopup,
   setToggleAddLinkPopup,
   setToggleUpdateProfilePicPopup,
+  setIsEditingUserMessage,
   setSelectedLLM,
   setSelectedResponseStyle,
   setSelectedLanguage,

@@ -26,6 +26,7 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { appColors } from "../../../themes/appColors";
 
 const SidebarFooter = ({ translateX }) => {
   const styleProps = {};
@@ -114,7 +115,7 @@ const SidebarFooter = ({ translateX }) => {
         onPress={() => dispatch(setToggleProPlanUpgradePopup(true))}
         style={styles.upgradeBtn}
       >
-        <SparkleIcon />
+        <SparkleIcon color={appColors.navyBlueShade} />
         <View>
           <GradientText
             children="Upgrade plan"

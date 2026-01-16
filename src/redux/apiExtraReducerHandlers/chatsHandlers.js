@@ -41,15 +41,17 @@ export const handleGetAllSubjectsForChat = {
 
 export const handleGetAllTopicsOfSelectedSubjects = {
   pending: (state) => {
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = "pending";
   },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.allTopicsOfSelectedSubjects = action?.payload.data.data;
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = true;
     console.log(action?.payload.data.data,"data");
-    
+
   },
   rejected: (state, {payload}) => {
     console.log(payload.message);
-    
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = false;
   },
 };
 
@@ -59,10 +61,12 @@ export const handleCreateChatWithAI = {
     state.chatsStates.loaderStates.isChatCreatedWithAI = "pending";
   },
   fulfilled: (state, action) => {
+    console.log("createChatWithAI - REQUEST PAYLOAD:", JSON.stringify(action?.meta?.arg, null, 2));
+    console.log("createChatWithAI - FULL RESPONSE:", JSON.stringify(action?.payload, null, 2));
     state.chatsStates.allChatsDatas.createdChatDetails = action?.payload.data.data;
     console.log(action?.payload.data.data,"data");
     state.chatsStates.loaderStates.isChatCreatedWithAI = true;
-    
+
   },
   rejected: (state, {payload}) => {
     console.log(payload.message);
@@ -229,48 +233,59 @@ export const handleFetchAllUserRoomsAvailable = {
 
 export const handleSendPromptAndGetMessageFromAI = {
   pending: (state) => {
-    console.log("sendPromptAndGetMessageFromAI - PENDING");
     state.chatsStates.loaderStates.isMessagesFetched = "pending";
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+    // Reset isChatCreatedWithAI after using it to trigger send-message
+    state.chatsStates.loaderStates.isChatCreatedWithAI = null;
   },
   fulfilled: (state, action) => {
-    console.log("sendPromptAndGetMessageFromAI - FULFILLED", action?.payload.data.data);
-    state.chatsStates.allChatsDatas.chatMessages = action?.payload.data.data;
+    const responseData = action?.payload.data.data;
+    state.chatsStates.allChatsDatas.chatMessages = responseData;
+
+    // Store AI message content separately
+    state.chatsStates.allChatsDatas.aiMessageContent = responseData?.assistant_message?.content || null;
+
+    // Store message IDs in the messageIDsArray
+    const userMessageId = responseData?.user_message?.id;
+    const aiMessageId = responseData?.assistant_message?.id;
+
+    if (userMessageId && aiMessageId) {
+      // Get current messageIDsArray from globalDataStates
+      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      // Add both user and AI message IDs
+      state.globalDataStates.messageIDsArray = [...currentMessageIds, userMessageId, aiMessageId];
+    }
+
     state.chatsStates.loaderStates.isMessagesFetched = true;
   },
   rejected: (state, {payload}) => {
-    console.log("sendPromptAndGetMessageFromAI - REJECTED", payload);
     state.chatsStates.loaderStates.isMessagesFetched = false;
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
   },
 };
 
 export const handlePostAddToNotes = {
   pending: (state) => {
-    console.log("postAddToNotes - PENDING");
     state.chatsStates.loaderStates.isAddToNotesPending = "pending";
   },
   fulfilled: (state, action) => {
-    console.log("postAddToNotes - FULFILLED", action?.payload);
     state.chatsStates.allChatsDatas.addToNotes = action?.payload.data.data;
     state.chatsStates.loaderStates.isAddToNotesPending = true;
   },
   rejected: (state, {payload}) => {
-    console.log("postAddToNotes - REJECTED", payload);
     state.chatsStates.loaderStates.isAddToNotesPending = false;
   },
 };
 
 export const handlePostRemoveFromNotes = {
   pending: (state) => {
-    console.log("postRemoveFromNotes - PENDING");
     state.chatsStates.loaderStates.isRemoveFromNotesPending = "pending";
   },
   fulfilled: (state, action) => {
-    console.log("postRemoveFromNotes - FULFILLED", action?.payload);
     state.chatsStates.allChatsDatas.addToNotes = {};
     state.chatsStates.loaderStates.isRemoveFromNotesPending = true;
   },
   rejected: (state, {payload}) => {
-    console.log("postRemoveFromNotes - REJECTED", payload);
     state.chatsStates.loaderStates.isRemoveFromNotesPending = false;
   },
 };

@@ -40,7 +40,13 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  // Get chat details
+  const chatDetails = chatsStates.allChatsDatas.createdChatDetails;
+  const chatTitle = chatDetails?.name || "Chat Name";
+  const roomName = chatDetails?.room?.name;
 
   // Refs for guided tour measurement
   const menuIconRef = useRef(null);
@@ -127,21 +133,23 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
               fontFamily: "Mukta-Bold",
             }}
           >
-            First Chat with AI
+            {chatTitle}
           </Text>
-          <TouchableOpacity style={styles.topicNamemain}>
-            <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: 400,
-                color: "#406DD8",
-                fontFamily: "Mukta-Regular",
-              }}
-            >
-              Finance
-            </Text>
-          </TouchableOpacity>
+          {roomName && (
+            <TouchableOpacity style={styles.topicNamemain}>
+              <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: 400,
+                  color: "#406DD8",
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                {roomName}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <TouchableOpacity

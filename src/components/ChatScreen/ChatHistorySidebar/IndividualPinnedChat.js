@@ -7,10 +7,11 @@ import chat from "../../../assets/images/ChatTeardrop.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress, setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
+import { setCurrentActionChatDetails } from "../../../redux/slices/apiCommonSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { scaleFont } from "../../../utils/responsive";
 
-const IndividualPinnedChat = ({ title, translateX }) => {
+const IndividualPinnedChat = ({ title, item, translateX }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
 
   const styleProps = {};
@@ -18,6 +19,9 @@ const IndividualPinnedChat = ({ title, translateX }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+
+  // Support both title prop (legacy) and item prop (new)
+  const chatTitle = item?.name || title || "Untitled Chat";
 
   const truncateTitle = (title, limit = 20) => {
     if (title.length <= limit) return title;
@@ -41,12 +45,15 @@ const IndividualPinnedChat = ({ title, translateX }) => {
       }}
       onLongPress={() => {
         dispatch(setToggleChatActionsPopupOnLongPress(true));
-        dispatch(setChatTitleOnLongPress(title));
+        dispatch(setChatTitleOnLongPress(chatTitle));
+        if (item) {
+          dispatch(setCurrentActionChatDetails(item));
+        }
       }}
       style={styles.individualPinnedChats}
     >
       <ChatIcon />
-      <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(14)}}>{truncateTitle(title)}</Text>
+      <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(14)}}>{truncateTitle(chatTitle)}</Text>
     </TouchableOpacity>
   );
 };

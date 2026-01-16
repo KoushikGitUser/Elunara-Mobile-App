@@ -4,6 +4,7 @@ import { allInitialStates } from "../allInitialStates";
 import { addCasePending } from "../addCases/pending";
 import { addCaseFulfilled } from "../addCases/fulfilled";
 import { addCaseRejected } from "../addCases/rejected";
+import { resetAllStates } from "../actions/resetActions";
 
 export const commonFunctionForAPICalls = createAsyncThunk(
   "/common-api-call",
@@ -88,6 +89,10 @@ const apiCommonSlice = createSlice({
       // Handle rejected API calls
       .addCase(commonFunctionForAPICalls.rejected, (state, action) => {
         addCaseRejected(state, action);
+      })
+      // Handle reset all states
+      .addCase(resetAllStates, () => {
+        return allInitialStates;
       });
   },
 });

@@ -9,7 +9,14 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useMemo, useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -26,10 +33,12 @@ import {
   setToggleIsChattingWithAI,
   setToggleIsWaitingForResponse,
   setToggleKeyboardVisibilityOnChatScreen,
+  setToggleSubTopics,
   setToggleToolsPopup,
   setToggleTopicsPopup,
   setToggleUnlockPersonalisationLimitPopup,
 } from "../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
 import topicsIcon from "../../assets/images/TopicsIcon.png";
 import toolsIcon from "../../assets/images/toolsIcon.png";
@@ -42,10 +51,10 @@ import {
   setChatInputContentLinesNumber,
   setChatMessagesArray,
   setSelecetdFiles,
+  setCurrentSelectedTopic,
 } from "../../redux/slices/globalDataSlice";
 import ImageFile from "./ChatInputCompos/SelectedFilesCompo/ImageFile";
 import PdfFile from "./ChatInputCompos/SelectedFilesCompo/PdfFile";
-import { demoResponseFromAI } from "../../data/datas";
 import ClipIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ClipIcon";
 import TopicsBooksIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/TopicsBooksIcon";
 import ToolsIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ToolsIcon";
@@ -58,8 +67,12 @@ const ChatInputMain = forwardRef((props, ref) => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
+  const isMessagesFetched = chatsStates.loaderStates.isMessagesFetched;
+  const aiMessageContent = chatsStates.allChatsDatas.aiMessageContent;
+  const isWaitingForResponse = toggleStates.toggleIsWaitingForResponse;
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const LINE_HEIGHT = 20;
   const PADDING_VERTICAL = 16; // 8 top + 8 bottom
@@ -102,6 +115,68 @@ const ChatInputMain = forwardRef((props, ref) => {
     dispatch(setChatInputContentLinesNumber(1));
   }, []);
 
+  const sendMessageDirectly = () => {
+    const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+    if (!chatUuid) {
+      Alert.alert("Error", "No active chat found");
+      return;
+    }
+
+    const payload = {
+      method: "POST",
+      url: `/chats/${chatUuid}/messages`,
+      data: {
+        content: globalDataStates.userMessagePrompt,
+        content_type: "text",
+        attachment_ids: [],
+      },
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const createChatWithAIFunction = () => {
+    const data = {
+      title: "New Chat",
+    };
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      data.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      data.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      data.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      data.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
+    const payload = {
+      method: "POST",
+      url: "/chats",
+      data,
+      name: "createChatWithAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
   const handleContentSizeChange = (event) => {
     const contentHeight = event.nativeEvent.contentSize.height;
 
@@ -143,22 +218,25 @@ const ChatInputMain = forwardRef((props, ref) => {
     };
   }, []);
 
+  // Real API flow - when AI message is fetched, add it to chat messages array
   useEffect(() => {
-    setTimeout(() => {
-      if (toggleStates.toggleIsWaitingForResponse) {
-        dispatch(
-          setChatMessagesArray([
-            ...globalDataStates.chatMessagesArray,
-            {
-              role: "ai",
-              message: demoResponseFromAI,
-            },
-          ])
-        );
-        dispatch(setToggleIsWaitingForResponse(false));
-      }
-    }, 5000);
-  }, [toggleStates.toggleIsWaitingForResponse]);
+    if (isMessagesFetched === true && aiMessageContent) {
+      dispatch(
+        setChatMessagesArray([
+          ...globalDataStates.chatMessagesArray,
+          {
+            role: "ai",
+            message: aiMessageContent,
+          },
+        ])
+      );
+      dispatch(setToggleIsWaitingForResponse(false));
+    }
+    // Handle error case
+    if (isMessagesFetched === false && toggleStates.toggleIsWaitingForResponse) {
+      dispatch(setToggleIsWaitingForResponse(false));
+    }
+  }, [isMessagesFetched, aiMessageContent]);
 
   // Reset input height when text is cleared
   useEffect(() => {
@@ -176,12 +254,16 @@ const ChatInputMain = forwardRef((props, ref) => {
           marginBottom: keyboardHeight,
         },
       ]}
+      pointerEvents={isWaitingForResponse ? "none" : "auto"}
     >
       <View
         ref={inputSectionRef}
         style={[
           styles.chatInputMain,
-          { paddingTop: globalDataStates.selectedFiles.length > 0 ? 0 : 10 },
+          {
+            paddingTop: globalDataStates.selectedFiles.length > 0 ? 0 : 10,
+            opacity: isWaitingForResponse ? 0.5 : 1,
+          },
         ]}
       >
         {globalDataStates.selectedFiles?.length > 0 && (
@@ -247,6 +329,7 @@ const ChatInputMain = forwardRef((props, ref) => {
           onContentSizeChange={handleContentSizeChange}
           scrollEnabled={inputHeight >= MAX_HEIGHT}
           returnKeyType="default"
+          editable={!isWaitingForResponse}
         />
         <View style={styles.inputActionIconsMainWrapper}>
           <View style={styles.inputLeftActionIcons}>
@@ -277,7 +360,11 @@ const ChatInputMain = forwardRef((props, ref) => {
             </View>
 
             <TouchableOpacity
-              onPress={() => dispatch(setToggleTopicsPopup(true))}
+              onPress={() => {
+                dispatch(setToggleTopicsPopup(true));
+                dispatch(setToggleSubTopics(false));
+                dispatch(setCurrentSelectedTopic(null));
+              }}
             >
               <TopicsBooksIcon />
             </TouchableOpacity>
@@ -308,6 +395,7 @@ const ChatInputMain = forwardRef((props, ref) => {
               globalDataStates.selectedFiles.length > 0) && (
               <TouchableOpacity
                 onPress={() => {
+                  // Add user message to chat array
                   dispatch(
                     setChatMessagesArray([
                       ...globalDataStates.chatMessagesArray,
@@ -320,10 +408,21 @@ const ChatInputMain = forwardRef((props, ref) => {
                       },
                     ])
                   );
+
+                  // Check if already chatting with AI
+                  if (toggleStates.toggleIsChattingWithAI) {
+                    // Direct message send flow - chat already exists
+                    sendMessageDirectly();
+                  } else {
+                    // Initial flow - create new chat
+                    createChatWithAIFunction();
+                    dispatch(setToggleIsChattingWithAI(true));
+                  }
+
+                  // Common cleanup
                   dispatch(setUserMessagePrompt(""));
                   dispatch(setSelecetdFiles([]));
                   dispatch(setChatInputContentLinesNumber(1));
-                  dispatch(setToggleIsChattingWithAI(true));
                   dispatch(setToggleIsWaitingForResponse(true));
                 }}
               >

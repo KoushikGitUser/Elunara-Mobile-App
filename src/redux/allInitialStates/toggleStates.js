@@ -43,4 +43,5 @@ export const toggleStates = {
       toggleAddChatToLearningLabPopup:false,
       toggleAddLinkPopup:false,
       toggleUpdateProfilePicPopup:false,
+      isEditingUserMessage:false,
 }

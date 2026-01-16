@@ -21,6 +21,7 @@ import {
   removeToken,
   removeRefreshToken,
 } from "../../utils/Secure/secureStore";
+import { resetAllStates } from "../../redux/actions/resetActions";
 
 const ConfirmLogoutPopup = ({
   toggleLogOutConfirmPopup,
@@ -33,14 +34,26 @@ const ConfirmLogoutPopup = ({
   useEffect(() => {
     const handleLogout = async () => {
       if (authStates.isLogOut === true) {
+        // Reset all Redux states
+        dispatch(resetAllStates());
+
+        // Clear tokens
         await removeToken();
         await removeRefreshToken();
+
+        // Clear AsyncStorage
+        await AsyncStorage.setItem("authenticUser", "false");
+
+        // Close popup
         setToggleLogOutConfirmPopup(false);
+
+        // Navigate to welcome screen
         navigation.reset({
           index: 0,
           routes: [{ name: "welcome" }],
         });
-        AsyncStorage.setItem("authenticUser", "false");
+
+        // Reset logout state
         dispatch(setIsLogOutToFalse());
       }
     };

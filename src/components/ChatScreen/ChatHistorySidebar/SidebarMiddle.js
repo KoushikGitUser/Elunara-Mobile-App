@@ -67,6 +67,15 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
     dispatch(commonFunctionForAPICalls(payload));
   };
 
+  const fetchAllPinnedChats = () => {
+    const payload = {
+      method: "GET",
+      url: "/chats",
+      name: "fetchAllUserChatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
   // Expose measurement methods via ref
   useImperativeHandle(ref, () => ({
     measurePinnedSection: () => {
@@ -99,7 +108,10 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
     <ScrollView style={styles.chatHistorySidebarMiddle}>
       <View ref={pinnedSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
-          onPress={() => setPinnedChatsOpened(!pinnedChatsOpened)}
+          onPress={() => {
+            setPinnedChatsOpened(!pinnedChatsOpened);
+            fetchAllPinnedChats();
+          }}
           style={styles.pinnedBtn}
         >
           <PinIcon />
@@ -110,7 +122,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
               fontFamily: "Mukta-Regular",
             }}
           >
-            Pinned Chats (06)
+            Pinned Chats ({chatsStates.allChatsDatas.allUserChatsAvailable?.filter(chat => chat.is_pinned)?.length || 0})
           </Text>
           {pinnedChatsOpened ? (
             <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
@@ -120,15 +132,62 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
         </TouchableOpacity>
         {pinnedChatsOpened && (
           <View style={styles.individualPinnedChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
-                <IndividualPinnedChat
-                  translateX={translateX}
-                  key={chatIndex}
-                  title={chat?.title}
-                />
-              );
-            })}
+            {chatsStates.loaderStates.isAllUserChatsFetched == true ? (
+              chatsStates.allChatsDatas.allUserChatsAvailable?.filter(chat => chat.is_pinned)?.length > 0 ? (
+                chatsStates.allChatsDatas.allUserChatsAvailable
+                  .filter(chat => chat.is_pinned)
+                  .map((chat, chatIndex) => {
+                    return (
+                      <IndividualPinnedChat
+                        translateX={translateX}
+                        key={chatIndex}
+                        item={chat}
+                      />
+                    );
+                  })
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <Text style={{ color: "#081A35" }}>
+                    No pinned chats{"   "}
+                  </Text>
+                </View>
+              )
+            ) : chatsStates.loaderStates.isAllUserChatsFetched == "pending" ? (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <ActivityIndicator color="#081A35" size="small" />
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <Text style={{ color: "#ff7474ff" }}>
+                  Something went wrong{"   "}
+                </Text>
+                <RotateCw onPress={fetchAllPinnedChats} color="#081A35" />
+              </View>
+            )}
           </View>
         )}
         <TouchableOpacity

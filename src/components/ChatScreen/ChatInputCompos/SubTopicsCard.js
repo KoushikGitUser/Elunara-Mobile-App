@@ -15,20 +15,68 @@ import {
   setToggleSubTopics,
   setToggleTopicsPopup,
 } from "../../../redux/slices/toggleSlice";
-import { useFonts } from "expo-font";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SubTopicsCard = ({ item }) => {
   const dispatch = useDispatch();
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
+
+  const sendMessageDirectly = () => {
+    const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+    if (!chatUuid) {
+      return;
+    }
+
+    const payload = {
+      method: "POST",
+      url: `/chats/${chatUuid}/messages`,
+      data: {
+        content: item.name,
+        content_type:"text",
+        attachment_ids: [],
+      },
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   const createChatWithAIFunction = () => {
-    Alert.alert("SubTopicsCard", "Creating chat with subject_id: " + globalDataStates.selectedSubjectID + ", topic_id: " + item?.id);
     const data = {
-      title:item.name,
+      title:item?.name,
       subject_id:globalDataStates.selectedSubjectID,
       topic_id:item?.id,
     }
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      data.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      data.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      data.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      data.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
     const payload = {
       method: "POST",
       url: "/chats",
@@ -38,31 +86,43 @@ const SubTopicsCard = ({ item }) => {
     dispatch(commonFunctionForAPICalls(payload));
   };
 
+  const handlePress = () => {
+    // Add user message to chat array
+    dispatch(
+      setChatMessagesArray([
+        ...globalDataStates.chatMessagesArray,
+        {
+          role: "user",
+          message: item.name,
+          file: globalDataStates.selectedFiles
+            ? globalDataStates.selectedFiles[0]
+            : null,
+        },
+      ])
+    );
+
+    // Check if already chatting with AI
+    if (toggleStates.toggleIsChattingWithAI) {
+      // Direct message send flow - chat already exists
+      sendMessageDirectly();
+    } else {
+      // Initial flow - create new chat
+      createChatWithAIFunction();
+      dispatch(setToggleIsChattingWithAI(true));
+    }
+
+    // Common cleanup and state updates
+    dispatch(setUserMessagePrompt(""));
+    dispatch(setSelecetdFiles([]));
+    dispatch(setChatInputContentLinesNumber(1));
+    dispatch(setToggleIsWaitingForResponse(true));
+    dispatch(setToggleTopicsPopup(false));
+  };
+
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => {
-        Alert.alert("Click", "SubTopicsCard clicked!");
-        createChatWithAIFunction();
-        dispatch(
-          setChatMessagesArray([
-            ...globalDataStates.chatMessagesArray,
-            {
-              role: "user",
-              message: item.name,
-              file: globalDataStates.selectedFiles
-                ? globalDataStates.selectedFiles[0]
-                : null,
-            },
-          ])
-        );
-        dispatch(setUserMessagePrompt(""));
-        dispatch(setSelecetdFiles([]));
-        dispatch(setChatInputContentLinesNumber(1));
-        dispatch(setToggleIsChattingWithAI(true));
-        dispatch(setToggleIsWaitingForResponse(true));
-        dispatch(setToggleTopicsPopup(false));
-      }}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <View style={styles.cardContent}>

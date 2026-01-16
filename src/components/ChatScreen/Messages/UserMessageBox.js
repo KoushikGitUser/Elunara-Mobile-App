@@ -4,9 +4,9 @@ import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsi
 import { useDispatch, useSelector } from "react-redux";
 import pdfLogo from "../../../assets/images/pdf.png";
 import { setToggleUserMessageActionPopup } from "../../../redux/slices/toggleSlice";
-import { setChatTitleOnLongPress, setUserMessageOnLongPress } from "../../../redux/slices/globalDataSlice";
+import { setChatTitleOnLongPress, setUserMessageOnLongPress, setEditingMessageData } from "../../../redux/slices/globalDataSlice";
 
-const UserMessageBox = ({ chat }) => {
+const UserMessageBox = ({ chat, messageIndex }) => {
   const { globalDataStates } = useSelector((state) => state.Global);
     const truncateFileName = (fileName) => {
     if (!fileName) return "";
@@ -52,7 +52,12 @@ const UserMessageBox = ({ chat }) => {
 
       <TouchableOpacity onLongPress={()=>{
         dispatch(setToggleUserMessageActionPopup(true));
-        dispatch(setUserMessageOnLongPress(chat.message))
+        dispatch(setUserMessageOnLongPress(chat.message));
+        dispatch(setEditingMessageData({
+          message: chat.message,
+          messageIndex: messageIndex,
+          chat: chat
+        }));
       }} style={styles.messageBox}>
         <Text style={[styles.message,{fontFamily:'Mukta-Regular'}]}>{chat.message} </Text>
       </TouchableOpacity>

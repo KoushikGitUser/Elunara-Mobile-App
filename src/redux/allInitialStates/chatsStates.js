@@ -8,6 +8,8 @@ export const chatsStates = {
     allUserChatsAvailable:[],
     allUserRoomsAvailable:[],
     lastBulkOperationInfo:null,
+    chatMessages:{},
+    aiMessageContent:null,
     },
     loaderStates:{
         isAllRecentChatsFetched:null,
@@ -23,5 +25,6 @@ export const chatsStates = {
         isAddToNotesPending:null,
         isRemoveFromNotesPending:null,
         isMessagesFetched:null,
+        isTopicsOfSelectedSubjectsFetched:null,
     }
 }

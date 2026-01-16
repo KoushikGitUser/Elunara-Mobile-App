@@ -1,5 +1,6 @@
 export const globalDataStates = {
   chatMessagesArray: [],
+  messageIDsArray: [], // Stores message IDs in order: [userMessageId, aiMessageId, userMessageId, aiMessageId, ...]
   userMessagePrompt: "",
   allMessagesForAChat: null,
   selectedFiles: [], 
@@ -8,6 +9,7 @@ export const globalDataStates = {
   currentSelectedTopic: null,
   chatTitleOnLongPress:null,
   userMessageOnLongPress:null,
+  editingMessageData:null, // {message: string, messageIndex: number, chat: object}
   settingsInnerPageHeaderTitle:"",
   settingsInnerPageComponentToRender:"General Settings",
   compareResponseStyleItemsArray:[],
