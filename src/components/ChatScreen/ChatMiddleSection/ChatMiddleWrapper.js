@@ -63,7 +63,7 @@ const  ChatMiddleWrapper = () => {
             justifyContent: "flex-end",
             gap: 25,
             alignItems: "center",
-          }}
+          }} 
           style={[styles.messagesContainer,]}
         >
           <View style={{height:120}}></View>

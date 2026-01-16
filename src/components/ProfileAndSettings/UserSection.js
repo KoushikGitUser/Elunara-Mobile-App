@@ -74,6 +74,27 @@ const UserSection = () => {
   }, [settingsStates?.allProfileInfos]);
 
   const navigation = useNavigation();
+
+  const formatEmail = (email, maxLength = 20) => {
+    if (!email) return "";
+
+    if (email.length <= maxLength) return email;
+
+    const [name, domain] = email.split("@");
+    if (!domain) return email.substring(0, maxLength - 3) + "...";
+
+    const dots = "...";
+    const allowedNameLength =
+      maxLength - domain.length - dots.length - 1;
+
+    if (allowedNameLength <= 0) {
+      return email.substring(0, maxLength - 3) + dots;
+    }
+
+    return `${name.substring(0, allowedNameLength)}${dots}@${domain}`;
+  };
+
+
   
   return (
     <View style={styles.upgradeBtn}>
@@ -111,8 +132,12 @@ const UserSection = () => {
               marginTop: 3,
               fontFamily: "Mukta-Regular",
             }}
+            numberOfLines={1}
+            ellipsizeMode="middle"
           >
-            {settingsStates?.allProfileInfos?.email || ""}
+           {formatEmail(settingsStates?.allProfileInfos?.email || "")}
+            {/* {formatEmail(item?.name)} */}
+            {/* {"vmjvbhbvhfbfdhgbhfbdshfbdhsfbdhbghgbghfb"} */}
           </Text>
           {/* <Text style={{ fontSize: scaleFont(14), fontWeight: 400,color:"#757575",marginTop:3}}>
             +91 9807649876

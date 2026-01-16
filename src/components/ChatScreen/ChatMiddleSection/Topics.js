@@ -73,10 +73,16 @@ const Topics = ({ item, index }) => {
           {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
 
-        <Text style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}>
+        <Text
+          style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {item?.name}
         </Text>
-        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}>
+        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}
+        numberOfLines={1}
+        ellipsizeMode="tail">
           {item.description}
         </Text>
       </View>
