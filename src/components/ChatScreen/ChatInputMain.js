@@ -188,25 +188,26 @@ const ChatInputMain = forwardRef((props, ref) => {
     const updatedMessage = globalDataStates.userMessagePrompt;
 
     // Get user message ID BEFORE updating arrays
-    const userMessageId = globalDataStates.messageIDsArray[editingIndex * 2];
+    const userMessageId = globalDataStates.messageIDsArray[editingIndex];
 
     if (!userMessageId) {
       Alert.alert("Error", "Message ID not found");
       return;
     }
 
-    // Delete messages below the editing point from chatMessagesArray
-    const updatedChatMessagesArray = globalDataStates.chatMessagesArray.slice(0, editingIndex);
+    // Keep messages up to and including the editing point, remove everything after
+    const updatedChatMessagesArray = globalDataStates.chatMessagesArray.slice(0, editingIndex + 1);
 
-    // Update the user message at the editing index
+    // Update the user message at the editing index with new content
     updatedChatMessagesArray[editingIndex] = {
       ...editingMessageData.chat,
       message: updatedMessage,
     };
 
-    // Delete corresponding message IDs from messageIDsArray
-    // Each message pair has 2 IDs (user + AI), so delete from (editingIndex * 2)
-    const updatedMessageIDsArray = globalDataStates.messageIDsArray.slice(0, editingIndex * 2);
+    // Keep message IDs up to and including the user message being edited
+    // Each message pair has 2 IDs (user + AI), so keep up to (editingIndex * 2 + 1)
+    // This keeps the user message ID but removes the AI response ID and everything after
+    const updatedMessageIDsArray = globalDataStates.messageIDsArray.slice(0, editingIndex + 1);
 
     // Update arrays
     dispatch(setChatMessagesArray(updatedChatMessagesArray));
@@ -225,9 +226,6 @@ const ChatInputMain = forwardRef((props, ref) => {
     const regeneratePayload = {
       method: "POST",
       url: `/messages/${userMessageId}/regenerate`,
-      data: {
-        content: updatedMessage,
-      },
       name: "regenerateAIResponse",
     };
 
@@ -289,6 +287,18 @@ const ChatInputMain = forwardRef((props, ref) => {
   // Real API flow - when AI message is fetched, add it to chat messages array
   useEffect(() => {
     if (isMessagesFetched === true && aiMessageContent) {
+      console.log("Full AI Response:", JSON.stringify(chatsStates.allChatsDatas.chatMessages));
+      console.log("Current messageIDsArray:", globalDataStates.messageIDsArray);
+
+      const responseData = chatsStates.allChatsDatas.chatMessages;
+      const userMessageId = responseData?.user_message?.id;
+      const aiMessageId = responseData?.assistant_message?.id;
+
+      // Update message IDs array
+      if (userMessageId && aiMessageId) {
+        dispatch(setMessageIDsArray([...globalDataStates.messageIDsArray, userMessageId, aiMessageId]));
+      }
+
       dispatch(
         setChatMessagesArray([
           ...globalDataStates.chatMessagesArray,
@@ -326,6 +336,17 @@ const ChatInputMain = forwardRef((props, ref) => {
     const isAIResponseRegenerated = chatsStates.loaderStates.isAIResponseRegenerated;
 
     if (isAIResponseRegenerated === true && aiMessageContent) {
+      console.log("Full Regenerated AI Response:",JSON.stringify(chatsStates.allChatsDatas.chatMessages) );
+      console.log("Current messageIDsArray:", globalDataStates.messageIDsArray);
+
+      const responseData = chatsStates.allChatsDatas.chatMessages;
+      const aiMessageId = responseData?.assistant_message?.id;
+
+      // Update message IDs array - add only AI message ID since user message already exists
+      if (aiMessageId) {
+        dispatch(setMessageIDsArray([...globalDataStates.messageIDsArray, aiMessageId]));
+      }
+
       // Add regenerated AI message to chat messages array
       dispatch(
         setChatMessagesArray([

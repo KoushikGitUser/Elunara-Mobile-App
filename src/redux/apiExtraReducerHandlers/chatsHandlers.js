@@ -250,7 +250,7 @@ export const handleSendPromptAndGetMessageFromAI = {
     const aiMessageId = responseData?.assistant_message?.id;
 
       // Get current messageIDsArray from globalDataStates
-      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      const currentMessageIds = state.globalDataStates?.messageIDsArray;
       // Add both user and AI message IDs
       state.globalDataStates.messageIDsArray = [...currentMessageIds, userMessageId, aiMessageId];
 
@@ -329,7 +329,7 @@ export const handleRegenerateAIResponse = {
     console.log("AI response regenerated:", responseData);
   },
   rejected: (state, {payload}) => {
-    console.log(payload.message);
+    console.log(payload);
     state.chatsStates.loaderStates.isAIResponseRegenerated = false;
     state.chatsStates.allChatsDatas.aiMessageContent = null;
   },

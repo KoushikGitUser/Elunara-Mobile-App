@@ -265,3 +265,32 @@ export default MobileVerificationPopup;
 const scale = (size) => (width / 375) * size;
 const verticalScale = (size) => (height / 812) * size;
 const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
+
+
+{
+  "assistant_message": {
+    "added_to_notes": null, 
+    "content": "I apologize, but I encountered an error while generating a response. Please try again.",
+     "content_type": "markdown", 
+     "created_at": "2026-01-17T10:58:41.000000Z",
+      "generation": {
+        "language": null,
+         "llm": null,
+          "style": null
+          }, 
+          "id": "c3efe76e-fb97-431a-981f-439547f9359c",
+           "is_active_version": true,
+            "role": "assistant", 
+            "sources": null,
+             "total_versions": 1, 
+             "version": 1
+             }, 
+             "user_message": {
+              "added_to_notes": null,
+               "content": "Hello",
+                "content_type": "text",
+                 "created_at": "2026-01-17T10:58:41.000000Z", 
+                 "id": "5f45b7f3-9e87-401e-9f7d-f19f8c27fe8e", 
+                 "role": "user"
+                 }
+                 }
