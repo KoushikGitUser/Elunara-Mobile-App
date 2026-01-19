@@ -90,6 +90,33 @@ const globalDataSlice = createSlice({
     setSelectedTopicsID: (state, action) => {
       state.globalDataStates.selectedTopicsID = action.payload;
     },
+    setCurrentAIMessageIndexForRegeneration: (state, action) => {
+      state.globalDataStates.currentAIMessageIndexForRegeneration = action.payload;
+    },
+    navigateToNextVersion: (state, action) => {
+      const messageIndex = action.payload;
+      const message = state.globalDataStates.chatMessagesArray[messageIndex];
+      if (message && message.versions && message.currentVersionIndex < message.versions.length - 1) {
+        message.currentVersionIndex += 1;
+        const newVersion = message.versions[message.currentVersionIndex];
+        message.message = newVersion.content;
+        message.uuid = newVersion.uuid;
+        message.version = newVersion.version;
+        message.total_versions = newVersion.total_versions;
+      }
+    },
+    navigateToPreviousVersion: (state, action) => {
+      const messageIndex = action.payload;
+      const message = state.globalDataStates.chatMessagesArray[messageIndex];
+      if (message && message.versions && message.currentVersionIndex > 0) {
+        message.currentVersionIndex -= 1;
+        const newVersion = message.versions[message.currentVersionIndex];
+        message.message = newVersion.content;
+        message.uuid = newVersion.uuid;
+        message.version = newVersion.version;
+        message.total_versions = newVersion.total_versions;
+      }
+    },
     resetAllGuidedTourSteps: (state) => {
       state.globalDataStates.manualGuidedTourRunning = false;
       state.globalDataStates.navigationBasicsGuideTourSteps = 0;
@@ -133,6 +160,9 @@ export const {
   resetAllGuidedTourSteps,
   setSelectedSubjectID,
   setSelectedTopicsID,
+  setCurrentAIMessageIndexForRegeneration,
+  navigateToNextVersion,
+  navigateToPreviousVersion,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

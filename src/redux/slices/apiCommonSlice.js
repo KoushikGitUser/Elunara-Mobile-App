@@ -63,6 +63,12 @@ const apiCommonSlice = createSlice({
     resetChatArchiveUnarchiveUpdated:(state)=>{
       state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = null;
     },
+    resetAIResponseRegenerated:(state)=>{
+      state.chatsStates.loaderStates.isAIResponseRegenerated = null;
+    },
+    resetVersionSwitched:(state)=>{
+      state.chatsStates.loaderStates.isVersionSwitched = null;
+    },
     resetChatDeleted:(state)=>{
       state.chatsStates.loaderStates.isChatDeleted = null;
     },
@@ -97,7 +103,7 @@ const apiCommonSlice = createSlice({
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched,resetChatTitleUpdated,resetChatPinUnpinUpdated,resetChatArchiveUnarchiveUpdated,resetChatDeleted,resetChatDeleteUndone,resetBulkOperationCompleted,setCurrentActionChatDetails} =
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched,resetChatTitleUpdated,resetChatPinUnpinUpdated,resetChatArchiveUnarchiveUpdated,resetChatDeleted,resetChatDeleteUndone,resetBulkOperationCompleted,setCurrentActionChatDetails,resetAIResponseRegenerated,resetVersionSwitched} =
   apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

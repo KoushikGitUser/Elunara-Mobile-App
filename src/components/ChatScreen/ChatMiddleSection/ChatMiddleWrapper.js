@@ -101,7 +101,10 @@ const  ChatMiddleWrapper = () => {
                   <AIMessageBox
                     message={chats.message}
                     messageUuid={chats.uuid}
+                    messageIndex={chatsIndex}
                     isSavedToNotes={chats.is_saved_to_notes}
+                    version={chats.version || 1}
+                    totalVersions={chats.total_versions || 1}
                     key={chatsIndex}
                   />
                 );

@@ -39,7 +39,7 @@ import {
   setToggleUnlockPersonalisationLimitPopup,
   setIsEditingUserMessage,
 } from "../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetAIResponseRegenerated } from "../../redux/slices/apiCommonSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
 import topicsIcon from "../../assets/images/TopicsIcon.png";
 import toolsIcon from "../../assets/images/toolsIcon.png";
@@ -187,7 +187,7 @@ const ChatInputMain = forwardRef((props, ref) => {
     const editingIndex = editingMessageData.messageIndex;
     const updatedMessage = globalDataStates.userMessagePrompt;
 
-    // Get user message ID BEFORE updating arrays
+    // Get user message ID for the message being edited
     const userMessageId = globalDataStates.messageIDsArray[editingIndex];
 
     if (!userMessageId) {
@@ -195,25 +195,26 @@ const ChatInputMain = forwardRef((props, ref) => {
       return;
     }
 
-    // Keep messages up to and including the editing point, remove everything after
-    const updatedChatMessagesArray = globalDataStates.chatMessagesArray.slice(0, editingIndex + 1);
+    // Get chat UUID for sending message
+    const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+    if (!chatUuid) {
+      Alert.alert("Error", "No active chat found");
+      return;
+    }
 
-    // Update the user message at the editing index with new content
-    updatedChatMessagesArray[editingIndex] = {
-      ...editingMessageData.chat,
-      message: updatedMessage,
-    };
+    // Keep array intact - just add edited message as new user message at the end
+    const updatedChatMessagesArray = [
+      ...globalDataStates.chatMessagesArray,
+      {
+        role: "user",
+        message: updatedMessage,
+      }
+    ];
 
-    // Keep message IDs up to and including the user message being edited
-    // Each message pair has 2 IDs (user + AI), so keep up to (editingIndex * 2 + 1)
-    // This keeps the user message ID but removes the AI response ID and everything after
-    const updatedMessageIDsArray = globalDataStates.messageIDsArray.slice(0, editingIndex + 1);
-
-    // Update arrays
+    // Update chat messages array
     dispatch(setChatMessagesArray(updatedChatMessagesArray));
-    dispatch(setMessageIDsArray(updatedMessageIDsArray));
 
-    // Call both APIs
+    // Call update message API to update the original message
     const updatePayload = {
       method: "PUT",
       url: `/messages/${userMessageId}`,
@@ -223,15 +224,21 @@ const ChatInputMain = forwardRef((props, ref) => {
       name: "updateUserMessageForRegeneration",
     };
 
-    const regeneratePayload = {
+    // Call send message API (not regenerate) with the chat UUID
+    const sendMessagePayload = {
       method: "POST",
-      url: `/messages/${userMessageId}/regenerate`,
-      name: "regenerateAIResponse",
+      url: `/chats/${chatUuid}/messages`,
+      data: {
+        content: updatedMessage,
+        content_type: "text",
+        attachment_ids: [],
+      },
+      name: "sendPromptAndGetMessageFromAI",
     };
 
     // Dispatch both API calls
     dispatch(commonFunctionForAPICalls(updatePayload));
-    dispatch(commonFunctionForAPICalls(regeneratePayload));
+    dispatch(commonFunctionForAPICalls(sendMessagePayload));
 
     // Set waiting state
     dispatch(setToggleIsWaitingForResponse(true));
@@ -299,13 +306,26 @@ const ChatInputMain = forwardRef((props, ref) => {
         dispatch(setMessageIDsArray([...globalDataStates.messageIDsArray, userMessageId, aiMessageId]));
       }
 
+      const newAIMessage = {
+        role: "ai",
+        message: aiMessageContent,
+        uuid: aiMessageId || null,
+        is_saved_to_notes: false,
+        version: 1,
+        total_versions: 1,
+        versions: [{
+          content: aiMessageContent,
+          uuid: aiMessageId || null,
+          version: 1,
+          total_versions: 1,
+        }],
+        currentVersionIndex: 0,
+      };
+
       dispatch(
         setChatMessagesArray([
           ...globalDataStates.chatMessagesArray,
-          {
-            role: "ai",
-            message: aiMessageContent,
-          },
+          newAIMessage,
         ])
       );
       dispatch(setToggleIsWaitingForResponse(false));
@@ -336,33 +356,68 @@ const ChatInputMain = forwardRef((props, ref) => {
     const isAIResponseRegenerated = chatsStates.loaderStates.isAIResponseRegenerated;
 
     if (isAIResponseRegenerated === true && aiMessageContent) {
-      console.log("Full Regenerated AI Response:",JSON.stringify(chatsStates.allChatsDatas.chatMessages) );
+      console.log("Full Regenerated AI Response:", JSON.stringify(chatsStates.allChatsDatas.regeneratedResponse));
       console.log("Current messageIDsArray:", globalDataStates.messageIDsArray);
 
-      const responseData = chatsStates.allChatsDatas.chatMessages;
-      const aiMessageId = responseData?.assistant_message?.id;
+      const regeneratedMessage = chatsStates.allChatsDatas.regeneratedResponse;
+      const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
 
-      // Update message IDs array - add only AI message ID since user message already exists
-      if (aiMessageId) {
-        dispatch(setMessageIDsArray([...globalDataStates.messageIDsArray, aiMessageId]));
+      if (aiMessageIndex !== null && aiMessageIndex >= 0) {
+        // Create a new array with updated message
+        const updatedChatMessagesArray = globalDataStates.chatMessagesArray.map((msg, index) => {
+          if (index === aiMessageIndex) {
+            // Get existing versions or initialize with current message
+            const existingVersions = msg.versions || [{
+              content: msg.message,
+              uuid: msg.uuid,
+              version: 1,
+              total_versions: 1,
+            }];
+
+            // Add the new regenerated version
+            const newVersion = {
+              content: regeneratedMessage?.content || aiMessageContent,
+              uuid: regeneratedMessage?.id || null,
+              version: existingVersions.length + 1,
+              total_versions: existingVersions.length + 1,
+            };
+
+            const updatedVersions = [...existingVersions, newVersion];
+            const actualTotalVersions = updatedVersions.length;
+
+            // Return new message object with updated version - show the LATEST regenerated version
+            return {
+              ...msg,
+              message: newVersion.content,
+              uuid: newVersion.uuid,
+              version: actualTotalVersions, // Current version number
+              total_versions: actualTotalVersions, // Total versions available
+              versions: updatedVersions,
+              currentVersionIndex: updatedVersions.length - 1,
+            };
+          }
+          return msg;
+        });
+
+        // Update the chat messages array
+        dispatch(setChatMessagesArray(updatedChatMessagesArray));
+
+        // Add the new AI message ID to messageIDsArray
+        if (regeneratedMessage?.id) {
+          dispatch(setMessageIDsArray([...globalDataStates.messageIDsArray, regeneratedMessage.id]));
+        }
       }
 
-      // Add regenerated AI message to chat messages array
-      dispatch(
-        setChatMessagesArray([
-          ...globalDataStates.chatMessagesArray,
-          {
-            role: "ai",
-            message: aiMessageContent,
-          },
-        ])
-      );
       dispatch(setToggleIsWaitingForResponse(false));
+      // Reset the regenerate state so it can be triggered again
+      dispatch(resetAIResponseRegenerated());
     }
 
     // Handle error case
     if (isAIResponseRegenerated === false) {
       dispatch(setToggleIsWaitingForResponse(false));
+      // Reset the regenerate state
+      dispatch(resetAIResponseRegenerated());
     }
   }, [chatsStates.loaderStates.isAIResponseRegenerated, aiMessageContent]);
 
