@@ -17,12 +17,11 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const SplashScreen = ({ navigation }) => {
-
   const dispatch = useDispatch();
 
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
-      const payload = { 
+      const payload = {
         method: "GET",
         url: "/settings/profile",
         name: "getAllProfileInfos",
@@ -34,11 +33,31 @@ const SplashScreen = ({ navigation }) => {
 
   const { settingsStates } = useSelector((state) => state.API);
 
-  useEffect(()=>{
-    if(settingsStates.allPersonalisationsSettings.isPersonalInfosFetched == true){
-      navigation.navigate("chat");
+  useEffect(() => {
+    if (
+      settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true
+    ) {
+      navigation.replace("chat");
+    } else if (
+      settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
+      false
+    ) {
+      // Check if the API call has completed (either success or failure)
+      // If allProfileInfos is empty and fetch completed, user is not authenticated
+      const hasProfileData =
+        settingsStates.allProfileInfos &&
+        Object.keys(settingsStates.allProfileInfos).length > 0;
+
+      // Add a small delay to ensure the API call has had time to complete
+      const timer = setTimeout(() => {
+        if (!hasProfileData) {
+          navigation.replace("welcome");
+        }
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
-  },[settingsStates.allPersonalisationsSettings.isPersonalInfosFetched])
+  }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched]);
 
   return (
     <View style={styles.container}>

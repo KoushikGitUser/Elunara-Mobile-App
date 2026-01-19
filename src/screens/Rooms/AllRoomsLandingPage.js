@@ -37,15 +37,6 @@ const AllRoomsLandingPage = () => {
   const dispatch = useDispatch();
   const allUserRooms = chatsStates.allChatsDatas.allUserRoomsAvailable || [];
 
-  useEffect(() => {
-    const payload = {
-      method: "GET",
-      url: "/rooms?page=1&per_page=20",
-      name: "fetchAllUserRoomsAvailable",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
-  }, []);
-
   // Search Debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

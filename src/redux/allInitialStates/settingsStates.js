@@ -26,6 +26,7 @@ export const settingsStates = {
     academicCareer: {},
     learningDevices: {},
     isAnythingChangedInPersonalisationSettings: false,
+    isPersonalInfosFetched: false,
   },
   allProfileInfos: {},
 

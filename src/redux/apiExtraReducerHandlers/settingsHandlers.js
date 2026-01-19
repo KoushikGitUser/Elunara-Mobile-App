@@ -169,11 +169,16 @@ export const handleGetAllSpecializationsAvailable = {
 };
 
 export const handleGetAllProfileInfos = {
-  pending: (state) => {},
+  pending: (state) => {
+    state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
+  },
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos = action.payload.data.data;
+    state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = true;
   },
-  rejected: (state, action) => {},
+  rejected: (state, action) => {
+    state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
+  },
 };
 
 export const handleUpdateProfileName = {
@@ -187,7 +192,7 @@ export const handleUpdateProfileName = {
       "Profile Updated",
       "Your name has been updated successfully",
       "success",
-      3000
+      3000,
     );
   },
   rejected: (state, action) => {},
@@ -223,7 +228,7 @@ export const handleSubmitHelpCenterFeedback = {
       "Submitted",
       "Your feedback submitted successfully",
       "success",
-      3000
+      3000,
     );
   },
   rejected: (state, action) => {
@@ -233,7 +238,7 @@ export const handleSubmitHelpCenterFeedback = {
       "Error",
       action.payload?.message || "Failed to submit feedback",
       "error",
-      3000
+      3000,
     );
   },
 };
@@ -267,7 +272,7 @@ export const handleAddAcademicLink = {
       "Link Added",
       "Link has been added successfully",
       "success",
-      3000
+      3000,
     );
   },
   rejected: (state, action) => {
@@ -277,7 +282,7 @@ export const handleAddAcademicLink = {
       "Error",
       action.payload?.message || "Failed to add link",
       "error",
-      3000
+      3000,
     );
   },
 };
@@ -294,7 +299,7 @@ export const handleDeleteAcademicLink = {
       "Link Deleted",
       "Link has been deleted successfully",
       "success",
-      3000
+      3000,
     );
   },
   rejected: (state, action) => {
@@ -304,7 +309,7 @@ export const handleDeleteAcademicLink = {
       "Error",
       action.payload?.message || "Failed to delete link",
       "error",
-      3000
+      3000,
     );
   },
 };
