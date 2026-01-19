@@ -14,14 +14,21 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import deleteBin from "../../../../assets/images/deleteBin.png";
 import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import { setToggleDeleteChatConfirmPopup } from "../../../../redux/slices/toggleSlice";
-import { triggerToast } from "../../../../services/toast";
+import {
+  triggerToast,
+  triggerToastWithAction,
+} from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
 
 const DeleteConfirmPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { roomsStates } = useSelector((state) => state.API);
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
@@ -65,8 +72,13 @@ const DeleteConfirmPopup = () => {
 
             {/* Title */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-              {globalDataStates.deleteConfirmPopupFrom == "chat" ?"Delete Chat?":globalDataStates.deleteConfirmPopupFrom == "allChats"?"Delete <10> chats?":globalDataStates.deleteConfirmPopupFrom == "rooms"?"Delete room?":"Delete <10> rooms?"}
-              
+              {globalDataStates.deleteConfirmPopupFrom == "chat"
+                ? "Delete Chat?"
+                : globalDataStates.deleteConfirmPopupFrom == "allChats"
+                  ? "Delete <10> chats?"
+                  : globalDataStates.deleteConfirmPopupFrom == "rooms"
+                    ? "Delete room?"
+                    : "Delete <10> rooms?"}
             </Text>
 
             {/* Description */}
@@ -100,15 +112,55 @@ const DeleteConfirmPopup = () => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
+                  if (globalDataStates.deleteConfirmPopupFrom === "rooms") {
+                    if (roomsStates.currentRoom) {
+                      const roomUuid =
+                        roomsStates.currentRoom.uuid ||
+                        roomsStates.currentRoom.id;
+
+                      const payload = {
+                        method: "DELETE",
+                        url: `/rooms/${roomUuid}`,
+                        name: "delete-room",
+                        uuid: roomUuid, // passing uuid for handler to use in meta/arg
+                      };
+                      dispatch(commonFunctionForAPICalls(payload));
+
+                      // Navigate back to rooms list
+                      navigation.navigate("allRooms");
+
+                      // Trigger Toast with Undo Action
+                      const undoCallback = () => {
+                        const undoPayload = {
+                          method: "POST",
+                          url: `/rooms/${roomUuid}/undo-delete`,
+                          name: "undo-delete-room",
+                        };
+                        dispatch(commonFunctionForAPICalls(undoPayload));
+                      };
+
+                      triggerToastWithAction(
+                        "Room Deleted",
+                        "This action can be undone",
+                        "success",
+                        5000,
+                        "Undo",
+                        undoCallback,
+                      );
+                    }
+                  } else {
+                    // Existing logic for other types (chats, etc.)
+                    setTimeout(() => {
+                      triggerToast(
+                        "Chat Deleted",
+                        "Your chat has been successfully deleted",
+                        "success",
+                        3000,
+                      );
+                    }, 500);
+                  }
+
                   dispatch(setToggleDeleteChatConfirmPopup(false));
-                  setTimeout(() => {
-                    triggerToast(
-                      "Chat Deleted",
-                      "Your chat has been successfully deleted",
-                      "success",
-                      3000
-                    );
-                  }, 500);
                 }}
                 activeOpacity={0.8}
               >

@@ -23,17 +23,23 @@ const RoomsHeader = ({ translateX }) => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
-  const [addOptionsPopup,setAddOptionsPopup] = useState(false);
-  const [roomOptionsPopup,setRoomOptionsPopup] = useState(false);
+  const [addOptionsPopup, setAddOptionsPopup] = useState(false);
+  const [roomOptionsPopup, setRoomOptionsPopup] = useState(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setIsKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsKeyboardVisible(false);
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
 
     return () => {
       keyboardDidShowListener.remove();
@@ -42,9 +48,23 @@ const RoomsHeader = ({ translateX }) => {
   }, []);
 
   return (
-    <View style={[styles.roomsHeader, isKeyboardVisible && { borderBottomWidth: 1, borderBottomColor: '#D3DAE5' }]}>
-      {addOptionsPopup && <PlusButtonPopup setAddOptionsPopup={setAddOptionsPopup} />}
-      {roomOptionsPopup && <RoomsOptionsPopup setRoomOptionsPopup={setRoomOptionsPopup} />}
+    <View
+      style={[
+        styles.roomsHeader,
+        isKeyboardVisible && {
+          borderBottomWidth: 1,
+          borderBottomColor: "#D3DAE5",
+        },
+      ]}
+    >
+      <PlusButtonPopup
+        visible={addOptionsPopup}
+        setAddOptionsPopup={setAddOptionsPopup}
+      />
+      <RoomsOptionsPopup
+        visible={roomOptionsPopup}
+        setRoomOptionsPopup={setRoomOptionsPopup}
+      />
       <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {
@@ -62,10 +82,10 @@ const RoomsHeader = ({ translateX }) => {
         <Feather name="menu" size={30} color="black" />
       </TouchableOpacity>
       <View style={styles.rightHeaderIcons}>
-        <TouchableOpacity onPress={()=>setAddOptionsPopup(true)}>
+        <TouchableOpacity onPress={() => setAddOptionsPopup(true)}>
           <Plus size={35} strokeWidth={1.5} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>setRoomOptionsPopup(true)}>
+        <TouchableOpacity onPress={() => setRoomOptionsPopup(true)}>
           <EllipsisVertical strokeWidth={2} size={30} color="black" />
         </TouchableOpacity>
       </View>

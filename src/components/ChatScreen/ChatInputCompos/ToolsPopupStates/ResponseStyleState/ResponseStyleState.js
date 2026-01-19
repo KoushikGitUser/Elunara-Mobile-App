@@ -12,18 +12,27 @@ import React, { useState } from "react";
 import { scaleFont, verticalScale } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
 } from "../../../../../redux/slices/toggleSlice";
+import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 import { responseStyles } from "../../../../../data/datas";
 import chakraLogo from "../../../../../assets/images/chakraFull.png";
 const screenHeight = Dimensions.get("window").height;
 
 const ResponseStyleState = () => {
   const dispatch = useDispatch();
-  const [selectedStyle, setSelectedStyle] = useState(0);
+  const { roomsStates } = useSelector((state) => state.API);
+
+  const initialSelection =
+    roomsStates.tempRoomSettings?.response_style_id !== null &&
+    roomsStates.tempRoomSettings?.response_style_id !== undefined
+      ? roomsStates.tempRoomSettings.response_style_id - 1
+      : 0;
+
+  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -49,7 +58,9 @@ const ResponseStyleState = () => {
           />
         </View>
         {/* Title */}
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+          Response Style
+        </Text>
 
         {/* Description */}
         <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
@@ -61,11 +72,11 @@ const ResponseStyleState = () => {
           showsVerticalScrollIndicator={false}
           style={styles.optionsContainer}
         >
-          <View style={{ flexDirection: "column",}}>
+          <View style={{ flexDirection: "column" }}>
             {responseStyles.map((styleOptions, optionsIndex) => {
               return (
                 <React.Fragment key={optionsIndex}>
-                  <TouchableOpacity  
+                  <TouchableOpacity
                     style={[
                       styles.card,
                       {
@@ -79,7 +90,15 @@ const ResponseStyleState = () => {
                             : "#D3DAE5",
                       },
                     ]}
-                    onPress={() => setSelectedStyle(styleOptions.id)}
+                    onPress={() => {
+                      setSelectedStyle(styleOptions.id);
+                      dispatch(
+                        setTempRoomProperty({
+                          key: "response_style_id",
+                          value: styleOptions.id + 1, // Map 0 -> 1, 1 -> 2
+                        })
+                      );
+                    }}
                     activeOpacity={0.7}
                   >
                     <View style={styles.contentMain}>
@@ -91,7 +110,11 @@ const ResponseStyleState = () => {
                         <Text
                           style={[
                             styles.optionTitle,
-                            { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
+                            {
+                              fontSize: scaleFont(18),
+                              fontWeight: 600,
+                              fontFamily: "Mukta-Bold",
+                            },
                           ]}
                         >
                           {styleOptions.title}
@@ -103,7 +126,7 @@ const ResponseStyleState = () => {
                               fontSize: scaleFont(14),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily:"Mukta-Regular"
+                              fontFamily: "Mukta-Regular",
                             },
                           ]}
                         >
@@ -115,13 +138,13 @@ const ResponseStyleState = () => {
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
                   {styleOptions.id == 0 && (
-                    <View style={{ width: "100%",marginBottom:20, }}>
+                    <View style={{ width: "100%", marginBottom: 20 }}>
                       <Text
                         style={{
                           textAlign: "center",
                           color: "#757575",
                           fontSize: scaleFont(15),
-                          fontFamily:"Mukta-Regular"
+                          fontFamily: "Mukta-Regular",
                         }}
                       >
                         Or Select Manually
@@ -219,7 +242,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 18,
     backgroundColor: "white",
-    marginBottom:20
+    marginBottom: 20,
   },
   contentMain: {
     flexDirection: "row",

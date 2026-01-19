@@ -20,19 +20,34 @@ import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/C
 import AddChatToRoomPopup from "../../components/Rooms/AddChatToRoomPopup";
 import { useFonts } from "expo-font";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const Rooms = ({ route }) => {
-  const { roomName } = route.params;
+  const { roomName, roomUuid } = route.params || {};
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
   });
+
+  useEffect(() => {
+    const uuid = roomUuid || roomsStates.currentRoom?.uuid;
+    if (uuid) {
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: `/rooms/${uuid}`,
+          name: "get-room",
+        }),
+      );
+    }
+  }, [roomUuid]);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -45,7 +60,9 @@ const Rooms = ({ route }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.mainWrapper,{marginTop: -StatusBar.currentHeight }]}>
+    <SafeAreaView
+      style={[styles.mainWrapper, { marginTop: -StatusBar.currentHeight }]}
+    >
       <StatusBar
         backgroundColor="#000000ff"
         barStyle="dark-content"
@@ -53,7 +70,9 @@ const Rooms = ({ route }) => {
         translucent={false}
         animated
       />
-       {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup from="rooms" />}
+      {toggleStates.toggleDeleteChatConfirmPopup && (
+        <DeleteConfirmPopup from="rooms" />
+      )}
       <ChatHistorySidebar translateX={translateX} />
       {toggleStates.toggleAddExistingChatToRoomPopup && <AddChatToRoomPopup />}
 

@@ -26,7 +26,7 @@ export const commonFunctionForAPICalls = createAsyncThunk(
         data: error.response?.data,
       });
     }
-  }
+  },
 );
 
 const apiCommonSlice = createSlice({
@@ -41,14 +41,31 @@ const apiCommonSlice = createSlice({
       state.settingsStates.settingsMasterDatas.isCountrySelectionChanged =
         action?.payload;
     },
-    setIsAnythingChangedInGeneralSettings:(state,action)=>{
-      state.settingsStates.allGeneralSettings.isAnythingChangedInGeneralSettings = action.payload;
+    setIsAnythingChangedInGeneralSettings: (state, action) => {
+      state.settingsStates.allGeneralSettings.isAnythingChangedInGeneralSettings =
+        action.payload;
     },
-    setIsAnythingChangedInPersonalisationSettings:(state,action)=>{
-      state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings = action.payload;
+    setIsAnythingChangedInPersonalisationSettings: (state, action) => {
+      state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings =
+        action.payload;
     },
-    setIsGeneralSettingsRestored:(state,action)=>{
+    setIsGeneralSettingsRestored: (state, action) => {
       state.settingsStates.isGeneralSettingsRestored = action.payload;
+    },
+    setCurrentRoom: (state, action) => {
+      state.roomsStates.currentRoom = action.payload;
+    },
+    setTempRoomProperty: (state, action) => {
+      const { key, value } = action.payload;
+      state.roomsStates.tempRoomSettings[key] = value;
+    },
+    resetTempRoomSettings: (state) => {
+      state.roomsStates.tempRoomSettings = {
+        llm_id: null,
+        response_style_id: null,
+        response_language_id: null,
+        citation_format_id: null,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -68,7 +85,15 @@ const apiCommonSlice = createSlice({
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings} =
-  apiCommonSlice.actions;
+export const {
+  setIsCountrySelectionChanged,
+  setSelectedCountryCode,
+  setIsAnythingChangedInGeneralSettings,
+  setIsGeneralSettingsRestored,
+  setIsAnythingChangedInPersonalisationSettings,
+  setCurrentRoom,
+  setTempRoomProperty,
+  resetTempRoomSettings,
+} = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

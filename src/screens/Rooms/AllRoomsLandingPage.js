@@ -6,19 +6,22 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AllRoomsPageHeader from "../../components/Rooms/AllRoomsPageHeader";
 import AllRoomsPageSearchIcons from "../../components/Rooms/AllRoomsPageSearchIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { scaleFont, verticalScale } from "../../utils/responsive";
-import { allChatsData } from "../../data/datas";
 import ChatsScrollForAllRoomsPage from "../../components/Rooms/ChatsScrollForAllRoomsPage";
 import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import SearchHistory from "../../components/Search/SearchHistory";
+import SearchResults from "../../components/Search/SearchResults";
 
 const AllRoomsLandingPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
@@ -26,13 +29,43 @@ const AllRoomsLandingPage = () => {
   const [selectedArray, setSelectedArray] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [checked, setChecked] = useState(false);
-    const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
+
+  // Search Debounce
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery.length >= 2) {
+        dispatch(
+          commonFunctionForAPICalls({
+            method: "GET",
+            url: "/search",
+            params: { q: searchQuery, type: "all" },
+            name: "search-global",
+          }),
+        );
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  // Fetch rooms on mount
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/rooms",
+      name: "get-rooms",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
   const handleSelectAll = () => {
     setChecked(!checked);
     if (!checked) {
-      const allIds = allChatsData.map((chat) => chat.id);
+      const allIds = roomsStates.rooms?.map((room) => room.uuid) || [];
       setSelectedArray(allIds);
     } else {
       setSelectedArray([]);
@@ -47,7 +80,9 @@ const AllRoomsLandingPage = () => {
         marginTop: -StatusBar.currentHeight,
       }}
     >
-       {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup from="allRooms" />}
+      {toggleStates.toggleDeleteChatConfirmPopup && (
+        <DeleteConfirmPopup from="allRooms" />
+      )}
       <StatusBar
         backgroundColor="#ff0000ff"
         barStyle="dark-content"
@@ -73,9 +108,7 @@ const AllRoomsLandingPage = () => {
               <View
                 style={[styles.checkbox, checked && styles.checkboxChecked]}
               >
-                {checked && (
-                  <Check strokeWidth={2} size={17} color="white" />
-                )}
+                {checked && <Check strokeWidth={2} size={17} color="white" />}
               </View>
               <Text style={styles.selectAllText}>Select All</Text>
             </TouchableOpacity>
@@ -88,39 +121,77 @@ const AllRoomsLandingPage = () => {
                 </Text>
               </View>
 
-              <TouchableOpacity onPress={()=>{
-                dispatch(setToggleDeleteChatConfirmPopup(true))
-              }} style={styles.deleteButton} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(setToggleDeleteChatConfirmPopup(true));
+                }}
+                style={styles.deleteButton}
+                activeOpacity={0.7}
+              >
                 <Trash2 size={24} color="#1a2233" strokeWidth={1.8} />
               </TouchableOpacity>
             </View>
           </View>
         ) : (
-          <AllRoomsPageSearchIcons />
+          <AllRoomsPageSearchIcons
+            isSearching={isSearching}
+            setIsSearching={setIsSearching}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
         )}
 
-        <ScrollView
-          contentContainerStyle={{
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-          style={styles.allChatsScrollMain}
-        >
-          {allChatsData.map((chat, chatsIndex) => {
-            return (
-              <ChatsScrollForAllRoomsPage
-                key={chatsIndex}
-                index={chat.id}
-                title={chat.title}
-                subject={chat.subject}
-                isSelecting={isSelecting}
-                selectedArray={selectedArray}
-                setIsSelecting={setIsSelecting}
-                setSelectedArray={setSelectedArray}
+        {isSearching ? (
+          <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
+            {searchQuery.length === 0 ? (
+              <SearchHistory
+                onHistoryItemPress={(query) => {
+                  setSearchQuery(query);
+                }}
               />
-            );
-          })}
-        </ScrollView>
+            ) : (
+              <SearchResults />
+            )}
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={{
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+            style={styles.allChatsScrollMain}
+          >
+            {roomsStates.fetchingRooms ? (
+              <ActivityIndicator
+                size="large"
+                color="#081A35"
+                style={{ marginTop: 50 }}
+              />
+            ) : roomsStates.rooms?.length > 0 ? (
+              roomsStates.rooms.map((room, roomIndex) => {
+                return (
+                  <ChatsScrollForAllRoomsPage
+                    key={room.uuid || roomIndex}
+                    index={room.uuid}
+                    title={room.name}
+                    subject={room.description || "No description"}
+                    isSelecting={isSelecting}
+                    selectedArray={selectedArray}
+                    setIsSelecting={setIsSelecting}
+                    setSelectedArray={setSelectedArray}
+                    room={room}
+                  />
+                );
+              })
+            ) : (
+              <View style={{ marginTop: 50, alignItems: "center" }}>
+                <Text style={{ fontSize: scaleFont(16), color: "#6B7280" }}>
+                  No rooms yet. Create your first Learning Lab!
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        )}
       </Animated.View>
     </SafeAreaView>
   );

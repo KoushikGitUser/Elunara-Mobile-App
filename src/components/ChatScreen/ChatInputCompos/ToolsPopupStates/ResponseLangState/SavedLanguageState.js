@@ -8,21 +8,45 @@ import {
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { setLanguages } from "../../../../../data/datas";
+import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 
 const SavedLanguageState = () => {
-  const [selectedStyle, setSelectedStyle] = useState(0);
+  const dispatch = useDispatch();
+  const { roomsStates } = useSelector((state) => state.API);
+
+  // Initialize from tempRoomSettings or default to 0. Subtract 1 for local 0-based index.
+  const initialSelection =
+    roomsStates.tempRoomSettings?.response_language_id !== null &&
+    roomsStates.tempRoomSettings?.response_language_id !== undefined
+      ? roomsStates.tempRoomSettings.response_language_id - 1
+      : 0;
+
+  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
       {selected && <View style={styles.radioInner} />}
     </View>
   );
 
+  const handleSelection = (langIndex) => {
+    setSelectedStyle(langIndex);
+    dispatch(
+      setTempRoomProperty({
+        key: "response_language_id",
+        value: langIndex + 1, // Add 1 for backend 1-based index
+      })
+    );
+  };
+
   return (
     <>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Language</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+        Response Language
+      </Text>
       {/* Description */}
       <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Choose your response language — ideal for bilinguals or fluent speakers.
@@ -32,36 +56,52 @@ const SavedLanguageState = () => {
         {setLanguages.map((langs, langIndex) => {
           return (
             <TouchableOpacity
-              onPress={() => setSelectedStyle(langIndex)}
+              key={langIndex}
+              onPress={() => handleSelection(langIndex)}
               style={styles.langsMain}
             >
-              <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(15)}}>{langs.lang}</Text>
+              <Text
+                style={{ fontFamily: "Mukta-Regular", fontSize: scaleFont(15) }}
+              >
+                {langs.lang}
+              </Text>
               <RadioButton selected={selectedStyle === langIndex} />
             </TouchableOpacity>
           );
         })}
       </View>
-            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
-              <Text
-                style={{
-                  fontSize: moderateScale(13),
-                  fontWeight: 400,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Regular",
-                }}
-              >
-                More LLMS? Update your list in{" "}
-              </Text>
-              <Pressable style={{borderBottomWidth:2}}>
-                <Text style={{
-                  fontSize: moderateScale(13),
-                  lineHeight:15,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Bold",
-                }}>Settings</Text>
-              </Pressable>
-            </View>
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: moderateScale(13),
+            fontWeight: 400,
+            textAlign: "center",
+            fontFamily: "Mukta-Regular",
+          }}
+        >
+          More LLMS? Update your list in{" "}
+        </Text>
+        <Pressable style={{ borderBottomWidth: 2 }}>
+          <Text
+            style={{
+              fontSize: moderateScale(13),
+              lineHeight: 15,
+              fontWeight: 600,
+              textAlign: "center",
+              fontFamily: "Mukta-Bold",
+            }}
+          >
+            Settings
+          </Text>
+        </Pressable>
+      </View>
     </>
   );
 };

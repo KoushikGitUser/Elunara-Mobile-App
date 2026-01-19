@@ -18,21 +18,45 @@ import {
 import { ArrowLeft } from "lucide-react-native";
 import DropDowns from "../DropDowns";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
 } from "../../../../../redux/slices/toggleSlice";
+import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 import LLMSavedState from "./LLMSavedState";
 import IntegrateAIAccState from "./IntegrateAIAccState";
 
 const screenHeight = Dimensions.get("window").height;
 
 const LLMState = () => {
-  const [selectedCountsArray, setSelectedCountsArray] = useState([]);
+  const dispatch = useDispatch();
+  const { roomsStates } = useSelector((state) => state.API);
+
+  // Initialize with current selection if available
+  const initialSelection = roomsStates.tempRoomSettings?.llm_id
+    ? [roomsStates.tempRoomSettings.llm_id.toString()]
+    : [];
+
+  const [selectedCountsArray, setSelectedCountsArray] =
+    useState(initialSelection);
   const [isLLMSaved, setIsLLMSaved] = useState(false);
   const [toggleIntegrateAi, setToggleIntegrateAi] = useState(false);
-  const dispatch = useDispatch();
+
+  const handleSave = () => {
+    if (selectedCountsArray.length > 0) {
+      dispatch(
+        setTempRoomProperty({ key: "llm_id", value: selectedCountsArray[0] })
+      );
+    }
+    setIsLLMSaved(true);
+  };
+
+  const updateSelection = (index, itemId) => {
+    const newCounts = [...selectedCountsArray];
+    newCounts[index] = itemId;
+    setSelectedCountsArray(newCounts);
+  };
 
   return (
     <View style={styles.modalSheet}>
@@ -106,9 +130,8 @@ const LLMState = () => {
               LLM 1
             </Text>
             <DropDowns
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
+              selectedId={selectedCountsArray[0]}
+              onSelect={(item) => updateSelection(0, item.id)}
             />
             <Text
               style={{
@@ -121,9 +144,8 @@ const LLMState = () => {
               LLM 2
             </Text>
             <DropDowns
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
+              selectedId={selectedCountsArray[1]}
+              onSelect={(item) => updateSelection(1, item.id)}
             />
             <Text
               style={{
@@ -136,9 +158,8 @@ const LLMState = () => {
               LLM 3
             </Text>
             <DropDowns
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
+              selectedId={selectedCountsArray[2]}
+              onSelect={(item) => updateSelection(2, item.id)}
             />
 
             {/* Button */}
@@ -147,10 +168,10 @@ const LLMState = () => {
                 styles.button,
                 {
                   backgroundColor:
-                    selectedCountsArray?.length >= 3 ? "#081A35" : "#CDD5DC",
+                    selectedCountsArray?.length >= 1 ? "#081A35" : "#CDD5DC",
                 },
               ]}
-              onPress={() => setIsLLMSaved(true)}
+              onPress={handleSave}
               activeOpacity={0.8}
             >
               <Text
@@ -159,7 +180,14 @@ const LLMState = () => {
                 Save LLM Preferences
               </Text>
             </TouchableOpacity>
-            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <Text
                 style={{
                   fontSize: moderateScale(13),
@@ -170,14 +198,18 @@ const LLMState = () => {
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              <Pressable style={{borderBottomWidth:2}}>
-                <Text style={{
-                  fontSize: moderateScale(13),
-                  lineHeight:15,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Bold",
-                }}>Settings</Text>
+              <Pressable style={{ borderBottomWidth: 2 }}>
+                <Text
+                  style={{
+                    fontSize: moderateScale(13),
+                    lineHeight: 15,
+                    fontWeight: 600,
+                    textAlign: "center",
+                    fontFamily: "Mukta-Bold",
+                  }}
+                >
+                  Settings
+                </Text>
               </Pressable>
             </View>
           </ScrollView>

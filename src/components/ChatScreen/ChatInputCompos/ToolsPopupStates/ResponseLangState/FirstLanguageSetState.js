@@ -9,37 +9,72 @@ import {
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import LanguageDropdown from "./LanguageDropdown";
 import { languages } from "../../../../../data/datas";
+import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 const screenHeight = Dimensions.get("window").height;
 
-const FirstLanguageSetState = ({setIsLanguageSaved}) => {
-  const [selectedCounts, setSelectedCounts] = useState([]);
+const FirstLanguageSetState = ({ setIsLanguageSaved }) => {
+  const dispatch = useDispatch();
+  const { roomsStates } = useSelector((state) => state.API);
+
+  // Initialize with current selection if available
+  const initialSelection =
+    roomsStates.tempRoomSettings?.response_language_id !== null &&
+    roomsStates.tempRoomSettings?.response_language_id !== undefined
+      ? [(roomsStates.tempRoomSettings.response_language_id - 1).toString()]
+      : [];
+
+  const [selectedCounts, setSelectedCounts] = useState(initialSelection);
+
+  const updateSelection = (index, itemId) => {
+    const newCounts = [...selectedCounts];
+    newCounts[index] = itemId;
+    setSelectedCounts(newCounts);
+  };
+
+  const handleSave = () => {
+    if (selectedCounts.length > 0) {
+      dispatch(
+        setTempRoomProperty({
+          key: "response_language_id",
+          value: Number(selectedCounts[0]) + 1, // Map 0 -> 1, 1 -> 2
+        })
+      );
+    }
+    setIsLanguageSaved(true);
+  };
+
   return (
     <>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Set Response Language</Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+        Set Response Language
+      </Text>
       {/* Description */}
       <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Choose up to 3 languages to toggle between. Update anytime in Settings.
       </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollableContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollableContent}
+      >
         <Text
           style={{
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular",
           }}
         >
           Default Language
         </Text>
         <LanguageDropdown
-          selectedCounts={selectedCounts}
-          setSelectedCounts={setSelectedCounts}
-          selectOptionsArray={languages}
+          selectedId={selectedCounts[0]}
+          onSelect={(item) => updateSelection(0, item.id)}
         />
         <Text
           style={{
@@ -47,7 +82,7 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             color: "#757575",
             fontSize: scaleFont(13),
             paddingTop: 15,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular",
           }}
         >
           Select 2 more
@@ -57,30 +92,28 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular",
           }}
         >
           Language 2
         </Text>
         <LanguageDropdown
-          selectedCounts={selectedCounts}
-          setSelectedCounts={setSelectedCounts}
-          selectOptionsArray={languages}
+          selectedId={selectedCounts[1]}
+          onSelect={(item) => updateSelection(1, item.id)}
         />
         <Text
           style={{
             fontSize: moderateScale(12),
             color: "#5E5E5E",
             marginTop: 40,
-            fontFamily: "Mukta-Regular" 
+            fontFamily: "Mukta-Regular",
           }}
         >
           Language 3
         </Text>
         <LanguageDropdown
-          selectedCounts={selectedCounts}
-          setSelectedCounts={setSelectedCounts}
-          selectOptionsArray={languages}
+          selectedId={selectedCounts[2]}
+          onSelect={(item) => updateSelection(2, item.id)}
         />
         {/* Button */}
         <TouchableOpacity
@@ -88,35 +121,48 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
             styles.button,
             {
               backgroundColor:
-                selectedCounts?.length >= 3 ? "#081A35" : "#CDD5DC",
+                selectedCounts?.length >= 1 ? "#081A35" : "#CDD5DC",
             },
           ]}
-          onPress={() => setIsLanguageSaved(true)}
+          onPress={handleSave}
           activeOpacity={0.8}
         >
-          <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save LLM Preferences</Text>
+          <Text style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}>
+            Save Preferences
+          </Text>
         </TouchableOpacity>
-            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
-              <Text
-                style={{
-                  fontSize: moderateScale(13),
-                  fontWeight: 400,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Regular",
-                }}
-              >
-                More LLMS? Update your list in{" "}
-              </Text>
-              <Pressable style={{borderBottomWidth:2}}>
-                <Text style={{
-                  fontSize: moderateScale(13),
-                  lineHeight:15,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Bold",
-                }}>Settings</Text>
-              </Pressable>
-            </View>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: moderateScale(13),
+              fontWeight: 400,
+              textAlign: "center",
+              fontFamily: "Mukta-Regular",
+            }}
+          >
+            More LLMS? Update your list in{" "}
+          </Text>
+          <Pressable style={{ borderBottomWidth: 2 }}>
+            <Text
+              style={{
+                fontSize: moderateScale(13),
+                lineHeight: 15,
+                fontWeight: 600,
+                textAlign: "center",
+                fontFamily: "Mukta-Bold",
+              }}
+            >
+              Settings
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </>
   );
@@ -137,7 +183,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
-    maxHeight:0.8
+    maxHeight: 0.8,
   },
   iconContainer: {
     marginTop: 5,
@@ -161,7 +207,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     letterSpacing: 0.2,
   },
-    button: {
+  button: {
     backgroundColor: "#081A35",
     paddingVertical: 13,
     borderRadius: 50,
@@ -176,9 +222,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 0.3,
   },
-  scrollableContent:{
-    maxHeight:screenHeight*0.55
-  }
+  scrollableContent: {
+    maxHeight: screenHeight * 0.55,
+  },
 });
 
 export default FirstLanguageSetState;

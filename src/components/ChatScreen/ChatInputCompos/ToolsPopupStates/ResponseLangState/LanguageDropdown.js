@@ -7,21 +7,18 @@ import {
   Dimensions,
   StyleSheet,
   ScrollView,
+  TextInput,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react-native";
+import { ChevronDown, ChevronUp, Search } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const LanguageDropdown = ({
-  setSelectedCounts,
-  selectedCounts,
-  triggerAPICall,
-  initialSetValue
-}) => {
+const LanguageDropdown = ({ onSelect, selectedId }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const selectorRef = useRef(null);
   const screenHeight = Dimensions.get("window").height;
   const { settingsStates } = useSelector((state) => state.API);
@@ -37,10 +34,19 @@ const LanguageDropdown = ({
   }, []);
 
   useEffect(() => {
-    if (initialSetValue) {
-      setSelected(initialSetValue);
+    if (
+      selectedId &&
+      settingsStates.settingsMasterDatas.allLanguagesAvailable
+    ) {
+      const lang =
+        settingsStates.settingsMasterDatas.allLanguagesAvailable.find(
+          (item) => item.id == selectedId
+        );
+      if (lang) {
+        setSelected(lang);
+      }
     }
-  }, [initialSetValue]);
+  }, [selectedId, settingsStates.settingsMasterDatas.allLanguagesAvailable]);
 
   const toggleDropdown = () => {
     if (selectorRef.current) {
@@ -56,8 +62,9 @@ const LanguageDropdown = ({
   const handleSelect = (item) => {
     setSelected(item);
     setVisible(false);
-    triggerAPICall(item?.id);
-    setSelectedCounts([...selectedCounts, 0]);
+    if (onSelect) {
+      onSelect(item);
+    }
   };
 
   return (
@@ -79,7 +86,8 @@ const LanguageDropdown = ({
               }}
             >
               {selected == null
-                ?"Select": selected.name + "  " + selected.native_name}
+                ? "Select"
+                : selected.name + "  " + selected.native_name}
             </Text>
           </View>
 
@@ -92,24 +100,49 @@ const LanguageDropdown = ({
 
         {visible && (
           <View style={[styles.dropdown]}>
-            {settingsStates.settingsMasterDatas.allLanguagesAvailable?.map(
-              (item, itemIndex) => {
-                return (
-                  <TouchableOpacity
-                    key={itemIndex}
-                    style={styles.option}
-                    onPress={() => handleSelect(item)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[styles.description, { fontFamily: "Mukta-Bold" }]}
+            <View style={styles.searchContainer}>
+              <View style={styles.searchInputWrapper}>
+                <Search size={16} color="#9CA3AF" />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search..."
+                  placeholderTextColor="#9CA3AF"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+            </View>
+            <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled={true}>
+              {settingsStates.settingsMasterDatas.allLanguagesAvailable
+                ?.filter(
+                  (item) =>
+                    item.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) ||
+                    item.native_name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase())
+                )
+                .map((item, itemIndex) => {
+                  return (
+                    <TouchableOpacity
+                      key={itemIndex}
+                      style={styles.option}
+                      onPress={() => handleSelect(item)}
+                      activeOpacity={0.7}
                     >
-                      {item.name} {item.native_name}{" "}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }
-            )}
+                      <Text
+                        style={[
+                          styles.description,
+                          { fontFamily: "Mukta-Bold" },
+                        ]}
+                      >
+                        {item.name} {item.native_name}{" "}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+            </ScrollView>
           </View>
         )}
       </View>
@@ -167,6 +200,29 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#757575",
     fontWeight: 600,
+  },
+  searchContainer: {
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+    marginBottom: 8,
+  },
+  searchInputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    height: 36,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: moderateScale(13),
+    color: "#1F2937",
+    paddingVertical: 0,
+    fontFamily: "Mukta-Regular",
   },
 });
 

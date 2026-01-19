@@ -19,6 +19,7 @@ import { setToggleRoomCreationPopup } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import { scaleFont } from "../../utils/responsive";
 import { triggerToast } from "../../services/toast";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const RoomCreationPopup = () => {
   const [roomName, setRoomName] = useState("");
@@ -87,7 +88,7 @@ const RoomCreationPopup = () => {
           style={styles.backdrop}
           activeOpacity={0.5}
           onPress={() => {
-           dispatch(setToggleRoomCreationPopup(false))
+            dispatch(setToggleRoomCreationPopup(false));
             Keyboard.dismiss();
           }}
         />
@@ -97,9 +98,7 @@ const RoomCreationPopup = () => {
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 320], // average keyboard height
-                  outputRange: [
-                    0, -(keyboardHeight * 2.3),
-                  ],
+                  outputRange: [0, -(keyboardHeight * 2.3)],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
@@ -117,7 +116,12 @@ const RoomCreationPopup = () => {
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
-                  <AntDesign onPress={()=> dispatch(setToggleRoomCreationPopup(false))} name="close" size={24} color="black" />
+                  <AntDesign
+                    onPress={() => dispatch(setToggleRoomCreationPopup(false))}
+                    name="close"
+                    size={24}
+                    color="black"
+                  />
                 </View>
                 {/* Title */}
                 <Text style={styles.title}>Create New Learning Lab</Text>
@@ -127,7 +131,10 @@ const RoomCreationPopup = () => {
                   Group chats, notes, and resources into one
                 </Text>
 
-                <Text style={styles.description}> space — ideal for assignments or research.</Text>
+                <Text style={styles.description}>
+                  {" "}
+                  space — ideal for assignments or research.
+                </Text>
 
                 {/* Input Section */}
                 <View style={styles.inputSection}>
@@ -147,15 +154,38 @@ const RoomCreationPopup = () => {
                   style={[
                     styles.verifyButton,
                     !roomName && styles.verifyButtonDisabled,
-                    { marginBottom:85 },
+                    { marginBottom: 85 },
                   ]}
-                  onPress={() => {
-                    dispatch(setToggleRoomCreationPopup(false));
-                    navigation.navigate("rooms",{roomName});
-                    setTimeout(() => {
-                      triggerToast("Room Added","Room <room name> has been added successfully","success",3000)
-                    }, 500);
-                    
+                  onPress={async () => {
+                    // Call create-room API
+                    const payload = {
+                      method: "POST",
+                      url: "/rooms",
+                      name: "create-room",
+                      data: {
+                        name: roomName,
+                      },
+                    };
+                    try {
+                      const result = await dispatch(
+                        commonFunctionForAPICalls(payload),
+                      ).unwrap();
+                      const newRoom = result?.data?.data;
+
+                      dispatch(setToggleRoomCreationPopup(false));
+
+                      if (newRoom?.id || newRoom?.uuid) {
+                        navigation.navigate("rooms", {
+                          roomName: newRoom.name,
+                          roomUuid: newRoom.id || newRoom.uuid,
+                        });
+                      } else {
+                        // Fallback if UUID is missing for some reason
+                        navigation.navigate("rooms", { roomName });
+                      }
+                    } catch (error) {
+                      console.error("Failed to create room:", error);
+                    }
                   }}
                   activeOpacity={0.8}
                   disabled={!roomName}
@@ -170,7 +200,6 @@ const RoomCreationPopup = () => {
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -211,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   closeModalMain: {
-    width: "100%", 
+    width: "100%",
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -290,7 +319,6 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Medium",
     color: "#374151",
     marginBottom: 8,
-
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -346,6 +374,5 @@ const styles = StyleSheet.create({
     color: "#374151",
   },
 });
-
 
 export default RoomCreationPopup;

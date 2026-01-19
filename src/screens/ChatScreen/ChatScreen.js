@@ -6,9 +6,19 @@ import {
   BackHandler,
   Alert,
 } from "react-native";
-import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+  useRef,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useFocusEffect,
+  useRoute,
+} from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import ChatHeader from "../../components/ChatScreen/ChatHeader";
@@ -42,12 +52,15 @@ const ChatScreen = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
+  const route = useRoute();
+  const chatUuid = route.params?.chatUuid;
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const translateX = useRef(new Animated.Value(0)).current;
-  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] = useState(false);
+  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] =
+    useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -71,7 +84,7 @@ const ChatScreen = () => {
     checkNewUser();
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const backAction = () => {
       setToggleExitAppConfirmPopup(true);
       return true; // prevent default behavior (exit)
@@ -79,20 +92,16 @@ const ChatScreen = () => {
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove(); // clean up
   }, [toggleExitAppConfirmPopup]);
 
-
   // Show nothing (or a loader) while fonts are loading
   if (!fontsLoaded) {
     return null;
   }
-
- 
-
 
   return (
     <SafeAreaView
@@ -110,7 +119,9 @@ const ChatScreen = () => {
         ></View>
         <ChatHeader translateX={translateX} />
         <View style={styles.chatMainWrapper}>
-          {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
+          {toggleStates.toggleChatMenuPopup && (
+            <ChatOptionsPopup chatUuid={chatUuid} />
+          )}
           {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
           {toggleStates.toggleTopicsPopup && <TopicsCompo />}
           {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup />}
@@ -118,7 +129,12 @@ const ChatScreen = () => {
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && (
             <ChangeLLMPopup />
           )}
-          {toggleExitAppConfirmPopup && <ExitAppConfirmationPopup setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup} toggleExitAppConfirmPopup={toggleExitAppConfirmPopup} />}
+          {toggleExitAppConfirmPopup && (
+            <ExitAppConfirmationPopup
+              setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup}
+              toggleExitAppConfirmPopup={toggleExitAppConfirmPopup}
+            />
+          )}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
           {toggleStates.toggleChangeResponseStyleWhileChatPopup && (
             <ChangeResponseStylePopup />
@@ -144,34 +160,36 @@ const ChatScreen = () => {
           {toggleStates.toggleElunaraProWelcomePopup && (
             <ElunaraProWelcomePopup />
           )}
-          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 1 && (
-            <UniversalTooltip
-              title="Customise Your AI"
-              description="Customize how Elunara responds, choose the AI model, response style, language, and citation format, all tailored to your needs."
-              isBelowButtonPresent={false}
-              pointerPosition="down"
-              pointerAlignment="left"
-              modalPosition="down"
-              modalAlignment="right"
-              bottom={140}
-              right={20}
-              pointerLeft={60} 
-            />
-          )}
-          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2 && (
-            <UniversalTooltip
-              title="Organise your work quickly."
-              description="Start a new learning lab easily from the sidebar to keep everything focused."
-              isBelowButtonPresent={false}
-              pointerPosition="up"
-              pointerAlignment="left"
-              modalPosition="up"
-              modalAlignment="left"
-              top ={105}
-              left={10}
-              pointerLeft={20}
-            />
-          )}
+          {toggleStates.toggleChatScreenGuideStart &&
+            globalDataStates.guidedTourStepsCount == 1 && (
+              <UniversalTooltip
+                title="Customise Your AI"
+                description="Customize how Elunara responds, choose the AI model, response style, language, and citation format, all tailored to your needs."
+                isBelowButtonPresent={false}
+                pointerPosition="down"
+                pointerAlignment="left"
+                modalPosition="down"
+                modalAlignment="right"
+                bottom={140}
+                right={20}
+                pointerLeft={60}
+              />
+            )}
+          {toggleStates.toggleChatScreenGuideStart &&
+            globalDataStates.guidedTourStepsCount == 2 && (
+              <UniversalTooltip
+                title="Organise your work quickly."
+                description="Start a new learning lab easily from the sidebar to keep everything focused."
+                isBelowButtonPresent={false}
+                pointerPosition="up"
+                pointerAlignment="left"
+                modalPosition="up"
+                modalAlignment="left"
+                top={105}
+                left={10}
+                pointerLeft={20}
+              />
+            )}
           <ToasterWithAction />
           {/* middle section */}
           <ChatMiddleWrapper />

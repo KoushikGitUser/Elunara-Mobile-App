@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import AddRoomDetailsHeader from "../../components/Rooms/AddRoomDetailsHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScrollListIcon from "../../../assets/SvgIconsComponent/RoomsIcons/ScrollListIcon";
@@ -17,8 +19,8 @@ import { scaleFont } from "../../utils/responsive";
 import BrainMindIcon from "../../../assets/SvgIconsComponent/RoomsIcons/BrainMindIcon";
 import SlidersToolsIcon from "../../../assets/SvgIconsComponent/RoomsIcons/SlidersToolsIcon";
 import ToolsContainers from "../../components/ChatScreen/ChatInputCompos/ToolsContainers";
-import { MoreVertical, Paperclip, Plus } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
+import { MoreVertical, Paperclip, Plus, Trash2 } from "lucide-react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
 import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
@@ -26,25 +28,128 @@ import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
 import pdfLogo from "../../assets/images/pdf.png";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
 import { triggerToast } from "../../services/toast";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import {
+  setTempRoomProperty,
+  resetTempRoomSettings,
+} from "../../redux/slices/apiCommonSlice";
 const { width } = Dimensions.get("window");
 
 const AddRoomDetails = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [sourcesPopup, setSourcesPopup] = useState(false);
+  const [description, setDescription] = useState("");
+  const [instructions, setInstructions] = useState("");
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false }
+    { useNativeDriver: false },
   );
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
+  const route = useRoute();
   const dispatch = useDispatch();
+
+  // Get roomUuid from route params or currentRoom in Redux
+  const roomUuid = route.params?.roomUuid || roomsStates.currentRoom?.uuid;
+
+  // Fetch room data when screen opens
+  useEffect(() => {
+    if (roomUuid) {
+      const payload = {
+        method: "GET",
+        url: `/rooms/${roomUuid}`,
+        name: "get-room",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  }, [roomUuid]);
+
+  // Load existing room data when it's fetched
+  useEffect(() => {
+    if (roomsStates.currentRoom) {
+      setDescription(roomsStates.currentRoom.description || "");
+      setInstructions(roomsStates.currentRoom.instructions || "");
+
+      // Initialize temp settings
+      dispatch(
+        setTempRoomProperty({
+          key: "llm_id",
+          value:
+            roomsStates.currentRoom.llm_id || roomsStates.currentRoom.llm?.id,
+        }),
+      );
+      dispatch(
+        setTempRoomProperty({
+          key: "response_style_id",
+          value:
+            roomsStates.currentRoom.response_style_id ||
+            roomsStates.currentRoom.response_style?.id,
+        }),
+      );
+      dispatch(
+        setTempRoomProperty({
+          key: "response_language_id",
+          value:
+            roomsStates.currentRoom.response_language_id ||
+            roomsStates.currentRoom.response_language?.id,
+        }),
+      );
+      dispatch(
+        setTempRoomProperty({
+          key: "citation_format_id",
+          value:
+            roomsStates.currentRoom.citation_format_id ||
+            roomsStates.currentRoom.citation_format?.id,
+        }),
+      );
+    }
+  }, [roomsStates.currentRoom]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      dispatch(resetTempRoomSettings());
+    };
+  }, []);
+
+  const handleSaveDetails = () => {
+    // Use roomUuid from route params or currentRoom as fallback
+    const effectiveRoomUuid =
+      route.params?.roomUuid || roomsStates.currentRoom?.uuid;
+
+    if (!effectiveRoomUuid) {
+      triggerToast("Error", "Room not found", "error", 3000);
+      return;
+    }
+
+    const payload = {
+      method: "PUT",
+      url: `/rooms/${effectiveRoomUuid}`,
+      name: "update-room",
+      data: {
+        description: description,
+        instructions: instructions,
+        llm_id: roomsStates.tempRoomSettings.llm_id,
+        response_style_id: roomsStates.tempRoomSettings.response_style_id,
+        response_language_id: roomsStates.tempRoomSettings.response_language_id,
+        citation_format_id: roomsStates.tempRoomSettings.citation_format_id,
+      },
+    };
+
+    dispatch(commonFunctionForAPICalls(payload));
+    navigation.navigate("rooms", {
+      roomName: roomsStates.currentRoom?.name || "Room",
+      roomUuid: roomsStates.currentRoom?.uuid || roomsStates.currentRoom?.id,
+    });
+    dispatch(setToggleAddedRoomDetails(true));
+  };
 
   return (
     <SafeAreaView
       style={{ flex: 1, width: "100%", backgroundColor: "#FAFAFA" }}
     >
       {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
-      {/* {sourcesPopup && <TouchableOpacity style={styles.sourcesPopupWrapper} ></TouchableOpacity>} */}
       {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
       <AddRoomDetailsHeader scrollY={scrollY} />
       <ScrollView
@@ -59,12 +164,15 @@ const AddRoomDetails = () => {
           <Text style={styles.subtitle}>
             Briefly describe what this Room is about
           </Text>
-          <View style={[styles.inputLarge, ,]}>
+          <View style={styles.inputLarge}>
             <TextInput
               style={styles.inputText}
-              placeholder="e.g. “Preparing for final exams in biology”..."
+              placeholder='e.g. "Preparing for final exams in biology"...'
               placeholderTextColor="#9CA3AF"
               returnKeyType="done"
+              value={description}
+              onChangeText={setDescription}
+              multiline={true}
             />
           </View>
         </View>
@@ -77,12 +185,15 @@ const AddRoomDetails = () => {
             Help Elunara AI support you better by outlining goals or task
             instructions here
           </Text>
-          <View style={[styles.inputLarge, ,]}>
+          <View style={styles.inputLarge}>
             <TextInput
               style={styles.inputText}
               placeholder="Answer as if I'm new — keep it beginner-friendly."
               placeholderTextColor="#9CA3AF"
               returnKeyType="done"
+              value={instructions}
+              onChangeText={setInstructions}
+              multiline={true}
             />
           </View>
         </View>
@@ -126,39 +237,76 @@ const AddRoomDetails = () => {
               <Plus size={28} color="#1F2937" strokeWidth={1.5} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.linksMain}>
-            {/* Link Icon */}
-            <View style={styles.pdfLogoContainer}>
-              <Image
-                source={pdfLogo}
-                style={{ height: 25, width: 25, objectFit: "contain" }}
-              />
-            </View>
+          {/* Dynamic File List */}
+          {roomsStates.currentRoom?.attachments?.map((file, index) => (
+            <TouchableOpacity key={index} style={styles.linksMain}>
+              {/* Link Icon based on type (simplified for now to PDF logo or generic) */}
+              <View style={styles.pdfLogoContainer}>
+                <Image
+                  source={pdfLogo}
+                  style={{ height: 25, width: 25, objectFit: "contain" }}
+                />
+              </View>
 
-            {/* Link Details */}
-            <View style={styles.linkDetails}>
-              <Text style={styles.url}>Finance.pdf </Text>
-              <Text style={styles.description}>PDF </Text>
-            </View>
+              {/* Link Details */}
+              <View style={styles.linkDetails}>
+                <Text style={styles.url}>{file.filename || file.name} </Text>
+                <Text style={styles.description}>
+                  {file.type === "document" ? "PDF" : "File"}{" "}
+                </Text>
+              </View>
 
-            {/* More Options Button */}
-            <TouchableOpacity style={styles.moreButton}>
-              <MoreVertical size={24} color="#1F2937" strokeWidth={2} />
+              {/* More Options Button acting as Delete for now */}
+              <TouchableOpacity
+                style={styles.moreButton}
+                onPress={() => {
+                  Alert.alert(
+                    "Delete Attachment",
+                    "Are you sure you want to delete this attachment?",
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: () => {
+                          const payload = {
+                            method: "DELETE",
+                            url: `/attachments/${file.id || file.uuid}`, // Ensure correct ID field
+                            name: "delete-attachment",
+                          };
+                          dispatch(commonFunctionForAPICalls(payload)).then(
+                            () => {
+                              // Refresh room
+                              dispatch(
+                                commonFunctionForAPICalls({
+                                  method: "GET",
+                                  url: `/rooms/${roomUuid}`,
+                                  name: "get-room",
+                                }),
+                              );
+                            },
+                          );
+                        },
+                      },
+                    ],
+                  );
+                }}
+              >
+                <Trash2 size={20} color="#EF4444" strokeWidth={2} />
+              </TouchableOpacity>
             </TouchableOpacity>
-          </TouchableOpacity>
+          ))}
           <TouchableOpacity
             style={[styles.verifyButton, { marginBottom: 25 }]}
-            onPress={() => {
-              navigation.navigate("rooms", { roomName: "Room name" });
-              dispatch(setToggleAddedRoomDetails(true));
-              setTimeout(() => {
-                 triggerToast("Details saved","Your room details has been saved","success",3000)
-              }, 300);
-             
-            }}
+            onPress={handleSaveDetails}
             activeOpacity={0.8}
+            disabled={roomsStates.updatingRoom}
           >
-            <Text style={styles.verifyButtonText}>Save details</Text>
+            {roomsStates.updatingRoom ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.verifyButtonText}>Save details</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -194,23 +342,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  bellIcon: {
-    marginRight: 16,
-  },
-  title: {
-    fontSize: scaleFont(17),
-    fontWeight: "600",
-    fontFamily: "Mukta-Medium",
-    color: "#1F2937",
-    letterSpacing: -0.5,
-    paddingLeft: 10,
-  },
-  subtitle: {
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
-    color: "#6B7280",
-    marginTop: 10,
-  },
   inputLarge: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
@@ -233,6 +364,8 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#1F2937",
     letterSpacing: 0.2,
+    flex: 1,
+    textAlignVertical: "top",
   },
   mainOptionsContainer: {
     width: "100%",
@@ -270,12 +403,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-  },
-  title: {
-    fontSize: scaleFont(18),
-    fontWeight: "600",
-    fontFamily: "Mukta-Bold",
-    color: "#1F2937",
   },
   addButton: {
     width: 52,

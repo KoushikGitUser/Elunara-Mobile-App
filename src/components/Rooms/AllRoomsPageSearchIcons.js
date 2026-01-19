@@ -14,10 +14,16 @@ import FolderPlusIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIco
 import { verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
 import RoomsSortingPopup from "../Modals/Rooms/RoomsSortingPopup";
 import RoomsFilterPopup from "../Modals/Rooms/RoomsFilterPopup";
 
-const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
+const AllRoomsPageSearchIcons = ({
+  isSearching,
+  setIsSearching,
+  searchQuery,
+  setSearchQuery,
+}) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -29,7 +35,9 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
     <View
       style={[styles.searchAndIcons, { paddingHorizontal: 20, marginTop: 15 }]}
     >
-      {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} />}
+      {toggleSortingPopup && (
+        <RoomsSortingPopup close={setToggleSortingPopup} />
+      )}
       {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
       <View
         style={[
@@ -45,22 +53,38 @@ const AllRoomsPageSearchIcons = ({ isSearching, setIsSearching }) => {
         />
         <TextInput
           ref={inputRef}
-         
           placeholder="Search"
           placeholderTextColor="#B5BECE"
           style={[styles.searchInput, { outlineWidth: isSearching ? 1 : 0 }]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onFocus={() => setIsSearching(true)}
         />
       </View>
+      {isSearching && (
+        <TouchableOpacity
+          onPress={() => {
+            setIsSearching(false);
+            setSearchQuery("");
+          }}
+        >
+          <Text style={{ fontSize: scaleFont(14), color: "#081A35" }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      )}
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
-        <TouchableOpacity onPress={()=>setToggleSortingPopup(true)}>
+        <TouchableOpacity onPress={() => setToggleSortingPopup(true)}>
           <ArrowUpDownIcon />
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>setToggleFilterPopup(true)}>
+        <TouchableOpacity onPress={() => setToggleFilterPopup(true)}>
           <FilterIcon />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => dispatch(setToggleLearningLabUnlockPopup(true))}
+        >
           <FolderPlusIcon />
         </TouchableOpacity>
       </View>
@@ -95,7 +119,7 @@ const styles = StyleSheet.create({
     borderColor: "#ABB8CC",
     paddingLeft: 30,
     backgroundColor: "white",
-    fontFamily:"Mukta-Regular"
+    fontFamily: "Mukta-Regular",
   },
   iconsMain: {
     flexDirection: "row",

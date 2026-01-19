@@ -10,18 +10,27 @@ import React, { useState } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    setToggleToolsPopup,
+  setToggleToolsPopup,
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
 } from "../../../../../redux/slices/toggleSlice";
+import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 import { citationStyles } from "../../../../../data/datas";
-import PenNib from '../../../../../assets/images/penNib2.svg'
+import PenNib from "../../../../../assets/images/penNib2.svg";
 
 const CitationState = () => {
   const dispatch = useDispatch();
-  const [selectedStyle, setSelectedStyle] = useState(0);
+  const { roomsStates } = useSelector((state) => state.API);
+
+  const initialSelection =
+    roomsStates.tempRoomSettings?.citation_format_id !== null &&
+    roomsStates.tempRoomSettings?.citation_format_id !== undefined
+      ? roomsStates.tempRoomSettings.citation_format_id - 1
+      : 0;
+
+  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -46,7 +55,9 @@ const CitationState = () => {
             color="black"
           />
         </View>
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Citation Format</Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+          Citation Format
+        </Text>
 
         {/* Description */}
         <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
@@ -56,7 +67,7 @@ const CitationState = () => {
         <View style={{ flexDirection: "column", gap: 25 }}>
           {citationStyles.map((styleOptions, optionsIndex) => (
             <TouchableOpacity
-              key={optionsIndex} 
+              key={optionsIndex}
               style={[
                 styles.card,
                 {
@@ -66,18 +77,28 @@ const CitationState = () => {
                     selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
                 },
               ]}
-              onPress={() => setSelectedStyle(styleOptions.id)}
+              onPress={() => {
+                setSelectedStyle(styleOptions.id);
+                dispatch(
+                  setTempRoomProperty({
+                    key: "citation_format_id",
+                    value: styleOptions.id + 1, // Map 0 -> 1, 1 -> 2
+                  })
+                );
+              }}
               activeOpacity={0.7}
             >
               <View style={styles.contentMain}>
-                <View style={styles.iconContainer}>
-                  {styleOptions.icon}
-                </View>
+                <View style={styles.iconContainer}>{styleOptions.icon}</View>
                 <View style={styles.textContainer}>
                   <Text
                     style={[
                       styles.optionTitle,
-                      { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold"},
+                      {
+                        fontSize: scaleFont(18),
+                        fontWeight: 600,
+                        fontFamily: "Mukta-Bold",
+                      },
                     ]}
                   >
                     {styleOptions.style}
@@ -89,7 +110,7 @@ const CitationState = () => {
                         fontSize: scaleFont(14),
                         fontWeight: 400,
                         color: "#8F8F8F",
-                        fontFamily:"Mukta-Regular"
+                        fontFamily: "Mukta-Regular",
                       },
                     ]}
                   >
@@ -101,11 +122,29 @@ const CitationState = () => {
             </TouchableOpacity>
           ))}
         </View>
-        <Text style={{ fontSize: moderateScale(12), fontWeight: 400,color:"#3A3A3A",textAlign:"center",marginTop:40,marginBottom:20,fontFamily:"Mukta-Regular" }}>
-          <Text style={{ fontSize: moderateScale(12), fontWeight: 600,color:"black",fontFamily:"Mukta-Bold" }}>
+        <Text
+          style={{
+            fontSize: moderateScale(12),
+            fontWeight: 400,
+            color: "#3A3A3A",
+            textAlign: "center",
+            marginTop: 40,
+            marginBottom: 20,
+            fontFamily: "Mukta-Regular",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: moderateScale(12),
+              fontWeight: 600,
+              color: "black",
+              fontFamily: "Mukta-Bold",
+            }}
+          >
             Note:
           </Text>{" "}
-          Citations appear only in academic chats. Creative or general chats may not include resources.
+          Citations appear only in academic chats. Creative or general chats may
+          not include resources.
         </Text>
       </View>
     </View>

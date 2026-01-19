@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
+import { setCurrentRoom } from "../../redux/slices/apiCommonSlice";
 
 const ChatsScrollForAllRoomsPage = ({
   title,
@@ -24,7 +25,8 @@ const ChatsScrollForAllRoomsPage = ({
   isSelecting,
   setIsSelecting,
   selectedArray,
-  setSelectedArray
+  setSelectedArray,
+  room,
 }) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -32,11 +34,37 @@ const ChatsScrollForAllRoomsPage = ({
   const dispatch = useDispatch();
   const [optionsIndex, setOptionsIndex] = useState(null);
 
+  const handleRoomPress = () => {
+    if (isSelecting) {
+      if (!selectedArray.includes(index)) {
+        setSelectedArray([...selectedArray, index]);
+      } else {
+        const newArray = [...selectedArray];
+        newArray.splice(selectedArray.indexOf(index), 1);
+        setSelectedArray(newArray);
+        if (selectedArray.length == 1) {
+          setIsSelecting(false);
+        }
+      }
+    } else {
+      // Navigate to room when not in selection mode
+      if (room) {
+        dispatch(setCurrentRoom(room));
+      }
+      navigation.navigate("rooms", { roomName: title });
+    }
+  };
 
   const CheckBox = ({ selected }) => {
     return (
       <View
-        style={[styles.radioOuter, { borderColor: selected ? "black" : "",backgroundColor:selected?"black":"transparent" }]}
+        style={[
+          styles.radioOuter,
+          {
+            borderColor: selected ? "black" : "",
+            backgroundColor: selected ? "black" : "transparent",
+          },
+        ]}
       >
         {selected && <Check size={19} color="white" strokeWidth={1.75} />}
       </View>
@@ -44,23 +72,21 @@ const ChatsScrollForAllRoomsPage = ({
   };
 
   return (
-    <TouchableOpacity style={[styles.cardContainer,{backgroundColor:selectedArray.includes(index)?"#EEF4FF":"transparent"}]} onLongPress={()=>{setIsSelecting(true);
-      setSelectedArray([...selectedArray,index])
-    }} onPress={()=>{
-      if(isSelecting){
-        if(!selectedArray.includes(index)){
-           setSelectedArray([...selectedArray,index])
-        }
-        else{
-          const newArray = [...selectedArray]
-          newArray.splice(selectedArray.indexOf(index),1)
-          setSelectedArray(newArray);
-          if(selectedArray.length == 1){
-            setIsSelecting(false)
-          }
-        }
-      }
-    }}>
+    <TouchableOpacity
+      style={[
+        styles.cardContainer,
+        {
+          backgroundColor: selectedArray.includes(index)
+            ? "#EEF4FF"
+            : "transparent",
+        },
+      ]}
+      onLongPress={() => {
+        setIsSelecting(true);
+        setSelectedArray([...selectedArray, index]);
+      }}
+      onPress={handleRoomPress}
+    >
       <View
         style={[
           styles.cardContent,
@@ -70,9 +96,9 @@ const ChatsScrollForAllRoomsPage = ({
         {toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index && (
           <RoomsOptionsPopup setRoomOptionsPopup={setOptionsIndex} />
         )}
-        
+
         {isSelecting && <CheckBox selected={selectedArray.includes(index)} />}
-        
+
         {/* Chat Icon */}
         <View style={styles.iconContainer}>
           <FolderIcon />
@@ -114,8 +140,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     zIndex: 5,
     width: "100%",
-    marginBottom:8,
-    paddingLeft:10
+    marginBottom: 8,
+    paddingLeft: 10,
   },
   cardPressed: {
     backgroundColor: "#F9FAFB",
@@ -140,7 +166,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#3A3A3A",
     marginBottom: 4,
-    fontFamily:"Mukta-Bold"
+    fontFamily: "Mukta-Bold",
   },
   subtitleContainer: {
     flexDirection: "row",
@@ -150,7 +176,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#757575",
     fontWeight: "400",
-    fontFamily:"Mukta-Regular"
+    fontFamily: "Mukta-Regular",
   },
   dotSeparator: {
     fontSize: 14,
@@ -177,10 +203,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ffffff",
-    padding:5,
-    marginRight:20,
+    padding: 5,
+    marginRight: 20,
   },
-
 });
 
 export default ChatsScrollForAllRoomsPage;

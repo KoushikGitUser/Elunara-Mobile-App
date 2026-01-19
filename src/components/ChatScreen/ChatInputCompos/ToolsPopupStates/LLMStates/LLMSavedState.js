@@ -68,9 +68,8 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
         <View style={styles.optionsMain}>
           {savedLLMOptions?.map((option, optionsIndex) => {
             return (
-              <>
+              <React.Fragment key={optionsIndex}>
                 <TouchableOpacity
-                  key={optionsIndex}
                   style={[
                     styles.card,
                     {
@@ -94,7 +93,11 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                       <Text
                         style={[
                           styles.optionTitle,
-                          { fontSize: scaleFont(18), fontWeight: 600,fontFamily:"Mukta-Bold" },
+                          {
+                            fontSize: scaleFont(18),
+                            fontWeight: 600,
+                            fontFamily: "Mukta-Bold",
+                          },
                         ]}
                       >
                         {option.title}
@@ -106,7 +109,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                             fontSize: scaleFont(14),
                             fontWeight: 400,
                             color: "#8F8F8F",
-                            fontFamily:"Mukta-Regular"
+                            fontFamily: "Mukta-Regular",
                           },
                         ]}
                       >
@@ -119,7 +122,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                               fontSize: scaleFont(12.5),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily:"Mukta-Regular"
+                              fontFamily: "Mukta-Regular",
                             }}
                           >
                             {option.buttonText}
@@ -137,14 +140,14 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                         textAlign: "center",
                         color: "#757575",
                         fontSize: scaleFont(15),
-                        fontFamily:"Mukta-Regular"
+                        fontFamily: "Mukta-Regular",
                       }}
                     >
                       Or Select Manually
                     </Text>
                   </View>
                 )}
-              </>
+              </React.Fragment>
             );
           })}
         </View>
@@ -185,7 +188,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
                 style={{
                   fontSize: moderateScale(15),
                   fontWeight: 600,
-                  fontFamily:"Mukta-Bold"
+                  fontFamily: "Mukta-Bold",
                 }}
               >
                 Integrate Your AI account
@@ -193,32 +196,49 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
             </View>
             <ChevronRight size={30} strokeWidth={1.25} />
           </View>
-          <Text style={{ fontSize: scaleFont(13), color: "#757575",fontFamily:"Mukta-Regular" }}>
+          <Text
+            style={{
+              fontSize: scaleFont(13),
+              color: "#757575",
+              fontFamily: "Mukta-Regular",
+            }}
+          >
             Link your account to tailor responses and enjoy the benefits of your
             subscription.
           </Text>
         </TouchableOpacity>
-            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
-              <Text
-                style={{
-                  fontSize: moderateScale(13),
-                  fontWeight: 400,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Regular",
-                }}
-              >
-                More LLMS? Update your list in{" "}
-              </Text>
-              <Pressable style={{borderBottomWidth:2}}>
-                <Text style={{
-                  fontSize: moderateScale(13),
-                  lineHeight:15,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  fontFamily: "Mukta-Bold",
-                }}>Settings</Text>
-              </Pressable>
-            </View>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: moderateScale(13),
+              fontWeight: 400,
+              textAlign: "center",
+              fontFamily: "Mukta-Regular",
+            }}
+          >
+            More LLMS? Update your list in{" "}
+          </Text>
+          <Pressable style={{ borderBottomWidth: 2 }}>
+            <Text
+              style={{
+                fontSize: moderateScale(13),
+                lineHeight: 15,
+                fontWeight: 600,
+                textAlign: "center",
+                fontFamily: "Mukta-Bold",
+              }}
+            >
+              Settings
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );

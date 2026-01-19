@@ -20,6 +20,7 @@ import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleRenameChatPopup } from "../../../../redux/slices/toggleSlice";
 import { Delete } from "lucide-react-native";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import { triggerToast } from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
@@ -27,10 +28,17 @@ const { width } = Dimensions.get("window");
 const RenameChatPopup = () => {
   const inputRef = useRef(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [chatName, setChatName] = useState("");
+
+  useEffect(() => {
+    if (roomsStates.currentRoom) {
+      setChatName(roomsStates.currentRoom.name);
+    }
+  }, [roomsStates.currentRoom]);
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -91,15 +99,14 @@ const RenameChatPopup = () => {
             dispatch(setToggleRenameChatPopup(false));
           }}
         />
-        <TouchableWithoutFeedback onPress={() => {console.log("iytgouiyto");
-        }}>
+        <TouchableWithoutFeedback onPress={() => {}}>
           <Animated.View
             style={{
               transform: [
                 {
                   translateY: animatedValue.interpolate({
-                    inputRange: [0, keyboardHeight], // average keyboard height
-                    outputRange: [0, -keyboardHeight * 2.3],
+                    inputRange: [0, Math.max(keyboardHeight, 1)], // ensure non-zero positive range
+                    outputRange: [0, -Math.max(keyboardHeight, 1) * 2.3],
                     extrapolate: "clamp",
                   }),
                 },
@@ -117,16 +124,28 @@ const RenameChatPopup = () => {
                 <View style={styles.content}>
                   {/* Title */}
 
-                  <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Rename Chat</Text>
+                  <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+                    Rename Chat
+                  </Text>
                   <View style={styles.inputSection}>
-                    <Text style={[styles.inputLabel,{fontFamily:"Mukta-Regular"}]}>Rename</Text>
+                    <Text
+                      style={[
+                        styles.inputLabel,
+                        { fontFamily: "Mukta-Regular" },
+                      ]}
+                    >
+                      Rename
+                    </Text>
                     <View style={styles.input}>
                       <TextInput
                         ref={inputRef}
-                        style={[styles.inputText,{fontFamily:"Mukta-Regular",fontSize:14}]}
-                        placeholder="Enter your mobile number"
+                        style={[
+                          styles.inputText,
+                          { fontFamily: "Mukta-Regular", fontSize: 14 },
+                        ]}
+                        placeholder="Enter chat name"
                         placeholderTextColor="#9CA3AF"
-                        value={chatName} 
+                        value={chatName}
                         onChangeText={(text) => setChatName(text)}
                         returnKeyType="done"
                       />
@@ -142,13 +161,29 @@ const RenameChatPopup = () => {
 
                   {/* Verify Button */}
                   <TouchableOpacity
-                  onPress={()=>{
-                    dispatch(setToggleRenameChatPopup(false));
-                    setTimeout(() => {
-                       triggerToast("Renamed!","Your chat has been successfully renamed","success",3000)
-                    }, 500);
-                   
-                  }}
+                    onPress={() => {
+                      if (roomsStates.currentRoom) {
+                        const payload = {
+                          method: "PUT",
+                          url: `/rooms/${roomsStates.currentRoom.uuid || roomsStates.currentRoom.id}`,
+                          name: "update-room",
+                          data: {
+                            name: chatName,
+                          },
+                        };
+                        dispatch(commonFunctionForAPICalls(payload));
+                      }
+
+                      dispatch(setToggleRenameChatPopup(false));
+                      setTimeout(() => {
+                        triggerToast(
+                          "Renamed!",
+                          "Your chat has been successfully renamed",
+                          "success",
+                          3000,
+                        );
+                      }, 500);
+                    }}
                     style={[
                       styles.verifyButton,
                       !chatName && styles.verifyButtonDisabled,
@@ -156,13 +191,20 @@ const RenameChatPopup = () => {
                     activeOpacity={0.8}
                     disabled={!chatName}
                   >
-                    <Text style={[styles.verifyButtonText,{fontFamily:"Mukta-Regular"}]}>Done</Text>
+                    <Text
+                      style={[
+                        styles.verifyButtonText,
+                        { fontFamily: "Mukta-Regular" },
+                      ]}
+                    >
+                      Done
+                    </Text>
                   </TouchableOpacity>
 
                   {/* Skip for now */}
                   <TouchableOpacity
                     style={[styles.skipButton]}
-                    onPress={() => close(false)}
+                    onPress={() => dispatch(setToggleRenameChatPopup(false))}
                     activeOpacity={0.7}
                   ></TouchableOpacity>
 
@@ -358,6 +400,7 @@ const styles = StyleSheet.create({
   },
   noteBold: {
     fontWeight: "700",
+    color: "#374151",
     color: "#374151",
   },
 });

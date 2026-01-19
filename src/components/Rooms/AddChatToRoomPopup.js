@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,22 +17,40 @@ import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont, verticalScale } from "../../utils/responsive";
 import { Plus, Search } from "lucide-react-native";
-import { allChatsData, existingChats } from "../../data/datas";
 import ExistingChatsCards from "./ExistingChatsCards";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const AddChatToRoomPopup = () => {
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const [isSearching, setIsSearching] = useState(false);
-    const inputRef = useRef();
-    
-    useEffect(()=>{
-      if(!isSearching){
-          inputRef.current.blur();
-      }
-    },[isSearching])
+  const inputRef = useRef();
 
+  // Fetch available chats when popup opens
+  useEffect(() => {
+    if (
+      toggleStates.toggleAddExistingChatToRoomPopup &&
+      roomsStates.currentRoom?.uuid
+    ) {
+      const payload = {
+        method: "GET",
+        url: `/rooms/${roomsStates.currentRoom.uuid}/available-chats`,
+        name: "get-available-chats",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  }, [
+    toggleStates.toggleAddExistingChatToRoomPopup,
+    roomsStates.currentRoom?.uuid,
+  ]);
+
+  useEffect(() => {
+    if (!isSearching) {
+      inputRef.current?.blur();
+    }
+  }, [isSearching]);
 
   return (
     <Modal
@@ -128,13 +147,39 @@ const AddChatToRoomPopup = () => {
                 ]}
               />
             </View>
-            <ScrollView style={[styles.chatsScroll,{maxHeight:SCREEN_HEIGHT*0.5}]}>
-                {existingChats?.map((item,itemIndex)=>{
-                    return(
-                        <ExistingChatsCards key={itemIndex} chatName={item?.name} projects={item?.projectQuantity} />
-                    )
-                })}
-
+            <ScrollView
+              style={[styles.chatsScroll, { maxHeight: SCREEN_HEIGHT * 0.5 }]}
+            >
+              {roomsStates.fetchingAvailableChats ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#081A35"
+                  style={{ marginTop: 20 }}
+                />
+              ) : roomsStates.availableChats?.length > 0 ? (
+                roomsStates.availableChats.map((item, itemIndex) => {
+                  return (
+                    <ExistingChatsCards
+                      key={item.uuid || itemIndex}
+                      chatName={item.name || item.title}
+                      projects={item.message_count || 0}
+                      chat={item}
+                    />
+                  );
+                })
+              ) : (
+                <View style={{ marginTop: 20, alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: scaleFont(14),
+                      color: "#6B7280",
+                      fontFamily: "Mukta-Regular",
+                    }}
+                  >
+                    No available chats to add
+                  </Text>
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -210,9 +255,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     letterSpacing: 0.2,
   },
-  chatsScroll:{
-   width:"100%",
-   marginTop:30
+  chatsScroll: {
+    width: "100%",
+    marginTop: 30,
   },
   button: {
     width: "100%",
@@ -371,7 +416,7 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     alignItems: "center",
-    marginTop:15
+    marginTop: 15,
   },
   searchIcon: {
     position: "absolute",

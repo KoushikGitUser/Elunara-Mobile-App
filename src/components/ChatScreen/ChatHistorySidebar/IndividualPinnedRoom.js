@@ -15,8 +15,9 @@ import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarI
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import { setCurrentRoom } from "../../../redux/slices/apiCommonSlice";
 
-const IndividualPinnedRoom = ({ title, translateX }) => {
+const IndividualPinnedRoom = ({ title, translateX, room }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
 
   const styleProps = {};
@@ -26,23 +27,27 @@ const IndividualPinnedRoom = ({ title, translateX }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const truncateTitle = (title, limit = 20) => {
+    if (!title) return "";
     if (title.length <= limit) return title;
     return title.slice(0, limit) + "...";
   };
 
+  const handleRoomPress = () => {
+    if (room) {
+      dispatch(setCurrentRoom(room));
+    }
+    navigation.navigate("rooms", { roomName: title });
+    dispatch(setToggleChatHistorySidebar(false));
+    Animated.timing(translateX, {
+      toValue: toggleStates.toggleChatHistorySidebar ? 0 : SCREEN_WIDTH * 0.75,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <TouchableOpacity
-      onPress={() => {
-        navigation.navigate("rooms", { roomName: title });
-        dispatch(setToggleChatHistorySidebar(false));
-        Animated.timing(translateX, {
-          toValue: toggleStates.toggleChatHistorySidebar
-            ? 0
-            : SCREEN_WIDTH * 0.75,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      }}
+      onPress={handleRoomPress}
       onLongPress={() => {
         setIsLongPressed(!isLongPressed);
         dispatch(setToggleChatHistorySidebar(false));

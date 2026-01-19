@@ -9,11 +9,14 @@ import {
   Dimensions,
   LayoutAnimation,
   Image,
+  TextInput,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { LLMOptionsAvailable } from "../../../../data/datas";
 import { MaterialIcons } from "@expo/vector-icons";
-import { ChevronDown, ChevronUp } from "lucide-react-native";
+import { ChevronDown, ChevronUp, Search } from "lucide-react-native";
+
 import { moderateScale, scaleFont } from "../../../../utils/responsive";
 import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,11 +26,11 @@ import mistral from "../../../../assets/images/mistral.png";
 import chatgpt from "../../../../assets/images/chatgpt.png";
 
 const providerImages = {
-  "google": gemini,
-  "anthropic": anthropic,
+  google: gemini,
+  anthropic: anthropic,
   "mistral ai": mistral,
   "open ai": chatgpt,
-  "openai": chatgpt,
+  openai: chatgpt,
 };
 
 const getProviderImage = (provider) => {
@@ -35,30 +38,36 @@ const getProviderImage = (provider) => {
   return providerImages[key] || anthropic;
 };
 
-const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetValue}) => {
+const DropDowns = ({ onSelect, selectedId }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const selectorRef = useRef(null);
   const screenHeight = Dimensions.get("window").height;
   const dispatch = useDispatch();
   const { settingsStates } = useSelector((state) => state.API);
 
-    useEffect(()=>{
-      const payload = {
-        method:"GET",
-        url:"/master/llms",
-        name:"getAllLLMsAvailable"
-      }
-    dispatch(commonFunctionForAPICalls(payload)) 
-    },[]);
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/llms",
+      name: "getAllLLMsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
-    useEffect(()=>{
-      if(initialSetValue){
-        setSelected(initialSetValue);
-        setSelectedIcon(getProviderImage(initialSetValue?.provider));
+  useEffect(() => {
+    if (selectedId && settingsStates.settingsMasterDatas.allLLMsAvailable) {
+      const llm = settingsStates.settingsMasterDatas.allLLMsAvailable.find(
+        (item) => item.id == selectedId,
+      );
+      if (llm) {
+        setSelected(llm);
+        setSelectedIcon(getProviderImage(llm?.provider));
       }
-    },[initialSetValue])
+    }
+  }, [selectedId, settingsStates.settingsMasterDatas.allLLMsAvailable]);
 
   const toggleDropdown = () => {
     if (selectorRef.current) {
@@ -72,11 +81,11 @@ const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetVa
   const handleSelect = (item) => {
     setSelected(item);
     setVisible(false);
-    triggerAPICall(item?.id)
+    if (onSelect) {
+      onSelect(item);
+    }
     setSelectedIcon(getProviderImage(item?.provider));
-    setSelectedCounts([...selectedCounts,0])
   };
-
 
   return (
     <View style={styles.container}>
@@ -87,7 +96,7 @@ const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetVa
           onPress={toggleDropdown}
           activeOpacity={0.7}
         >
-          <View style={{flexDirection:"row",gap:10,alignItems:"center"}}>
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             {selected && (
               <Image style={styles.iconImage} source={selectedIcon} />
             )}
@@ -95,12 +104,12 @@ const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetVa
               style={{
                 fontWeight: "400",
                 fontSize: scaleFont(14),
-                fontFamily:"Mukta-Bold",
+                fontFamily: "Mukta-Bold",
                 color: selected ? "black" : "#B5BECE",
-                fontFamily:"Mukta-Regular",
+                fontFamily: "Mukta-Regular",
               }}
             >
-              {selected == null?"Select": selected.name}
+              {selected == null ? "Select" : selected.name}
             </Text>
           </View>
 
@@ -113,31 +122,70 @@ const DropDowns = ({setSelectedCounts,selectedCounts,triggerAPICall,initialSetVa
 
         {visible && (
           <View style={[styles.dropdown]}>
-            {settingsStates.settingsMasterDatas.allLLMsAvailable?.map((item, itemIndex) => {
-              return (
-                <TouchableOpacity
-                  key={itemIndex}
-                  style={styles.option}
-                  onPress={() => handleSelect(item)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      gap: 10,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image style={styles.iconImage} source={getProviderImage(item?.provider)} />
-                    <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>{item.name}</Text>
-                  </View>
+            <View style={styles.searchContainer}>
+              <View style={styles.searchInputWrapper}>
+                <Search size={16} color="#9CA3AF" />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search..."
+                  placeholderTextColor="#9CA3AF"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+            </View>
+            <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled={true}>
+              {settingsStates.settingsMasterDatas.allLLMsAvailable
+                ?.filter(
+                  (item) =>
+                    item.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) ||
+                    (item.description &&
+                      item.description
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())),
+                )
+                .map((item, itemIndex) => {
+                  return (
+                    <TouchableOpacity
+                      key={itemIndex}
+                      style={styles.option}
+                      onPress={() => handleSelect(item)}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 10,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Image
+                          style={styles.iconImage}
+                          source={getProviderImage(item?.provider)}
+                        />
+                        <Text
+                          style={[styles.title, { fontFamily: "Mukta-Bold" }]}
+                        >
+                          {item.name}
+                        </Text>
+                      </View>
 
-                  <View>
-                    <Text style={[styles.description,{fontFamily:"Mukta-Regular"}]}>{item.description}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                      <View>
+                        <Text
+                          style={[
+                            styles.description,
+                            { fontFamily: "Mukta-Regular" },
+                          ]}
+                        >
+                          {item.description}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+            </ScrollView>
           </View>
         )}
       </View>
@@ -194,6 +242,29 @@ const styles = StyleSheet.create({
   description: {
     fontSize: scaleFont(12.5),
     color: "#757575",
+  },
+  searchContainer: {
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+    marginBottom: 8,
+  },
+  searchInputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    height: 36,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: moderateScale(13),
+    color: "#1F2937",
+    paddingVertical: 0,
+    fontFamily: "Mukta-Regular",
   },
 });
 

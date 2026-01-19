@@ -6,8 +6,9 @@ import {
   Image,
   Animated,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -30,6 +31,7 @@ import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarI
 import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const SidebarMiddle = ({ translateX }) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
@@ -37,11 +39,30 @@ const SidebarMiddle = ({ translateX }) => {
   const [pinnedRoomsOpened, setPinnedRoomsOpened] = useState(false);
   const [roomsOpened, setRoomsOpened] = useState(false);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates } = useSelector((state) => state.API);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  // Fetch rooms and pinned rooms on mount
+  useEffect(() => {
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/rooms",
+        name: "get-rooms",
+      })
+    );
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/rooms?pinned=true",
+        name: "get-pinned-rooms",
+      })
+    );
+  }, []);
 
   return (
     <ScrollView style={styles.chatHistorySidebarMiddle}>
@@ -91,7 +112,7 @@ const SidebarMiddle = ({ translateX }) => {
               fontFamily: "Mukta-Regular",
             }}
           >
-            Pinned Learning Labs (10)
+            Pinned Learning Labs ({roomsStates.pinnedRooms?.length || 0})
           </Text>
           {pinnedRoomsOpened ? (
             <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
@@ -101,15 +122,20 @@ const SidebarMiddle = ({ translateX }) => {
         </TouchableOpacity>
         {pinnedRoomsOpened && (
           <View style={styles.individualPinnedChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
+            {roomsStates.pinnedRooms?.length > 0 ? (
+              roomsStates.pinnedRooms.map((room, roomIndex) => (
                 <IndividualPinnedRoom
                   translateX={translateX}
-                  key={chatIndex}
-                  title={chat?.title}
+                  key={room.uuid || roomIndex}
+                  title={room.name}
+                  room={room}
                 />
-              );
-            })}
+              ))
+            ) : (
+              <Text style={{ paddingLeft: 20, fontSize: 12, color: "#6B7280" }}>
+                No pinned rooms
+              </Text>
+            )}
           </View>
         )}
       </View>
@@ -137,7 +163,11 @@ const SidebarMiddle = ({ translateX }) => {
           <View style={styles.individualRecentChatsMain}>
             {recentChats.map((chat, chatIndex) => {
               return (
-                <IndividualRecentChat translateX={translateX} key={chatIndex} title={chat?.title} />
+                <IndividualRecentChat
+                  translateX={translateX}
+                  key={chatIndex}
+                  title={chat?.title}
+                />
               );
             })}
             <TouchableOpacity
@@ -192,15 +222,22 @@ const SidebarMiddle = ({ translateX }) => {
         </TouchableOpacity>
         {roomsOpened && (
           <View style={styles.individualPinnedChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
-                <IndividualPinnedRoom
-                  translateX={translateX}
-                  key={chatIndex}
-                  title={chat?.title}
-                />
-              );
-            })}
+            {roomsStates.rooms?.length > 0 ? (
+              roomsStates.rooms
+                .slice(0, 5)
+                .map((room, roomIndex) => (
+                  <IndividualPinnedRoom
+                    translateX={translateX}
+                    key={room.uuid || roomIndex}
+                    title={room.name}
+                    room={room}
+                  />
+                ))
+            ) : (
+              <Text style={{ paddingLeft: 20, fontSize: 12, color: "#6B7280" }}>
+                No rooms yet
+              </Text>
+            )}
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("allRooms");

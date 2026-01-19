@@ -22,7 +22,7 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import { triggerToast } from "../../../services/toast";
 
-const ChatOptionsPopup = () => {
+const ChatOptionsPopup = ({ chatUuid }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -32,29 +32,29 @@ const ChatOptionsPopup = () => {
 
   const commonFunctions = (type) => {
     if (type == "Open Notes") {
-       dispatch(setToggleChatMenuPopup(false))
-      navigation.navigate("notes");
+      dispatch(setToggleChatMenuPopup(false));
+      navigation.navigate("notes", { chatUuid });
     } else if (type == "Add to Learning Lab") {
-       dispatch(setToggleChatMenuPopup(false))
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
     } else if (type == "Rename") {
-       dispatch(setToggleChatMenuPopup(false))
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleRenameChatPopup(true));
     } else if (type == "Pin") {
-       dispatch(setToggleChatMenuPopup(false))
+      dispatch(setToggleChatMenuPopup(false));
       setTimeout(() => {
         triggerToast(
           "Chat Pinned",
           "Your chat has been successfully pinned",
           "success",
-          3000
+          3000,
         );
       }, 200);
     } else if (type == "Archive") {
-       dispatch(setToggleChatMenuPopup(false))
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleUnlockArchiveLimitPopup(true));
     } else if (type == "Delete") {
-       dispatch(setToggleChatMenuPopup(false))
+      dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleDeleteChatConfirmPopup(true));
     }
   };

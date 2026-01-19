@@ -9,17 +9,39 @@ import React from "react";
 import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import { scaleFont } from "../../utils/responsive";
 import { CirclePlus } from "lucide-react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddExistingChatToRoomPopup } from "../../redux/slices/toggleSlice";
 import { triggerToast } from "../../services/toast";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
-const ExistingChatsCards = ({ chatName, projects }) => {
+const ExistingChatsCards = ({ chatName, projects, chat }) => {
   const dispatch = useDispatch();
+  const { roomsStates } = useSelector((state) => state.API);
+
+  const handleAddChat = () => {
+    if (roomsStates.currentRoom?.uuid && (chat.uuid || chat.id)) {
+      const payload = {
+        method: "POST",
+        url: `/rooms/${roomsStates.currentRoom.uuid}/chats`,
+        name: "add-chats-to-room",
+        data: { chat_ids: [chat.uuid || chat.id] },
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+
+      // Close popup immediately or wait for success?
+      // Usually better to close and let background handle it, or show loading.
+      // For now, mirroring previous behavior + API call.
+      dispatch(setToggleAddExistingChatToRoomPopup(false));
+      // Toast is handled by the reducer handler now (Step 14, line 259 triggers success toast)
+      // So we can remove the manual triggerToast here to avoid double toasts.
+    } else {
+      triggerToast("Error", "Could not identify room or chat", "error", 3000);
+    }
+  };
 
   return (
-    <TouchableOpacity onPress={()=> { dispatch(setToggleAddExistingChatToRoomPopup(false));
-      triggerToast("Chat added","Chat has been added to Room successfully","success",3000);
-    }} style={styles.cardContainer}>
+    <TouchableOpacity onPress={handleAddChat} style={styles.cardContainer}>
       <View style={[styles.cardContent]}>
         {/* Chat Icon */}
         <View style={styles.iconContainer}>

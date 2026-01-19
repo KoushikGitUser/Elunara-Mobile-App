@@ -9,13 +9,19 @@ import {
 } from "react-native";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { RichEditor, actions } from "react-native-pell-rich-editor";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./Notes.styles";
 import * as ImagePicker from "expo-image-picker";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import Feather from "@expo/vector-icons/Feather";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { useRoute } from "@react-navigation/native";
 import {
   ArrowLeft,
   Bold,
@@ -91,9 +97,15 @@ const Notes = () => {
   };
 
   // Get button style based on active state
-  const getButtonStyle = (action) => activeStyles.includes(action)
-    ? { ...defaultButtonStyle, backgroundColor: "#EEF4FF" }
-    : defaultButtonStyle;
+  const getButtonStyle = (action) =>
+    activeStyles.includes(action)
+      ? { ...defaultButtonStyle, backgroundColor: "#EEF4FF" }
+      : defaultButtonStyle;
+
+  const { notesStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
+  const route = useRoute();
+  const chatUuid = route.params?.chatUuid;
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -111,6 +123,53 @@ const Notes = () => {
       hideSub.remove();
     };
   }, []);
+
+  // Fetch notes on mount
+  useEffect(() => {
+    if (chatUuid) {
+      const payload = {
+        method: "GET",
+        url: `/chats/${chatUuid}/notes`,
+        name: "get-notes",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  }, [chatUuid]);
+
+  // Update local state when notes are fetched
+  useEffect(() => {
+    if (notesStates.currentChatNotes) {
+      setNoteContent(notesStates.currentChatNotes.content || "");
+      richTextRef.current?.setContentHTML(
+        notesStates.currentChatNotes.content || "",
+      );
+    }
+  }, [notesStates.currentChatNotes]);
+
+  const handleSaveNotes = () => {
+    if (chatUuid) {
+      const payload = {
+        method: "PUT",
+        url: `/chats/${chatUuid}/notes`,
+        name: "update-notes",
+        data: { content: noteContent },
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  };
+
+  const handleDeleteNotes = () => {
+    if (chatUuid) {
+      const payload = {
+        method: "DELETE",
+        url: `/chats/${chatUuid}/notes`,
+        name: "delete-notes",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+      setNoteContent("");
+      richTextRef.current?.setContentHTML("");
+    }
+  };
 
   // Insert an image into the RichEditor using Expo Image Picker
   const insertImage = async () => {
@@ -135,11 +194,16 @@ const Notes = () => {
     const base64 = asset.base64;
 
     // Determine the image type from mimeType or URI
-    const mimeType = asset.mimeType || (asset.uri.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg");
+    const mimeType =
+      asset.mimeType ||
+      (asset.uri.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg");
     const dataUri = `data:${mimeType};base64,${base64}`;
 
     // Insert image into rich editor
-    richTextRef.current?.insertImage(dataUri, "width: 90%; height: 200px; border-radius: 8px; object-fit: cover; margin-bottom: 10px;");
+    richTextRef.current?.insertImage(
+      dataUri,
+      "width: 90%; height: 200px; border-radius: 8px; object-fit: cover; margin-bottom: 10px;",
+    );
   };
 
   // Search and highlight functionality
@@ -353,10 +417,7 @@ const Notes = () => {
       <DeleteNoteConfirmPopup
         setToggleDeleteNotePopup={setToggleDeleteNotePopup}
         toggleDeleteNotePopup={toggleDeleteNotePopup}
-        onDelete={() => {
-          setNoteContent("");
-          richTextRef.current?.setContentHTML("");
-        }}
+        onDelete={handleDeleteNotes}
       />
 
       {/* header */}
@@ -368,10 +429,18 @@ const Notes = () => {
           <ArrowLeft size={25} strokeWidth={1.5} />
         </TouchableOpacity>
         <View style={styles.rightOptionsMain}>
-          <TouchableOpacity onPress={() => richTextRef.current?.sendAction(actions.undo, 'result')}>
+          <TouchableOpacity
+            onPress={() =>
+              richTextRef.current?.sendAction(actions.undo, "result")
+            }
+          >
             <Undo size={25} strokeWidth={1.5} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => richTextRef.current?.sendAction(actions.redo, 'result')}>
+          <TouchableOpacity
+            onPress={() =>
+              richTextRef.current?.sendAction(actions.redo, "result")
+            }
+          >
             <Redo size={25} strokeWidth={1.5} />
           </TouchableOpacity>
           <TouchableOpacity onPress={downloadAsPdf}>
@@ -384,7 +453,7 @@ const Notes = () => {
             <EllipsisVertical size={25} strokeWidth={1.5} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.doneBtn}>
+          <TouchableOpacity style={styles.doneBtn} onPress={handleSaveNotes}>
             <Text style={{ fontWeight: 600 }}>Done</Text>
           </TouchableOpacity>
         </View>
@@ -444,7 +513,11 @@ const Notes = () => {
           onPress={() => setToggleTextActionTab(true)}
           style={[
             styles.collapsedButton,
-            { bottom: keyboardVisible ? keyboardHeight - insets.bottom + 70 : 60 },
+            {
+              bottom: keyboardVisible
+                ? keyboardHeight - insets.bottom + 70
+                : 60,
+            },
           ]}
         >
           <Plus size={25} color="white" strokeWidth={1.25} />
@@ -455,13 +528,19 @@ const Notes = () => {
         <View
           style={[
             styles.footerActions,
-            { bottom: keyboardVisible ? keyboardHeight - (isGestureNavigation ? 10 : 5) : 0 },
+            {
+              bottom: keyboardVisible
+                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                : 0,
+            },
           ]}
         >
-          <View style={[
-            styles.searchInputMain,
-            isSearchFocused && { borderColor: appColors.navyBlueShade }
-          ]}>
+          <View
+            style={[
+              styles.searchInputMain,
+              isSearchFocused && { borderColor: appColors.navyBlueShade },
+            ]}
+          >
             <Search
               size={20}
               strokeWidth={1.25}
@@ -479,13 +558,17 @@ const Notes = () => {
               autoFocus
             />
             {searchText.length > 0 && (
-              <Text style={{
-                color: "#6B7280",
-                fontSize: 12,
-                position: "absolute",
-                right: 10,
-              }}>
-                {matchCount > 0 ? `${currentMatchIndex + 1} of ${matchCount}` : "0 of 0"}
+              <Text
+                style={{
+                  color: "#6B7280",
+                  fontSize: 12,
+                  position: "absolute",
+                  right: 10,
+                }}
+              >
+                {matchCount > 0
+                  ? `${currentMatchIndex + 1} of ${matchCount}`
+                  : "0 of 0"}
               </Text>
             )}
           </View>
@@ -506,10 +589,7 @@ const Notes = () => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            onPress={closeSearch}
-            style={styles.crossIcon}
-          >
+          <TouchableOpacity onPress={closeSearch} style={styles.crossIcon}>
             <X size={20} strokeWidth={1.25} />
           </TouchableOpacity>
         </View>
@@ -519,7 +599,11 @@ const Notes = () => {
         <View
           style={[
             styles.footerActions,
-            { bottom: keyboardVisible ? keyboardHeight - (isGestureNavigation ? 10 : 5) : 0 },
+            {
+              bottom: keyboardVisible
+                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                : 0,
+            },
           ]}
         >
           <TouchableOpacity onPress={() => setShowSizingOptions(true)}>
@@ -596,11 +680,18 @@ const Notes = () => {
         <View
           style={[
             styles.footerActions,
-            { bottom: keyboardVisible ? keyboardHeight - (isGestureNavigation ? 10 : 5) : 0 },
+            {
+              bottom: keyboardVisible
+                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                : 0,
+            },
           ]}
         >
           <View style={styles.sizingOptionsMain}>
-            <TouchableOpacity style={styles.backFromSize} onPress={() => setShowSizingOptions(false)}>
+            <TouchableOpacity
+              style={styles.backFromSize}
+              onPress={() => setShowSizingOptions(false)}
+            >
               <ChevronLeft size={30} strokeWidth={2} />
             </TouchableOpacity>
             <Type strokeWidth={2} />
@@ -615,7 +706,7 @@ const Notes = () => {
               style={defaultButtonStyle}
               onPress={() => richTextRef.current?.setFontSize(4)}
             >
-             <Heading2 strokeWidth={2} />
+              <Heading2 strokeWidth={2} />
             </TouchableOpacity>
             <TouchableOpacity
               style={defaultButtonStyle}
@@ -625,13 +716,23 @@ const Notes = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={getButtonStyle("unorderedList")}
-              onPress={() => richTextRef.current?.sendAction(actions.insertBulletsList, 'result')}
+              onPress={() =>
+                richTextRef.current?.sendAction(
+                  actions.insertBulletsList,
+                  "result",
+                )
+              }
             >
-             <List strokeWidth={2} />
+              <List strokeWidth={2} />
             </TouchableOpacity>
             <TouchableOpacity
               style={getButtonStyle("orderedList")}
-              onPress={() => richTextRef.current?.sendAction(actions.insertOrderedList, 'result')}
+              onPress={() =>
+                richTextRef.current?.sendAction(
+                  actions.insertOrderedList,
+                  "result",
+                )
+              }
             >
               <Octicons name="list-ordered" size={24} color="black" />
             </TouchableOpacity>
