@@ -1,0 +1,49 @@
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+} from "react-native";
+import React, { useMemo } from "react";
+import { createStyles } from "../../screens/ProfileAndSettings/ProfileAndSettings.style";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { Feather } from "@expo/vector-icons";
+import { scaleFont } from "../../utils/responsive";
+import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
+
+const ProfileHeader = ({translateX}) => {
+  const styleProps = {};
+  const styles = useMemo(() => createStyles(styleProps), []);
+  const navigation = useNavigation();
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const SCREEN_WIDTH = Dimensions.get("window").width;
+  const dispatch = useDispatch();
+ 
+  return (
+    <View style={[styles.chatHeader]}>
+      <TouchableOpacity
+        onPress={() => {
+          Animated.timing(translateX, {
+            toValue: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : SCREEN_WIDTH * 0.75,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+          dispatch(
+            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar)
+          );
+        }}
+      >
+        <Feather name="menu" size={30} color="black" />
+      </TouchableOpacity>
+      <Text style={{ fontSize: scaleFont(20), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
+        Profile
+      </Text>
+    </View>
+  );
+};
+
+export default ProfileHeader;

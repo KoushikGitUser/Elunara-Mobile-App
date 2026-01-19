@@ -1,0 +1,30 @@
+export const authStates = {
+  loading: false,
+  error: null,
+  isSignedUp: null,
+  isSignedIn: null,
+  isLogOut: null,
+  isPasswordReset: null,
+  isMailVerified: null,
+  isOTPReceivedForAccountRecovery:false,
+  isOTPReceivedForMobileVerification:false,
+  isMobileOTPVerified:false,
+  isAccountRecoverable:false,
+  accountRecoverableMessage:"",
+  isEmailChangeRequested:false,
+  isOTPSentForEmailChange:null,
+  isEmailChangeRequestVerified:null,
+  isPasswordUpdated:null,
+  isCodeSentForForgotPassInProfile:null,
+  isPasswordUpdatedForgotProfile:null,
+
+  //oauth states, signin/signup with social
+  isRedirectURLReceivedForGoogle:false,
+  redirectURLForGoogle:"",
+  isRedirectURLReceivedForApple:false,
+  redirectURLForApple:"",
+  isRedirectURLReceivedForLinkedIn:false,
+  redirectURLForLinkedIn:"",
+
+  loggedInUsingProvider:false,
+};

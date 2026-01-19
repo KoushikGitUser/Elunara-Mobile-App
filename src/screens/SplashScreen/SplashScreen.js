@@ -1,16 +1,27 @@
 import { DarkTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, StatusBar, ImageBackground, Image } from 'react-native';
+import { scaleFont } from '../../utils/responsive';
 import chakraLogoSplash from '../../assets/images/chakraBig.png';
-import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png'
+import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png';
+import { getToken } from '../../utils/Secure/secureStore';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('signin');
-    }, 2500); // 2.5 seconds
+    const checkAuthAndNavigate = async () => {
+      const accessToken = await getToken();
+      const timer = setTimeout(() => {
+        if (accessToken) {
+          navigation.replace('chat');
+        } else {
+          navigation.replace('welcome');
+        }
+      }, 2500);
 
-    return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
+    };
+
+    checkAuthAndNavigate();
   }, [navigation]);
 
   return (
@@ -31,7 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#081A35',
   },
   logo: {
-    fontSize: 48,
+    fontSize: scaleFont(48),
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 8,
@@ -49,7 +60,7 @@ const styles = StyleSheet.create({
 
   },
   tagline: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     color: '#E1BEE7',
     marginBottom: 40,
   },

@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "elunara",
+    "name": "Elunara",
     "slug": "elunara",
+    "scheme": ["elunara", "elunaraapp"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,8 +13,31 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with others.",
+          "cameraPermission": "The app accesses your camera to let you take photos.",
+          "mediaLibraryPermission": "The app accesses your media library to let you select photos and videos."
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      "expo-font",
+      "expo-secure-store"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app requires camera access to take photos.",
+        "NSPhotoLibraryUsageDescription": "This app requires photo library access to select images.",
+        "NSMicrophoneUsageDescription": "This app requires microphone access for audio features."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +45,14 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.smgdev.elunara"
+      "package": "com.smgdev.elunara",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

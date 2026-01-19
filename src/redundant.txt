@@ -1,0 +1,267 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  Dimensions,
+  Platform,
+  TextInput,
+  KeyboardAvoidingView,
+  ScrollView,
+  Keyboard,
+} from 'react-native';
+import { BlurView } from '@react-native-community/blur';
+
+const { width } = Dimensions.get('window');
+
+const MobileVerificationPopup = ({close,mobileVerificationPopup}) => {
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+
+
+  return (
+    <Modal
+      visible={mobileVerificationPopup}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={() => close(false)}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        {/* Blur Background */}
+          <BlurView
+            style={styles.blurView}
+            blurType="light"
+            blurAmount={5}
+            reducedTransparencyFallbackColor="rgba(0,0,0,0.4)"
+          />
+          <View style={styles.androidBlur} />
+
+        <TouchableOpacity
+          style={styles.backdrop}
+          activeOpacity={0.5}
+          onPress={() => {
+            close(false);
+            Keyboard.dismiss();
+          }}
+        />
+
+        {/* Modal Sheet */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.modalSheet}>
+
+            {/* Content */}
+            <View style={styles.content}>
+              {/* Title */}
+              <Text style={styles.title}>
+                Lastly, Verify your{"\n"}mobile number
+              </Text>
+
+              {/* Description */}
+              <Text style={styles.description}>
+                To enhance security, we need to verify.
+              </Text>
+              <Text style={[styles.description,{marginBottom:35}]}>
+                 your mobile number
+              </Text>
+
+              {/* Input Section */}
+              <View style={styles.inputSection}>
+                <Text style={styles.inputLabel}>Mobile Number</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your mobile number"
+                  placeholderTextColor="#9CA3AF"
+                  value={mobileNumber}
+                  onChangeText={setMobileNumber}
+                  keyboardType="phone-pad"
+                  returnKeyType="done"
+                />
+              </View>
+
+              {/* Verify Button */}
+              <TouchableOpacity
+                style={[
+                  styles.verifyButton,
+                  !mobileNumber && styles.verifyButtonDisabled,
+                ]}
+                onPress={() => {
+                  console.log("Verify pressed");
+                }}
+                activeOpacity={0.8}
+                disabled={!mobileNumber}
+              >
+                <Text style={styles.verifyButtonText}>Verify</Text>
+              </TouchableOpacity>
+
+              {/* Skip for now */}
+              <TouchableOpacity
+                style={styles.skipButton}
+                onPress={() => close(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.skipButtonText}>Skip for now</Text>
+              </TouchableOpacity>
+
+              {/* Note */}
+              <View style={[styles.noteContainer,{marginBottom:50}]}>
+                <Text style={styles.noteText}>
+                  <Text style={styles.noteBold}>Note:</Text> You can skip this
+                  step for now — but verification will be required within 7 days
+                  to continue using Elunara.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  blurView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  androidBlur: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#ffffffff',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 20,
+    marginBottom:0
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+  },
+  title: {
+    fontSize: 23,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 5,
+    lineHeight: 36,
+    letterSpacing: -0.5,
+  },
+  description: {
+    fontSize: 11,
+    lineHeight: 24,
+    color: '#6B7280',
+    letterSpacing: 0.2,
+  },
+  inputSection: {
+    marginBottom: 24,
+  },
+  inputLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+    letterSpacing: 0.1,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 10,
+    color: '#1F2937',
+    letterSpacing: 0.2,
+  },
+  verifyButton: {
+    backgroundColor: '#081A35',
+    paddingVertical: 13,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  verifyButtonDisabled: {
+    backgroundColor: '#E5E7EB',
+  },
+  verifyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+  },
+  skipButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginBottom: 10,
+  },
+  skipButtonText: {
+    color: '#0F172A',
+    fontSize: 10,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+    letterSpacing: 0.2,
+  },
+  noteContainer: {
+    paddingHorizontal: 16,
+    borderRadius: 8,
+
+  },
+  noteText: {
+    fontSize: 9,
+    lineHeight: 20,
+    color: '#6B7280',
+    letterSpacing: 0.1,
+  },
+  noteBold: {
+    fontWeight: '700',
+    color: '#374151',
+  },
+});
+
+export default MobileVerificationPopup;
+
+
+// Responsive scaling functions
+const scale = (size) => (width / 375) * size;
+const verticalScale = (size) => (height / 812) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;

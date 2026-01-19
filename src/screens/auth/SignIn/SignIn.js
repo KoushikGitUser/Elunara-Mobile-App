@@ -1,119 +1,419 @@
-import { View, Text, StatusBar, TouchableOpacity, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import AntDesign from '@expo/vector-icons/AntDesign';
-import React, { useMemo } from 'react'
-import { createStyles } from './SignIn.styles';
-import mainLogo from '../../../assets/images/Knowledge Chakra 1.png';
-import chakraLogo from '../../../assets/images/Knowledge Chakra 2.png';
-import google from '../../../assets/images/search.png';
-import LinkedIn from '../../../assets/images/linkedin.png';
-import apple from '../../../assets/images/apple-logo.png';
-
+import {
+  View,
+  Text,
+  StatusBar,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+  Linking,
+  BackHandler,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import React, { useEffect, useMemo, useState } from "react";
+import { createStyles } from "./SignIn.styles";
+import mainLogo from "../../../assets/images/Knowledge Chakra 1.png";
+import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
+import google from "../../../assets/images/search.png";
+import LinkedIn from "../../../assets/images/linkedin.png";
+import apple from "../../../assets/images/apple-logo.png";
+import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
+import { useNavigation } from "@react-navigation/native";
+import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
+import GradientText from "../../../components/common/GradientText";
+import { scaleFont } from "../../../utils/responsive";
+import { triggerToast } from "../../../services/toast";
+import { useFonts } from "expo-font";
+import { appColors } from "../../../themes/appColors";
+import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
+import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signWithGoogle,
+  signWithApple,
+  signWithLinkedIn,
+  userSignIn,
+  setIsSignedInToFalse,
+} from "../../../redux/slices/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignIn = () => {
-  // You can pass custom props to override default styles
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [toggleForgotPassword, setToggleForgotPassword] = useState(false);
+  const [focusedInput, setFocusedInput] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const { authStates } = useSelector((state) => state.Auth);
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    if (authStates.isSignedIn == true) {
+      navigation.navigate("chat");
+      dispatch(setIsSignedInToFalse());
+    }
+  }, [authStates.isSignedIn]);
+
+  useEffect(() => {
+    const backAction = () => {
+      return true; // prevent default behavior (exit)
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove(); // clean up
+  }, [navigation]);
+
+  // Real-time validation functions
+  const validateEmail = (text) => {
+    if (!text.trim()) {
+      return "Email is required";
+    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(text.trim())) {
+      return "Valid Email ID required";
+    }
+    return "";
+  };
+
+  const validatePassword = (text) => {
+    if (!text) {
+      return "Password is required";
+    }
+    if (text.length < 8) {
+      return "Password must be at least 8 characters";
+    }
+    if (text.length > 32) {
+      return "Password must not exceed 32 characters";
+    }
+    return "";
+  };
+
+  const handleUserSignIn = () => {
+    setLoading(true);
+    const newErrors = {
+      email: "",
+      password: "",
+    };
+    let hasError = false;
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+      hasError = true;
+    } else {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email.trim())) {
+        newErrors.email = "Valid Email ID required";
+        hasError = true;
+      }
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required";
+      hasError = true;
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+      hasError = true;
+    } else if (password.length > 32) {
+      newErrors.password = "Password must not exceed 32 characters";
+      hasError = true;
+    }
+
+    setErrors(newErrors);
+
+    if (hasError) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("email", email.trim());
+    formData.append("password", password.trim());
+    dispatch(userSignIn(formData));
+    // navigation.navigate("chat");
+  };
+
   const styleProps = {
     // Example: backgroundColor: '#F5F5F5',
     // Example: headingColor: '#000000',
     // Add any dynamic values here
   };
 
+  const navigation = useNavigation();
+
   const styles = useMemo(() => createStyles(styleProps), []);
+  const subtitle =
+    "Pick up right where you left off  /n—smarter learning awaits.";
 
+  const [fontsLoaded] = useFonts({
+    "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
+    "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
+  });
 
-
+  useEffect(() => {
+    if (fontsLoaded) {
+    }
+  }, [fontsLoaded]);
 
   return (
- <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      {toggleForgotPassword && (
+        <ForgotPassword
+          close={setToggleForgotPassword}
+          toggleForgotPassword={toggleForgotPassword}
+        />
+      )}
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        style={styles.container}
+      >
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Image source={mainLogo} style={styles.mainLogo}  />
+            <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
+              <BackArrowLeftIcon />
+            </TouchableOpacity>
+            {
+              <GradientText
+                marginBottom={0}
+                marginTop={20}
+                children=" Welcome back"
+                fullWidth={true}
+                fontSize={scaleFont(24)}
+              />
+            }
+            <Text style={styles.headDesc}>
+              Pick up right where you left off
+            </Text>
+            <Text style={[styles.headDesc, { marginTop: 0 }]}>
+              —smarter learning awaits.
+            </Text>
           </View>
           <View>
-            <Image source={chakraLogo} style={styles.chakraLogo}  />
+            <Image source={chakraLogo} style={styles.chakraLogo} />
           </View>
         </View>
 
-        {/* Content Section */}
-        <View style={styles.content}>
-          {/* Flower of Life Background */}
-          <View style={styles.flowerContainer}>
+        {/* Email Label */}
+        <View style={styles.inputFieldsMain}>
+          <Text style={styles.label}>Email</Text>
+          <View
+            style={[
+              styles.input,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 0,
+              },
+              focusedInput === "email" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.email && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
+            <TextInput
+              style={{
+                flex: 1,
+                height: "100%",
+                paddingHorizontal: 15,
+                fontFamily: "Mukta-Regular",
+                fontSize: scaleFont(14),
+              }}
+              placeholder="Enter your email"
+              placeholderTextColor="#B0B7C3"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrors((prev) => ({ ...prev, email: validateEmail(text) }));
+              }}
+              onFocus={() => setFocusedInput("email")}
+              onBlur={() => setFocusedInput(null)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {errors.email && (
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 15 }}
+              />
+            )}
           </View>
+          {errors.email && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.email}
+            </Text>
+          )}
 
-          {/* Main Heading */}
-          <View style={styles.headingContainer}>
-            <Text style={styles.heading}>Learning,</Text>
-            <Text style={styles.heading}>Reimagined.</Text>
-            <Text style={styles.heading}>Ethically.</Text>
+          {/* Password Label */}
+          <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
+          <View
+            style={[
+              styles.passwordContainer,
+              focusedInput === "password" && {
+                borderColor: appColors.navyBlueShade,
+              },
+              errors.password && { borderColor: "#D00B0B", borderWidth: 2 },
+            ]}
+          >
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Enter your password"
+              placeholderTextColor="#B0B7C3"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setErrors((prev) => ({
+                  ...prev,
+                  password: validatePassword(text),
+                }));
+              }}
+              onFocus={() => setFocusedInput("password")}
+              onBlur={() => setFocusedInput(null)}
+            />
+            {errors.password && (
+              <AlertCircle
+                size={20}
+                color="#D00B0B"
+                style={{ marginRight: 10 }}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={{ marginRight: 5 }}
+              activeOpacity={0.7}
+            >
+              {showPassword ? (
+                <EyeOff size={22} color="#0F1419" />
+              ) : (
+                <Eye size={22} color="#0F1419" />
+              )}
+            </TouchableOpacity>
           </View>
+          {errors.password && (
+            <Text
+              style={{
+                color: "#D00B0B",
+                fontSize: scaleFont(11),
+                marginTop: 4,
+                fontFamily: "Mukta-Regular",
+              }}
+            >
+              {errors.password}
+            </Text>
+          )}
 
-          {/* Subheading */}
-          <Text style={styles.subheading}>
-            Designed to combine transparency,{'\n'}privacy, and empathy to support{'\n'}your learning journey.
-          </Text>
-
-          {/* Progress Indicators */}
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, styles.progressActive]} />
-            <View style={styles.progressBar} />
-            <View style={styles.progressBar} />
-          </View>
-        </View>
-
-        {/* Buttons Section */}
-        <View style={styles.buttonsContainer}>
-          {/* Google Button */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Image source={google} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          {/* Forgot Password */}
+          <TouchableOpacity
+            onPress={() => setToggleForgotPassword(true)}
+            style={styles.forgotPasswordMain}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-
-          {/* LinkedIn Button */}
-          <TouchableOpacity style={styles.socialButton} activeOpacity={0.7}>
-            <Image source={LinkedIn} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
-          </TouchableOpacity>
-
-          {/* Apple Button */}
-          <TouchableOpacity style={[styles.socialButton,{marginBottom:0}]} activeOpacity={0.7}>
-          <Image source={apple} style={styles.socialIcons} />
-            <Text style={styles.socialButtonText}>Continue with Apple</Text>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <Text style={styles.divider}>or</Text>
-
           {/* Email Button */}
-          <TouchableOpacity style={styles.emailButton} activeOpacity={0.8}>
-            <Text style={styles.emailButtonText}>Login with Email</Text>
+          <TouchableOpacity
+            onPress={handleUserSignIn}
+            style={[
+              styles.emailButton,
+              (!email.trim() ||
+                !password ||
+                authStates.isSignedIn == "pending") && {
+                backgroundColor: "#CDD5DC",
+              },
+            ]}
+            activeOpacity={0.8}
+            disabled={
+              !email.trim() || !password || authStates.isSignedIn == "pending"
+            }
+          >
+            {authStates.isSignedIn == "pending" ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.emailButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity onPress={() => navigation.navigate("signup")}>
               <Text style={styles.signupLink}>Sign Up</Text>
+              <View style={styles.customUnderline} />
             </TouchableOpacity>
           </View>
-
-          {/* Footer Links */}
-          <View style={styles.footer}>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Terms Of Use</Text>
-            </TouchableOpacity>
-            <Text style={styles.footerDot}>  •  </Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Privacy Policy</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.divider}>or</Text>
+          {/* Divider */}
         </View>
-      </View>
+
+        {/* Buttons Section */}
+        <View style={styles.buttonsContainer}>
+          {/* Google Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+              );
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            <Image source={google} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* LinkedIn Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+              );
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            <Image source={LinkedIn} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
+          </TouchableOpacity>
+
+          {/* Apple Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+              );
+            }}
+            style={[styles.socialButton, { marginBottom: 0 }]}
+            activeOpacity={0.7}
+          >
+            <Image source={apple} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-
-export default SignIn
+export default SignIn;
