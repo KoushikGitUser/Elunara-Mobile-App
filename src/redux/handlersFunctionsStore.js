@@ -47,6 +47,9 @@ import {
   handleUpdateUserMessageForRegeneration,
   handleRegenerateAIResponse,
   handleGetAllMessagesOfParticularChat,
+  handleSwitchVersionsOfAIResponse,
+  handleAddToRoom,
+  handleRemoveFromRoom,
 } from "./apiExtraReducerHandlers/chatsHandlers";
 
 import {
@@ -70,11 +73,6 @@ import {
   handleUpdateNotes,
   handleDeleteNotes,
 } from "./apiExtraReducerHandlers/notesHandlers";
-
-import {
-  handleAddToRoom,
-  handleRemoveFromRoom,
-} from "./apiExtraReducerHandlers/chatsHandlers";
 
 import {
   handleUploadAttachment,
@@ -155,6 +153,7 @@ export const chatsHandlersFunctions = {
   //Message editing and regeneration
   updateUserMessageForRegeneration: handleUpdateUserMessageForRegeneration,
   regenerateAIResponse: handleRegenerateAIResponse,
+  switchVersionsOfAIResponse: handleSwitchVersionsOfAIResponse,
   //  Room operations
   addToRoom: handleAddToRoom,
   removeFromRoom: handleRemoveFromRoom,
