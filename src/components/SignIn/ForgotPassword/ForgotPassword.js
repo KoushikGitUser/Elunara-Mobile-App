@@ -26,6 +26,7 @@ import {
   setUserMailIDOnForgotPassword,
   setUserOTPOnForgotPassword,
 } from "../../../redux/slices/globalDataSlice";
+import Toaster from "../../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
 
@@ -115,6 +116,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
       animationType="slide"
       onRequestClose={() => close(false)}
     >
+      <Toaster/>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}

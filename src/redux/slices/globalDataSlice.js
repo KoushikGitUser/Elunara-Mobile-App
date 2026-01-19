@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { allInitialStates } from "../allInitialStates";
 import { setUser } from "./authSlice";
+import { resetAllStates } from "../actions/resetActions";
 
 const globalDataSlice = createSlice({
   name: 'globalDatas',
@@ -23,6 +24,9 @@ const globalDataSlice = createSlice({
     setChatMessagesArray: (state, action) => {
       state.globalDataStates.chatMessagesArray = action.payload;
     },
+    setMessageIDsArray: (state, action) => {
+      state.globalDataStates.messageIDsArray = action.payload;
+    },
     setCurrentSelectedTopic: (state, action) => {
       state.globalDataStates.currentSelectedTopic = action.payload;
     },
@@ -31,6 +35,9 @@ const globalDataSlice = createSlice({
     },
     setUserMessageOnLongPress: (state, action) => {
       state.globalDataStates.userMessageOnLongPress = action.payload;
+    },
+    setEditingMessageData: (state, action) => {
+      state.globalDataStates.editingMessageData = action.payload;
     },
     setSettingsInnerPageHeaderTitle: (state, action) => {
       state.globalDataStates.settingsInnerPageHeaderTitle = action.payload;
@@ -77,6 +84,50 @@ const globalDataSlice = createSlice({
     setLearningLabsGuideTourSteps: (state, action) => {
       state.globalDataStates.learningLabsGuideTourSteps = action.payload;
     },
+    setSelectedSubjectID: (state, action) => {
+      state.globalDataStates.selectedSubjectID = action.payload;
+    },
+    setSelectedTopicsID: (state, action) => {
+      state.globalDataStates.selectedTopicsID = action.payload;
+    },
+    setCurrentAIMessageIndexForRegeneration: (state, action) => {
+      state.globalDataStates.currentAIMessageIndexForRegeneration = action.payload;
+    },
+    navigateToNextVersion: (state, action) => {
+      const messageIndex = action.payload;
+      const message = state.globalDataStates.chatMessagesArray[messageIndex];
+      if (message && message.versions && message.currentVersionIndex < message.versions.length - 1) {
+        message.currentVersionIndex += 1;
+        const newVersion = message.versions[message.currentVersionIndex];
+        message.message = newVersion.content;
+        message.uuid = newVersion.uuid;
+        message.version = newVersion.version;
+        message.total_versions = newVersion.total_versions;
+      }
+    },
+    navigateToPreviousVersion: (state, action) => {
+      const messageIndex = action.payload;
+      const message = state.globalDataStates.chatMessagesArray[messageIndex];
+      if (message && message.versions && message.currentVersionIndex > 0) {
+        message.currentVersionIndex -= 1;
+        const newVersion = message.versions[message.currentVersionIndex];
+        message.message = newVersion.content;
+        message.uuid = newVersion.uuid;
+        message.version = newVersion.version;
+        message.total_versions = newVersion.total_versions;
+      }
+    },
+    resetAllGuidedTourSteps: (state) => {
+      state.globalDataStates.manualGuidedTourRunning = false;
+      state.globalDataStates.navigationBasicsGuideTourSteps = 0;
+      state.globalDataStates.chatFunctionsGuideTourSteps = 0;
+      state.globalDataStates.learningLabsGuideTourSteps = 0;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetAllStates, () => {
+      return allInitialStates;
+    });
   },
 });
 
@@ -86,9 +137,11 @@ export const {
   setUserMessagePrompt,
   setChatInputContentLinesNumber,
   setChatMessagesArray,
+  setMessageIDsArray,
   setCurrentSelectedTopic,
   setChatTitleOnLongPress,
   setUserMessageOnLongPress,
+  setEditingMessageData,
   setSettingsInnerPageHeaderTitle,
   setSettingsInnerPageComponentToRender,
   setCompareResponseStyleItemsArray,
@@ -104,6 +157,12 @@ export const {
   setNavigationBasicsGuideTourSteps,
   setChatFunctionsGuideTourSteps,
   setLearningLabsGuideTourSteps,
+  resetAllGuidedTourSteps,
+  setSelectedSubjectID,
+  setSelectedTopicsID,
+  setCurrentAIMessageIndexForRegeneration,
+  navigateToNextVersion,
+  navigateToPreviousVersion,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

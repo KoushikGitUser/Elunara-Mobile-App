@@ -1,20 +1,28 @@
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import React from "react";
 import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { scaleFont, verticalScale } from "../../../utils/responsive";
-import { useSelector } from "react-redux";
-import BackArrowLeftIcon from '../../../../assets/SvgIconsComponent/BackArrowLeftIcon'
+import { useDispatch, useSelector } from "react-redux";
+import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLeftIcon";
+import { setSettingsInnerPageHeaderTitle } from "../../../redux/slices/globalDataSlice";
 
 const InnerPagesHeader = ({ scrollY }) => {
-  const {globalDataStates} = useSelector((state) => state.Global);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   // Interpolate border opacity based on scroll position
   const borderOpacity = scrollY
     ? scrollY.interpolate({
         inputRange: [0, 50],
-        outputRange: [0, 1], 
+        outputRange: [0, 1],
         extrapolate: "clamp",
       })
     : new Animated.Value(0);
@@ -24,16 +32,29 @@ const InnerPagesHeader = ({ scrollY }) => {
       <View style={[styles.chatHeader]}>
         <TouchableOpacity
           onPress={() => {
+            if (globalDataStates.settingsInnerPageHeaderTitle == "Search") {
+              navigation.navigate("settingsInnerPages", { page: 5 });
+              dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
+            }
+            else{
             navigation.goBack();
+            }
+
           }}
         >
-          <BackArrowLeftIcon/>
+          <BackArrowLeftIcon />
         </TouchableOpacity>
-        <Text style={{ fontSize: scaleFont(20), fontWeight: 600,fontFamily:"Mukta-Bold" }}>
+        <Text
+          style={{
+            fontSize: scaleFont(20),
+            fontWeight: 600,
+            fontFamily: "Mukta-Bold",
+          }}
+        >
           {globalDataStates.settingsInnerPageHeaderTitle}
         </Text>
       </View>
-      
+
       {/* Animated Border */}
       <Animated.View
         style={[

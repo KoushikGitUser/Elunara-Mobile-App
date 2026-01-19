@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,11 +20,23 @@ import LLMState from "./ToolsPopupStates/LLMStates/LLMState";
 import ResponseStyleState from "./ToolsPopupStates/ResponseStyleState/ResponseStyleState";
 import ResponseLangState from "./ToolsPopupStates/ResponseLangState/ResponseLangState";
 import CitationState from "./ToolsPopupStates/CitationState/CitationState";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const ToolsOptionsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (toggleStates.toggleToolsPopup) {
+      const payload = {
+        method: "GET",
+        url: "/settings/general",
+        name: "getAllGeneralSettings",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+  }, [toggleStates.toggleToolsPopup]);
   return (
     <Modal
       visible={toggleStates.toggleToolsPopup}

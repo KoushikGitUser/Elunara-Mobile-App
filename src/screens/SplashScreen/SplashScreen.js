@@ -1,34 +1,55 @@
-import { DarkTheme } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, StatusBar, ImageBackground, Image } from 'react-native';
-import { scaleFont } from '../../utils/responsive';
-import chakraLogoSplash from '../../assets/images/chakraBig.png';
-import elunaraLogoSplash from '../../assets/images/ElunaraLogoSplash.png';
-import { getToken } from '../../utils/Secure/secureStore';
+import { DarkTheme, useNavigation } from "@react-navigation/native";
+import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  StatusBar,
+  ImageBackground,
+  Image,
+} from "react-native";
+import { scaleFont } from "../../utils/responsive";
+import chakraLogoSplash from "../../assets/images/chakraBig.png";
+import elunaraLogoSplash from "../../assets/images/ElunaraLogoSplash.png";
+import { getToken } from "../../utils/Secure/secureStore";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const SplashScreen = ({ navigation }) => {
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
-      const accessToken = await getToken();
-      const timer = setTimeout(() => {
-        if (accessToken) {
-          navigation.replace('chat');
-        } else {
-          navigation.replace('welcome');
-        }
-      }, 2500);
-
-      return () => clearTimeout(timer);
+      const payload = { 
+        method: "GET",
+        url: "/settings/profile",
+        name: "getAllProfileInfos",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
     };
-
     checkAuthAndNavigate();
-  }, [navigation]);
+  }, []);
+
+  const { settingsStates } = useSelector((state) => state.API);
+
+  useEffect(()=>{
+    if(settingsStates.allPersonalisationsSettings.isPersonalInfosFetched == true){
+      navigation.navigate("chat");
+    }
+  },[settingsStates.allPersonalisationsSettings.isPersonalInfosFetched])
 
   return (
     <View style={styles.container}>
-      <ImageBackground resizeMode='contain' style={styles.bigLogo} imageStyle={{opacity:0.2}} source={chakraLogoSplash}> 
+      <ImageBackground
+        resizeMode="contain"
+        style={styles.bigLogo}
+        imageStyle={{ opacity: 0.2 }}
+        source={chakraLogoSplash}
+      >
         <Image source={elunaraLogoSplash} style={styles.elunaraLogoSplash} />
-      <StatusBar backgroundColor="#081A35" barStyle='light-content' />
+        <StatusBar backgroundColor="#081A35" barStyle="light-content" />
       </ImageBackground>
     </View>
   );
@@ -37,31 +58,30 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#081A35',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#081A35",
   },
   logo: {
     fontSize: scaleFont(48),
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 8,
   },
-  elunaraLogoSplash:{
-    height:100,
-    width:300,
-    opacity:1
+  elunaraLogoSplash: {
+    height: 100,
+    width: 300,
+    opacity: 1,
   },
-  bigLogo:{
+  bigLogo: {
     flex: 1,
-    width:"100%",
-    justifyContent: 'center',
-    alignItems: 'center',
-
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   tagline: {
     fontSize: scaleFont(16),
-    color: '#E1BEE7',
+    color: "#E1BEE7",
     marginBottom: 40,
   },
   loader: {

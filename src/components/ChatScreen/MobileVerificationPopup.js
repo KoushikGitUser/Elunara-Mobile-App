@@ -45,7 +45,7 @@ const MobileVerificationPopup = ({
   const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [isCodeSent, setIsCodeSent] = useState(true);
+  const [isCodeSent, setIsCodeSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -21,16 +21,77 @@ import {
   triggerToast,
   triggerToastWithAction,
 } from "../../../../services/toast";
+import {
+  resetChatDeleted,
+  resetChatDeleteUndone,
+  resetBulkOperationCompleted,
+} from "../../../../redux/slices/apiCommonSlice";
+import Toaster from "../../../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
 
-const DeleteConfirmPopup = () => {
+const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { roomsStates } = useSelector((state) => state.API);
+  const { roomsStates, chatsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
+
+  const isSingleDelete = from === "chat";
+  const isBulkDelete = from === "allChats";
+  const chatCount = selectedChatIds.length;
+
+  const isLoading = isBulkDelete
+    ? chatsStates.loaderStates.isBulkOperationCompleted === "pending"
+    : chatsStates.loaderStates.isChatDeleted === "pending";
+
+  // Handle delete success case
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatDeleted === true) {
+      dispatch(setToggleDeleteChatConfirmPopup(false));
+
+      const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+      // Show toast with undo action
+      setTimeout(() => {
+        triggerToastWithAction(
+          "Chat Deleted",
+          "Your chat has been successfully deleted",
+          "success",
+          5000,
+          "Undo",
+          () => {
+            // Undo delete action
+            if (chatId) {
+              const payload = {
+                method: "POST",
+                url: `/chats/${chatId}/undo-delete`,
+                name: "undoDeleteChat",
+              };
+              dispatch(commonFunctionForAPICalls(payload));
+            }
+          },
+        );
+      }, 500);
+
+      dispatch(resetChatDeleted());
+    }
+  }, [chatsStates.loaderStates.isChatDeleted]);
+
+  // Handle bulk delete success case
+  useEffect(() => {
+    if (chatsStates.loaderStates.isBulkOperationCompleted === true) {
+      dispatch(setToggleDeleteChatConfirmPopup(false));
+    }
+  }, [chatsStates.loaderStates.isBulkOperationCompleted]);
+
+  // Handle undo delete success case
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatDeleteUndone === true) {
+      dispatch(resetChatDeleteUndone());
+    }
+  }, [chatsStates.loaderStates.isChatDeleteUndone]);
 
   return (
     <Modal
@@ -39,6 +100,7 @@ const DeleteConfirmPopup = () => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleDeleteChatConfirmPopup(false))}
     >
+      <Toaster />
       <View style={styles.container}>
         {/* Blur Background */}
 
@@ -75,16 +137,21 @@ const DeleteConfirmPopup = () => {
               {globalDataStates.deleteConfirmPopupFrom == "chat"
                 ? "Delete Chat?"
                 : globalDataStates.deleteConfirmPopupFrom == "allChats"
-                  ? "Delete <10> chats?"
+                  ? `Delete ${chatCount} chat${chatCount > 1 ? "s" : ""}?`
                   : globalDataStates.deleteConfirmPopupFrom == "rooms"
                     ? "Delete room?"
                     : "Delete <10> rooms?"}
             </Text>
 
             {/* Description */}
-            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
-              Deleting this chat removes it permanently. It cannot be recovered.
-            </Text>
+            {isBulkDelete && (
+              <Text
+                style={[styles.description, { fontFamily: "Mukta-Regular" }]}
+              >
+                Confirm chat deletion{"\n"}Once deleted, this chat can't be
+                recovered.
+              </Text>
+            )}
 
             {/* Button */}
             <View style={styles.btnsMain}>
@@ -148,26 +215,52 @@ const DeleteConfirmPopup = () => {
                         undoCallback,
                       );
                     }
+                  } else if (isBulkDelete) {
+                    // Bulk delete operation
+                    if (!selectedChatIds || selectedChatIds.length === 0) {
+                      triggerToast("Error", "No chats selected", "error", 3000);
+                      return;
+                    }
+
+                    const payload = {
+                      method: "POST",
+                      url: "/chats/bulk",
+                      data: {
+                        action: "delete",
+                        chat_ids: selectedChatIds,
+                      },
+                      name: "bulkOperationsForChats",
+                    };
+
+                    dispatch(commonFunctionForAPICalls(payload));
                   } else {
-                    // Existing logic for other types (chats, etc.)
-                    setTimeout(() => {
-                      triggerToast(
-                        "Chat Deleted",
-                        "Your chat has been successfully deleted",
-                        "success",
-                        3000,
-                      );
-                    }, 500);
+                    // Single delete operation
+                    const chatId =
+                      chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+                    if (!chatId) {
+                      triggerToast("Error", "Chat ID not found", "error", 3000);
+                      return;
+                    }
+
+                    const payload = {
+                      method: "DELETE",
+                      url: `/chats/${chatId}`,
+                      name: "deleteChat",
+                    };
+
+                    dispatch(commonFunctionForAPICalls(payload));
                   }
 
                   dispatch(setToggleDeleteChatConfirmPopup(false));
                 }}
                 activeOpacity={0.8}
+                disabled={isLoading}
               >
                 <Text
                   style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
                 >
-                  Done
+                  {isLoading ? "Deleting..." : "Done"}
                 </Text>
               </TouchableOpacity>
             </View>

@@ -109,6 +109,7 @@ const AccountNotRecoveredPopup = ({ close, toggleAccNotRecovered }) => {
     if (!isCodeSent) {
       const formData = new FormData();
       formData.append("email", globalDataStates.userMailIDOnSignup);
+      formData.append("platform","android");
       dispatch(recoverAccount(formData));
     } else {
       const formData = new FormData();

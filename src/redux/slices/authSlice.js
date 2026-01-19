@@ -8,6 +8,7 @@ import {
   getToken,
 } from "../../utils/Secure/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { resetAllStates } from "../actions/resetActions";
 import { allInitialStates } from "../allInitialStates";
 
 export const userSignUp = createAsyncThunk(
@@ -921,6 +922,12 @@ const authSlice = createSlice({
             3000
           );
         }
+      })
+      // Handle reset all states - for auth we keep the logout state
+      .addCase(resetAllStates, (state) => {
+        // Import initial states
+        const { allInitialStates: initialStates } = require('../allInitialStates');
+        return initialStates;
       });
   },
 });

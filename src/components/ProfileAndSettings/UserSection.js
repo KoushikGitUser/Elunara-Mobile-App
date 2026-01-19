@@ -20,7 +20,7 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 const UserSection = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [isMobileVerified, setIsMobileVerified] = useState(true);
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(userImg);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
@@ -64,16 +64,37 @@ const UserSection = () => {
             setProfileImage(femaleStudentAvatar);
             break;
           default:
-            setProfileImage(null);
+            setProfileImage(userImg);
         }
       } else {
         // Both are null, use default local asset
-        setProfileImage(null);
+        setProfileImage(userImg);
       }
     }
   }, [settingsStates?.allProfileInfos]);
 
   const navigation = useNavigation();
+
+  const formatEmail = (email, maxLength = 20) => {
+    if (!email) return "";
+
+    if (email.length <= maxLength) return email;
+
+    const [name, domain] = email.split("@");
+    if (!domain) return email.substring(0, maxLength - 3) + "...";
+
+    const dots = "...";
+    const allowedNameLength =
+      maxLength - domain.length - dots.length - 1;
+
+    if (allowedNameLength <= 0) {
+      return email.substring(0, maxLength - 3) + dots;
+    }
+
+    return `${name.substring(0, allowedNameLength)}${dots}@${domain}`;
+  };
+
+
   
   return (
     <View style={styles.upgradeBtn}>
@@ -111,8 +132,12 @@ const UserSection = () => {
               marginTop: 3,
               fontFamily: "Mukta-Regular",
             }}
+            numberOfLines={1}
+            ellipsizeMode="middle"
           >
-            {settingsStates?.allProfileInfos?.email || ""}
+           {formatEmail(settingsStates?.allProfileInfos?.email || "")}
+            {/* {formatEmail(item?.name)} */}
+            {/* {"vmjvbhbvhfbfdhgbhfbdshfbdhsfbdhbghgbghfb"} */}
           </Text>
           {/* <Text style={{ fontSize: scaleFont(14), fontWeight: 400,color:"#757575",marginTop:3}}>
             +91 9807649876
@@ -122,7 +147,7 @@ const UserSection = () => {
           onPress={() => {
             dispatch(setSettingsInnerPageHeaderTitle("Profile Information"));
             dispatch(setSettingsInnerPageComponentToRender("Edit Profile"));
-            navigation.navigate("settingsInnerPages", { page: 11 });
+            navigation.navigate("settingsInnerPages", { page: 10 });
           }}
           style={{ marginLeft: "auto", alignSelf: "flex-end" }}
         >

@@ -13,29 +13,59 @@ import { moderateScale, scaleFont, verticalScale } from "../../../../../utils/re
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import DropDowns from "../../../ChatInputCompos/ToolsPopupStates/DropDowns";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import { setToggleChangeResponseLLMWhileChatPopup } from "../../../../../redux/slices/toggleSlice";
 const screenHeight = Dimensions.get("window").height;
 
 
 const SettingLLMState = ({setCurrentStateOfPopup}) => {
   const [selectedCountsArray, setSelectedCountsArray] = useState([]);
+  const [selectedLLM1, setSelectedLLM1] = useState(null);
+  const [selectedLLM2, setSelectedLLM2] = useState(null);
+  const [selectedLLM3, setSelectedLLM3] = useState(null);
   const dispatch = useDispatch();
+  const { settingsStates } = useSelector((state) => state.API);
+
+  // Handler to save LLM preferences
+  const handleSaveLLMPreferences = () => {
+    const updateData = {};
+
+    if (selectedLLM1) {
+      updateData.preferred_llm_1_id = selectedLLM1;
+    }
+    if (selectedLLM2) {
+      updateData.preferred_llm_2_id = selectedLLM2;
+    }
+    if (selectedLLM3) {
+      updateData.preferred_llm_3_id = selectedLLM3;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      const payload = {
+        method: "PUT",
+        url: "/settings/general",
+        data: updateData,
+        name: "updateGeneralSettings",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+
+    // Move to next state
+    setCurrentStateOfPopup(2);
+  };
 
   return (
     <View style={styles.modalSheet}>
       <View style={styles.content}>
         <View style={styles.closeModalMain}>
-          <ArrowLeft
-            onPress={() => dispatch(setToggleToolsPopupStates(0))}
-            size={30}
-            strokeWidth={2}
-          />
           <AntDesign
-            onPress={() => dispatch(setToggleToolsPopup(false))}
+            onPress={() => dispatch(setToggleChangeResponseLLMWhileChatPopup(false))}
             name="close"
             size={24}
             color="black"
+            style={{marginLeft: "auto"}}
           />
         </View>
         {/* Title */}
@@ -86,9 +116,10 @@ const SettingLLMState = ({setCurrentStateOfPopup}) => {
             LLM 1
           </Text>
           <DropDowns
+            initialSetValue={settingsStates.allGeneralSettings.preferredLLMs?.preferred_llm_1}
+            triggerAPICall={setSelectedLLM1}
             selectedCounts={selectedCountsArray}
             setSelectedCounts={setSelectedCountsArray}
-            selectOptionsArray={LLMOptionsAvailable}
           />
           <Text
             style={{
@@ -101,9 +132,10 @@ const SettingLLMState = ({setCurrentStateOfPopup}) => {
             LLM 2
           </Text>
           <DropDowns
+            initialSetValue={settingsStates.allGeneralSettings.preferredLLMs?.preferred_llm_2}
+            triggerAPICall={setSelectedLLM2}
             selectedCounts={selectedCountsArray}
             setSelectedCounts={setSelectedCountsArray}
-            selectOptionsArray={LLMOptionsAvailable}
           />
           <Text
             style={{
@@ -116,9 +148,10 @@ const SettingLLMState = ({setCurrentStateOfPopup}) => {
             LLM 3
           </Text>
           <DropDowns
+            initialSetValue={settingsStates.allGeneralSettings.preferredLLMs?.preferred_llm_3}
+            triggerAPICall={setSelectedLLM3}
             selectedCounts={selectedCountsArray}
             setSelectedCounts={setSelectedCountsArray}
-            selectOptionsArray={LLMOptionsAvailable}
           />
 
           {/* Button */}
@@ -130,8 +163,9 @@ const SettingLLMState = ({setCurrentStateOfPopup}) => {
                   selectedCountsArray?.length >= 3 ? "#081A35" : "#CDD5DC",
               },
             ]}
-            onPress={() => setCurrentStateOfPopup(2)}
+            onPress={handleSaveLLMPreferences}
             activeOpacity={0.8}
+            disabled={selectedCountsArray?.length < 3}
           >
             <Text style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}>
               Save LLM Preferences

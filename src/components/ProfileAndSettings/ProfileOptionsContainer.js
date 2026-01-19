@@ -42,10 +42,8 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
           <React.Fragment key={optionIndex}>
             <TouchableOpacity
               onPress={() => {
-                if (optionIndex == 9) {
+                if (optionIndex == 8) {
                   setToggleLogOutConfirmPopup(true);
-                } else if (optionIndex == 2) {
-                  dispatch(setToggleUnlockAnalyticsDashboardPopup(true));
                 } else {
                   navigation.navigate("settingsInnerPages", {
                     page: optionIndex,

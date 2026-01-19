@@ -23,7 +23,31 @@ import {
   handleGetAnalyticsDashboard,
   handleGetAnalyticsTopics,
   handleGetAnalyticsSubjects,
+  handleFetchResponseStylesAvailable,
+  handleFetchCitationFormatsAvailable,
 } from "./apiExtraReducerHandlers/settingsHandlers";
+
+import {
+  handleCreateChatWithAI,
+  handleGetAllDetailsOfChatByID,
+  handleGetAllRecentChats,
+  handleGetAllSubjectsForChat,
+  handleGetAllTopicsOfSelectedSubjects,
+  handleRenameAndUpdateChatTitle,
+  handlePinOrUnpinChat,
+  handleArchiveOrUnarchiveChat,
+  handleDeleteChat,
+  handleUndoDeleteChat,
+  handleFetchAllUserChatsAvailable,
+  handleBulkOperationsForChats,
+  handleFetchAllUserRoomsAvailable,
+  handlePostAddToNotes,
+  handlePostRemoveFromNotes,
+  handleSendPromptAndGetMessageFromAI,
+  handleUpdateUserMessageForRegeneration,
+  handleRegenerateAIResponse,
+  handleGetAllMessagesOfParticularChat,
+} from "./apiExtraReducerHandlers/chatsHandlers";
 
 import {
   handleGetRooms,
@@ -80,6 +104,8 @@ export const settingsHandlersFunctions = {
   getAllUniversitiesAvailable: handleGetAllUniversitiesAvailable,
   getAllDegreeProgramsAvailable: handleGetAllDegreeProgramsAvailable,
   getAllSpecializationsAvailable: handleGetAllSpecializationsAvailable,
+  fetchResponseStylesAvailable: handleFetchResponseStylesAvailable,
+  fetchCitationFormatsAvailable: handleFetchCitationFormatsAvailable,
 
   // update or change settings
   updateGeneralSettings: handleUpdateGeneralSettings,
@@ -105,6 +131,35 @@ export const settingsHandlersFunctions = {
   getAnalyticsSubjects: handleGetAnalyticsSubjects,
 };
 
+export const chatsHandlersFunctions = {
+  getAllRecentChats: handleGetAllRecentChats,
+  getAllDetailsOfChatByID: handleGetAllDetailsOfChatByID,
+  //get master datas
+  getAllSubjectsForChat: handleGetAllSubjectsForChat,
+  getAllTopicsOfSelectedSubjects: handleGetAllTopicsOfSelectedSubjects,
+
+  createChatWithAI: handleCreateChatWithAI,
+  sendPromptAndGetMessageFromAI: handleSendPromptAndGetMessageFromAI,
+  getAllMessagesOfParticularChat: handleGetAllMessagesOfParticularChat,
+  //Chat Notes
+  postAddToNotes: handlePostAddToNotes,
+  postRemoveFromNotes: handlePostRemoveFromNotes,
+  renameAndUpdateChatTitle: handleRenameAndUpdateChatTitle,
+  pinOrUnpinChat: handlePinOrUnpinChat,
+  archiveOrUnarchiveChat: handleArchiveOrUnarchiveChat,
+  deleteChat: handleDeleteChat,
+  undoDeleteChat: handleUndoDeleteChat,
+  fetchAllUserChatsAvailable: handleFetchAllUserChatsAvailable,
+  bulkOperationsForChats: handleBulkOperationsForChats,
+  fetchAllUserRoomsAvailable: handleFetchAllUserRoomsAvailable,
+  //Message editing and regeneration
+  updateUserMessageForRegeneration: handleUpdateUserMessageForRegeneration,
+  regenerateAIResponse: handleRegenerateAIResponse,
+  //  Room operations
+  addToRoom: handleAddToRoom,
+  removeFromRoom: handleRemoveFromRoom,
+};
+
 // Rooms Handlers
 export const roomsHandlersFunctions = {
   "get-rooms": handleGetRooms,
@@ -127,12 +182,6 @@ export const notesHandlersFunctions = {
   "get-notes": handleGetNotes,
   "update-notes": handleUpdateNotes,
   "delete-notes": handleDeleteNotes,
-};
-
-// Chats Handlers
-export const chatsHandlersFunctions = {
-  "add-to-room": handleAddToRoom,
-  "remove-from-room": handleRemoveFromRoom,
 };
 
 // Attachments Handlers

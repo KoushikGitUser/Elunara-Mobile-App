@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { allInitialStates } from '../allInitialStates';
+import { resetAllStates } from '../actions/resetActions';
 
 
 const toggleSlice = createSlice({
@@ -39,6 +40,15 @@ const toggleSlice = createSlice({
     setToggleDeleteChatConfirmPopup: (state, action) => {
       state.toggleStates.toggleDeleteChatConfirmPopup = action.payload;
     },
+    setToggleArchiveChatConfirmPopup: (state, action) => {
+      state.toggleStates.toggleArchiveChatConfirmPopup = action.payload;
+    },
+    setToggleDeleteChatPopup: (state, action) => {
+      state.toggleStates.toggleDeleteChatPopup = action.payload;
+    },
+    setToggleArchiveChatPopup: (state, action) => {
+      state.toggleStates.toggleArchiveChatPopup = action.payload;
+    },
     setToggleRenameChatPopup: (state, action) => {
       state.toggleStates.toggleRenameChatPopup = action.payload;
     },
@@ -50,6 +60,9 @@ const toggleSlice = createSlice({
     },
     setToggleAllChatsOptionsPopup: (state, action) => {
       state.toggleStates.toggleAllChatsOptionsPopup = action.payload;
+    },
+    setToggleAllRoomsOptionsPopup: (state, action) => {
+      state.toggleStates.toggleAllRoomsOptionsPopup = action.payload;
     },
     setToggleUnlockPremiumPopup: (state, action) => {
       state.toggleStates.toggleUnlockPremiumPopup = action.payload;
@@ -126,6 +139,27 @@ const toggleSlice = createSlice({
     setToggleUpdateProfilePicPopup: (state, action) => {
       state.toggleStates.toggleUpdateProfilePicPopup = action.payload;
     },
+    setIsEditingUserMessage: (state, action) => {
+      state.toggleStates.isEditingUserMessage = action.payload;
+    },
+    // Chat Customisation Actions
+    setSelectedLLM: (state, action) => {
+      state.chatCustomisationStates.selectedLLM = action.payload;
+    },
+    setSelectedResponseStyle: (state, action) => {
+      state.chatCustomisationStates.selectedResponseStyle = action.payload;
+    },
+    setSelectedLanguage: (state, action) => {
+      state.chatCustomisationStates.selectedLanguage = action.payload;
+    },
+    setSelectedCitationFormat: (state, action) => {
+      state.chatCustomisationStates.selectedCitationFormat = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetAllStates, () => {
+      return allInitialStates;
+    });
   },
 });
 
@@ -141,10 +175,14 @@ export const {
   setToggleIsWaitingForResponse,
   setToggleSubTopics,
   setToggleDeleteChatConfirmPopup,
+  setToggleArchiveChatConfirmPopup,
+  setToggleDeleteChatPopup,
+  setToggleArchiveChatPopup,
   setToggleRenameChatPopup,
   setToggleUserMessageActionPopup,
   setToggleChatActionsPopupOnLongPress,
   setToggleAllChatsOptionsPopup,
+  setToggleAllRoomsOptionsPopup,
   setToggleUnlockPremiumPopup,
   setToggleResetSettingsPopup,
   setToggleIsPaidOrProUser,
@@ -169,7 +207,12 @@ export const {
   setToggleAddExistingChatToRoomPopup,
   setToggleAddChatToLearningLabPopup,
   setToggleAddLinkPopup,
-  setToggleUpdateProfilePicPopup
+  setToggleUpdateProfilePicPopup,
+  setIsEditingUserMessage,
+  setSelectedLLM,
+  setSelectedResponseStyle,
+  setSelectedLanguage,
+  setSelectedCitationFormat
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

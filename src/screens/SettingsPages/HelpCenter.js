@@ -73,7 +73,7 @@ const HelpCenter = ({ handleScroll }) => {
           />
           <TextInput
             onFocus={() => {
-              navigation.navigate("settingsInnerPages", { page: 10 });
+              navigation.navigate("settingsInnerPages", { page: 9 });
               dispatch(setSettingsInnerPageHeaderTitle("Search"));
             }}
             placeholder="Search"
@@ -163,7 +163,7 @@ const HelpCenter = ({ handleScroll }) => {
                       )}
                     </View>
                   </TouchableOpacity>
-                  {index == 9 && moreAccordions && (
+                  {index === faqData.length - 1 && moreAccordions && (
                     <View style={styles.moreIcon}>
                       <ChevronUp
                         onPress={() => setMoreAccordions(false)}
@@ -223,7 +223,7 @@ const HelpCenter = ({ handleScroll }) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigation.navigate("settingsInnerPages", { page: 9 });
+              navigation.navigate("settingsInnerPages", { page: 8 });
               dispatch(setSettingsInnerPageHeaderTitle("Contact Us"));
             }}
             activeOpacity={0.7}

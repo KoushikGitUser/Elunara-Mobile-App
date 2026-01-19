@@ -15,7 +15,7 @@ export const handleAddToRoom = {
       "Error",
       action?.payload?.message || "Failed to add chat to room",
       "error",
-      3000
+      3000,
     );
   },
 };
@@ -35,7 +35,459 @@ export const handleRemoveFromRoom = {
       "Error",
       action?.payload?.message || "Failed to remove chat from room",
       "error",
-      3000
+      3000,
     );
+  },
+};
+
+export const handleGetAllRecentChats = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAllRecentChatsFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.allRecentChats = action?.payload.data.data;
+    state.chatsStates.loaderStates.isAllRecentChatsFetched = true;
+    console.log(action?.payload.data.data, "chats");
+  },
+  rejected: (state, { payload }) => {
+    state.chatsStates.loaderStates.isAllRecentChatsFetched = false;
+  },
+};
+
+export const handleGetAllDetailsOfChatByID = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.currentActionChatDetails =
+      action?.payload.data.data;
+    console.log(action?.payload.data.data, "data");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+  },
+};
+
+export const handleGetAllSubjectsForChat = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.allSubjectsAvailable =
+      action?.payload.data.data;
+  },
+  rejected: (state, { payload }) => {},
+};
+
+export const handleGetAllTopicsOfSelectedSubjects = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched =
+      "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.allTopicsOfSelectedSubjects =
+      action?.payload.data.data;
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = true;
+    console.log(action?.payload.data.data, "data");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = false;
+  },
+};
+
+export const handleCreateChatWithAI = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatCreatedWithAI = "pending";
+  },
+  fulfilled: (state, action) => {
+    console.log(
+      "createChatWithAI - REQUEST PAYLOAD:",
+      JSON.stringify(action?.meta?.arg, null, 2),
+    );
+    console.log(
+      "createChatWithAI - FULL RESPONSE:",
+      JSON.stringify(action?.payload, null, 2),
+    );
+    state.chatsStates.allChatsDatas.createdChatDetails =
+      action?.payload.data.data;
+    console.log(action?.payload.data.data, "data");
+    state.chatsStates.loaderStates.isChatCreatedWithAI = true;
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatCreatedWithAI = false;
+  },
+};
+
+export const handleRenameAndUpdateChatTitle = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatTitleUpdated = "pending";
+  },
+  fulfilled: (state, action) => {
+    console.log("renameddddd", action?.payload.data);
+    state.chatsStates.loaderStates.isChatTitleUpdated = true;
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatTitleUpdated = false;
+  },
+};
+
+export const handlePinOrUnpinChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatPinUnpinUpdated = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isChatPinUnpinUpdated = true;
+    console.log(action?.payload.data);
+
+    // Show toast based on action with delay to ensure popup is closed
+    const isPinned = action?.meta?.arg?.url?.includes("/pin");
+    setTimeout(() => {
+      triggerToast(
+        isPinned ? "Chat Pinned" : "Chat Unpinned",
+        isPinned
+          ? "Your chat has been successfully pinned"
+          : "Your chat has been successfully unpinned",
+        "success",
+        3000,
+      );
+    }, 500);
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatPinUnpinUpdated = false;
+  },
+};
+
+export const handleArchiveOrUnarchiveChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = true;
+    console.log(action?.payload.data);
+    // Show toast based on action with delay to ensure popup is closed
+    const isArchived = action?.meta?.arg?.url?.includes("/archive");
+    setTimeout(() => {
+      triggerToast(
+        isArchived ? "Chat Archived" : "Chat Unarchived",
+        isArchived
+          ? "Your chat has been successfully archived"
+          : "Your chat has been successfully unarchived",
+        "success",
+        3000,
+      );
+    }, 500);
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = false;
+  },
+};
+
+export const handleDeleteChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatDeleted = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isChatDeleted = true;
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatDeleted = false;
+  },
+};
+
+export const handleUndoDeleteChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isChatDeleteUndone = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isChatDeleteUndone = true;
+
+    // Show toast with delay
+    setTimeout(() => {
+      triggerToast(
+        "Undo Successful",
+        "Your chat has been restored",
+        "success",
+        3000,
+      );
+    }, 500);
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isChatDeleteUndone = false;
+  },
+};
+
+export const handleFetchAllUserChatsAvailable = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAllUserChatsFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.allUserChatsAvailable =
+      action?.payload.data.data;
+    state.chatsStates.loaderStates.isAllUserChatsFetched = true;
+    console.log(action?.payload.data.data, "all user chats");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isAllUserChatsFetched = false;
+  },
+};
+
+export const handleBulkOperationsForChats = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isBulkOperationCompleted = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isBulkOperationCompleted = true;
+    console.log(action?.payload.data);
+
+    // Store action info for later use in toast
+    const actionType = action?.meta?.arg?.data?.action;
+    const count =
+      action?.meta?.arg?.data?.chat_ids?.length ||
+      action?.meta?.arg?.data?.chat_uuids?.length ||
+      0;
+
+    state.chatsStates.allChatsDatas.lastBulkOperationInfo = {
+      action: actionType,
+      count: count,
+    };
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isBulkOperationCompleted = false;
+  },
+};
+
+export const handleFetchAllUserRoomsAvailable = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAllUserRoomsFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.allUserRoomsAvailable =
+      action?.payload.data.data;
+    state.chatsStates.loaderStates.isAllUserRoomsFetched = true;
+    console.log(action?.payload.data.data, "all user chats");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isAllUserRoomsFetched = false;
+  },
+};
+
+export const handleSendPromptAndGetMessageFromAI = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isMessagesFetched = "pending";
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+    // Reset isChatCreatedWithAI after using it to trigger send-message
+    state.chatsStates.loaderStates.isChatCreatedWithAI = null;
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    state.chatsStates.allChatsDatas.chatMessages = responseData;
+
+    // Store AI message content separately
+    state.chatsStates.allChatsDatas.aiMessageContent =
+      responseData?.assistant_message?.content || null;
+
+    // Store message IDs in the messageIDsArray
+    const userMessageId = responseData?.user_message?.id;
+    const aiMessageId = responseData?.assistant_message?.id;
+
+    // Get current messageIDsArray from globalDataStates
+    const currentMessageIds = state.globalDataStates?.messageIDsArray;
+    // Add both user and AI message IDs
+    state.globalDataStates.messageIDsArray = [
+      ...currentMessageIds,
+      userMessageId,
+      aiMessageId,
+    ];
+
+    state.chatsStates.loaderStates.isMessagesFetched = true;
+  },
+  rejected: (state, { payload }) => {
+    state.chatsStates.loaderStates.isMessagesFetched = false;
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+  },
+};
+
+export const handlePostAddToNotes = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAddToNotesPending = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.addToNotes = action?.payload.data.data;
+    state.chatsStates.loaderStates.isAddToNotesPending = true;
+  },
+  rejected: (state, { payload }) => {
+    state.chatsStates.loaderStates.isAddToNotesPending = false;
+  },
+};
+
+export const handlePostRemoveFromNotes = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isRemoveFromNotesPending = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.allChatsDatas.addToNotes = {};
+    state.chatsStates.loaderStates.isRemoveFromNotesPending = true;
+  },
+  rejected: (state, { payload }) => {
+    state.chatsStates.loaderStates.isRemoveFromNotesPending = false;
+  },
+};
+
+export const handleUpdateUserMessageForRegeneration = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isUserMessageUpdated = "pending";
+  },
+  fulfilled: (state, action) => {
+    state.chatsStates.loaderStates.isUserMessageUpdated = true;
+    console.log("User message updated:", action?.payload.data);
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload.message);
+    state.chatsStates.loaderStates.isUserMessageUpdated = false;
+  },
+};
+
+export const handleRegenerateAIResponse = {
+  pending: (state) => {
+    console.log("pending regenbrate");
+    state.chatsStates.loaderStates.isAIResponseRegenerated = "pending";
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.toggleStates.toggleIsWaitingForResponse = true;
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    state.chatsStates.allChatsDatas.regeneratedResponse = responseData;
+
+    // Store AI message content separately (flat structure)
+    state.chatsStates.allChatsDatas.aiMessageContent =
+      responseData?.content || null;
+
+    // Store message ID in the messageIDsArray (flat structure)
+    const aiMessageId = responseData?.id;
+
+    if (aiMessageId) {
+      // Get current messageIDsArray from globalDataStates
+      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      // Add AI message ID
+      state.globalDataStates.messageIDsArray = [
+        ...currentMessageIds,
+        aiMessageId,
+      ];
+    }
+    state.chatsStates.loaderStates.isAIResponseRegenerated = true;
+    state.toggleStates.toggleIsWaitingForResponse = false;
+    console.log("AI response regenerated:", JSON.stringify(responseData));
+  },
+  rejected: (state, { payload }) => {
+    console.log("yfyuyfu");
+
+    console.log(payload, "yfyuyfu");
+    state.chatsStates.loaderStates.isAIResponseRegenerated = false;
+    state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.toggleStates.toggleIsWaitingForResponse = false;
+  },
+};
+
+export const handleGetAllMessagesOfParticularChat = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    const messages = responseData?.messages || [];
+
+    // Transform messages to chatMessagesArray format
+    const chatMessagesArray = messages.map((msg) => ({
+      role: msg.role === "assistant" ? "ai" : msg.role,
+      message: msg.content,
+      uuid: msg.uuid,
+      is_saved_to_notes: false, // Default value, can be updated if available in response
+      version: msg.version || 1,
+      total_versions: msg.total_versions || 1,
+      versions: [
+        {
+          content: msg.content,
+          uuid: msg.uuid,
+          version: msg.version || 1,
+          total_versions: msg.total_versions || 1,
+        },
+      ],
+      currentVersionIndex: 0,
+    }));
+
+    // Store in globalDataStates
+    state.globalDataStates.chatMessagesArray = chatMessagesArray;
+
+    // Extract and store message IDs in messageIDsArray
+    const messageIDsArray = [];
+    for (let i = 0; i < messages.length; i += 2) {
+      // Assuming messages come in pairs: user, assistant, user, assistant...
+      const userMsg = messages[i];
+      const aiMsg = messages[i + 1];
+
+      if (userMsg && userMsg.uuid) {
+        messageIDsArray.push(userMsg.uuid);
+      }
+      if (aiMsg && aiMsg.uuid) {
+        messageIDsArray.push(aiMsg.uuid);
+      }
+    }
+
+    state.globalDataStates.messageIDsArray = messageIDsArray;
+
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = true;
+    console.log("All messages fetched:", chatMessagesArray);
+    console.log("Message IDs array:", messageIDsArray);
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to fetch messages");
+    state.chatsStates.loaderStates.isAllMessagesOfChatFetched = false;
+  },
+};
+
+export const handleSwitchVersionsOfAIResponse = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isVersionSwitched = "pending";
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    console.log("Version switched:", JSON.stringify(responseData));
+    state.chatsStates.allChatsDatas.switchedVersionData = responseData;
+
+    // Get the message index from meta (we'll pass it in the payload)
+    const messageIndex = action?.meta?.arg?.messageIndex;
+
+    if (messageIndex !== undefined && messageIndex >= 0) {
+      // Update the message at the index with the new version data
+      const updatedChatMessagesArray =
+        state.globalDataStates.chatMessagesArray.map((msg, index) => {
+          if (index === messageIndex) {
+            return {
+              ...msg,
+              message: responseData?.content || msg.message,
+              uuid: responseData?.id || msg.uuid,
+              version: responseData?.version || msg.version,
+              total_versions:
+                responseData?.total_versions || msg.total_versions,
+              is_active_version: responseData?.is_active_version || false,
+            };
+          }
+          return msg;
+        });
+
+      state.globalDataStates.chatMessagesArray = updatedChatMessagesArray;
+    }
+
+    state.chatsStates.loaderStates.isVersionSwitched = true;
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to switch version");
+    state.chatsStates.loaderStates.isVersionSwitched = false;
   },
 };

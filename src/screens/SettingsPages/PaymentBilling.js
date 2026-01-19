@@ -178,7 +178,7 @@ const PaymentBilling = ({handleScroll}) => {
                   </View>
                   <TouchableOpacity
                     onPress={() => {
-                      navigation.navigate("settingsInnerPages", { page: 12 });
+                      navigation.navigate("settingsInnerPages", { page: 11 });
                       dispatch(
                         setSettingsInnerPageHeaderTitle("Payment Method")
                       );

@@ -22,27 +22,28 @@ import ReGenerationLinkPopup from "../../../components/VerifyEmailPage/ReGenerat
 
 const VerifyEmailWhileSignup = ({ route }) => {
   const [isVerified, setIsVerified] = useState("loading");
-  const [generateLinkPopup,setGenerateLinkPopup] = useState(false);
+  const [generateLinkPopup, setGenerateLinkPopup] = useState(false);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
   const { emailToken } = route.params || {};
 
   useEffect(() => {
-    const formData = new FormData();
-    formData.append("token", emailToken);
-    dispatch(verifyEmail(formData));
+    setTimeout(() => {
+      const formData = new FormData();
+      formData.append("token", emailToken);
+      dispatch(verifyEmail(formData));
+    }, 100);
   }, [emailToken]);
 
   useEffect(() => {
     if (authStates.isMailVerified == true) {
       setIsVerified(true);
     }
-    if(authStates.isMailVerified == false){
+    if (authStates.isMailVerified == false) {
       setIsVerified(false);
     }
   }, [authStates.isMailVerified]);
-     
 
   useEffect(() => {
     const backAction = () => {
@@ -58,7 +59,12 @@ const VerifyEmailWhileSignup = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.wrapper}>
-      {generateLinkPopup && <ReGenerationLinkPopup toggleGenerateLinkPopup={generateLinkPopup} close={setGenerateLinkPopup} />}
+      {generateLinkPopup && (
+        <ReGenerationLinkPopup
+          toggleGenerateLinkPopup={generateLinkPopup}
+          close={setGenerateLinkPopup}
+        />
+      )}
       {isVerified == true ? (
         <View style={styles.wrapper}>
           <SuccessCheckMark color={appColors.navyBlueShade} />
@@ -78,14 +84,14 @@ const VerifyEmailWhileSignup = ({ route }) => {
               }}
               activeOpacity={0.7}
             >
-              <Text style={styles.signupLink}> Log In</Text>
+              <Text style={[styles.signupLink,{color:appColors.navyBlueShade}]}> Log In</Text>
               <View style={styles.customUnderline} />
             </TouchableOpacity>
           </View>
         </View>
       ) : isVerified == false ? (
         <View style={styles.wrapper}>
-         <RejectedCrossMark/>
+          <RejectedCrossMark />
           <Text
             style={[
               styles.description,
@@ -96,9 +102,9 @@ const VerifyEmailWhileSignup = ({ route }) => {
           </Text>
           <View style={styles.signupContainer}>
             <TouchableOpacity
-            style={styles.generateBtn}
+              style={styles.generateBtn}
               onPress={() => {
-                setGenerateLinkPopup(true)
+                setGenerateLinkPopup(true);
               }}
               activeOpacity={0.7}
             >
@@ -106,7 +112,7 @@ const VerifyEmailWhileSignup = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-      ):isVerified == "loading"? (
+      ) : isVerified == "loading" ? (
         <View style={styles.wrapper}>
           <Image
             style={{ height: 100, width: 100, objectFit: "contain" }}
@@ -129,7 +135,7 @@ const VerifyEmailWhileSignup = ({ route }) => {
             Almost there! We appreciate your patience.
           </Text>
         </View>
-      ):null}
+      ) : null}
     </SafeAreaView>
   );
 };
@@ -158,11 +164,11 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "Mukta-Regular",
   },
-  generateBtn:{
-   backgroundColor:appColors.navyBlueShade,
-   paddingVertical:10,
-   paddingHorizontal:35,
-   borderRadius:50
+  generateBtn: {
+    backgroundColor: appColors.navyBlueShade,
+    paddingVertical: 10,
+    paddingHorizontal: 35,
+    borderRadius: 50,
   },
   signupLink: {
     fontSize: scaleFont(14),

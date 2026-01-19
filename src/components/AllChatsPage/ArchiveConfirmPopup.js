@@ -1,71 +1,46 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Modal,
   TouchableOpacity,
-  Image,
-  Platform,
   StyleSheet,
-  ActivityIndicator,
+  Modal,
+  Dimensions,
+  Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
+import { Archive } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
-import { useNavigation } from "@react-navigation/native";
-import { triggerToast } from "../../services/toast";
-import { appColors } from "../../themes/appColors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsLogOutToFalse, userLogOut } from "../../redux/slices/authSlice";
-import {
-  removeToken,
-  removeRefreshToken,
-} from "../../utils/Secure/secureStore";
-import { resetAllStates } from "../../redux/actions/resetActions";
+import { setToggleArchiveChatConfirmPopup } from "../../redux/slices/toggleSlice";
+import { triggerToast } from "../../services/toast";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
-const ConfirmLogoutPopup = ({
-  toggleLogOutConfirmPopup,
-  setToggleLogOutConfirmPopup,
-}) => {
-  const navigation = useNavigation();
+const { width } = Dimensions.get("window");
+
+const ArchiveConfirmPopup = ({ selectedChatIds = [] }) => {
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates } = useSelector((state) => state.API);
+
   const dispatch = useDispatch();
-  const { authStates } = useSelector((state) => state.Auth);
 
+  const chatCount = selectedChatIds.length;
+
+  const isLoading = chatsStates.loaderStates.isBulkOperationCompleted === "pending";
+
+  // Handle bulk archive success case
   useEffect(() => {
-    const handleLogout = async () => {
-      if (authStates.isLogOut === true) {
-        // Reset all Redux states
-        dispatch(resetAllStates());
-
-        // Clear tokens
-        await removeToken();
-        await removeRefreshToken();
-
-        // Clear AsyncStorage
-        await AsyncStorage.setItem("authenticUser", "false");
-
-        // Close popup
-        setToggleLogOutConfirmPopup(false);
-
-        // Navigate to welcome screen
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "welcome" }],
-        });
-
-        // Reset logout state
-        dispatch(setIsLogOutToFalse());
-      }
-    };
-    handleLogout();
-  }, [authStates.isLogOut]);
+    if (chatsStates.loaderStates.isBulkOperationCompleted === true) {
+      dispatch(setToggleArchiveChatConfirmPopup(false));
+    }
+  }, [chatsStates.loaderStates.isBulkOperationCompleted]);
 
   return (
     <Modal
-      visible={toggleLogOutConfirmPopup}
+      visible={toggleStates.toggleArchiveChatConfirmPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => setToggleLogOutConfirmPopup(false)}
+      onRequestClose={() => dispatch(setToggleArchiveChatConfirmPopup(false))}
     >
       <View style={styles.container}>
         {/* Blur Background */}
@@ -81,7 +56,7 @@ const ConfirmLogoutPopup = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => setToggleLogOutConfirmPopup(false)}
+          onPress={() => dispatch(setToggleArchiveChatConfirmPopup(false))}
         />
 
         {/* Modal Sheet */}
@@ -93,13 +68,19 @@ const ConfirmLogoutPopup = ({
 
           {/* Content */}
           <View style={styles.content}>
+            {/* Icon */}
+            <View style={styles.iconContainer}>
+              <Archive size={55} color="#081A35" strokeWidth={1.5} />
+            </View>
+
             {/* Title */}
-            <Text style={styles.title}>Confirm Log Out</Text>
+            <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+              Archive {chatCount} chat{chatCount > 1 ? 's' : ''}?
+            </Text>
 
             {/* Description */}
-            <Text style={styles.description}>
-              Are you sure you want to log out? You'll need to sign in again to
-              access your Rooms and chats.
+            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+              Chats will be archived and can be viewed anytime.
             </Text>
 
             {/* Button */}
@@ -113,34 +94,46 @@ const ConfirmLogoutPopup = ({
                     borderColor: "black",
                   },
                 ]}
-                onPress={() => setToggleLogOutConfirmPopup(false)}
+                onPress={() => dispatch(setToggleArchiveChatConfirmPopup(false))}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.buttonText, { color: "black" }]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: "black", fontFamily: "Mukta-Regular" },
+                  ]}
+                >
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor:
-                      authStates.isLogOut == "pending"
-                        ? "#CDD5DC"
-                        : appColors.navyBlueShade,
-                  },
-                ]}
-                disabled={authStates.isLogOut == "pending"}
+                style={[styles.button, { opacity: isLoading ? 0.6 : 1 }]}
                 onPress={() => {
-                  dispatch(userLogOut());
+                  if (!selectedChatIds || selectedChatIds.length === 0) {
+                    triggerToast("Error", "No chats selected", "error", 3000);
+                    return;
+                  }
+
+                  const payload = {
+                    method: "POST",
+                    url: "/chats/bulk",
+                    data: {
+                      action: "archive",
+                      chat_ids: selectedChatIds
+                    },
+                    name: "bulkOperationsForChats"
+                  };
+
+                  dispatch(commonFunctionForAPICalls(payload));
                 }}
                 activeOpacity={0.8}
+                disabled={isLoading}
               >
-                {authStates.isLogOut == "pending" ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.buttonText}>Log Out</Text>
-                )}
+                <Text
+                  style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
+                >
+                  {isLoading ? "Archiving..." : "Archive"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -191,16 +184,22 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 20,
   },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D1D5DB",
+  },
   btnsMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
   },
   content: {
     paddingHorizontal: 24,
@@ -211,14 +210,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: scaleFont(23),
-    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(26),
     color: "#1F2937",
     marginBottom: 16,
+    letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
+    fontSize: scaleFont(13),
     lineHeight: 24,
     color: "#6B7280",
     marginBottom: 32,
@@ -227,7 +225,7 @@ const styles = StyleSheet.create({
   button: {
     width: "48%",
     backgroundColor: "#081A35",
-    paddingVertical: 10,
+    paddingVertical: 13,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
@@ -235,11 +233,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(13),
     fontWeight: "500",
-    fontFamily: "Mukta-Medium",
     letterSpacing: 0.3,
   },
 });
 
-export default ConfirmLogoutPopup;
+export default ArchiveConfirmPopup;

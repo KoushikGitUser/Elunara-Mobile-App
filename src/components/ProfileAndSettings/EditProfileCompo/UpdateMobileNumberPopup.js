@@ -59,7 +59,6 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
     if (authStates.isOTPReceivedForMobileVerification == true) {
       setIsCodeSent(true);
       setResendTimer(20);
-      
     }
     if (authStates.isMobileOTPVerified == true) {
       dispatch(setIsMobileOTPVerified(null));

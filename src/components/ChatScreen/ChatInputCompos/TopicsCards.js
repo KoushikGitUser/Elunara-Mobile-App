@@ -8,15 +8,30 @@ import {
 import { ArrowUpRight, ChevronRight } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { setToggleSubTopics } from "../../../redux/slices/toggleSlice";
-import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
-import { useFonts } from "expo-font";
+import { setCurrentSelectedTopic, setSelectedSubjectID } from "../../../redux/slices/globalDataSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const TopicsCards = ({ item }) => {
-
+  
   const dispatch = useDispatch();
+
+
+  const fetchAllTopicsOfSelectedSubjects = ()=>{
+    const subjectId = parseInt(item?.id, 10);
+
+    const payload = {
+      method:"GET",
+      url:`/master/topics?subject_id=${subjectId}`,
+      name:"getAllTopicsOfSelectedSubjects"
+    }
+    dispatch(commonFunctionForAPICalls(payload));
+  }
+
   return (
     <TouchableOpacity
       onPress={() => {
+        dispatch(setSelectedSubjectID(item?.id)); // New action to set selected subject ID
+        fetchAllTopicsOfSelectedSubjects()
         dispatch(setToggleSubTopics(true));
         dispatch(setCurrentSelectedTopic(item?.title));
       }}

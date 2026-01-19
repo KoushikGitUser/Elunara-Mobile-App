@@ -8,13 +8,22 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import React, { useMemo, useState, useEffect } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   ChevronDown,
   ChevronRight,
   ChevronUp,
   Folder,
   Pin,
+  RefreshCw,
+  RotateCw,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
@@ -33,18 +42,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
-const SidebarMiddle = ({ translateX }) => {
+const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
   const [pinnedChatsOpened, setPinnedChatsOpened] = useState(false);
   const [pinnedRoomsOpened, setPinnedRoomsOpened] = useState(false);
   const [roomsOpened, setRoomsOpened] = useState(false);
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { roomsStates } = useSelector((state) => state.API);
+  const { roomsStates, chatsStates } = useSelector((state) => state.API);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  // Refs for guided tour measurement
+  const pinnedSectionRef = useRef(null);
+  const recentChatsSectionRef = useRef(null);
 
   // Fetch rooms and pinned rooms on mount
   useEffect(() => {
@@ -53,22 +66,71 @@ const SidebarMiddle = ({ translateX }) => {
         method: "GET",
         url: "/rooms",
         name: "get-rooms",
-      })
+      }),
     );
     dispatch(
       commonFunctionForAPICalls({
         method: "GET",
         url: "/rooms?pinned=true",
         name: "get-pinned-rooms",
-      })
+      }),
     );
   }, []);
 
+  const fetchAllRecentChats = () => {
+    const payload = {
+      method: "GET",
+      url: "/chats/recent?limit=10",
+      name: "getAllRecentChats",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const fetchAllPinnedChats = () => {
+    const payload = {
+      method: "GET",
+      url: "/chats",
+      name: "fetchAllUserChatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measurePinnedSection: () => {
+      return new Promise((resolve) => {
+        if (pinnedSectionRef.current) {
+          pinnedSectionRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    measureRecentChatsSection: () => {
+      return new Promise((resolve) => {
+        if (recentChatsSectionRef.current) {
+          recentChatsSectionRef.current.measureInWindow(
+            (x, y, width, height) => {
+              resolve({ x, y, width, height });
+            },
+          );
+        } else {
+          resolve(null);
+        }
+      });
+    },
+  }));
+
   return (
     <ScrollView style={styles.chatHistorySidebarMiddle}>
-      <View style={styles.pinnedSectionMain}>
+      <View ref={pinnedSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
-          onPress={() => setPinnedChatsOpened(!pinnedChatsOpened)}
+          onPress={() => {
+            setPinnedChatsOpened(!pinnedChatsOpened);
+            fetchAllPinnedChats();
+          }}
           style={styles.pinnedBtn}
         >
           <PinIcon />
@@ -79,7 +141,11 @@ const SidebarMiddle = ({ translateX }) => {
               fontFamily: "Mukta-Regular",
             }}
           >
-            Pinned Chats (06)
+            Pinned Chats (
+            {chatsStates.allChatsDatas.allUserChatsAvailable?.filter(
+              (chat) => chat.is_pinned,
+            )?.length || 0}
+            )
           </Text>
           {pinnedChatsOpened ? (
             <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
@@ -89,15 +155,64 @@ const SidebarMiddle = ({ translateX }) => {
         </TouchableOpacity>
         {pinnedChatsOpened && (
           <View style={styles.individualPinnedChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
-                <IndividualPinnedChat
-                  translateX={translateX}
-                  key={chatIndex}
-                  title={chat?.title}
-                />
-              );
-            })}
+            {chatsStates.loaderStates.isAllUserChatsFetched == true ? (
+              chatsStates.allChatsDatas.allUserChatsAvailable?.filter(
+                (chat) => chat.is_pinned,
+              )?.length > 0 ? (
+                chatsStates.allChatsDatas.allUserChatsAvailable
+                  .filter((chat) => chat.is_pinned)
+                  .map((chat, chatIndex) => {
+                    return (
+                      <IndividualPinnedChat
+                        translateX={translateX}
+                        key={chatIndex}
+                        item={chat}
+                      />
+                    );
+                  })
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <Text style={{ color: "#081A35" }}>
+                    No pinned chats{"   "}
+                  </Text>
+                </View>
+              )
+            ) : chatsStates.loaderStates.isAllUserChatsFetched == "pending" ? (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <ActivityIndicator color="#081A35" size="small" />
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <Text style={{ color: "#ff7474ff" }}>
+                  Something went wrong{"   "}
+                </Text>
+                <RotateCw onPress={fetchAllPinnedChats} color="#081A35" />
+              </View>
+            )}
           </View>
         )}
         <TouchableOpacity
@@ -139,9 +254,12 @@ const SidebarMiddle = ({ translateX }) => {
           </View>
         )}
       </View>
-      <View style={styles.pinnedSectionMain}>
+      <View ref={recentChatsSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
-          onPress={() => setRecentChatsOpened(!recentChatsOpened)}
+          onPress={() => {
+            setRecentChatsOpened(!recentChatsOpened);
+            fetchAllRecentChats();
+          }}
           style={[styles.pinnedBtn, { paddingLeft: 0 }]}
         >
           <Text
@@ -161,15 +279,63 @@ const SidebarMiddle = ({ translateX }) => {
         </TouchableOpacity>
         {recentChatsOpened && (
           <View style={styles.individualRecentChatsMain}>
-            {recentChats.map((chat, chatIndex) => {
-              return (
-                <IndividualRecentChat
-                  translateX={translateX}
-                  key={chatIndex}
-                  title={chat?.title}
-                />
-              );
-            })}
+            {chatsStates.loaderStates.isAllRecentChatsFetched == true ? (
+              chatsStates.allChatsDatas.allRecentChats?.length > 0 ? (
+                chatsStates.allChatsDatas.allRecentChats.map(
+                  (chat, chatIndex) => {
+                    return (
+                      <IndividualRecentChat
+                        translateX={translateX}
+                        key={chatIndex}
+                        item={chat}
+                      />
+                    );
+                  },
+                )
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingVertical: 20,
+                  }}
+                >
+                  <Text style={{ color: "#081A35" }}>
+                    No chats to show{"   "}
+                  </Text>
+                </View>
+              )
+            ) : chatsStates.loaderStates.isAllRecentChatsFetched ==
+              "pending" ? (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <ActivityIndicator color="#081A35" size="small" />
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 20,
+                }}
+              >
+                <Text style={{ color: "#ff7474ff" }}>
+                  Something went wrong{"   "}
+                </Text>
+                <RotateCw onPress={fetchAllRecentChats} color="#081A35" />
+              </View>
+            )}
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("allchats");
@@ -269,6 +435,6 @@ const SidebarMiddle = ({ translateX }) => {
       </View>
     </ScrollView>
   );
-};
+});
 
 export default SidebarMiddle;

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import mainLogo from "../../assets/images/Knowledge Chakra 1.png";
 import chakraLogo from "../../assets/images/Knowledge Chakra 2.png";
 import google from "../../assets/images/search.png";
@@ -30,6 +30,8 @@ import {
 } from "../../redux/slices/authSlice";
 import { appColors } from "../../themes/appColors";
 import apiInstance from "../../redux/helper";
+import TermsOfUseModal from "../../components/WelcomeScreen/TermsOfUseModal";
+import PrivacyPolicyModal from "../../components/WelcomeScreen/PrivacyPolicyModal";
 
 const WelcomeScreen = () => {
   // You can pass custom props to override default styles
@@ -40,6 +42,9 @@ const WelcomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { authStates } = useSelector((state) => state.Auth);
+
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -114,19 +119,7 @@ const WelcomeScreen = () => {
               </Text>
             </TouchableOpacity>
 
-            {/* Apple Button */}
-            <TouchableOpacity
-              onPress={() => {
-                Linking.openURL(
-                  "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
-                );
-              }}
-              style={[styles.socialButton, { marginBottom: 0 }]}
-              activeOpacity={0.7}
-            >
-              <Image source={apple} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
-            </TouchableOpacity>
+
 
             {/* Divider */}
             <Text style={styles.divider}>or</Text>
@@ -155,19 +148,14 @@ const WelcomeScreen = () => {
             {/* Footer Links */}
             <View style={styles.footer}>
               <TouchableOpacity
-                onPress={() => navigation.navigate("verify-email")}
+                onPress={() => setShowTermsModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.footerLink}>Terms Of Use</Text>
               </TouchableOpacity>
               <Text style={styles.footerDot}> • </Text>
               <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("auth-using-provider", {
-                    authCode: 8716,
-                    state: "WB",
-                  })
-                }
+                onPress={() => setShowPrivacyModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.footerLink}>Privacy Policy</Text>
@@ -176,6 +164,16 @@ const WelcomeScreen = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modals */}
+      <TermsOfUseModal
+        visible={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
+      <PrivacyPolicyModal
+        visible={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </SafeAreaView>
   );
 };

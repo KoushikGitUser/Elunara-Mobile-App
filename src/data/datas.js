@@ -826,66 +826,140 @@ export const allChatsOptionsPopupData = [
 export const profileAndSettingsOptions = [
   { id: 1, title: "General Settings", icon: <SettingsIcon /> },
   { id: 2, title: "Personalisation", icon: <PersonIcon /> },
-  { id: 3, title: "Analytics Dashboard", icon: <ChartLineIcon /> },
-  { id: 4, title: "Payment & Billings", icon: <MoneyIcon /> },
-  { id: 5, title: "Academic Links", icon: <GradCapIcon /> },
-  { id: 6, title: "About", icon: <InfoIcon /> },
-  { id: 7, title: "Help Center", icon: <HelpIcon /> },
-  { id: 8, title: "Terms of Use", icon: <FilesIcon /> },
-  { id: 9, title: "Privacy Policy", icon: <PrivacyIcon /> },
-  { id: 10, title: "Log Out", icon: <SignOutIcon /> },
+  { id: 3, title: "Payment & Billings", icon: <MoneyIcon /> },
+  { id: 4, title: "Academic Links", icon: <GradCapIcon /> },
+  { id: 5, title: "About", icon: <InfoIcon /> },
+  { id: 6, title: "Help Center", icon: <HelpIcon /> },
+  { id: 7, title: "Terms of Use", icon: <FilesIcon /> },
+  { id: 8, title: "Privacy Policy", icon: <PrivacyIcon /> },
+  { id: 9, title: "Log Out", icon: <SignOutIcon /> },
 ];
 
 export const faqData = [
   {
-    questionTitle: "Is there a free plan available?",
+    questionTitle: "What is Elunara?",
     answer:
-      "Yes, there is a free plan available with basic features and certain limitations. You can start using Elunara at no cost, but some advanced capabilities and higher usage limits are reserved for Pro users.",
+      "Elunara is an AI-powered companion for lifelong learning. It helps you learn, reflect, and grow across subjects and skills using ethical, personalized, and multilingual AI support.",
+  },
+  {
+    questionTitle: "Who is Elunara for?",
+    answer:
+      "Elunara is designed for students, professionals, educators, parents, and lifelong learners of all ages.",
+  },
+  {
+    questionTitle: "Is Elunara a chatbot or a tutor?",
+    answer:
+      "Elunara is more than a chatbot. It is a learning companion that adapts to your goals, learning style, and pace while encouraging understanding, reflection, and academic integrity.",
+  },
+  {
+    questionTitle: "Is Elunara free to use?",
+    answer:
+      "Yes. Elunara offers a free plan with access to core learning features. Paid plans unlock advanced tools, higher usage limits, and premium capabilities.",
   },
   {
     questionTitle: "Can I change my plan later?",
     answer:
-      "Yes, you can upgrade or downgrade your plan at any time. Changes to your plan will be reflected in your next billing cycle.",
+      "Yes. You can upgrade, downgrade, or cancel your plan at any time from your account settings.",
   },
   {
-    questionTitle: "Can I create multiple Rooms in Elunara?",
+    questionTitle: "Will I be charged automatically?",
     answer:
-      "Yes, you can create multiple Rooms in Elunara. Each Room can have its own settings and configurations to help you organize your workspace.",
+      "Paid plans renew automatically unless cancelled before the renewal date. Pricing is always shown clearly before confirmation.",
   },
   {
-    questionTitle: "How do I customize my AI interaction settings?",
+    questionTitle: "What happens if my subscription ends?",
     answer:
-      "You can customize your AI interaction settings by going to the Settings menu and selecting AI Preferences. From there, you can adjust various parameters to suit your needs.",
+      "You will continue to have access to free plan features. Your data and learning history remain safe.",
   },
   {
-    questionTitle: "How do I recover deleted chats or notes?",
+    questionTitle: "What can I learn on Elunara?",
     answer:
-      "Deleted chats and notes can be recovered from the Trash folder within 30 days of deletion. After 30 days, they will be permanently removed.",
+      "You can learn academic subjects, professional skills, languages, and general knowledge. Elunara adapts to your goals and current level.",
   },
   {
-    questionTitle: "How do I change my account email?",
+    questionTitle: "Can Elunara help with exams, assignments, or projects?",
     answer:
-      "To change your account email, go to Account Settings, click on Email, and follow the verification process to update your email address.",
+      "Elunara helps you understand concepts, structure ideas, practice questions, and improve skills. It does not promote cheating or plagiarism.",
   },
   {
-    questionTitle: "Can I create multiple Rooms in Elunara?",
+    questionTitle: "What are Learning Labs?",
     answer:
-      "Yes, you can create multiple Rooms in Elunara. Each Room can have its own settings and configurations to help you organize your workspace.",
+      "Learning Labs help you organize learning by subject, project, or goal. They keep conversations, instructions, and context focused.",
   },
   {
-    questionTitle: "How do I customize my AI interaction settings?",
+    questionTitle: "Can I create multiple Learning Labs?",
     answer:
-      "You can customize your AI interaction settings by going to the Settings menu and selecting AI Preferences. From there, you can adjust various parameters to suit your needs.",
+      "Yes. You can create multiple Learning Labs to organize different subjects or projects.",
   },
   {
-    questionTitle: "How do I recover deleted chats or notes?",
+    questionTitle: "Can I edit or update a Learning Lab?",
     answer:
-      "Deleted chats and notes can be recovered from the Trash folder within 30 days of deletion. After 30 days, they will be permanently removed.",
+      "Yes. Learning Labs are fully editable. You can rename a lab, update instructions, and manage chats at any time.",
   },
   {
-    questionTitle: "How do I change my account email?",
+    questionTitle: "What happens if I remove a Learning Lab?",
     answer:
-      "To change your account email, go to Account Settings, click on Email, and follow the verification process to update your email address.",
+      "Removing a Learning Lab deletes the lab structure. Individual chats may still remain accessible unless explicitly deleted, depending on your settings.",
+  },
+  {
+    questionTitle: "What are AI models in Elunara?",
+    answer:
+      "Elunara integrates multiple AI models, each suited for different tasks such as reasoning, research, analysis, or creativity.",
+  },
+  {
+    questionTitle: "Can I choose which AI model to use?",
+    answer:
+      "Yes. You can select up to three preferred AI models in Settings and switch between them easily.",
+  },
+  {
+    questionTitle: "How do I customize AI responses?",
+    answer:
+      "You can update your profile and Learning Lab instructions to control tone, depth, language, and focus areas.",
+  },
+  {
+    questionTitle: "Which languages are supported?",
+    answer:
+      "Elunara supports over 20 languages, including English, Hindi, Bengali, Arabic, French, German, Spanish, Mandarin, Japanese, Tamil, Telugu, Urdu, and more.",
+  },
+  {
+    questionTitle: "Can I use more than one language?",
+    answer:
+      "Yes. You can select up to three response languages and switch between them seamlessly.",
+  },
+  {
+    questionTitle: "Is Elunara mobile-friendly?",
+    answer:
+      "Yes. Elunara is mobile-first and optimized for phones, tablets, and desktops.",
+  },
+  {
+    questionTitle: "Is my data safe?",
+    answer:
+      "Yes. Elunara follows strict privacy, security, and ethical AI standards. Your data is never sold.",
+  },
+  {
+    questionTitle: "What does ethical AI mean at Elunara?",
+    answer:
+      "Ethical AI at Elunara means responsible usage that supports learning, respects privacy, avoids bias, and encourages academic integrity.",
+  },
+  {
+    questionTitle: "Will Elunara help me cheat?",
+    answer:
+      "No. Elunara is built to support understanding and skill-building, not shortcuts or dishonest practices.",
+  },
+  {
+    questionTitle: "Is Elunara safe for children?",
+    answer:
+      "Yes, with guidance. Elunara follows child-safety principles and encourages responsible use.",
+  },
+  {
+    questionTitle: "How can I share feedback or report an issue?",
+    answer:
+      "Use the Send Feedback option in the Help Centre.",
+  },
+  {
+    questionTitle: "How do I contact support?",
+    answer:
+      "Tap Get in Touch for personalized assistance.",
   },
 ];
 

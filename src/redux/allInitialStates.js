@@ -1,12 +1,13 @@
 import { authStates } from "./allInitialStates/authStates";
+import { chatsStates } from "./allInitialStates/chatsStates";
 import { globalDataStates } from "./allInitialStates/globalDataStates";
 import { settingsStates } from "./allInitialStates/settingsStates";
 import { toggleStates } from "./allInitialStates/toggleStates";
 import { roomsStates } from "./allInitialStates/roomsStates";
 import { notesStates } from "./allInitialStates/notesStates";
-import { chatsStates } from "./allInitialStates/chatsStates";
 import { attachmentsStates } from "./allInitialStates/attachmentsStates";
 import { searchStates } from "./allInitialStates/searchStates";
+import { chatCustomisationStates } from "./allInitialStates/chatCustomisationStates";
 
 export const allInitialStates = {
   toggleStates,
@@ -18,4 +19,5 @@ export const allInitialStates = {
   chatsStates,
   attachmentsStates,
   searchStates,
+  chatCustomisationStates,
 };

@@ -9,7 +9,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   ChevronDown,
@@ -28,19 +28,53 @@ import SidebarMiddle from "./SidebarMiddle";
 import SidebarFooter from "./SidebarFooter";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import { StyleSheet } from "react-native";
 import RoomCreationPopup from "../../Rooms/RoomCreationPopup";
 import UnlockLearningLabPopup from "../../Monetisation/UnlockLearningLabPopup";
 import ProPlanUpgradingPopup from "../../Monetisation/ProPlanUpgradingPopup";
 import UnlockNewChatLimitPopup from "../../Monetisation/UnlockNewChatLimitPopup";
 import { useFonts } from "expo-font";
 
-const ChatHistorySidebar = ({ translateX }) => {
+const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+
+  // Refs for child components
+  const sidebarHeaderRef = useRef(null);
+  const sidebarMiddleRef = useRef(null);
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measureLearningLabBtn: async () => {
+      if (sidebarHeaderRef.current?.measureLearningLabBtn) {
+        return await sidebarHeaderRef.current.measureLearningLabBtn();
+      }
+      return null;
+    },
+    measurePinnedSection: async () => {
+      if (sidebarMiddleRef.current?.measurePinnedSection) {
+        return await sidebarMiddleRef.current.measurePinnedSection();
+      }
+      return null;
+    },
+    measureRecentChatsSection: async () => {
+      if (sidebarMiddleRef.current?.measureRecentChatsSection) {
+        return await sidebarMiddleRef.current.measureRecentChatsSection();
+      }
+      return null;
+    },
+  }));
+
+  // Check if guided tour needs touch-blocking overlay
+  const shouldBlockTouches =
+    globalDataStates.manualGuidedTourRunning &&
+    (globalDataStates.navigationBasicsGuideTourSteps >= 2 ||
+      globalDataStates.learningLabsGuideTourSteps >= 1);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
@@ -99,12 +133,17 @@ const ChatHistorySidebar = ({ translateX }) => {
           },
         ]}
       >
+        {/* Touch-blocking overlay for guided tour */}
+        {shouldBlockTouches && (
+          <View style={sidebarOverlayStyles.touchBlockingOverlay} pointerEvents="box-only" />
+        )}
+
         {/* chat history header */}
-        <SidebarHeader translateX={translateX} />
+        <SidebarHeader ref={sidebarHeaderRef} translateX={translateX} />
         {/* chat history header */}
 
         {/* chat history middle */}
-        <SidebarMiddle translateX={translateX} />
+        <SidebarMiddle ref={sidebarMiddleRef} translateX={translateX} />
         {/* chat history middle */}
 
         {/* chat history footer */}
@@ -113,6 +152,18 @@ const ChatHistorySidebar = ({ translateX }) => {
       </View>
     </>
   );
-};
+});
+
+const sidebarOverlayStyles = StyleSheet.create({
+  touchBlockingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "transparent",
+    zIndex: 9998,
+  },
+});
 
 export default ChatHistorySidebar;

@@ -10,6 +10,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Keyboard,
+  Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,17 +27,19 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import SendIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import { useFonts } from "expo-font";
+import authLoader from "../../../assets/images/authLoader.gif";
 const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
+  const isTopicsLoading = chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === "pending";
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [expandTextInput, setExpandTextInput] = useState(false);
-
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -74,9 +77,13 @@ const SubTopicsCompo = () => {
         />
       </View>
       {/* Title */}
-      <Text style={[styles.title,{fontFamily:'Mukta-Bold'}]}>{globalDataStates.currentSelectedTopic} </Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+        {globalDataStates.currentSelectedTopic}{" "}
+      </Text>
       {/* Description */}
-      <Text style={[styles.description,{fontFamily:'Mukta-Regular'}]}>Popular Topics</Text>
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+        Popular Topics
+      </Text>
       <View style={styles.input}>
         <Search color="#B5BECE" strokeWidth={1.5} />
         <TextInput
@@ -88,7 +95,7 @@ const SubTopicsCompo = () => {
           }}
           keyboardType="text"
           returnKeyType="done"
-          style={{fontFamily:"Mukta-Regular",fontSize:17}}
+          style={{ fontFamily: "Mukta-Regular", fontSize: 17 }}
         />
       </View>
 
@@ -97,11 +104,17 @@ const SubTopicsCompo = () => {
         style={styles.optionsContainer}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.grid}>
-          {subTopics.map((topics, topicIndex) => {
-            return <SubTopicsCard key={topicIndex} item={topics} />;
-          })}
-        </View>
+        {isTopicsLoading ? (
+          <View style={styles.loaderContainer}>
+            <Image source={authLoader} style={styles.loader} />
+          </View>
+        ) : (
+          <View style={styles.grid}>
+            {chatsStates.allChatsDatas.allTopicsOfSelectedSubjects?.map((topics, topicIndex) => {
+              return <SubTopicsCard key={topicIndex} item={topics} />;
+            })}
+          </View>
+        )}
       </ScrollView>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -124,7 +137,10 @@ const SubTopicsCompo = () => {
               <TextInput
                 style={[
                   styles.belowInput,
-                  { alignSelf: expandTextInput ? "flex-start" : "center",fontFamily:"Mukta-Regular" },
+                  {
+                    alignSelf: expandTextInput ? "flex-start" : "center",
+                    fontFamily: "Mukta-Regular",
+                  },
                 ]}
                 onFocus={() => setExpandTextInput(true)}
                 onBlur={() => setExpandTextInput(false)}
@@ -355,6 +371,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A1A1A",
     borderRadius: 100,
     alignSelf: "center",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 50,
+  },
+  loader: {
+    width: 100,
+    height: 100,
   },
 });
 

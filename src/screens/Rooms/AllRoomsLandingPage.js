@@ -22,6 +22,7 @@ import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/Ch
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import SearchHistory from "../../components/Search/SearchHistory";
 import SearchResults from "../../components/Search/SearchResults";
+import RoomsOptionsPopup from "../../components/Modals/Rooms/RoomsOptionsPopup";
 
 const AllRoomsLandingPage = () => {
   const translateX = React.useRef(new Animated.Value(0)).current;
@@ -29,10 +30,21 @@ const AllRoomsLandingPage = () => {
   const [selectedArray, setSelectedArray] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [checked, setChecked] = useState(false);
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const { roomsStates } = useSelector((state) => state.API);
+  const [popupPosition, setPopupPosition] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { roomsStates, chatsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
+  const allUserRooms = chatsStates.allChatsDatas.allUserRoomsAvailable || [];
+
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/rooms?page=1&per_page=20",
+      name: "fetchAllUserRoomsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
   // Search Debounce
   useEffect(() => {
@@ -65,7 +77,11 @@ const AllRoomsLandingPage = () => {
   const handleSelectAll = () => {
     setChecked(!checked);
     if (!checked) {
-      const allIds = roomsStates.rooms?.map((room) => room.uuid) || [];
+      // Use roomsStates if available, otherwise use allUserRooms
+      const allIds =
+        roomsStates.rooms?.map((room) => room.uuid) ||
+        allUserRooms.map((room) => room.id) ||
+        [];
       setSelectedArray(allIds);
     } else {
       setSelectedArray([]);
@@ -179,6 +195,7 @@ const AllRoomsLandingPage = () => {
                     selectedArray={selectedArray}
                     setIsSelecting={setIsSelecting}
                     setSelectedArray={setSelectedArray}
+                    setPopupPosition={setPopupPosition}
                     room={room}
                   />
                 );
@@ -193,6 +210,7 @@ const AllRoomsLandingPage = () => {
           </ScrollView>
         )}
       </Animated.View>
+      <RoomsOptionsPopup popupPosition={popupPosition} />
     </SafeAreaView>
   );
 };

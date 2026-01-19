@@ -7,7 +7,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { FolderPlus, MessageCirclePlus, Search } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
@@ -23,13 +23,31 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import { scaleFont } from "../../../utils/responsive";
 
-const SidebarHeader = ({ translateX }) => {
+const SidebarHeader = forwardRef(({ translateX }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+
+  // Ref for Learning Lab button
+  const learningLabBtnRef = useRef(null);
+
+  // Expose measurement methods via ref
+  useImperativeHandle(ref, () => ({
+    measureLearningLabBtn: () => {
+      return new Promise((resolve) => {
+        if (learningLabBtnRef.current) {
+          learningLabBtnRef.current.measureInWindow((x, y, width, height) => {
+            resolve({ x, y, width, height });
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
+  }));
 
   return (
     <View style={styles.chatHistorySidebarHeader}>
@@ -78,6 +96,7 @@ const SidebarHeader = ({ translateX }) => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          ref={learningLabBtnRef}
           onPress={() => {
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
@@ -108,6 +127,6 @@ const SidebarHeader = ({ translateX }) => {
       </View>
     </View>
   );
-};
+});
 
 export default SidebarHeader;

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ChevronRight,
   CircleUserRound,
@@ -20,10 +20,27 @@ import {
   setLanguages,
   citationStyles,
 } from "../../../data/datas";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const ToolsContainers = () => {
   const dispatch = useDispatch();
   const { roomsStates } = useSelector((state) => state.API);
+
+  useEffect(() => {
+    const responseStylesPayload = {
+      method: "GET",
+      url: "/master/response-styles",
+      name: "fetchResponseStylesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(responseStylesPayload));
+
+    const citationFormatsPayload = {
+      method: "GET",
+      url: "/master/citation-formats",
+      name: "fetchCitationFormatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(citationFormatsPayload));
+  }, []);
 
   const getToolSelection = (tool, index) => {
     const { tempRoomSettings } = roomsStates;
@@ -116,7 +133,6 @@ const ToolsContainers = () => {
     }
     return tool.selection;
   };
-
   return (
     <View style={{ width: "100%" }}>
       {toolsArrayOptions?.map((tools, toolIndex) => {

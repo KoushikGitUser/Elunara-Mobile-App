@@ -110,7 +110,7 @@ const MakePaymentPage = () => {
   useEffect(() => {
     setTimeout(() => {
       if (paymentSuccess) {
-        navigation.navigate("settingsInnerPages", { page: 3,});
+        navigation.navigate("settingsInnerPages", { page: 2,});
         dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
         dispatch(setToggleIsPaidOrProUser(true));
         setPaymentSuccess(false)

@@ -18,13 +18,27 @@ import {
   setToggleSubTopics,
   setToggleTopicsPopup,
 } from "../../../redux/slices/toggleSlice";
-import { setCurrentSelectedTopic } from "../../../redux/slices/globalDataSlice";
+import { setCurrentSelectedTopic, setSelectedSubjectID } from "../../../redux/slices/globalDataSlice";
 import { useFonts } from "expo-font";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const Topics = ({ item, index }) => {
 
 
   const dispatch = useDispatch();
+
+    const fetchAllTopicsOfSelectedSubjects = ()=>{
+      const subjectId = parseInt(item?.id, 10);
+  
+      const payload = {
+        method:"GET",
+        url:`/master/topics?subject_id=${subjectId}`,
+        name:"getAllTopicsOfSelectedSubjects"
+      }
+      dispatch(commonFunctionForAPICalls(payload));
+    }
+
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -33,8 +47,10 @@ const Topics = ({ item, index }) => {
           dispatch(setToggleSubTopics(false));
           dispatch(setCurrentSelectedTopic(null));
         } else {
+          fetchAllTopicsOfSelectedSubjects();
+          dispatch(setSelectedSubjectID(item?.id));
           dispatch(setToggleTopicsPopup(true));
-          dispatch(setCurrentSelectedTopic(item?.title));
+          dispatch(setCurrentSelectedTopic(item?.name));
           dispatch(setToggleSubTopics(true));
         }
       }}
@@ -57,10 +73,16 @@ const Topics = ({ item, index }) => {
           {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
 
-        <Text style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}>
-          {item?.title}
+        <Text
+          style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {item?.name}
         </Text>
-        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}>
+        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}
+        numberOfLines={1}
+        ellipsizeMode="tail">
           {item.description}
         </Text>
       </View>

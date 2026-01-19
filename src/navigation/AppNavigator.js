@@ -19,6 +19,7 @@ import * as Linking from "expo-linking";
 import VerifyEmailWhileSignup from "../screens/auth/redirectionsAuth/VerifyEmailWhileSignup";
 import AuthenticateUserUsingProvider from "../screens/auth/redirectionsAuth/AuthenticateUserUsingProvider";
 import { navigationRef } from "../services/navigationService";
+import RedirectToChangePassForToken from "../screens/auth/redirectionsAuth/RedirectToChangePassForToken";
 
 // Screens
 
@@ -35,6 +36,7 @@ const linking = {
       "signin": "signin",
       "signup": "signup",
       "changepass": "changepass/:recoveryToken/:isForTokenOrOTP",
+      "recover-account":"recover-account/:recoveryToken",
       "chat": "chat/:chatId?",           // optional param
       "notes": "notes/:noteId?",         // optional param
       "allRooms": "allRooms",
@@ -185,6 +187,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="auth-using-provider"
           component={AuthenticateUserUsingProvider}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="recover-account"
+          component={RedirectToChangePassForToken}
           options={{
             headerShown: false,
           }}

@@ -19,6 +19,10 @@ const  ChatMiddleWrapper = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
 
+  // Get editing state
+  const isEditingUserMessage = toggleStates.isEditingUserMessage;
+  const editingMessageData = globalDataStates.editingMessageData;
+
   // Ref for ScrollView to enable auto-scroll
   const scrollViewRef = useRef(null);
 
@@ -59,19 +63,54 @@ const  ChatMiddleWrapper = () => {
             justifyContent: "flex-end",
             gap: 25,
             alignItems: "center",
-          }}
+          }} 
           style={[styles.messagesContainer,]}
         >
           <View style={{height:120}}></View>
-          {globalDataStates.chatMessagesArray.map((chats, chatsIndex) => {
-            if (chats.role == "user") {
-              return (
-                <UserMessageBox chat={chats} key={chatsIndex} />
-              );
-            } else {
-              return <AIMessageBox message={chats.message} key={chatsIndex} />;
-            }
-          })}
+          {isEditingUserMessage && editingMessageData ? (
+            // Show only the editing message
+            <>
+              <UserMessageBox
+                chat={editingMessageData.chat}
+                messageIndex={editingMessageData.messageIndex}
+                key="editing-message"
+              />
+              <View style={{ width: "100%", alignItems: "flex-end" }}>
+                <Text style={{
+                  fontSize: 13,
+                  color: "#6B7280",
+                  fontFamily: "Mukta-Regular",
+                  textAlign: "right",
+                  width: "80%",
+                  marginTop: -15,
+                  marginBottom: 20,
+                }}>
+                  Editing this message will restart the conversation from this point.
+                </Text>
+              </View>
+            </>
+          ) : (
+            // Show all messages normally
+            globalDataStates.chatMessagesArray.map((chats, chatsIndex) => {
+              if (chats.role == "user") {
+                return (
+                  <UserMessageBox chat={chats} messageIndex={chatsIndex} key={chatsIndex} />
+                );
+              } else {
+                return (
+                  <AIMessageBox
+                    message={chats.message}
+                    messageUuid={chats.uuid}
+                    messageIndex={chatsIndex}
+                    isSavedToNotes={chats.is_saved_to_notes}
+                    version={chats.version || 1}
+                    totalVersions={chats.total_versions || 1}
+                    key={chatsIndex}
+                  />
+                );
+              }
+            })
+          )}
           {toggleStates.toggleIsWaitingForResponse && (
             <View style={styles.chatLoaderMain}>
               <Image
