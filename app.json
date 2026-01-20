@@ -36,7 +36,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app requires camera access to take photos.",
         "NSPhotoLibraryUsageDescription": "This app requires photo library access to select images.",
-        "NSMicrophoneUsageDescription": "This app requires microphone access for audio features."
+        "NSMicrophoneUsageDescription": "This app requires microphone access for speech-to-text and audio features.",
+        "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text."
       }
     },
     "android": {
@@ -51,7 +52,8 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO"
+        "READ_MEDIA_VIDEO",
+        "RECORD_AUDIO"
       ]
     },
     "web": {

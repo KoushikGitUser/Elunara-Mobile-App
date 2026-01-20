@@ -4,18 +4,23 @@ import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsi
 import GradientText from "../../common/GradientText";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import { useFonts } from "expo-font";
+import { useSelector } from "react-redux";
 
 const GreetingsHeader = () => {
     const [fontsLoaded] = useFonts({
     'Mukta-Bold': require('../../../../assets/fonts/Mukta-Bold.ttf'),
     'Mukta-Regular': require('../../../../assets/fonts/Mukta-Regular.ttf')
   });
-  
+
+  // Get profile info from Redux
+  const { settingsStates } = useSelector((state) => state.API);
+  const firstName = settingsStates?.allProfileInfos?.first_name || "User";
+
     useEffect(() => {
       if (fontsLoaded) {
       }
     }, [fontsLoaded]);
-  
+
     // Show nothing (or a loader) while fonts are loading
     if (!fontsLoaded) {
       return null;
@@ -32,7 +37,7 @@ const GreetingsHeader = () => {
           widthNumber={0.52}
           fontSize={24}
         />
-        <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>Koushik!</Text>
+        <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>{firstName}!</Text>
       </View>
       <Text style={{fontSize:scaleFont(15),color:"#9C9C9C",fontFamily:'Mukta-Regular'}}>
          {belowText}

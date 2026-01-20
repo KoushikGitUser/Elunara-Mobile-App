@@ -8,7 +8,7 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
@@ -19,18 +19,122 @@ import { ArrowRight } from "lucide-react-native";
 import {
   setToggleChangeResponseStyleWhileChatPopup,
   setToggleCompareStyleState,
+  setSelectedResponseStyle,
 } from "../../../../../redux/slices/toggleSlice";
 import CompareStyleCards from "./CompareStyleCards";
 import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
 import Toaster from "../../../../UniversalToaster/Toaster";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import ChakraIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import ConversationalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
+import DetailedIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+
+// Helper function to get response style icon based on name
+const getResponseStyleIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("auto") || key?.includes("chakra")) {
+    return <ChakraIcon />;
+  } else if (key?.includes("concise")) {
+    return <ConciseIcon />;
+  } else if (key?.includes("formal")) {
+    return <FormalIcon />;
+  } else if (key?.includes("conversational")) {
+    return <ConversationalIcon />;
+  } else if (key?.includes("detailed")) {
+    return <DetailedIcon />;
+  } else if (key?.includes("creative")) {
+    return <CreativeIcon />;
+  }
+  return <ChakraIcon />; // Default to Chakra/Auto
+};
 
 const ChangeResponseStylePopup = () => {
   const SCREEN_HEIGHT = Dimensions.get("window").height;
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const [selectedStyle, setSelectedStyle] = useState(null);
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { settingsStates } = useSelector((state) => state.API);
+  const { globalDataStates } = useSelector((state) => state.Global);
+  const [selectedStyle, setSelectedStyle] = useState(0);
   const [selectedStyleForCompare, setSelectedStyleForCompare] = useState([]);
   const dispatch = useDispatch();
   const [selectedCategory, setSelectedCategory] = useState(1);
+
+  // Fetch response styles on mount
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/master/response-styles",
+      name: "fetchResponseStylesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Get all response styles
+  const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+
+  // Initialize selected style from Redux state
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedResponseStyle?.id) {
+      const index = allResponseStyles.findIndex(
+        (style) => style.id === chatCustomisationStates.selectedResponseStyle.id
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      setSelectedStyle(0); // Default to Auto
+    }
+  }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
+
+  // Handle response style selection and trigger regeneration
+  const handleStyleSelection = (styleOption, index) => {
+    setSelectedStyle(index);
+    const selectedData = {
+      id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
+      name: styleOption.name,
+    };
+
+    dispatch(setSelectedResponseStyle(selectedData));
+
+    // Get the AI message UUID for regeneration using the stored index
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+    console.log("Message Index:", aiMessageIndex, "Message UUID:", aiMessageUuid);
+
+    if (aiMessageUuid) {
+      // Build customisations payload
+      const customisationsPayload = {
+        llm_id: chatCustomisationStates.selectedLLM?.id,
+        response_style_id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
+        language_id: chatCustomisationStates.selectedLanguage?.id,
+        citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
+      };
+
+      // Call regenerate API
+      const regeneratePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/regenerate`,
+        data: customisationsPayload,
+        name: "regenerateAIResponse",
+      };
+
+      dispatch(commonFunctionForAPICalls(regeneratePayload));
+    } else {
+      console.log("cannot trigger regeneration");
+    }
+
+    // Close the popup
+    dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
+  };
+
+  // Radio button component
+  const RadioButton = ({ selected }) => (
+    <View style={[styles.radioOuter, { borderColor: selected ? "black" : "#D3DAE5" }]}>
+      {selected && <View style={styles.radioInner} />}
+    </View>
+  );
 
   return (
     <Modal
@@ -87,7 +191,9 @@ const ChangeResponseStylePopup = () => {
                 </Text>
 
                 <TouchableOpacity style={styles.badge}>
-                  <Text style={styles.btnText}>Concise</Text>
+                  <Text style={styles.btnText}>
+                    {chatCustomisationStates.selectedResponseStyle?.name || "Auto"}
+                  </Text>
                 </TouchableOpacity>
               </View>
 
@@ -138,7 +244,7 @@ const ChangeResponseStylePopup = () => {
                 </TouchableOpacity>
               </View>
               {/* Description */}
-              <Text style={styles.description}>
+              <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
                 Update the current answer by selecting a different style
               </Text>
               {selectedCategory == 1 ? (
@@ -151,14 +257,76 @@ const ChangeResponseStylePopup = () => {
                     marginBottom: 20,
                   }}
                 >
-                  {responseStyles?.map((credits, creditIndex) => {
+                  {allResponseStyles.map((styleOptions, optionsIndex) => {
+                    const icon = getResponseStyleIcon(styleOptions.name);
+                    const isAuto = styleOptions.name?.toLowerCase().includes("auto") || styleOptions.id === 0;
+
                     return (
-                      <ResponseStyleCards
-                        selectedStyle={selectedStyle}
-                        setSelectedStyle={setSelectedStyle}
-                        item={credits}
-                        key={creditIndex}
-                      />
+                      <React.Fragment key={styleOptions.id || optionsIndex}>
+                        <TouchableOpacity
+                          style={[
+                            styles.card,
+                            {
+                              backgroundColor:
+                                selectedStyle == optionsIndex
+                                  ? "#EEF4FF"
+                                  : "white",
+                              borderColor:
+                                selectedStyle == optionsIndex
+                                  ? "black"
+                                  : "#D3DAE5",
+                            },
+                          ]}
+                          onPress={() => handleStyleSelection(styleOptions, optionsIndex)}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.contentMain}>
+                            <View style={styles.iconContainer}>
+                              {icon}
+                            </View>
+
+                            <View style={styles.textContainer}>
+                              <Text
+                                style={[
+                                  styles.optionTitle,
+                                  { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
+                                ]}
+                              >
+                                {styleOptions.name}
+                              </Text>
+                              <Text
+                                style={[
+                                  styles.optionDescription,
+                                  {
+                                    fontSize: scaleFont(14),
+                                    fontWeight: 400,
+                                    color: "#8F8F8F",
+                                    fontFamily: "Mukta-Regular"
+                                  },
+                                ]}
+                              >
+                                {styleOptions.description}
+                              </Text>
+                            </View>
+                          </View>
+
+                          <RadioButton selected={selectedStyle === optionsIndex} />
+                        </TouchableOpacity>
+                        {isAuto && (
+                          <View style={{ width: "100%", marginBottom: 20 }}>
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                color: "#757575",
+                                fontSize: scaleFont(15),
+                                fontFamily: "Mukta-Regular"
+                              }}
+                            >
+                              Or Select Manually
+                            </Text>
+                          </View>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </ScrollView>
@@ -434,6 +602,50 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: "#1A1A1A",
     fontFamily: "Mukta-Regular",
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    borderRadius: 18,
+    backgroundColor: "white",
+    marginBottom: 20
+  },
+  contentMain: {
+    flexDirection: "row",
+    gap: 10,
+    width: "85%",
+    alignItems: "flex-start",
+  },
+  textContainer: {
+    flexDirection: "column",
+    gap: 5,
+  },
+  optionTitle: {
+    color: "#1F2937",
+  },
+  optionDescription: {
+    lineHeight: 20,
+  },
+  radioOuter: {
+    width: 23,
+    height: 23,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: "#D3DAE5",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#ffffff",
+  },
+  radioInner: {
+    width: "80%",
+    height: "80%",
+    borderRadius: 50,
+    backgroundColor: "#000000ff",
   },
 });
 

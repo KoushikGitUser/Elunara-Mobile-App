@@ -24,13 +24,22 @@ import { ArrowLeft, Mic, Search } from "lucide-react-native";
 import {
   setToggleSubTopics,
   setToggleTopicsPopup,
+  setToggleIsChattingWithAI,
+  setToggleIsWaitingForResponse,
 } from "../../../redux/slices/toggleSlice";
+import {
+  setChatMessagesArray,
+  setUserMessagePrompt,
+  setSelecetdFiles,
+  setChatInputContentLinesNumber,
+} from "../../../redux/slices/globalDataSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import SendIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import { useFonts } from "expo-font";
 import authLoader from "../../../assets/images/authLoader.gif";
 const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates } = useSelector((state) => state.API);
   const isTopicsLoading = chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === "pending";
@@ -40,6 +49,20 @@ const SubTopicsCompo = () => {
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [expandTextInput, setExpandTextInput] = useState(false);
+  const [filteredTopics, setFilteredTopics] = useState([]);
+
+  // Filter topics based on search text
+  useEffect(() => {
+    const allTopics = chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || [];
+    if (searchText.trim() === "") {
+      setFilteredTopics(allTopics);
+    } else {
+      const filtered = allTopics.filter((topic) =>
+        topic.name.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredTopics(filtered);
+    }
+  }, [searchText, chatsStates.allChatsDatas.allTopicsOfSelectedSubjects]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -60,6 +83,107 @@ const SubTopicsCompo = () => {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  const sendMessageDirectly = () => {
+    const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+    if (!chatUuid) {
+      return;
+    }
+
+    const payload = {
+      method: "POST",
+      url: `/chats/${chatUuid}/messages`,
+      data: {
+        content: belowSearchText,
+        content_type: "text",
+        attachment_ids: [],
+      },
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const createChatWithAIFunction = () => {
+    const data = {
+      title: belowSearchText,
+      subject_id: globalDataStates.selectedSubjectID,
+      topic_id: globalDataStates.selectedTopicsID,
+    };
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      data.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      data.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      data.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      data.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
+    const payload = {
+      method: "POST",
+      url: "/chats",
+      data,
+      name: "createChatWithAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const handleSendButton = () => {
+    if (belowSearchText.trim() === "") {
+      return;
+    }
+
+    // Add user message to chat array
+    dispatch(
+      setChatMessagesArray([
+        ...globalDataStates.chatMessagesArray,
+        {
+          role: "user",
+          message: belowSearchText,
+          file: globalDataStates.selectedFiles
+            ? globalDataStates.selectedFiles[0]
+            : null,
+        },
+      ])
+    );
+
+    // Check if already chatting with AI
+    if (toggleStates.toggleIsChattingWithAI) {
+      // Direct message send flow - chat already exists
+      sendMessageDirectly();
+    } else {
+      // Initial flow - create new chat
+      createChatWithAIFunction();
+      dispatch(setToggleIsChattingWithAI(true));
+    }
+
+    // Common cleanup and state updates
+    setBelowSearchText("");
+    dispatch(setUserMessagePrompt(""));
+    dispatch(setSelecetdFiles([]));
+    dispatch(setChatInputContentLinesNumber(1));
+    dispatch(setToggleIsWaitingForResponse(true));
+    dispatch(setToggleTopicsPopup(false));
+  };
 
   return (
     <View style={styles.content}>
@@ -110,9 +234,17 @@ const SubTopicsCompo = () => {
           </View>
         ) : (
           <View style={styles.grid}>
-            {chatsStates.allChatsDatas.allTopicsOfSelectedSubjects?.map((topics, topicIndex) => {
-              return <SubTopicsCard key={topicIndex} item={topics} />;
-            })}
+            {filteredTopics.length > 0 ? (
+              filteredTopics.map((topics, topicIndex) => {
+                return <SubTopicsCard key={topicIndex} item={topics} />;
+              })
+            ) : (
+              <View style={styles.noResultsContainer}>
+                <Text style={[styles.noResultsText, { fontFamily: "Mukta-Regular" }]}>
+                  No topics found matching "{searchText}"
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -173,6 +305,7 @@ const SubTopicsCompo = () => {
                       { alignSelf: expandTextInput ? "flex-end" : "center" },
                     ]}
                     activeOpacity={0.7}
+                    onPress={handleSendButton}
                   >
                     <SendIcon />
                   </TouchableOpacity>
@@ -381,6 +514,17 @@ const styles = StyleSheet.create({
   loader: {
     width: 100,
     height: 100,
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 50,
+  },
+  noResultsText: {
+    fontSize: scaleFont(14),
+    color: "#6B7280",
+    textAlign: "center",
   },
 });
 

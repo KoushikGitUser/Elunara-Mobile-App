@@ -51,14 +51,32 @@ const Personal = () => {
     setAboutText(
       settingsStates.allPersonalisationsSettings.personalInfos.about
     );
+
+    // Initialize birthday from stored settings
+    const storedBirthday = settingsStates.allPersonalisationsSettings.personalInfos.birthday;
+    if (storedBirthday) {
+      setDate(new Date(storedBirthday));
+    }
   }, [
     settingsStates.allPersonalisationsSettings.personalInfos.hobbies,
-    settingsStates.allPersonalisationsSettings.personalInfos.hobbies,
+    settingsStates.allPersonalisationsSettings.personalInfos.about,
+    settingsStates.allPersonalisationsSettings.personalInfos.birthday,
   ]);
 
   const onChange = (event, selectedDate) => {
     setShowDatePicker(false);
-    if (selectedDate) setDate(selectedDate);
+    if (selectedDate) {
+      setDate(selectedDate);
+
+      // Format date to YYYY-MM-DD
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
+      // Update birthday in backend
+      updateUserBirthday(formattedDate);
+    }
   };
 
   const updateUserGender = (id) => {
@@ -99,6 +117,19 @@ const Personal = () => {
     };
     dispatch(commonFunctionForAPICalls(payload));
   }, [dispatch]);
+
+  const updateUserBirthday = (birthday) => {
+    const data = {
+      birthday: birthday,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/personalization",
+      data,
+      name: "updatePersonalizationSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
 
   // Debounce timer refs
   const hobbiesDebounceRef = useRef(null);

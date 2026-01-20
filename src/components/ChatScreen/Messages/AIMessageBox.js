@@ -23,21 +23,40 @@ import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessage
 import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
 import { commonFunctionForAPICalls, resetVersionSwitched } from "../../../redux/slices/apiCommonSlice";
 import { setCurrentAIMessageIndexForRegeneration } from "../../../redux/slices/globalDataSlice";
+import Markdown from 'react-native-markdown-display';
 
-const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = false, version = 1, totalVersions = 1 }) => {
+const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const dispatch = useDispatch();
   const { chatsStates } = useSelector((state) => state.API);
-  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
   const [changeResponsePopup,setChangeResponsePopup] = useState(false);
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
   const [savedToNotes,setSavedToNotes] = useState(isSavedToNotes);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [isRemovingFromNotes, setIsRemovingFromNotes] = useState(false);
+  const { globalDataStates } = useSelector((state) => state.Global);
 
   const isAddToNotesPending = chatsStates?.loaderStates?.isAddToNotesPending;
   const isRemoveFromNotesPending = chatsStates?.loaderStates?.isRemoveFromNotesPending;
 
+  // Get message UUID
+  const messageUuid = globalDataStates.messageIDsArray[messageIndex] || "";
+
+  // Get version info from the message in chatMessagesArray (updated by both regeneration and version switching)
+  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
+  const currentVersion = currentMessage?.version || 1;
+  const totalVersions = currentMessage?.total_versions || 1;
+
+  // Get customizations from API response (regeneratedResponse or switchedVersionData)
+  const switchedVersionData = chatsStates?.allChatsDatas?.switchedVersionData;
+  const regeneratedResponse = chatsStates?.allChatsDatas?.regeneratedResponse;
+
+  // Use generation data from latest API response
+  const generationData = switchedVersionData?.generation || regeneratedResponse?.generation || currentMessage?.generation;
+
+  // Check if this message has regenerations
+  const hasRegenerations = totalVersions > 1;
+  
   // Watch for add to notes success
   useEffect(() => {
     if (isAddingToNotes && isAddToNotesPending === true) {
@@ -90,40 +109,49 @@ const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = fal
   };
 
   const handlePreviousVersion = () => {
-    // Calculate previous version number
-    const previousVersionNumber = version - 1;
+    // Calculate previous version number based on current version from Redux
+    const previousVersionNumber = currentVersion - 1;
 
     if (previousVersionNumber >= 1) {
-      console.log("oihyoughiouh");
-      
+      console.log("qiwudgiuqgwdiuqgwd");
+
+      // Store the message index for the handler to use
+      dispatch(setCurrentAIMessageIndexForRegeneration(messageIndex));
+
       // Call API to switch version
       const payload = {
         method: "POST",
         url: `/messages/${messageUuid}/versions/${previousVersionNumber}`,
-        name: "switchVersionsOfAIResponse", // Pass messageIndex for handler to update correct message
+        name: "switchVersionsOfAIResponse",
       };
       dispatch(commonFunctionForAPICalls(payload));
     }
   };
 
   const handleNextVersion = () => {
-    // Calculate next version number
-    const nextVersionNumber = version + 1;
+    // Calculate next version number based on current version from Redux
+    const nextVersionNumber = currentVersion + 1;
 
     if (nextVersionNumber <= totalVersions) {
+      // Store the message index for the handler to use
+      dispatch(setCurrentAIMessageIndexForRegeneration(messageIndex));
+
       // Call API to switch version
       const payload = {
         method: "POST",
         url: `/messages/${messageUuid}/versions/${nextVersionNumber}`,
-        name: "switchVersionsOfAIResponse", // Pass messageIndex for handler to update correct message
+        name: "switchVersionsOfAIResponse",
       };
       dispatch(commonFunctionForAPICalls(payload));
     }
   };
 
+  // Check if arrows should be disabled
+  const isPrevDisabled = currentVersion <= 1;
+  const isNextDisabled = currentVersion >= totalVersions;
+
   // Watch for version switch success and show toast
   const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
-  const switchedVersionData = chatsStates?.allChatsDatas?.switchedVersionData;
 
   useEffect(() => {
     if (isVersionSwitched === true && switchedVersionData) {
@@ -135,50 +163,72 @@ const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = fal
 
   return (
     <View style={styles.mainBox}>
-      <View style={styles.messageBox}>
-        <Text style={[styles.message,{fontFamily:'Mukta-Regular'}]}>{message}</Text>
+      <View style={styles.messageBox}> 
+         <Markdown>
+           {message}
+          </Markdown>
       </View>
 
-      {/* Customization Badges */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.badgesContainer}
-      >
-        {chatCustomisationStates.selectedLLM?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>LLM: {chatCustomisationStates.selectedLLM.name}</Text>
-          </View>
-        )}
-        {chatCustomisationStates.selectedResponseStyle?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>Style: {chatCustomisationStates.selectedResponseStyle.name}</Text>
-          </View>
-        )}
-        {chatCustomisationStates.selectedLanguage?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>Language: {chatCustomisationStates.selectedLanguage.name}</Text>
-          </View>
-        )}
-      </ScrollView>
+      {/* Customization Badges - Only show for regenerated messages */}
+      {hasRegenerations && generationData && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.badgesContainer}
+        >
+          {generationData.llm?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>LLM: {generationData.llm.name}</Text>
+            </View>
+          )}
+          {generationData.style?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>Style: {generationData.style.name}</Text>
+            </View>
+          )}
+          {generationData.language?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>Language: {generationData.language.name}</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
 
       {/* Actions Container - Everything on Left Side */}
       <View style={styles.actionsContainer}>
        {changeResponsePopup && <ChangeResponsePopup setChangeResponsePopup={setChangeResponsePopup}/>}
-       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup}/>}
+       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup} messageContent={message} />}
        {feedbackPopup && <FeedbackPopup close={setFeedbackPopup} />}
 
         {/* Version Navigation - Left Side */}
         {totalVersions > 1 && (
           <View style={styles.versionNavigation}>
-            <TouchableOpacity style={styles.versionArrow} onPress={handlePreviousVersion}>
-              <ChevronDown style={{ transform: [{ rotate: '90deg' }] }} size={23} strokeWidth={1} />
+            <TouchableOpacity
+              style={styles.versionArrow}
+              onPress={handlePreviousVersion}
+              disabled={isPrevDisabled}
+            >
+              <ChevronDown
+                style={{ transform: [{ rotate: '90deg' }] }}
+                size={23}
+                strokeWidth={1}
+                color={isPrevDisabled ? "#D1D5DB" : "#1F2937"}
+              />
             </TouchableOpacity>
             <Text style={styles.versionText}>
-              {version}/{totalVersions}
+              {currentVersion}/{totalVersions}
             </Text>
-            <TouchableOpacity style={styles.versionArrow} onPress={handleNextVersion}>
-              <ChevronDown style={{ transform: [{ rotate: '-90deg' }] }} size={23} strokeWidth={1} />
+            <TouchableOpacity
+              style={styles.versionArrow}
+              onPress={handleNextVersion}
+              disabled={isNextDisabled}
+            >
+              <ChevronDown
+                style={{ transform: [{ rotate: '-90deg' }] }}
+                size={23}
+                strokeWidth={1}
+                color={isNextDisabled ? "#D1D5DB" : "#1F2937"}
+              />
             </TouchableOpacity>
           </View>
         )}

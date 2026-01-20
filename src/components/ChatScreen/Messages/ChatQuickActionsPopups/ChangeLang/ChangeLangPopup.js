@@ -1,5 +1,5 @@
 import { View, Text, Modal, TouchableOpacity, Platform, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SavedLang from "./SavedLang";
 import SettingLang from "./SettingLang";
 import { BlurView } from "@react-native-community/blur";
@@ -7,11 +7,31 @@ import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChangeLangWhileChatPopup } from "../../../../../redux/slices/toggleSlice";
 import { scaleFont } from "../../../../../utils/responsive";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
 
 const ChangeLangPopup = () => {
   const dispatch = useDispatch();
-  const [isLanguageSaved, setIsLanguageSaved] = useState(false);
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { settingsStates } = useSelector((state) => state.API);
+  const [currentStateOfPopup, setCurrentStateOfPopup] = useState(1);
+
+  // Fetch general settings on mount
+  useEffect(() => {
+    const generalSettingsPayload = {
+      method: "GET",
+      url: "/settings/general",
+      name: "getAllGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(generalSettingsPayload));
+  }, []);
+
+  // Check if language preferences exist and skip to state 2 if they do
+  useEffect(() => {
+    const languagePreferences = settingsStates?.allGeneralSettings?.responseLanguageSettings;
+    if (languagePreferences !== null && languagePreferences !== undefined) {
+      setCurrentStateOfPopup(2);
+    }
+  }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
 
   return (
     <Modal
@@ -52,10 +72,10 @@ const ChangeLangPopup = () => {
                 color="black"
               />
             </View>
-            {isLanguageSaved ? (
-              <SavedLang />
+            {currentStateOfPopup === 1 ? (
+              <SettingLang setCurrentStateOfPopup={setCurrentStateOfPopup} />
             ) : (
-              <SettingLang setIsLanguageSaved={setIsLanguageSaved} />
+              <SavedLang />
             )}
           </View>
         </View>

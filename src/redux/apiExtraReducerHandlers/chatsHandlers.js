@@ -370,6 +370,7 @@ export const handleGetAllMessagesOfParticularChat = {
       is_saved_to_notes: false, // Default value, can be updated if available in response
       version: msg.version || 1,
       total_versions: msg.total_versions || 1,
+      generation: msg.generation || null, // Store generation data for badges
       versions: [{
         content: msg.content,
         uuid: msg.uuid,
@@ -383,19 +384,10 @@ export const handleGetAllMessagesOfParticularChat = {
     state.globalDataStates.chatMessagesArray = chatMessagesArray;
 
     // Extract and store message IDs in messageIDsArray
-    const messageIDsArray = [];
-    for (let i = 0; i < messages.length; i += 2) {
-      // Assuming messages come in pairs: user, assistant, user, assistant...
-      const userMsg = messages[i];
-      const aiMsg = messages[i + 1];
-
-      if (userMsg && userMsg.uuid) {
-        messageIDsArray.push(userMsg.uuid);
-      }
-      if (aiMsg && aiMsg.uuid) {
-        messageIDsArray.push(aiMsg.uuid);
-      }
-    }
+    // Simply extract UUIDs in the order they appear (user, ai, user, ai...)
+    const messageIDsArray = messages
+      .filter(msg => msg.uuid) // Only include messages with UUIDs
+      .map(msg => msg.uuid);
 
     state.globalDataStates.messageIDsArray = messageIDsArray;
 
@@ -411,20 +403,23 @@ export const handleGetAllMessagesOfParticularChat = {
 
 export const handleSwitchVersionsOfAIResponse = {
   pending: (state) => {
+    console.log("opendihfg switch version");
+
     state.chatsStates.loaderStates.isVersionSwitched = "pending";
   },
   fulfilled: (state, action) => {
     const responseData = action?.payload.data.data;
-     console.log("Version switched:", JSON.stringify(responseData));
+    console.log("Version switched:", JSON.stringify(responseData));
     state.chatsStates.allChatsDatas.switchedVersionData = responseData;
 
-    // Get the message index from meta (we'll pass it in the payload)
-    const messageIndex = action?.meta?.arg?.messageIndex;
+    // Get the message index that was stored before the API call
+    const messageIndex = state.globalDataStates.currentAIMessageIndexForRegeneration;
 
-    if (messageIndex !== undefined && messageIndex >= 0) {
-      // Update the message at the index with the new version data
+    if (messageIndex !== null && messageIndex >= 0) {
+      // Update the specific message at the stored index
       const updatedChatMessagesArray = state.globalDataStates.chatMessagesArray.map((msg, index) => {
         if (index === messageIndex) {
+          // Update this message with the switched version data
           return {
             ...msg,
             message: responseData?.content || msg.message,
@@ -432,6 +427,7 @@ export const handleSwitchVersionsOfAIResponse = {
             version: responseData?.version || msg.version,
             total_versions: responseData?.total_versions || msg.total_versions,
             is_active_version: responseData?.is_active_version || false,
+            generation: responseData?.generation || msg.generation, // Store generation data for badges
           };
         }
         return msg;
@@ -441,7 +437,6 @@ export const handleSwitchVersionsOfAIResponse = {
     }
 
     state.chatsStates.loaderStates.isVersionSwitched = true;
-   
   },
   rejected: (state, { payload }) => {
     console.log(payload?.message || "Failed to switch version");

@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  PermissionsAndroid,
 } from "react-native";
 import React, {
   useMemo,
@@ -19,6 +20,7 @@ import React, {
 } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import Voice from "@react-native-voice/voice";
 import {
   LibraryBig,
   Mic,
@@ -82,6 +84,8 @@ const ChatInputMain = forwardRef((props, ref) => {
   const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL; // ~36px for 1 line
   const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL; // ~76px for 3 lines
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recognizedText, setRecognizedText] = useState("");
 
   // Refs for guided tour measurement
   const inputSectionRef = useRef(null);
@@ -117,6 +121,120 @@ const ChatInputMain = forwardRef((props, ref) => {
   useEffect(() => {
     dispatch(setChatInputContentLinesNumber(1));
   }, []);
+
+  // Request microphone permission
+  const requestMicrophonePermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: 'Microphone Permission',
+            message: 'Elunara needs access to your microphone to convert speech to text.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    }
+    return true; // iOS handles permissions automatically
+  };
+
+  // Voice recognition event handlers
+  useEffect(() => {
+    Voice.onSpeechStart = () => {
+      console.log('Speech started');
+      setIsRecording(true);
+    };
+
+    Voice.onSpeechEnd = () => {
+      console.log('Speech ended');
+      setIsRecording(false);
+    };
+
+    Voice.onSpeechResults = (event) => {
+      console.log('Speech results:', event.value);
+      if (event.value && event.value.length > 0) {
+        const text = event.value[0];
+        setRecognizedText(text);
+
+        // Append recognized text to existing prompt
+        const currentText = globalDataStates.userMessagePrompt;
+        const newText = currentText ? `${currentText} ${text}` : text;
+        dispatch(setUserMessagePrompt(newText));
+      }
+    };
+
+    Voice.onSpeechError = (error) => {
+      console.error('Speech recognition error:', error);
+      setIsRecording(false);
+      Alert.alert('Error', 'Failed to recognize speech. Please try again.');
+    };
+
+    // Cleanup
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, [globalDataStates.userMessagePrompt]);
+
+  // Start voice recognition
+  const startRecording = async () => {
+    try {
+      // Check if Voice module is available
+      if (!Voice || !Voice.start) {
+        Alert.alert(
+          'Feature Unavailable',
+          'Speech-to-text is not available. Please rebuild the app with: npx expo prebuild && npx expo run:android'
+        );
+        return;
+      }
+
+      const hasPermission = await requestMicrophonePermission();
+
+      if (!hasPermission) {
+        Alert.alert(
+          'Permission Required',
+          'Microphone permission is required for speech-to-text functionality.'
+        );
+        return;
+      }
+
+      setRecognizedText('');
+      await Voice.start('en-US'); // You can change language code as needed
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      const errorMessage = error?.message || 'Unknown error';
+      Alert.alert(
+        'Voice Recognition Error',
+        `Failed to start voice recognition: ${errorMessage}\n\nPlease ensure you've rebuilt the app with native modules.`
+      );
+    }
+  };
+
+  // Stop voice recognition
+  const stopRecording = async () => {
+    try {
+      await Voice.stop();
+      setIsRecording(false);
+    } catch (error) {
+      console.error('Error stopping voice recognition:', error);
+    }
+  };
+
+  // Handle mic button press
+  const handleMicPress = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
 
   const sendMessageDirectly = () => {
     const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
@@ -392,6 +510,7 @@ const ChatInputMain = forwardRef((props, ref) => {
               uuid: newVersion.uuid,
               version: actualTotalVersions, // Current version number
               total_versions: actualTotalVersions, // Total versions available
+              generation: regeneratedMessage?.generation || msg.generation, // Store generation data for badges
               versions: updatedVersions,
               currentVersionIndex: updatedVersions.length - 1,
             };
@@ -490,10 +609,37 @@ const ChatInputMain = forwardRef((props, ref) => {
           </ScrollView>
         )}
 
+        {isRecording && (
+          <View style={{
+            paddingHorizontal: 15,
+            paddingVertical: 10,
+            backgroundColor: '#FEE2E2',
+            borderRadius: 10,
+            marginBottom: 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+          }}>
+            <View style={{
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: '#EF4444',
+            }} />
+            <Text style={{
+              fontFamily: 'Mukta-Regular',
+              fontSize: 14,
+              color: '#DC2626',
+            }}>
+              Listening...
+            </Text>
+          </View>
+        )}
+
         <TextInput
           value={globalDataStates.userMessagePrompt}
           onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
-          placeholder="Ask anything"
+          placeholder={isRecording ? "Speak now..." : "Ask anything"}
           placeholderTextColor="grey"
           style={[
             styles.textInput,
@@ -504,7 +650,7 @@ const ChatInputMain = forwardRef((props, ref) => {
           onContentSizeChange={handleContentSizeChange}
           scrollEnabled={inputHeight >= MAX_HEIGHT}
           returnKeyType="default"
-          editable={!isWaitingForResponse}
+          editable={!isWaitingForResponse && !isRecording}
         />
         <View style={styles.inputActionIconsMainWrapper}>
           <View style={styles.inputLeftActionIcons}>
@@ -560,11 +706,16 @@ const ChatInputMain = forwardRef((props, ref) => {
           </View>
           <View style={styles.inputRightActionIcons}>
             <TouchableOpacity
-              onPress={() =>
-                dispatch(setToggleUnlockPersonalisationLimitPopup(true))
-              }
+              onPress={handleMicPress}
+              style={[
+                isRecording && {
+                  backgroundColor: '#EF4444',
+                  borderRadius: 25,
+                  padding: 8,
+                }
+              ]}
             >
-              <MicIcon />
+              <MicIcon color={isRecording ? 'white' : undefined} />
             </TouchableOpacity>
             {(globalDataStates.userMessagePrompt !== "" ||
               globalDataStates.selectedFiles.length > 0) && (

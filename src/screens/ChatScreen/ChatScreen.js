@@ -21,7 +21,7 @@ import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/Cha
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setToggleChatScreenGuideStart, setToggleChatHistorySidebar, setToggleChatActionsPopupOnLongPress, setIsEditingUserMessage } from "../../redux/slices/toggleSlice";
+import { setToggleChatScreenGuideStart, setToggleChatHistorySidebar, setToggleChatActionsPopupOnLongPress, setIsEditingUserMessage, setSelectedLLM, setSelectedResponseStyle, setSelectedLanguage, setSelectedCitationFormat } from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
   setNavigationBasicsGuideTourSteps,
@@ -52,6 +52,7 @@ import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQu
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { BlurView } from "@react-native-community/blur";
 
 // Mock chat messages for Chat Functions tour step 2
 const mockChatMessages = [
@@ -74,7 +75,7 @@ const ChatScreen = () => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -120,6 +121,55 @@ const ChatScreen = () => {
     }
     dispatch(commonFunctionForAPICalls(payload));
   },[])
+
+  // Fetch general settings on mount to populate chat customization states
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/settings/general",
+      name: "getAllGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Populate chatCustomisationStates when general settings are loaded
+  useEffect(() => {
+    if (settingsStates?.allGeneralSettings) {
+      const { preferredLLMs, responseLanguageSettings, adSettings } = settingsStates.allGeneralSettings;
+
+      // Set LLM preference
+      if (preferredLLMs) {
+        dispatch(setSelectedLLM({
+          id: preferredLLMs.llm_id || null,
+          name: preferredLLMs.llm_name || "Auto",
+        }));
+      }
+
+      // Set Response Style
+      if (adSettings?.response_style) {
+        dispatch(setSelectedResponseStyle({
+          id: adSettings.response_style.id || null,
+          name: adSettings.response_style.name || "Auto",
+        }));
+      }
+
+      // Set Response Language
+      if (responseLanguageSettings) {
+        dispatch(setSelectedLanguage({
+          id: responseLanguageSettings.language_id || null,
+          name: responseLanguageSettings.language_name || "English",
+        }));
+      }
+
+      // Set Citation Format
+      if (adSettings?.citation_format) {
+        dispatch(setSelectedCitationFormat({
+          id: adSettings.citation_format.id || null,
+          name: adSettings.citation_format.name || "Harvard",
+        }));
+      }
+    }
+  }, [settingsStates?.allGeneralSettings]);
 
   // Track previous chat UUID to detect new chat creation
   const previousChatUuidRef = useRef(null);
@@ -596,6 +646,27 @@ const ChatScreen = () => {
               style={{ width: 150, height: 150 }}
             />
           </View>
+        </Modal>
+      )}
+
+      {/* Full-screen loader for regenerating AI response */}
+      {chatsStates.loaderStates.isAIResponseRegenerated === "pending" && (
+        <Modal visible={true} transparent={true} animationType="fade">
+          <BlurView
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            blurType="light"
+            blurAmount={10}
+            reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.95)"
+          >
+            <Image
+              source={require("../../assets/images/authLoader.gif")}
+              style={{ width: 150, height: 150 }}
+            />
+          </BlurView>
         </Modal>
       )}
 

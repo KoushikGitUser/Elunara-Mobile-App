@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Pressable, Linking } from 'react-native'
 import React from 'react'
 import { Download } from 'lucide-react-native';
 import WhatsappIcon from '../../../../../assets/SvgIconsComponent/MessagesIcons/WhatsappIcon';
@@ -6,7 +6,17 @@ import LinkedInIcon from '../../../../../assets/SvgIconsComponent/MessagesIcons/
 import ZoomIcon from '../../../../../assets/SvgIconsComponent/MessagesIcons/ZoomIcon';
 
 
-const MessageSharePopup = ({setSharePopup}) => {
+const MessageSharePopup = ({setSharePopup,messageContent}) => {
+
+  const openWhatsApp = () => {
+  const url = `whatsapp://send?text=${encodeURIComponent(messageContent)}`;
+  Linking.openURL(url).catch(() => {
+    alert("Make sure WhatsApp is installed on your device");
+  });
+};
+
+
+
   return (
     <>
       <TouchableOpacity
@@ -31,6 +41,7 @@ const MessageSharePopup = ({setSharePopup}) => {
         <Pressable
           onPress={() => {
             setSharePopup(false);
+            openWhatsApp();
           }}
           style={({ pressed }) => [
             {

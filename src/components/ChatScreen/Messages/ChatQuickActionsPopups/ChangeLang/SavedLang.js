@@ -4,35 +4,127 @@ import {
   StyleSheet,
   TouchableOpacity,
   Pressable,
+  ScrollView,
+  Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
-import { setLanguages } from "../../../../../data/datas";
+import { useDispatch, useSelector } from "react-redux";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import { setSelectedLanguage, setToggleChangeLangWhileChatPopup } from "../../../../../redux/slices/toggleSlice";
+import { useNavigation } from "@react-navigation/native";
+
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 const SavedLang = () => {
-  const [selectedStyle, setSelectedStyle] = useState(0);
+  const [selectedLanguageIndex, setSelectedLanguageIndex] = useState(0);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates, toggleStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
+
+  // Fetch all available languages
+  useEffect(() => {
+    const languagesPayload = {
+      method: "GET",
+      url: "/master/languages",
+      name: "getAllLanguagesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(languagesPayload));
+  }, []);
+
+  // Get all available languages from master data
+  const allLanguagesAvailable = settingsStates?.settingsMasterDatas?.allLanguagesAvailable || [];
+
+  // Initialize selected language from Redux state
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedLanguage?.id && allLanguagesAvailable.length > 0) {
+      const index = allLanguagesAvailable.findIndex(
+        (lang) => lang.id === chatCustomisationStates.selectedLanguage.id
+      );
+      if (index !== -1) {
+        setSelectedLanguageIndex(index);
+      }
+    }
+  }, [chatCustomisationStates?.selectedLanguage, allLanguagesAvailable]);
+
+  // Handle language selection
+  const handleLanguageSelection = (language, index) => {
+    setSelectedLanguageIndex(index);
+
+    // Update Redux state with selected language
+    const selectedData = {
+      id: language.id,
+      name: language.name,
+    };
+    dispatch(setSelectedLanguage(selectedData));
+
+    // Get the AI message UUID for regeneration using the stored index
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+    console.log("Message Index:", aiMessageIndex, "Message UUID:", aiMessageUuid);
+
+    if (aiMessageUuid) {
+      // Build customisations payload
+      const customisationsPayload = {
+        llm_id: chatCustomisationStates.selectedLLM?.id,
+        response_style_id: chatCustomisationStates.selectedResponseStyle?.id,
+        language_id: language.id,
+        citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
+      };
+
+      // Call regenerate API
+      const regeneratePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/regenerate`,
+        data: customisationsPayload,
+        name: "regenerateAIResponse",
+      };
+
+      dispatch(commonFunctionForAPICalls(regeneratePayload));
+    } else {
+      console.log("cannot trigger regeneration");
+    }
+
+    // Close the popup
+    dispatch(setToggleChangeLangWhileChatPopup(false));
+  };
+
   const RadioButton = ({ selected }) => (
-    <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
+    <View style={[styles.radioOuter, { borderColor: selected ? "black" : "#D3DAE5" }]}>
       {selected && <View style={styles.radioInner} />}
     </View>
   );
 
   return (
     <>
-      <View style={styles.langContainer}>
-        <View style={styles.currentLLMMain}>
-          <Text style={styles.currentResponse}>Current Response Language</Text>
+      {/* Current Language Banner */}
+      <View style={styles.currentLLMMain}>
+        <Text style={styles.currentResponse}>Current Response Language</Text>
 
-          <TouchableOpacity style={styles.badge}>
-            <Text style={styles.btnText}>English</Text>
-          </TouchableOpacity>
-        </View>
-        {setLanguages.map((langs, langIndex) => {
-          if (langs.lang !== "English") {
+        <TouchableOpacity style={styles.badge}>
+          <Text style={styles.btnText}>
+            {chatCustomisationStates?.selectedLanguage?.name || "English"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Description */}
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular", marginBottom: 20 }]}>
+        Update the current answer by selecting a different language
+      </Text>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ maxHeight: SCREEN_HEIGHT * 0.55 }}
+      >
+        <View style={styles.langContainer}>
+          {allLanguagesAvailable.map((language, langIndex) => {
             return (
               <TouchableOpacity
                 key={langIndex}
-                onPress={() => setSelectedStyle(langIndex)}
+                onPress={() => handleLanguageSelection(language, langIndex)}
                 style={styles.langsMain}
               >
                 <Text
@@ -41,61 +133,54 @@ const SavedLang = () => {
                     fontSize: scaleFont(15),
                   }}
                 >
-                  {langs.lang}
+                  {language.name}
                 </Text>
-                <RadioButton selected={selectedStyle === langIndex} />
+                <RadioButton selected={selectedLanguageIndex === langIndex} />
               </TouchableOpacity>
             );
-          }
-        })}
-      </View>
-            {/* Button */}
-      <TouchableOpacity
-        style={[
-          styles.button,
-          {
-            backgroundColor: "#081A35",
-          },
-        ]}
-        activeOpacity={0.8}
-      >
-        <Text style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}>
-          Update Response Language
-        </Text>
-      </TouchableOpacity>
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text
+          })}
+        </View>
+
+        <View
           style={{
-            fontSize: moderateScale(13),
-            fontWeight: 400,
-            textAlign: "center",
-            fontFamily: "Mukta-Regular",
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 30,
           }}
         >
-          More LLMS? Update your list in{" "}
-        </Text>
-        <Pressable style={{ borderBottomWidth: 2 }}>
           <Text
             style={{
               fontSize: moderateScale(13),
-              lineHeight: 15,
-              fontWeight: 600,
+              fontWeight: 400,
               textAlign: "center",
-              fontFamily: "Mukta-Bold",
+              fontFamily: "Mukta-Regular",
             }}
           >
-            Settings
+            More Languages? Update your list in{" "}
           </Text>
-        </Pressable>
-      </View>
-
+          <Pressable
+            style={{ borderBottomWidth: 2 }}
+            onPress={() => {
+              dispatch(setToggleChangeLangWhileChatPopup(false));
+              navigation.navigate("settingsInnerPages", { page: 0 });
+            }}
+          >
+            <Text
+              style={{
+                fontSize: moderateScale(13),
+                lineHeight: 15,
+                fontWeight: 600,
+                textAlign: "center",
+                fontFamily: "Mukta-Bold",
+              }}
+            >
+              Settings
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
     </>
   );
 };
@@ -108,16 +193,16 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
+    marginBottom: 18,
     letterSpacing: 0.2,
   },
   langContainer: {
     width: "100%",
     flexDirection: "column",
-    gap: 45,
+    gap: 25,
     marginBottom: 30,
   },
   langsMain: {
