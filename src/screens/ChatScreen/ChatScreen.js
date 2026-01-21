@@ -29,6 +29,7 @@ import {
   setLearningLabsGuideTourSteps,
   resetAllGuidedTourSteps,
   setChatMessagesArray,
+  setMessageIDsArray,
   setChatTitleOnLongPress,
   setSettingsInnerPageHeaderTitle,
 } from "../../redux/slices/globalDataSlice";
@@ -210,6 +211,20 @@ const ChatScreen = () => {
       setIsWaitingForMessages(false);
     }
   }, [isMessagesFetched, chatMessages, isWaitingForMessages]);
+
+  // Handle fetched messages from chat history
+  useEffect(() => {
+    const isAllMessagesOfChatFetched = chatsStates.loaderStates.isAllMessagesOfChatFetched;
+    const fetchedMessages = chatsStates.allChatsDatas.fetchedMessages;
+
+    if (isAllMessagesOfChatFetched === true && fetchedMessages) {
+      // Update Global slice with fetched messages and IDs
+      dispatch(setChatMessagesArray(fetchedMessages.chatMessagesArray));
+      dispatch(setMessageIDsArray(fetchedMessages.messageIDsArray));
+
+      console.log("Messages loaded from history:", fetchedMessages.chatMessagesArray.length);
+    }
+  }, [chatsStates.loaderStates.isAllMessagesOfChatFetched, chatsStates.allChatsDatas.fetchedMessages]);
 
   useEffect(() => {
     const checkNewUser = async () => {

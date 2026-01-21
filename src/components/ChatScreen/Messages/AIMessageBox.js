@@ -6,7 +6,7 @@ import { EvilIcons, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ChevronDown } from "lucide-react-native";
 import copy from "../../../assets/images/copy.png";
 import share from "../../../assets/images/Share.png";
-import bookmark from "../../../assets/images/Bookmarks.png";
+import bookmark from "../../../assets/images/Bookmarks.png"; 
 import feedback from "../../../assets/images/Feedback.png";
 import repeat from "../../../assets/images/Repeat.png";
 import * as Clipboard from 'expo-clipboard';
@@ -22,7 +22,7 @@ import MessageSharePopup from "../../Modals/ChatScreen/Messages/MessageSharePopu
 import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookmarkFilledIcon";
 import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
 import { commonFunctionForAPICalls, resetVersionSwitched } from "../../../redux/slices/apiCommonSlice";
-import { setCurrentAIMessageIndexForRegeneration } from "../../../redux/slices/globalDataSlice";
+import { setCurrentAIMessageIndexForRegeneration, setChatMessagesArray } from "../../../redux/slices/globalDataSlice";
 import Markdown from 'react-native-markdown-display';
 
 const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
@@ -36,27 +36,121 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const [isRemovingFromNotes, setIsRemovingFromNotes] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
 
+  // Local state for version management
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [totalVersions, setTotalVersions] = useState(1);
+
+  // Local state for customization badges (generation data)
+  const [generationData, setGenerationData] = useState({
+    llm: { name: "Auto" },
+    style: { name: "Auto" },
+    language: { name: "Auto" }
+  });
+
+  // Local state for switched version message content
+  const [switchedVersionMessageContent, setSwitchedVersionMessageContent] = useState(null);
+
   const isAddToNotesPending = chatsStates?.loaderStates?.isAddToNotesPending;
   const isRemoveFromNotesPending = chatsStates?.loaderStates?.isRemoveFromNotesPending;
 
   // Get message UUID
   const messageUuid = globalDataStates.messageIDsArray[messageIndex] || "";
 
-  // Get version info from the message in chatMessagesArray (updated by both regeneration and version switching)
-  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
-  const currentVersion = currentMessage?.version || 1;
-  const totalVersions = currentMessage?.total_versions || 1;
-
-  // Get customizations from API response (regeneratedResponse or switchedVersionData)
+  // Get switchedVersionData from API response
   const switchedVersionData = chatsStates?.allChatsDatas?.switchedVersionData;
+
+  // Get regenerated response data
   const regeneratedResponse = chatsStates?.allChatsDatas?.regeneratedResponse;
 
-  // Use generation data from latest API response
-  const generationData = switchedVersionData?.generation || regeneratedResponse?.generation || currentMessage?.generation;
+  // Get version info from the message in chatMessagesArray (updated by both regeneration and version switching)
+  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
 
   // Check if this message has regenerations
   const hasRegenerations = totalVersions > 1;
-  
+
+  // Watch for regeneration success - update versions and generation data from regeneratedResponse
+  const isAIResponseRegenerated = chatsStates?.loaderStates?.isAIResponseRegenerated;
+  const currentAIMessageIndexForRegeneration = globalDataStates.currentAIMessageIndexForRegeneration;
+
+  useEffect(() => {
+    if (
+      isAIResponseRegenerated === true &&
+      regeneratedResponse &&
+      currentAIMessageIndexForRegeneration === messageIndex
+    ) {
+      // Update versions from regeneration response
+      if (regeneratedResponse.version !== undefined) {
+        setCurrentVersion(regeneratedResponse.version);
+      }
+      if (regeneratedResponse.total_versions !== undefined) {
+        setTotalVersions(regeneratedResponse.total_versions);
+      }
+
+      // Update generation data (customization badges) from regeneration response
+      if (regeneratedResponse.generation) {
+        setGenerationData({
+          llm: regeneratedResponse.generation.llm || { name: "Auto" },
+          style: regeneratedResponse.generation.style || { name: "Auto" },
+          language: regeneratedResponse.generation.language || { name: "Auto" }
+        });
+      }
+    }
+  }, [isAIResponseRegenerated, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex]);
+
+  // Watch for version switch success - update versions from switchedVersionData
+  const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
+
+  useEffect(() => {
+    if (
+      isVersionSwitched === true &&
+      switchedVersionData &&
+      currentAIMessageIndexForRegeneration === messageIndex
+    ) {
+      // Update versions from switch version response
+      if (switchedVersionData.version !== undefined) {
+        setCurrentVersion(switchedVersionData.version);
+      }
+      if (switchedVersionData.total_versions !== undefined) {
+        setTotalVersions(switchedVersionData.total_versions);
+      }
+
+      // Update generation data (customization badges) from switch version response
+      if (switchedVersionData.generation) {
+        setGenerationData({
+          llm: switchedVersionData.generation.llm || { name: "Auto" },
+          style: switchedVersionData.generation.style || { name: "Auto" },
+          language: switchedVersionData.generation.language || { name: "Auto" }
+        });
+      }
+
+      // Set switched version message content
+      if (switchedVersionData.content) {
+        setSwitchedVersionMessageContent(switchedVersionData.content);
+
+        // Update the chatMessagesArray to show the new content
+        const updatedChatMessagesArray = globalDataStates.chatMessagesArray.map((msg, index) => {
+          if (index === messageIndex) {
+            return {
+              ...msg,
+              message: switchedVersionData.content,
+              version: switchedVersionData.version,
+              total_versions: switchedVersionData.total_versions,
+              generation: switchedVersionData.generation
+            };
+          }
+          return msg;
+        });
+
+        // Dispatch the updated array to Redux
+        dispatch(setChatMessagesArray(updatedChatMessagesArray));
+      }
+
+      // Show toast notification
+      triggerToast(`Switched to version ${switchedVersionData.version}`, "", "normal", 3000);
+      dispatch(resetVersionSwitched());
+    }
+  }, [isVersionSwitched, switchedVersionData, currentAIMessageIndexForRegeneration, messageIndex]);
+
   // Watch for add to notes success
   useEffect(() => {
     if (isAddingToNotes && isAddToNotesPending === true) {
@@ -76,7 +170,7 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   }, [isRemoveFromNotesPending, isRemovingFromNotes]);
 
   const handleCopy = async() => {
-    await Clipboard.setStringAsync(message);
+    await Clipboard.setStringAsync(currentMessage?.message || message);
     triggerToast("Message copied!","","normal",3000)
   };
 
@@ -150,22 +244,11 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const isPrevDisabled = currentVersion <= 1;
   const isNextDisabled = currentVersion >= totalVersions;
 
-  // Watch for version switch success and show toast
-  const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
-
-  useEffect(() => {
-    if (isVersionSwitched === true && switchedVersionData) {
-      const switchedVersion = switchedVersionData.version;
-      triggerToast(`Switched to version ${switchedVersion}`, "", "normal", 3000);
-      dispatch(resetVersionSwitched());
-    }
-  }, [isVersionSwitched, switchedVersionData]);
-
   return (
     <View style={styles.mainBox}>
-      <View style={styles.messageBox}> 
+      <View style={styles.messageBox}>
          <Markdown>
-           {message}
+           {currentMessage?.message || message}
           </Markdown>
       </View>
 
@@ -197,7 +280,7 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
       {/* Actions Container - Everything on Left Side */}
       <View style={styles.actionsContainer}>
        {changeResponsePopup && <ChangeResponsePopup setChangeResponsePopup={setChangeResponsePopup}/>}
-       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup} messageContent={message} />}
+       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup} messageContent={currentMessage?.message || message} />}
        {feedbackPopup && <FeedbackPopup close={setFeedbackPopup} />}
 
         {/* Version Navigation - Left Side */}

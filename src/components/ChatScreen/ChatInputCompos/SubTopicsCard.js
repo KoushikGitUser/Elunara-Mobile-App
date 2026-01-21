@@ -44,7 +44,7 @@ const SubTopicsCard = ({ item }) => {
 
   const createChatWithAIFunction = () => {
     const data = {
-      title:item?.name,
+      name:item?.name,
       subject_id:globalDataStates.selectedSubjectID,
       topic_id:item?.id,
     }

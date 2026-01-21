@@ -37,12 +37,21 @@ const IndividualRecentChat = ({ item, translateX }) => {
   };
 
   const fetchAllMessagesOfChat = () => {
-    const payload = {
+    // First, fetch chat details to get the chat name
+    const chatDetailsPayload = {
+      method: "GET",
+      url: `/chats/${item?.id}`,
+      name: "getAllDetailsOfChatByID",
+    };
+    dispatch(commonFunctionForAPICalls(chatDetailsPayload));
+
+    // Then, fetch all messages of the chat
+    const messagesPayload = {
       method: "GET",
       url: `/chats/${item?.id}/messages`,
       name: "getAllMessagesOfParticularChat",
     };
-    dispatch(commonFunctionForAPICalls(payload));
+    dispatch(commonFunctionForAPICalls(messagesPayload));
     dispatch(setToggleIsChattingWithAI(true));
   };
 

@@ -17,9 +17,15 @@ export const handleGetAllRecentChats = {
 export const handleGetAllDetailsOfChatByID = {
   pending: (state) => {},
   fulfilled: (state, action) => {
-    state.chatsStates.allChatsDatas.currentActionChatDetails =
-      action?.payload.data.data;
-    console.log(action?.payload.data.data, "data");
+    const chatDetails = action?.payload.data.data;
+
+    // Store in currentActionChatDetails for actions (rename, delete, etc.)
+    state.chatsStates.allChatsDatas.currentActionChatDetails = chatDetails;
+
+    // Also update createdChatDetails so ChatHeader shows the correct name
+    state.chatsStates.allChatsDatas.createdChatDetails = chatDetails;
+
+    console.log(chatDetails, "Chat details fetched");
   },
   rejected: (state, { payload }) => {
     console.log(payload.message);
@@ -81,7 +87,18 @@ export const handleRenameAndUpdateChatTitle = {
     state.chatsStates.loaderStates.isChatTitleUpdated = "pending";
   },
   fulfilled: (state, action) => {
-    console.log("renameddddd", action?.payload.data);
+    const responseData = action?.payload.data.data;
+    console.log("Chat renamed - Response:", JSON.stringify(responseData, null, 2));
+
+    // Update the chat title in createdChatDetails
+    if (state.chatsStates.allChatsDatas.createdChatDetails && responseData?.name) {
+      state.chatsStates.allChatsDatas.createdChatDetails = {
+        ...state.chatsStates.allChatsDatas.createdChatDetails,
+        name: responseData.name,
+      };
+      console.log("Updated chat title to:", responseData.name);
+    }
+
     state.chatsStates.loaderStates.isChatTitleUpdated = true;
   },
   rejected: (state, { payload }) => {
@@ -360,36 +377,40 @@ export const handleGetAllMessagesOfParticularChat = {
   },
   fulfilled: (state, action) => {
     const responseData = action?.payload.data.data;
-    const messages = responseData?.messages || [];
+    console.log(JSON.stringify(action?.payload.data.data),"all messages");
+
+    // Response is directly an array of messages
+    const messages = Array.isArray(responseData) ? responseData : [];
 
     // Transform messages to chatMessagesArray format
     const chatMessagesArray = messages.map((msg) => ({
       role: msg.role === "assistant" ? "ai" : msg.role,
       message: msg.content,
-      uuid: msg.uuid,
-      is_saved_to_notes: false, // Default value, can be updated if available in response
+      uuid: msg.id, // Use 'id' from API response
+      is_saved_to_notes: msg.added_to_notes || false, // Use 'added_to_notes' from API response
       version: msg.version || 1,
       total_versions: msg.total_versions || 1,
       generation: msg.generation || null, // Store generation data for badges
       versions: [{
         content: msg.content,
-        uuid: msg.uuid,
+        uuid: msg.id, // Use 'id' from API response
         version: msg.version || 1,
         total_versions: msg.total_versions || 1,
       }],
       currentVersionIndex: 0,
     }));
 
-    // Store in globalDataStates
-    state.globalDataStates.chatMessagesArray = chatMessagesArray;
-
     // Extract and store message IDs in messageIDsArray
-    // Simply extract UUIDs in the order they appear (user, ai, user, ai...)
+    // Simply extract IDs in the order they appear (user, ai, user, ai...)
     const messageIDsArray = messages
-      .filter(msg => msg.uuid) // Only include messages with UUIDs
-      .map(msg => msg.uuid);
+      .filter(msg => msg.id) // Only include messages with IDs
+      .map(msg => msg.id);
 
-    state.globalDataStates.messageIDsArray = messageIDsArray;
+    // Store transformed data in API slice for the component to pick up
+    state.chatsStates.allChatsDatas.fetchedMessages = {
+      chatMessagesArray,
+      messageIDsArray
+    };
 
     state.chatsStates.loaderStates.isAllMessagesOfChatFetched = true;
     console.log("All messages fetched:", chatMessagesArray);
@@ -409,7 +430,7 @@ export const handleSwitchVersionsOfAIResponse = {
   },
   fulfilled: (state, action) => {
     const responseData = action?.payload.data.data;
-    console.log("Version switched:", JSON.stringify(responseData));
+    console.log("Version switched - Full Response:", JSON.stringify(responseData, null, 2));
     state.chatsStates.allChatsDatas.switchedVersionData = responseData;
 
     // Get the message index that was stored before the API call
@@ -419,21 +440,27 @@ export const handleSwitchVersionsOfAIResponse = {
       // Update the specific message at the stored index
       const updatedChatMessagesArray = state.globalDataStates.chatMessagesArray.map((msg, index) => {
         if (index === messageIndex) {
-          // Update this message with the switched version data
+          // Update this message with the switched version data - use responseData fields directly
+          console.log("Updating message at index:", messageIndex);
+          console.log("New version:", responseData.version);
+          console.log("Total versions:", responseData.total_versions);
+          console.log("Generation data:", JSON.stringify(responseData.generation));
+
           return {
             ...msg,
-            message: responseData?.content || msg.message,
-            uuid: responseData?.id || msg.uuid,
-            version: responseData?.version || msg.version,
-            total_versions: responseData?.total_versions || msg.total_versions,
-            is_active_version: responseData?.is_active_version || false,
-            generation: responseData?.generation || msg.generation, // Store generation data for badges
+            message: responseData.content,
+            uuid: responseData.id,
+            version: responseData.version,
+            total_versions: responseData.total_versions,
+            is_active_version: responseData.is_active_version,
+            generation: responseData.generation, // Store generation data for badges
           };
         }
         return msg;
       });
 
       state.globalDataStates.chatMessagesArray = updatedChatMessagesArray;
+      console.log("Updated chatMessagesArray:", JSON.stringify(updatedChatMessagesArray[messageIndex], null, 2));
     }
 
     state.chatsStates.loaderStates.isVersionSwitched = true;

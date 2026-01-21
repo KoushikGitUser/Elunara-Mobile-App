@@ -11,7 +11,7 @@ import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import chatLoader from "../../../assets/images/Loading chat mob.gif";
 
-const  ChatMiddleWrapper = () => {
+const  ChatMiddleWrapper = () => { 
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();

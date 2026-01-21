@@ -178,7 +178,7 @@ const RenameChatPopup = () => {
                     const payload = {
                       method: "PUT",
                       url: `/chats/${chatUUID}`,
-                      data: { title: chatName },
+                      data: { name: chatName },
                       name: "renameAndUpdateChatTitle"
                     };
 

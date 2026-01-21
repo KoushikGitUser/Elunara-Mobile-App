@@ -105,7 +105,7 @@ const SubTopicsCompo = () => {
 
   const createChatWithAIFunction = () => {
     const data = {
-      title: belowSearchText,
+      name: belowSearchText,
       subject_id: globalDataStates.selectedSubjectID,
       topic_id: globalDataStates.selectedTopicsID,
     };
