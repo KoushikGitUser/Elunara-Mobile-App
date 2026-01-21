@@ -470,3 +470,81 @@ export const handleSwitchVersionsOfAIResponse = {
     state.chatsStates.loaderStates.isVersionSwitched = false;
   },
 };
+
+export const handleCompareAIResponses = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isCompareResponsesLoading = "pending";
+    state.chatsStates.allChatsDatas.comparisonResponses = null;
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    console.log("Compare AI Responses - Full Response:", JSON.stringify(responseData, null, 2));
+
+    // Store the comparison responses
+    state.chatsStates.allChatsDatas.comparisonResponses = responseData;
+    state.chatsStates.loaderStates.isCompareResponsesLoading = true;
+
+    console.log("Comparison responses stored:", JSON.stringify(responseData));
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to compare AI responses");
+    state.chatsStates.loaderStates.isCompareResponsesLoading = false;
+    state.chatsStates.allChatsDatas.comparisonResponses = null;
+  },
+};
+
+export const handleStoreCompareResponses = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isStoreCompareResponsePending = "pending";
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    console.log("Store Compare Response - Full Response:", JSON.stringify(responseData, null, 2));
+
+    state.chatsStates.loaderStates.isStoreCompareResponsePending = true;
+    console.log("Compare response stored successfully");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to store compare response");
+    state.chatsStates.loaderStates.isStoreCompareResponsePending = false;
+  },
+};
+
+export const handleCompareAIResponseStyles = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isCompareStyleResponsesLoading = "pending";
+    state.chatsStates.allChatsDatas.comparisonStyleResponses = null;
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    console.log("Compare AI Response Styles - Full Response:", JSON.stringify(responseData, null, 2));
+
+    // Store the comparison responses
+    state.chatsStates.allChatsDatas.comparisonStyleResponses = responseData;
+    state.chatsStates.loaderStates.isCompareStyleResponsesLoading = true;
+
+    console.log("Style comparison responses stored:", JSON.stringify(responseData));
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to compare AI response styles");
+    state.chatsStates.loaderStates.isCompareStyleResponsesLoading = false;
+    state.chatsStates.allChatsDatas.comparisonStyleResponses = null;
+  },
+};
+
+export const handleStoreCompareStyleResponses = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = "pending";
+  },
+  fulfilled: (state, action) => {
+    const responseData = action?.payload.data.data;
+    console.log("Store Compare Style Response - Full Response:", JSON.stringify(responseData, null, 2));
+
+    state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = true;
+    console.log("Compare style response stored successfully");
+  },
+  rejected: (state, { payload }) => {
+    console.log(payload?.message || "Failed to store compare style response");
+    state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = false;
+  },
+};

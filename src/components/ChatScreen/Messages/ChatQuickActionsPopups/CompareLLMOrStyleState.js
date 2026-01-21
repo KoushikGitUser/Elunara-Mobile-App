@@ -15,10 +15,28 @@ import { useDispatch, useSelector } from "react-redux";
 import ChatIcon from "../../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import ConversationalIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
 import { setToggleChangeResponseStyleWhileChatPopup, setToggleCompareStyleState } from "../../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import OtherStylesPopup from "./ChangeStyle/OtherStylesPopup";
 import gemini from '../../../../assets/images/gemini.png'
 import anthropic from "../../../../assets/images/antropic.png"
+import mistral from "../../../../assets/images/mistral.png"
+import chatgpt from "../../../../assets/images/chatgpt.png"
+import loadingGif from "../../../../assets/images/Loading chat mob.gif"
 import OtherLLMPopup from "./ChangeResponse/OtherLLMPopup";
+
+// Helper function to map provider names to icons
+const providerImages = {
+  google: gemini,
+  anthropic: anthropic,
+  "mistral ai": mistral,
+  "open ai": chatgpt,
+  openai: chatgpt,
+};
+
+const getProviderImage = (provider) => {
+  const key = provider?.toLowerCase();
+  return providerImages[key] || anthropic;
+};
 
 const CompareLLMOrStyleState = ({
   forStyleOrLLM,
@@ -26,12 +44,80 @@ const CompareLLMOrStyleState = ({
   icon2,
   title1,
   title2,
-  setCurrentStateOfPopup
+  setCurrentStateOfPopup,
+  selectedLLMsForCompare,
+  selectedStylesForCompare
 }) => {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
+
+  // Get comparison responses from Redux based on type
+  const comparisonData = forStyleOrLLM === "LLM"
+    ? chatsStates?.allChatsDatas?.comparisonResponses
+    : chatsStates?.allChatsDatas?.comparisonStyleResponses;
+
+  const isLoading = forStyleOrLLM === "LLM"
+    ? chatsStates?.loaderStates?.isCompareResponsesLoading === "pending"
+    : chatsStates?.loaderStates?.isCompareStyleResponsesLoading === "pending";
+
+  // Extract responses
+  const firstResponse = comparisonData?.responses?.[0];
+  const secondResponse = comparisonData?.responses?.[1];
+
+  // Handler for selecting first response
+  const handleSelectFirstResponse = () => {
+    if (!firstResponse) return;
+
+    // Get the AI message index and UUID
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+    if (aiMessageUuid) {
+      const storePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/compare/store`,
+        data: {
+          content: firstResponse.content,
+          llm_id: firstResponse.generation?.llm?.id,
+          response_style_id: firstResponse.generation?.style?.id,
+          language_id: firstResponse.generation?.language?.id,
+        },
+        name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
+      };
+
+      console.log("Store First Response Payload:", storePayload);
+      dispatch(commonFunctionForAPICalls(storePayload));
+    }
+  };
+
+  // Handler for selecting second response
+  const handleSelectSecondResponse = () => {
+    if (!secondResponse) return;
+
+    // Get the AI message index and UUID
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+    if (aiMessageUuid) {
+      const storePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/compare/store`,
+        data: {
+          content: secondResponse.content,
+          llm_id: secondResponse.generation?.llm?.id,
+          response_style_id: secondResponse.generation?.style?.id,
+          language_id: secondResponse.generation?.language?.id,
+        },
+        name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
+      };
+
+      console.log("Store Second Response Payload:", storePayload);
+      dispatch(commonFunctionForAPICalls(storePayload));
+    }
+  };
 
   return (
     <View style={styles.modalSheet}>
@@ -61,9 +147,20 @@ const CompareLLMOrStyleState = ({
       <View style={styles.content}>
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
-            {forStyleOrLLM == "style"? <FileText size={22} color="#888888" />:<Image style={{height:25,width:25}} source={gemini} />}
-           
-              <Text style={styles.title}>{forStyleOrLLM == "style"?"Concise":"Google Gemini"}</Text>
+            {forStyleOrLLM == "style" ? (
+              <FileText size={22} color="#888888" />
+            ) : (
+              <Image
+                style={{height:25,width:25}}
+                source={firstResponse ? getProviderImage(firstResponse.generation?.llm?.name) : gemini}
+              />
+            )}
+
+            <Text style={styles.title}>
+              {forStyleOrLLM == "style"
+                ? "Concise"
+                : firstResponse?.generation?.llm?.name || "Loading..."}
+            </Text>
           </View>
 
           <TouchableOpacity
@@ -74,29 +171,28 @@ const CompareLLMOrStyleState = ({
           {(isExpandedFirst && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={true} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} /> :(isExpandedFirst && forStyleOrLLM == "LLM")?<OtherLLMPopup isFirst={true} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond}/>:null}
         </View>
         <View style={styles.responseBoxMain}>
-          <ScrollView style={styles.responseBoxScroll}>
-            <Text
-              style={{
-                fontFamily: "Mukta-Regular",
-                lineHeight: 20,
-                fontSize: scaleFont(18),
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <Image
+                source={loadingGif}
+                style={styles.loadingGif}
+                resizeMode="contain"
+              />
+            </View>
+          ) : (
+            <ScrollView style={styles.responseBoxScroll}>
+              <Text
+                style={{
+                  fontFamily: "Mukta-Regular",
+                  lineHeight: 20,
+                  fontSize: scaleFont(18),
                   color:"#5E5E5E"
-              }}
-            >
-              Finance is the comprehensive management of money, credit,
-              investments, and other financial assets and liabilities. It's
-              about how individuals, businesses, and governments acquire and
-              utilize funds, aiming to maximize value and minimize risk. Finance
-              is the comprehensive management of money, credit, investments, and
-              other financial assets and liabilities. It's about how
-              individuals, businesses, and governments acquire and utilize
-              funds, aiming to maximize value and minimize risk. Finance is the
-              comprehensive management of money, credit, investments, and other
-              financial assets and liabilities. It's about how individuals,
-              businesses, and governments acquire and utilize funds, aiming to
-              maximize value and minimize risk.
-            </Text>
-          </ScrollView>
+                }}
+              >
+                {firstResponse?.content || "No response available"}
+              </Text>
+            </ScrollView>
+          )}
         </View>
         <TouchableOpacity
           style={[
@@ -109,6 +205,9 @@ const CompareLLMOrStyleState = ({
               marginTop: 15,
             },
           ]}
+          onPress={handleSelectFirstResponse}
+          activeOpacity={0.7}
+          disabled={isLoading || !firstResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
@@ -116,9 +215,20 @@ const CompareLLMOrStyleState = ({
         </TouchableOpacity>
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
-            {forStyleOrLLM == "style"? <ConversationalIcon/>:<Image style={{height:25,width:25}} source={anthropic} />}
-            
-            <Text style={styles.title}>{forStyleOrLLM == "style"?"Conversational":"Anthropic"}</Text>
+            {forStyleOrLLM == "style" ? (
+              <ConversationalIcon/>
+            ) : (
+              <Image
+                style={{height:25,width:25}}
+                source={secondResponse ? getProviderImage(secondResponse.generation?.llm?.name) : anthropic}
+              />
+            )}
+
+            <Text style={styles.title}>
+              {forStyleOrLLM == "style"
+                ? "Conversational"
+                : secondResponse?.generation?.llm?.name || "Loading..."}
+            </Text>
           </View>
 
           <TouchableOpacity
@@ -129,29 +239,28 @@ const CompareLLMOrStyleState = ({
           {(isExpandedSecond && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={false} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} />:(isExpandedSecond && forStyleOrLLM == "LLM")? <OtherLLMPopup isFirst={false} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond} />:null}
         </View>
         <View style={styles.responseBoxMain}>
-          <ScrollView style={styles.responseBoxScroll}>
-            <Text
-              style={{
-                fontFamily: "Mukta-Regular",
-                lineHeight: 20,
-                fontSize: scaleFont(18),
-                color:"#5E5E5E"
-              }}
-            >
-              Finance is the comprehensive management of money, credit,
-              investments, and other financial assets and liabilities. It's
-              about how individuals, businesses, and governments acquire and
-              utilize funds, aiming to maximize value and minimize risk. Finance
-              is the comprehensive management of money, credit, investments, and
-              other financial assets and liabilities. It's about how
-              individuals, businesses, and governments acquire and utilize
-              funds, aiming to maximize value and minimize risk. Finance is the
-              comprehensive management of money, credit, investments, and other
-              financial assets and liabilities. It's about how individuals,
-              businesses, and governments acquire and utilize funds, aiming to
-              maximize value and minimize risk.
-            </Text>
-          </ScrollView>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <Image
+                source={loadingGif}
+                style={styles.loadingGif}
+                resizeMode="contain"
+              />
+            </View>
+          ) : (
+            <ScrollView style={styles.responseBoxScroll}>
+              <Text
+                style={{
+                  fontFamily: "Mukta-Regular",
+                  lineHeight: 20,
+                  fontSize: scaleFont(18),
+                  color:"#5E5E5E"
+                }}
+              >
+                {secondResponse?.content || "No response available"}
+              </Text>
+            </ScrollView>
+          )}
         </View>
         <TouchableOpacity
           style={[
@@ -164,6 +273,9 @@ const CompareLLMOrStyleState = ({
               marginTop: 15,
             },
           ]}
+          onPress={handleSelectSecondResponse}
+          activeOpacity={0.7}
+          disabled={isLoading || !secondResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
@@ -230,6 +342,19 @@ const styles = StyleSheet.create({
   responseBoxScroll: {
     flex: 1,
     width: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    width: "100%",
+    height: "100%",
+    paddingLeft: 10,
+    paddingBottom: 10,
+  },
+  loadingGif: {
+    width: 80,
+    height: 80,
   },
   btnsMain: {
     width: "100%",

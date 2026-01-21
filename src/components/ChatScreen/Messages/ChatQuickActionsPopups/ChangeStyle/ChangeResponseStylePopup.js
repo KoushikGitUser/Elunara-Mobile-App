@@ -136,6 +136,20 @@ const ChangeResponseStylePopup = () => {
     </View>
   );
 
+  // Helper function to get user message ID from AI message index
+  const getUserMessageIdFromAIMessageIndex = (aiMessageIndex) => {
+    if (aiMessageIndex === null || aiMessageIndex === undefined) {
+      return null;
+    }
+
+    if (aiMessageIndex > 0) {
+      const userMessageId = globalDataStates.messageIDsArray[aiMessageIndex - 1];
+      return userMessageId;
+    }
+
+    return null;
+  };
+
   return (
     <Modal
       visible={toggleStates.toggleChangeResponseStyleWhileChatPopup}
@@ -167,7 +181,10 @@ const ChangeResponseStylePopup = () => {
 
         {/* Modal Sheet */}
         {toggleStates.toggleCompareStyleState ? (
-          <CompareLLMOrStyleState forStyleOrLLM="style" />
+          <CompareLLMOrStyleState
+            forStyleOrLLM="style"
+            selectedStylesForCompare={selectedStyleForCompare}
+          />
         ) : (
           <View style={styles.modalSheet}>
             {/* Handle Bar */}
@@ -357,20 +374,63 @@ const ChangeResponseStylePopup = () => {
               {/* Button */}
               <View style={styles.btnsMain}>
                 <TouchableOpacity
-                  style={styles.button}
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: selectedCategory == 2 && selectedStyleForCompare.length === 2 ? "#081A35" : selectedCategory == 2 ? "#CDD5DC" : "#081A35",
+                    },
+                  ]}
                   onPress={() => {
                     if (selectedCategory == 1) {
                       //do something
                     } else {
-                      dispatch(setToggleCompareStyleState(true));
+                      if (selectedStyleForCompare.length === 2) {
+                        // Get the AI message index
+                        const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+
+                        if (aiMessageIndex !== null && aiMessageIndex !== undefined) {
+                          // Get AI message UUID
+                          const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                          // Get user message ID using helper function
+                          const userMessageUuid = getUserMessageIdFromAIMessageIndex(aiMessageIndex);
+
+                          if (aiMessageUuid && userMessageUuid) {
+                            console.log("Compare Styles API Payload:", {
+                              aiMessageUuid,
+                              userMessageUuid,
+                              styleIds: selectedStyleForCompare
+                            });
+
+                            // Call compare API
+                            const comparePayload = {
+                              method: "POST",
+                              url: `/messages/${aiMessageUuid}/compare`,
+                              data: {
+                                user_message_id: userMessageUuid,
+                                response_style_ids: selectedStyleForCompare,
+                              },
+                              name: "compareAIResponseStyles",
+                            };
+
+                            dispatch(commonFunctionForAPICalls(comparePayload));
+
+                            // Navigate to compare state
+                            dispatch(setToggleCompareStyleState(true));
+                          } else {
+                            console.error("Missing required IDs:", { aiMessageUuid, userMessageUuid });
+                          }
+                        }
+                      }
                     }
                   }}
                   activeOpacity={0.8}
+                  disabled={selectedCategory == 2 && selectedStyleForCompare.length !== 2}
                 >
                   <Text style={styles.buttonText}>
                     {selectedCategory == 1
                       ? "Update Response Style"
-                      : "Compare Style"}
+                      : `Compare Styles (${selectedStyleForCompare.length}/2)`}
                   </Text>
                 </TouchableOpacity>
               </View>

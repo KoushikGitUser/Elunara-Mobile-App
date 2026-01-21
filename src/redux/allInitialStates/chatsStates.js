@@ -12,6 +12,8 @@ export const chatsStates = {
     aiMessageContent:null,
     regeneratedResponse:{},
     switchedVersionData:{},
+    comparisonResponses:null,
+    comparisonStyleResponses:null,
     },
     loaderStates:{
         isAllRecentChatsFetched:null,
@@ -32,5 +34,9 @@ export const chatsStates = {
         isAIResponseRegenerated:null,
         isAllMessagesOfChatFetched:null,
         isVersionSwitched:null,
+        isCompareResponsesLoading:null,
+        isStoreCompareResponsePending:null,
+        isCompareStyleResponsesLoading:null,
+        isStoreCompareStyleResponsePending:null,
     }
 }

@@ -41,7 +41,7 @@ const providerImages = {
 
 const getProviderImage = (provider) => {
   const key = provider?.toLowerCase();
-  return providerImages[key] || anthropic;
+  return providerImages[key] || anthropic; 
 };
 
 // Helper function to generate badge text based on provider
@@ -177,6 +177,21 @@ const ChangeLLMPopup = () => {
         setSelectedLLMsForCompare([...selectedLLMsForCompare, llmOption]);
       }
     }
+  };
+
+  // Helper function to get user message ID from AI message index
+  const getUserMessageIdFromAIMessageIndex = (aiMessageIndex) => {
+    if (aiMessageIndex === null || aiMessageIndex === undefined) {
+      return null;
+    }
+
+    // If aiMessageIndex is stored, get the user message ID (previous index)
+    if (aiMessageIndex > 0) {
+      const userMessageId = globalDataStates.messageIDsArray[aiMessageIndex - 1];
+      return userMessageId;
+    }
+
+    return null;
   };
 
   // Combine Auto option with LLMs from API
@@ -521,7 +536,45 @@ const ChangeLLMPopup = () => {
                   ]}
                   onPress={() => {
                     if (selectedLLMsForCompare.length === 2) {
-                      setCurrentStateOfPopup(3);
+                      // Get the AI message index
+                      const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+
+                      if (aiMessageIndex !== null && aiMessageIndex !== undefined) {
+                        // Get AI message UUID
+                        const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                        // Get user message ID using helper function
+                        const userMessageUuid = getUserMessageIdFromAIMessageIndex(aiMessageIndex);
+
+                        if (aiMessageUuid && userMessageUuid) {
+                          // Extract LLM IDs from selected LLMs
+                          const llmIds = selectedLLMsForCompare.map(llm => llm.id);
+
+                          console.log("Compare API Payload:", {
+                            aiMessageUuid,
+                            userMessageUuid,
+                            llmIds
+                          });
+
+                          // Call compare API
+                          const comparePayload = {
+                            method: "POST",
+                            url: `/messages/${aiMessageUuid}/compare`,
+                            data: {
+                              user_message_id: userMessageUuid,
+                              llm_ids: llmIds,
+                            },
+                            name: "compareAIResponses",
+                          };
+
+                          dispatch(commonFunctionForAPICalls(comparePayload));
+
+                          // Navigate to compare state
+                          setCurrentStateOfPopup(3);
+                        } else {
+                          console.error("Missing required IDs:", { aiMessageUuid, userMessageUuid });
+                        }
+                      }
                     }
                   }}
                   activeOpacity={0.8}
@@ -535,7 +588,11 @@ const ChangeLLMPopup = () => {
             </View>
           </View>
         ) : currentStateOfPopup == 3 ? (
-          <CompareLLMOrStyleState setCurrentStateOfPopup={setCurrentStateOfPopup} forStyleOrLLM="LLM" />
+          <CompareLLMOrStyleState
+            setCurrentStateOfPopup={setCurrentStateOfPopup}
+            forStyleOrLLM="LLM"
+            selectedLLMsForCompare={selectedLLMsForCompare}
+          />
         ) : currentStateOfPopup == 4 ? (
           <IntegtrateAiState setCurrentStateOfPopup={setCurrentStateOfPopup} />
         ) : (
