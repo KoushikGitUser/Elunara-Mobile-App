@@ -10,7 +10,13 @@ import {
   Image,
   Modal,
 } from "react-native";
-import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+  useRef,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -21,7 +27,17 @@ import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/Cha
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setToggleChatScreenGuideStart, setToggleChatHistorySidebar, setToggleChatActionsPopupOnLongPress, setIsEditingUserMessage, setSelectedLLM, setSelectedResponseStyle, setSelectedLanguage, setSelectedCitationFormat } from "../../redux/slices/toggleSlice";
+import {
+  setToggleChatScreenGuideStart,
+  setToggleChatHistorySidebar,
+  setToggleChatActionsPopupOnLongPress,
+  setIsEditingUserMessage,
+  setSelectedLLM,
+  setSelectedResponseStyle,
+  setSelectedLanguage,
+  setSelectedCitationFormat,
+  setToggleIsChattingWithAI,
+} from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
   setNavigationBasicsGuideTourSteps,
@@ -64,7 +80,8 @@ const mockChatMessages = [
   },
   {
     role: "ai",
-    message: "Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data, learn from it, and make predictions or decisions.",
+    message:
+      "Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. It focuses on developing algorithms that can access data, learn from it, and make predictions or decisions.",
     file: null,
   },
 ];
@@ -80,7 +97,8 @@ const ChatScreen = () => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
-  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] = useState(false);
+  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] =
+    useState(false);
 
   // Store original chat messages before mock injection
   const [originalChatMessages, setOriginalChatMessages] = useState([]);
@@ -93,7 +111,8 @@ const ChatScreen = () => {
   const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
   const isMessagesFetched = chatsStates?.loaderStates?.isMessagesFetched;
   const chatMessages = chatsStates?.allChatsDatas?.chatMessages;
-  const isAllMessagesOfChatFetched = chatsStates?.loaderStates?.isAllMessagesOfChatFetched;
+  const isAllMessagesOfChatFetched =
+    chatsStates?.loaderStates?.isAllMessagesOfChatFetched;
 
   // Refs for guided tour measurements
   const chatHeaderRef = useRef(null);
@@ -111,17 +130,17 @@ const ChatScreen = () => {
 
   useEffect(() => {
     if (fontsLoaded) {
-    } 
+    }
   }, [fontsLoaded]);
 
-  useEffect(()=>{
+  useEffect(() => {
     const payload = {
-      method:"GET",
-      url:"/master/subjects",
-      name:"getAllSubjectsForChat",
-    }
+      method: "GET",
+      url: "/master/subjects",
+      name: "getAllSubjectsForChat",
+    };
     dispatch(commonFunctionForAPICalls(payload));
-  },[])
+  }, []);
 
   // Fetch general settings on mount to populate chat customization states
   useEffect(() => {
@@ -136,38 +155,47 @@ const ChatScreen = () => {
   // Populate chatCustomisationStates when general settings are loaded
   useEffect(() => {
     if (settingsStates?.allGeneralSettings) {
-      const { preferredLLMs, responseLanguageSettings, adSettings } = settingsStates.allGeneralSettings;
+      const { preferredLLMs, responseLanguageSettings, adSettings } =
+        settingsStates.allGeneralSettings;
 
       // Set LLM preference
       if (preferredLLMs) {
-        dispatch(setSelectedLLM({
-          id: preferredLLMs.llm_id || null,
-          name: preferredLLMs.llm_name || "Auto",
-        }));
+        dispatch(
+          setSelectedLLM({
+            id: preferredLLMs.llm_id || null,
+            name: preferredLLMs.llm_name || "Auto",
+          }),
+        );
       }
 
       // Set Response Style
       if (adSettings?.response_style) {
-        dispatch(setSelectedResponseStyle({
-          id: adSettings.response_style.id || null,
-          name: adSettings.response_style.name || "Auto",
-        }));
+        dispatch(
+          setSelectedResponseStyle({
+            id: adSettings.response_style.id || null,
+            name: adSettings.response_style.name || "Auto",
+          }),
+        );
       }
 
       // Set Response Language
       if (responseLanguageSettings) {
-        dispatch(setSelectedLanguage({
-          id: responseLanguageSettings.language_id || null,
-          name: responseLanguageSettings.language_name || "English",
-        }));
+        dispatch(
+          setSelectedLanguage({
+            id: responseLanguageSettings.language_id || null,
+            name: responseLanguageSettings.language_name || "English",
+          }),
+        );
       }
 
       // Set Citation Format
       if (adSettings?.citation_format) {
-        dispatch(setSelectedCitationFormat({
-          id: adSettings.citation_format.id || null,
-          name: adSettings.citation_format.name || "Harvard",
-        }));
+        dispatch(
+          setSelectedCitationFormat({
+            id: adSettings.citation_format.id || null,
+            name: adSettings.citation_format.name || "Harvard",
+          }),
+        );
       }
     }
   }, [settingsStates?.allGeneralSettings]);
@@ -187,7 +215,10 @@ const ChatScreen = () => {
           method: "POST",
           url: `/chats/${chatId}/messages`,
           data: {
-            content: globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1]?.message || "Hello",
+            content:
+              globalDataStates.chatMessagesArray[
+                globalDataStates.chatMessagesArray.length - 1
+              ]?.message || "Hello",
             content_type: "text",
             attachment_ids: [],
           },
@@ -214,7 +245,8 @@ const ChatScreen = () => {
 
   // Handle fetched messages from chat history
   useEffect(() => {
-    const isAllMessagesOfChatFetched = chatsStates.loaderStates.isAllMessagesOfChatFetched;
+    const isAllMessagesOfChatFetched =
+      chatsStates.loaderStates.isAllMessagesOfChatFetched;
     const fetchedMessages = chatsStates.allChatsDatas.fetchedMessages;
 
     if (isAllMessagesOfChatFetched === true && fetchedMessages) {
@@ -222,9 +254,15 @@ const ChatScreen = () => {
       dispatch(setChatMessagesArray(fetchedMessages.chatMessagesArray));
       dispatch(setMessageIDsArray(fetchedMessages.messageIDsArray));
 
-      console.log("Messages loaded from history:", fetchedMessages.chatMessagesArray.length);
+      console.log(
+        "Messages loaded from history:",
+        fetchedMessages.chatMessagesArray.length,
+      );
     }
-  }, [chatsStates.loaderStates.isAllMessagesOfChatFetched, chatsStates.allChatsDatas.fetchedMessages]);
+  }, [
+    chatsStates.loaderStates.isAllMessagesOfChatFetched,
+    chatsStates.allChatsDatas.fetchedMessages,
+  ]);
 
   useEffect(() => {
     const checkNewUser = async () => {
@@ -241,9 +279,11 @@ const ChatScreen = () => {
   useEffect(() => {
     if (globalDataStates.manualGuidedTourRunning) {
       // Navigation Basics - auto open sidebar after step 1
-      if (globalDataStates.navigationBasicsGuideTourSteps === 2 ||
-          globalDataStates.navigationBasicsGuideTourSteps === 3 ||
-          globalDataStates.navigationBasicsGuideTourSteps === 4) {
+      if (
+        globalDataStates.navigationBasicsGuideTourSteps === 2 ||
+        globalDataStates.navigationBasicsGuideTourSteps === 3 ||
+        globalDataStates.navigationBasicsGuideTourSteps === 4
+      ) {
         if (!toggleStates.toggleChatHistorySidebar) {
           setTimeout(() => {
             Animated.timing(translateX, {
@@ -320,7 +360,7 @@ const ChatScreen = () => {
           if (sidebarRef.current?.measureRecentChatsSection) {
             const rect = await sidebarRef.current.measureRecentChatsSection();
             if (rect) {
-              setSpotlightRects(prev => ({
+              setSpotlightRects((prev) => ({
                 ...prev,
                 recentChats: {
                   x: rect.x - padding,
@@ -396,7 +436,7 @@ const ChatScreen = () => {
           if (sidebarRef.current?.measureLearningLabBtn) {
             const rect = await sidebarRef.current.measureLearningLabBtn();
             if (rect) {
-              setSpotlightRects(prev => ({
+              setSpotlightRects((prev) => ({
                 ...prev,
                 learningLabBtn: {
                   x: rect.x - padding,
@@ -411,7 +451,7 @@ const ChatScreen = () => {
       }
 
       if (Object.keys(newRects).length > 0) {
-        setSpotlightRects(prev => ({ ...prev, ...newRects }));
+        setSpotlightRects((prev) => ({ ...prev, ...newRects }));
       }
     };
 
@@ -424,6 +464,11 @@ const ChatScreen = () => {
   ]);
 
   useEffect(() => {
+    dispatch(setChatMessagesArray([]));
+    dispatch(setToggleIsChattingWithAI(false));
+  }, []);
+ 
+  useEffect(() => {
     const backAction = () => {
       setToggleExitAppConfirmPopup(true);
       return true; // prevent default behavior (exit)
@@ -431,7 +476,7 @@ const ChatScreen = () => {
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
 
     return () => backHandler.remove(); // clean up
@@ -560,13 +605,39 @@ const ChatScreen = () => {
     if (tourType === "navigation") {
       switch (step) {
         case 1: // Menu icon
-          return spotlightRects.menuIcon || { x: 15, y: statusBarHeight + 35, width: 46, height: 46 };
+          return (
+            spotlightRects.menuIcon || {
+              x: 15,
+              y: statusBarHeight + 35,
+              width: 46,
+              height: 46,
+            }
+          );
         case 2: // Recent chats section
-          return spotlightRects.recentChats || { x: 10, y: statusBarHeight + 200, width: SCREEN_WIDTH * 0.7, height: 150 };
+          return (
+            spotlightRects.recentChats || {
+              x: 10,
+              y: statusBarHeight + 200,
+              width: SCREEN_WIDTH * 0.7,
+              height: 150,
+            }
+          );
         case 3: // Pinned section
-          return spotlightRects.pinnedSection || { x: 10, y: statusBarHeight + 100, width: SCREEN_WIDTH * 0.7, height: 100 };
+          return (
+            spotlightRects.pinnedSection || {
+              x: 10,
+              y: statusBarHeight + 100,
+              width: SCREEN_WIDTH * 0.7,
+              height: 100,
+            }
+          );
         case 4: // Chat options popup (will be shown)
-          return { x: SCREEN_WIDTH * 0.1, y: SCREEN_HEIGHT * 0.3, width: SCREEN_WIDTH * 0.55, height: 200 };
+          return {
+            x: SCREEN_WIDTH * 0.1,
+            y: SCREEN_HEIGHT * 0.3,
+            width: SCREEN_WIDTH * 0.55,
+            height: 200,
+          };
         default:
           return null;
       }
@@ -576,13 +647,39 @@ const ChatScreen = () => {
     if (tourType === "chatFunctions") {
       switch (step) {
         case 1: // Input section
-          return spotlightRects.inputSection || { x: 10, y: SCREEN_HEIGHT - 120, width: SCREEN_WIDTH - 20, height: 80 };
+          return (
+            spotlightRects.inputSection || {
+              x: 10,
+              y: SCREEN_HEIGHT - 120,
+              width: SCREEN_WIDTH - 20,
+              height: 80,
+            }
+          );
         case 2: // Quick actions (AI message)
-          return { x: 20, y: SCREEN_HEIGHT - 280, width: SCREEN_WIDTH - 40, height: 60 };
+          return {
+            x: 20,
+            y: SCREEN_HEIGHT - 280,
+            width: SCREEN_WIDTH - 40,
+            height: 60,
+          };
         case 3: // LLM customization icon
-          return spotlightRects.toolsIcon || { x: 15, y: SCREEN_HEIGHT - 115, width: 46, height: 46 };
+          return (
+            spotlightRects.toolsIcon || {
+              x: 15,
+              y: SCREEN_HEIGHT - 115,
+              width: 46,
+              height: 46,
+            }
+          );
         case 4: // Top chat options
-          return spotlightRects.chatOptionsIcon || { x: SCREEN_WIDTH - 55, y: statusBarHeight + 35, width: 46, height: 46 };
+          return (
+            spotlightRects.chatOptionsIcon || {
+              x: SCREEN_WIDTH - 55,
+              y: statusBarHeight + 35,
+              width: 46,
+              height: 46,
+            }
+          );
         default:
           return null;
       }
@@ -590,7 +687,14 @@ const ChatScreen = () => {
 
     // Learning Labs
     if (tourType === "learningLabs") {
-      return spotlightRects.learningLabBtn || { x: 10, y: statusBarHeight + 200, width: SCREEN_WIDTH * 0.7, height: 50 };
+      return (
+        spotlightRects.learningLabBtn || {
+          x: 10,
+          y: statusBarHeight + 200,
+          width: SCREEN_WIDTH * 0.7,
+          height: 50,
+        }
+      );
     }
 
     return null;
@@ -598,7 +702,11 @@ const ChatScreen = () => {
 
   // Calculate tooltip position based on spotlight rect
   // Returns { top/bottom, left/right, pointerLeft/pointerRight } for tooltip positioning
-  const getTooltipPosition = (spotlightRect, position = "below", alignment = "left") => {
+  const getTooltipPosition = (
+    spotlightRect,
+    position = "below",
+    alignment = "left",
+  ) => {
     if (!spotlightRect) return {};
 
     const tooltipWidth = SCREEN_WIDTH - 100; // From UniversalTooltip styles
@@ -620,26 +728,35 @@ const ChatScreen = () => {
       result.left = Math.max(10, spotlightRect.x);
       // Pointer points to center of spotlight
       const spotlightCenter = spotlightRect.x + spotlightRect.width / 2;
-      result.pointerLeft = Math.max(15, Math.min(spotlightCenter - result.left, tooltipWidth - 30));
+      result.pointerLeft = Math.max(
+        15,
+        Math.min(spotlightCenter - result.left, tooltipWidth - 30),
+      );
     } else if (alignment === "right") {
       // Right-aligned tooltip
-      result.right = Math.max(10, SCREEN_WIDTH - (spotlightRect.x + spotlightRect.width));
+      result.right = Math.max(
+        10,
+        SCREEN_WIDTH - (spotlightRect.x + spotlightRect.width),
+      );
       // Pointer points to center of spotlight
       const spotlightCenter = spotlightRect.x + spotlightRect.width / 2;
       const tooltipLeft = SCREEN_WIDTH - result.right - tooltipWidth;
-      result.pointerRight = Math.max(15, Math.min(SCREEN_WIDTH - spotlightCenter - tooltipLeft - 30, tooltipWidth - 30));
+      result.pointerRight = Math.max(
+        15,
+        Math.min(
+          SCREEN_WIDTH - spotlightCenter - tooltipLeft - 30,
+          tooltipWidth - 30,
+        ),
+      );
     } else if (alignment === "center") {
       // Center-aligned tooltip
       const spotlightCenter = spotlightRect.x + spotlightRect.width / 2;
-      result.left = Math.max(10, spotlightCenter -  tooltipWidth / 2);
+      result.left = Math.max(10, spotlightCenter - tooltipWidth / 2);
       result.pointerLeft = tooltipWidth / 2 - 8; // Center pointer
     }
 
     return result;
   };
-
- 
-  
 
   return (
     <SafeAreaView
@@ -705,7 +822,12 @@ const ChatScreen = () => {
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && (
             <ChangeLLMPopup />
           )}
-          {toggleExitAppConfirmPopup && <ExitAppConfirmationPopup setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup} toggleExitAppConfirmPopup={toggleExitAppConfirmPopup} />}
+          {toggleExitAppConfirmPopup && (
+            <ExitAppConfirmationPopup
+              setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup}
+              toggleExitAppConfirmPopup={toggleExitAppConfirmPopup}
+            />
+          )}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
           {toggleStates.toggleChangeResponseStyleWhileChatPopup && (
             <ChangeResponseStylePopup />
@@ -719,9 +841,8 @@ const ChatScreen = () => {
           {toggleStates.toggleUserMessageActionPopup && (
             <UserMessageActionPopup />
           )}
-          {toggleStates.toggleChatActionsPopupOnLongPress && !globalDataStates.manualGuidedTourRunning && (
-            <ChatLongPressPopup />
-          )}
+          {toggleStates.toggleChatActionsPopupOnLongPress &&
+            !globalDataStates.manualGuidedTourRunning && <ChatLongPressPopup />}
           {toggleStates.toggleUnlockArchiveLimitPopup && (
             <UnlockArchiveLimitPopup />
           )}
@@ -733,248 +854,306 @@ const ChatScreen = () => {
           )}
 
           {/* Original new user guided tour tooltips */}
-          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 1 && !globalDataStates.manualGuidedTourRunning && (
-            <UniversalTooltip
-              title="Customise Your AI"
-              description="Customize how Elunara responds, choose the AI model, response style, language, and citation format, all tailored to your needs."
-              isBelowButtonPresent={false}
-              pointerPosition="down"
-              pointerAlignment="left"
-              modalPosition="down"
-              modalAlignment="right"
-              bottom={140}
-              right={20}
-              pointerLeft={60}
-            />
-          )}
-          {toggleStates.toggleChatScreenGuideStart && globalDataStates.guidedTourStepsCount == 2 && !globalDataStates.manualGuidedTourRunning && (
-            <UniversalTooltip
-              title="Organise your work quickly."
-              description="Start a new learning lab easily from the sidebar to keep everything focused."
-              isBelowButtonPresent={false}
-              pointerPosition="up"
-              pointerAlignment="left"
-              modalPosition="up"
-              modalAlignment="left"
-              top ={105}
-              left={10}
-              pointerLeft={20}
-            />
-          )}
+          {toggleStates.toggleChatScreenGuideStart &&
+            globalDataStates.guidedTourStepsCount == 1 &&
+            !globalDataStates.manualGuidedTourRunning && (
+              <UniversalTooltip
+                title="Customise Your AI"
+                description="Customize how Elunara responds, choose the AI model, response style, language, and citation format, all tailored to your needs."
+                isBelowButtonPresent={false}
+                pointerPosition="down"
+                pointerAlignment="left"
+                modalPosition="down"
+                modalAlignment="right"
+                bottom={140}
+                right={20}
+                pointerLeft={60}
+              />
+            )}
+          {toggleStates.toggleChatScreenGuideStart &&
+            globalDataStates.guidedTourStepsCount == 2 &&
+            !globalDataStates.manualGuidedTourRunning && (
+              <UniversalTooltip
+                title="Organise your work quickly."
+                description="Start a new learning lab easily from the sidebar to keep everything focused."
+                isBelowButtonPresent={false}
+                pointerPosition="up"
+                pointerAlignment="left"
+                modalPosition="up"
+                modalAlignment="left"
+                top={105}
+                left={10}
+                pointerLeft={20}
+              />
+            )}
 
           {/* Navigation Basics Tour */}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.navigationBasicsGuideTourSteps === 1 && (() => {
-            const spotlightRect = getSpotlightRect("navigation", 1);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Open Sidebar"
-                description="Tap the menu icon to access your chat history, learning labs, and rooms."
-                currentStep={1}
-                totalSteps={4}
-                onNextPress={() => handleNavigationBasicsNext(1)}
-                showBackButton={false}
-                pointerPosition="up"
-                pointerAlignment="left"
-                modalPosition="up"
-                modalAlignment="left"
-                top={tooltipPos.top || 90}
-                left={tooltipPos.left || 10}
-                pointerLeft={tooltipPos.pointerLeft || 20}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.navigationBasicsGuideTourSteps === 2 && (() => {
-            const spotlightRect = getSpotlightRect("navigation", 2);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Recent Chats"
-                description="View and continue your recent conversations here."
-                currentStep={2}
-                totalSteps={4}
-                onNextPress={() => handleNavigationBasicsNext(2)}
-                onBackPress={() => handleNavigationBasicsBack(2)}
-                pointerPosition="up"
-                pointerAlignment="left"
-                modalPosition="up"
-                modalAlignment="left"
-                top={tooltipPos.top || 360}
-                left={tooltipPos.left || 10}
-                pointerLeft={tooltipPos.pointerLeft || 20}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.navigationBasicsGuideTourSteps === 3 && (() => {
-            const spotlightRect = getSpotlightRect("navigation", 3);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Pinned Items"
-                description="Pin important chats and rooms for quick access."
-                currentStep={3}
-                totalSteps={4}
-                onNextPress={() => handleNavigationBasicsNext(3)}
-                onBackPress={() => handleNavigationBasicsBack(3)}
-                pointerPosition="up"
-                pointerAlignment="left"
-                modalPosition="up"
-                modalAlignment="left"
-                top={tooltipPos.top || 210}
-                left={tooltipPos.left || 10}
-                pointerLeft={tooltipPos.pointerLeft || 20}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.navigationBasicsGuideTourSteps === 4 && (() => {
-            const spotlightRect = getSpotlightRect("navigation", 4);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Chat Actions"
-                description="Long press any chat to rename, delete, pin, or add to a learning lab."
-                currentStep={4}
-                totalSteps={4}
-                onNextPress={() => handleNavigationBasicsNext(4)}
-                onBackPress={() => handleNavigationBasicsBack(4)}
-                pointerPosition="up"
-                pointerAlignment="left"
-                modalPosition="up"
-                modalAlignment="left"
-                top={tooltipPos.top || 200}
-                left={tooltipPos.left || 10}
-                pointerLeft={tooltipPos.pointerLeft || 50}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.navigationBasicsGuideTourSteps === 1 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("navigation", 1);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Open Sidebar"
+                  description="Tap the menu icon to access your chat history, learning labs, and rooms."
+                  currentStep={1}
+                  totalSteps={4}
+                  onNextPress={() => handleNavigationBasicsNext(1)}
+                  showBackButton={false}
+                  pointerPosition="up"
+                  pointerAlignment="left"
+                  modalPosition="up"
+                  modalAlignment="left"
+                  top={tooltipPos.top || 90}
+                  left={tooltipPos.left || 10}
+                  pointerLeft={tooltipPos.pointerLeft || 20}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.navigationBasicsGuideTourSteps === 2 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("navigation", 2);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Recent Chats"
+                  description="View and continue your recent conversations here."
+                  currentStep={2}
+                  totalSteps={4}
+                  onNextPress={() => handleNavigationBasicsNext(2)}
+                  onBackPress={() => handleNavigationBasicsBack(2)}
+                  pointerPosition="up"
+                  pointerAlignment="left"
+                  modalPosition="up"
+                  modalAlignment="left"
+                  top={tooltipPos.top || 360}
+                  left={tooltipPos.left || 10}
+                  pointerLeft={tooltipPos.pointerLeft || 20}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.navigationBasicsGuideTourSteps === 3 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("navigation", 3);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Pinned Items"
+                  description="Pin important chats and rooms for quick access."
+                  currentStep={3}
+                  totalSteps={4}
+                  onNextPress={() => handleNavigationBasicsNext(3)}
+                  onBackPress={() => handleNavigationBasicsBack(3)}
+                  pointerPosition="up"
+                  pointerAlignment="left"
+                  modalPosition="up"
+                  modalAlignment="left"
+                  top={tooltipPos.top || 210}
+                  left={tooltipPos.left || 10}
+                  pointerLeft={tooltipPos.pointerLeft || 20}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.navigationBasicsGuideTourSteps === 4 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("navigation", 4);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Chat Actions"
+                  description="Long press any chat to rename, delete, pin, or add to a learning lab."
+                  currentStep={4}
+                  totalSteps={4}
+                  onNextPress={() => handleNavigationBasicsNext(4)}
+                  onBackPress={() => handleNavigationBasicsBack(4)}
+                  pointerPosition="up"
+                  pointerAlignment="left"
+                  modalPosition="up"
+                  modalAlignment="left"
+                  top={tooltipPos.top || 200}
+                  left={tooltipPos.left || 10}
+                  pointerLeft={tooltipPos.pointerLeft || 50}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
 
           {/* Chat Functions Tour */}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.chatFunctionsGuideTourSteps === 1 && (() => {
-            const spotlightRect = getSpotlightRect("chatFunctions", 1);
-            const tooltipPos = getTooltipPosition(spotlightRect, "above", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Input Area"
-                description="Type your questions here and attach files to enhance your conversation."
-                currentStep={1}
-                totalSteps={4}
-                onNextPress={() => handleChatFunctionsNext(1)}
-                showBackButton={false}
-                pointerPosition="down"
-                pointerAlignment="left"
-                modalPosition="down"
-                modalAlignment="left"
-                bottom={tooltipPos.bottom || 130}
-                left={tooltipPos.left || 20}
-                pointerLeft={tooltipPos.pointerLeft || 30}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.chatFunctionsGuideTourSteps === 2 && (() => {
-            const spotlightRect = getSpotlightRect("chatFunctions", 2);
-            const tooltipPos = getTooltipPosition(spotlightRect, "above", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Quick Actions"
-                description="Copy, share, save to notes, or provide feedback on AI responses."
-                currentStep={2}
-                totalSteps={4}
-                onNextPress={() => handleChatFunctionsNext(2)}
-                onBackPress={() => handleChatFunctionsBack(2)}
-                pointerPosition="down"
-                pointerAlignment="left"
-                modalPosition="down"
-                modalAlignment="left"
-                bottom={tooltipPos.bottom || 300}
-                left={tooltipPos.left || 20}
-                pointerLeft={tooltipPos.pointerLeft || 50}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.chatFunctionsGuideTourSteps === 3 && (() => {
-            const spotlightRect = getSpotlightRect("chatFunctions", 3);
-            const tooltipPos = getTooltipPosition(spotlightRect, "above", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Customize AI"
-                description="Choose your preferred AI model, response style, and language."
-                currentStep={3}
-                totalSteps={4}
-                onNextPress={() => handleChatFunctionsNext(3)}
-                onBackPress={() => handleChatFunctionsBack(3)}
-                pointerPosition="down"
-                pointerAlignment="left"
-                modalPosition="down"
-                modalAlignment="left"
-                bottom={tooltipPos.bottom || 130}
-                left={tooltipPos.left || 20}
-                pointerLeft={tooltipPos.pointerLeft || 20}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.chatFunctionsGuideTourSteps === 4 && (() => {
-            const spotlightRect = getSpotlightRect("chatFunctions", 4);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "right");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Chat Options"
-                description="Access additional options like rename, delete, or export chat."
-                currentStep={4}
-                totalSteps={4}
-                onNextPress={() => handleChatFunctionsNext(4)}
-                onBackPress={() => handleChatFunctionsBack(4)}
-                pointerPosition="up"
-                pointerAlignment="right"
-                modalPosition="up"
-                modalAlignment="right"
-                top={tooltipPos.top || 90}
-                right={tooltipPos.right || 20}
-                pointerRight={tooltipPos.pointerRight || 20}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.chatFunctionsGuideTourSteps === 1 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("chatFunctions", 1);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "above",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Input Area"
+                  description="Type your questions here and attach files to enhance your conversation."
+                  currentStep={1}
+                  totalSteps={4}
+                  onNextPress={() => handleChatFunctionsNext(1)}
+                  showBackButton={false}
+                  pointerPosition="down"
+                  pointerAlignment="left"
+                  modalPosition="down"
+                  modalAlignment="left"
+                  bottom={tooltipPos.bottom || 130}
+                  left={tooltipPos.left || 20}
+                  pointerLeft={tooltipPos.pointerLeft || 30}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.chatFunctionsGuideTourSteps === 2 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("chatFunctions", 2);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "above",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Quick Actions"
+                  description="Copy, share, save to notes, or provide feedback on AI responses."
+                  currentStep={2}
+                  totalSteps={4}
+                  onNextPress={() => handleChatFunctionsNext(2)}
+                  onBackPress={() => handleChatFunctionsBack(2)}
+                  pointerPosition="down"
+                  pointerAlignment="left"
+                  modalPosition="down"
+                  modalAlignment="left"
+                  bottom={tooltipPos.bottom || 300}
+                  left={tooltipPos.left || 20}
+                  pointerLeft={tooltipPos.pointerLeft || 50}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.chatFunctionsGuideTourSteps === 3 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("chatFunctions", 3);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "above",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Customize AI"
+                  description="Choose your preferred AI model, response style, and language."
+                  currentStep={3}
+                  totalSteps={4}
+                  onNextPress={() => handleChatFunctionsNext(3)}
+                  onBackPress={() => handleChatFunctionsBack(3)}
+                  pointerPosition="down"
+                  pointerAlignment="left"
+                  modalPosition="down"
+                  modalAlignment="left"
+                  bottom={tooltipPos.bottom || 130}
+                  left={tooltipPos.left || 20}
+                  pointerLeft={tooltipPos.pointerLeft || 20}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.chatFunctionsGuideTourSteps === 4 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("chatFunctions", 4);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "right",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Chat Options"
+                  description="Access additional options like rename, delete, or export chat."
+                  currentStep={4}
+                  totalSteps={4}
+                  onNextPress={() => handleChatFunctionsNext(4)}
+                  onBackPress={() => handleChatFunctionsBack(4)}
+                  pointerPosition="up"
+                  pointerAlignment="right"
+                  modalPosition="up"
+                  modalAlignment="right"
+                  top={tooltipPos.top || 90}
+                  right={tooltipPos.right || 20}
+                  pointerRight={tooltipPos.pointerRight || 20}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
 
           {/* Learning Labs Tour (Free User) */}
-          {globalDataStates.manualGuidedTourRunning && globalDataStates.learningLabsGuideTourSteps === 1 && (() => {
-            const spotlightRect = getSpotlightRect("learningLabs", 1);
-            const tooltipPos = getTooltipPosition(spotlightRect, "below", "left");
-            return (
-              <UniversalTooltip
-                isManualTour={true}
-                title="Learning Labs"
-                description="Unlock Learning Labs to organize your research and create focused projects. Upgrade to Pro for full access."
-                currentStep={1}
-                totalSteps={1}
-                showUnlockButton={true}
-                onUnlockPress={handleLearningLabsUnlock}
-                onBackPress={handleLearningLabsBack}
-                pointerPosition="up"
-                pointerAlignment="left"
-                modalPosition="up"
-                modalAlignment="left"
-                top={tooltipPos.top || 440}
-                left={tooltipPos.left || 10}
-                pointerLeft={tooltipPos.pointerLeft || 30}
-                spotlightRect={spotlightRect}
-              />
-            );
-          })()}
+          {globalDataStates.manualGuidedTourRunning &&
+            globalDataStates.learningLabsGuideTourSteps === 1 &&
+            (() => {
+              const spotlightRect = getSpotlightRect("learningLabs", 1);
+              const tooltipPos = getTooltipPosition(
+                spotlightRect,
+                "below",
+                "left",
+              );
+              return (
+                <UniversalTooltip
+                  isManualTour={true}
+                  title="Learning Labs"
+                  description="Unlock Learning Labs to organize your research and create focused projects. Upgrade to Pro for full access."
+                  currentStep={1}
+                  totalSteps={1}
+                  showUnlockButton={true}
+                  onUnlockPress={handleLearningLabsUnlock}
+                  onBackPress={handleLearningLabsBack}
+                  pointerPosition="up"
+                  pointerAlignment="left"
+                  modalPosition="up"
+                  modalAlignment="left"
+                  top={tooltipPos.top || 440}
+                  left={tooltipPos.left || 10}
+                  pointerLeft={tooltipPos.pointerLeft || 30}
+                  spotlightRect={spotlightRect}
+                />
+              );
+            })()}
 
           <ToasterWithAction />
           {/* middle section */}

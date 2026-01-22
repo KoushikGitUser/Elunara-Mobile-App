@@ -529,14 +529,14 @@ const ChangeLLMPopup = () => {
                         const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
                         if (aiMessageUuid) {
-                          // Make two separate API calls - one for each LLM
+                          // Make two separate API calls - one for each LLM with separate handler names
                           const firstLLMPayload = {
                             method: "POST",
                             url: `/messages/${aiMessageUuid}/compare`,
                             data: {
                               llm_id: selectedLLMsForCompare[0].id,
                             },
-                            name: "compareAIResponses",
+                            name: "compareAIResponsesFirst",
                           };
 
                           const secondLLMPayload = {
@@ -545,7 +545,7 @@ const ChangeLLMPopup = () => {
                             data: {
                               llm_id: selectedLLMsForCompare[1].id,
                             },
-                            name: "compareAIResponses",
+                            name: "compareAIResponsesSecond",
                           };
 
                           console.log("Compare API Payloads:", {
@@ -553,7 +553,7 @@ const ChangeLLMPopup = () => {
                             secondLLM: secondLLMPayload
                           });
 
-                          // Call both APIs
+                          // Call both APIs independently
                           dispatch(commonFunctionForAPICalls(firstLLMPayload));
                           dispatch(commonFunctionForAPICalls(secondLLMPayload));
 

@@ -14,6 +14,10 @@ export const chatsStates = {
     switchedVersionData:{},
     comparisonResponses:null,
     comparisonStyleResponses:null,
+    firstComparisonResponse:null,
+    secondComparisonResponse:null,
+    firstComparisonStyleResponse:null,
+    secondComparisonStyleResponse:null,
     latestUserMessageData:null,
     latestAiMessageData:null,
     addToNotes:{},
@@ -42,5 +46,9 @@ export const chatsStates = {
         isStoreCompareResponsePending:null,
         isCompareStyleResponsesLoading:null,
         isStoreCompareStyleResponsePending:null,
+        isFirstCompareResponseLoading:null,
+        isSecondCompareResponseLoading:null,
+        isFirstCompareStyleResponseLoading:null,
+        isSecondCompareStyleResponseLoading:null,
     }
 }

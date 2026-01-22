@@ -34,15 +34,27 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [isRemovingFromNotes, setIsRemovingFromNotes] = useState(false);
 
-  // Local state for version management
-  const [currentVersion, setCurrentVersion] = useState(1);
-  const [totalVersions, setTotalVersions] = useState(1);
+  // Get message data from chatMessagesArray
+  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
 
-  // Local state for customization badges (generation data)
-  const [generationData, setGenerationData] = useState({
-    llm: { name: "Auto" },
-    style: { name: "Auto" },
-    language: { name: "Auto" }
+  // Local state for version management - initialize from message data
+  const [currentVersion, setCurrentVersion] = useState(currentMessage?.version || 1);
+  const [totalVersions, setTotalVersions] = useState(currentMessage?.total_versions || 1);
+
+  // Local state for customization badges (generation data) - initialize from message data
+  const [generationData, setGenerationData] = useState(() => {
+    if (currentMessage?.generation) {
+      return {
+        llm: currentMessage.generation.llm || null,
+        style: currentMessage.generation.style || null,
+        language: currentMessage.generation.language || null
+      };
+    }
+    return {
+      llm: null,
+      style: null,
+      language: null
+    };
   });
 
   // Local state for switched version message content
@@ -60,11 +72,29 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   // Get regenerated response data
   const regeneratedResponse = chatsStates?.allChatsDatas?.regeneratedResponse;
 
-  // Get version info from the message in chatMessagesArray (updated by both regeneration and version switching)
-  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
+  // Check if generation data is available (for badges)
+  const hasGenerationData = generationData?.llm || generationData?.style || generationData?.language;
 
-  // Check if this message has regenerations
-  const hasRegenerations = totalVersions > 1;
+  // Update state when currentMessage changes (e.g., when chat is loaded)
+  useEffect(() => {
+    if (currentMessage) {
+      // Update version info
+      if (currentMessage.version !== undefined) {
+        setCurrentVersion(currentMessage.version);
+      }
+      if (currentMessage.total_versions !== undefined) {
+        setTotalVersions(currentMessage.total_versions);
+      }
+      // Update generation data
+      if (currentMessage.generation) {
+        setGenerationData({
+          llm: currentMessage.generation.llm || null,
+          style: currentMessage.generation.style || null,
+          language: currentMessage.generation.language || null
+        });
+      }
+    }
+  }, [currentMessage?.version, currentMessage?.total_versions, currentMessage?.generation]);
 
   // Watch for regeneration success - update versions and generation data from regeneratedResponse
   const isAIResponseRegenerated = chatsStates?.loaderStates?.isAIResponseRegenerated;
@@ -296,24 +326,24 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
           </Markdown>
       </View>
 
-      {/* Customization Badges - Only show for regenerated messages */}
-      {hasRegenerations && generationData && (
+      {/* Customization Badges - Show when generation data is available */}
+      {hasGenerationData && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.badgesContainer}
         >
-          {generationData.llm?.name && (
+          {generationData?.llm?.name && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>LLM: {generationData.llm.name}</Text>
             </View>
           )}
-          {generationData.style?.name && (
+          {generationData?.style?.name && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>Style: {generationData.style.name}</Text>
             </View>
           )}
-          {generationData.language?.name && (
+          {generationData?.language?.name && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>Language: {generationData.language.name}</Text>
             </View>

@@ -58,6 +58,7 @@ const ChangeResponseStylePopup = () => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const [selectedStyle, setSelectedStyle] = useState(0);
   const [selectedStyleForCompare, setSelectedStyleForCompare] = useState([]);
+  const [selectedStyleObjectsForCompare, setSelectedStyleObjectsForCompare] = useState([]);
   const dispatch = useDispatch();
   const [selectedCategory, setSelectedCategory] = useState(1);
 
@@ -87,6 +88,15 @@ const ChangeResponseStylePopup = () => {
       setSelectedStyle(0); // Default to Auto
     }
   }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
+
+  // Reset comparison state when modal opens
+  useEffect(() => {
+    if (toggleStates.toggleChangeResponseStyleWhileChatPopup) {
+      dispatch(setToggleCompareStyleState(false));
+      setSelectedStyleForCompare([]);
+      setSelectedStyleObjectsForCompare([]);
+    }
+  }, [toggleStates.toggleChangeResponseStyleWhileChatPopup, dispatch]);
 
   // Handle response style selection and trigger regeneration
   const handleStyleSelection = (styleOption, index) => {
@@ -145,7 +155,7 @@ const ChangeResponseStylePopup = () => {
         dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
       }
     >
-
+<Toaster/>
       <View style={styles.container}>
         {/* Blur Background */}
 
@@ -169,7 +179,7 @@ const ChangeResponseStylePopup = () => {
         {toggleStates.toggleCompareStyleState ? (
           <CompareLLMOrStyleState
             forStyleOrLLM="style"
-            selectedStylesForCompare={selectedStyleForCompare}
+            selectedStylesForCompare={selectedStyleObjectsForCompare}
           />
         ) : (
           <View style={styles.modalSheet}>
@@ -343,16 +353,26 @@ const ChangeResponseStylePopup = () => {
                     marginBottom: 20,
                   }}
                 >
-                  {responseStyles?.map((credits, creditIndex) => {
-                    return (
-                      <CompareStyleCards
-                        selectedStyleForCompare={selectedStyleForCompare}
-                        setSelectedStyleForCompare={setSelectedStyleForCompare}
-                        item={credits}
-                        key={creditIndex}
-                      />
-                    );
-                  })}
+                  {allResponseStyles
+                    ?.filter(style => !style.name?.toLowerCase().includes("auto"))
+                    ?.map((styleOption, optionsIndex) => {
+                      const icon = getResponseStyleIcon(styleOption.name);
+                      return (
+                        <CompareStyleCards
+                          selectedStyleForCompare={selectedStyleForCompare}
+                          setSelectedStyleForCompare={setSelectedStyleForCompare}
+                          selectedStyleObjectsForCompare={selectedStyleObjectsForCompare}
+                          setSelectedStyleObjectsForCompare={setSelectedStyleObjectsForCompare}
+                          item={{
+                            id: styleOption.id,
+                            icon: icon,
+                            title: styleOption.name,
+                            description: styleOption.description
+                          }}
+                          key={styleOption.id || optionsIndex}
+                        />
+                      );
+                    })}
                   <View style={{ height: 50 }} />
                 </ScrollView>
               )}
@@ -379,14 +399,14 @@ const ChangeResponseStylePopup = () => {
                           const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
                           if (aiMessageUuid) {
-                            // Make two separate API calls - one for each style
+                            // Make two separate API calls - one for each style with separate handler names
                             const firstStylePayload = {
                               method: "POST",
                               url: `/messages/${aiMessageUuid}/compare`,
                               data: {
                                 response_style_id: selectedStyleForCompare[0],
                               },
-                              name: "compareAIResponseStyles",
+                              name: "compareAIResponseStylesFirst",
                             };
 
                             const secondStylePayload = {
@@ -395,7 +415,7 @@ const ChangeResponseStylePopup = () => {
                               data: {
                                 response_style_id: selectedStyleForCompare[1],
                               },
-                              name: "compareAIResponseStyles",
+                              name: "compareAIResponseStylesSecond",
                             };
 
                             console.log("Compare Styles API Payloads:", {
@@ -403,7 +423,7 @@ const ChangeResponseStylePopup = () => {
                               secondStyle: secondStylePayload
                             });
 
-                            // Call both APIs
+                            // Call both APIs independently
                             dispatch(commonFunctionForAPICalls(firstStylePayload));
                             dispatch(commonFunctionForAPICalls(secondStylePayload));
 

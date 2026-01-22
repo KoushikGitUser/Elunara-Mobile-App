@@ -7,14 +7,19 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { ArrowLeft, ChevronDown, FileText } from "lucide-react-native";
 import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import ChatIcon from "../../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import ConversationalIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
-import { setToggleChangeResponseStyleWhileChatPopup, setToggleCompareStyleState } from "../../../../redux/slices/toggleSlice";
+import ChakraIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import DetailedIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+import { setToggleChangeResponseLLMWhileChatPopup, setToggleChangeResponseStyleWhileChatPopup, setToggleCompareStyleState } from "../../../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import OtherStylesPopup from "./ChangeStyle/OtherStylesPopup";
 import gemini from '../../../../assets/images/gemini.png'
@@ -23,6 +28,7 @@ import mistral from "../../../../assets/images/mistral.png"
 import chatgpt from "../../../../assets/images/chatgpt.png"
 import loadingGif from "../../../../assets/images/Loading chat mob.gif"
 import OtherLLMPopup from "./ChangeResponse/OtherLLMPopup";
+import Markdown from 'react-native-markdown-display';
 
 // Helper function to map provider names to icons
 const providerImages = {
@@ -38,6 +44,25 @@ const getProviderImage = (provider) => {
   return providerImages[key] || anthropic;
 };
 
+// Helper function to get response style icon based on name
+const getResponseStyleIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("auto") || key?.includes("chakra")) {
+    return <ChakraIcon />;
+  } else if (key?.includes("concise")) {
+    return <ConciseIcon />;
+  } else if (key?.includes("formal")) {
+    return <FormalIcon />;
+  } else if (key?.includes("conversational")) {
+    return <ConversationalIcon />;
+  } else if (key?.includes("detailed")) {
+    return <DetailedIcon />;
+  } else if (key?.includes("creative")) {
+    return <CreativeIcon />;
+  }
+  return <FileText size={22} color="#888888" />; // Default icon
+};
+
 const CompareLLMOrStyleState = ({
   forStyleOrLLM,
   icon1,
@@ -50,22 +75,66 @@ const CompareLLMOrStyleState = ({
 }) => {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
+  // Local state to track user's dropdown selections (for immediate title update)
+  const [localFirstStyleName, setLocalFirstStyleName] = useState(null);
+  const [localSecondStyleName, setLocalSecondStyleName] = useState(null);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
-  // Get comparison responses from Redux based on type
-  const comparisonData = forStyleOrLLM === "LLM"
-    ? chatsStates?.allChatsDatas?.comparisonResponses
-    : chatsStates?.allChatsDatas?.comparisonStyleResponses;
+  // Get all available styles
+  const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
 
-  const isLoading = forStyleOrLLM === "LLM"
-    ? chatsStates?.loaderStates?.isCompareResponsesLoading === "pending"
-    : chatsStates?.loaderStates?.isCompareStyleResponsesLoading === "pending";
+  // Get comparison responses from Redux based on type - using separate storage locations
+  const firstResponse = forStyleOrLLM === "LLM"
+    ? chatsStates?.allChatsDatas?.firstComparisonResponse
+    : chatsStates?.allChatsDatas?.firstComparisonStyleResponse;
 
-  // Extract responses
-  const firstResponse = comparisonData?.responses?.[0];
-  const secondResponse = comparisonData?.responses?.[1];
+  const secondResponse = forStyleOrLLM === "LLM"
+    ? chatsStates?.allChatsDatas?.secondComparisonResponse
+    : chatsStates?.allChatsDatas?.secondComparisonStyleResponse;
+
+  // Check loading state for each response independently
+  const isFirstLoading = forStyleOrLLM === "LLM"
+    ? chatsStates?.loaderStates?.isFirstCompareResponseLoading === "pending"
+    : chatsStates?.loaderStates?.isFirstCompareStyleResponseLoading === "pending";
+
+  const isSecondLoading = forStyleOrLLM === "LLM"
+    ? chatsStates?.loaderStates?.isSecondCompareResponseLoading === "pending"
+    : chatsStates?.loaderStates?.isSecondCompareStyleResponseLoading === "pending";
+
+  // Get LLM/Style details from selectedLLMsForCompare/selectedStylesForCompare for display
+  const firstLLM = selectedLLMsForCompare?.[0];
+  const secondLLM = selectedLLMsForCompare?.[1];
+  const firstStyle = selectedStylesForCompare?.[0];
+  const secondStyle = selectedStylesForCompare?.[1];
+
+  // Determine which data to use for display (prefer response data, fallback to selected items)
+  const firstLLMName = firstResponse?.generation?.llm?.name || firstLLM?.name || "Loading...";
+  const secondLLMName = secondResponse?.generation?.llm?.name || secondLLM?.name || "Loading...";
+
+  const firstLLMProvider = firstResponse?.generation?.llm?.name || firstLLM?.provider || firstLLM?.name;
+  const secondLLMProvider = secondResponse?.generation?.llm?.name || secondLLM?.provider || secondLLM?.name;
+
+  // For styles, use local selection first, then response data, then initial selection
+  const firstStyleName = localFirstStyleName || firstResponse?.generation?.response_style?.name || firstStyle?.title || "Loading...";
+  const secondStyleName = localSecondStyleName || secondResponse?.generation?.response_style?.name || secondStyle?.title || "Loading...";
+
+  // Listen for successful store compare response and close popup
+  const isStoreCompareResponsePending = chatsStates?.loaderStates?.isStoreCompareResponsePending;
+  const isStoreCompareStyleResponsePending = chatsStates?.loaderStates?.isStoreCompareStyleResponsePending;
+
+  useEffect(() => {
+    if (isStoreCompareResponsePending === true || isStoreCompareStyleResponsePending === true) {
+      // Close all comparison popups
+      if (forStyleOrLLM === "LLM") {
+        dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
+      } else {
+        dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
+      }
+      dispatch(setToggleCompareStyleState(false));
+    }
+  }, [isStoreCompareResponsePending, isStoreCompareStyleResponsePending, forStyleOrLLM, dispatch]);
 
   // Handler for selecting first response
   const handleSelectFirstResponse = () => {
@@ -127,10 +196,10 @@ const CompareLLMOrStyleState = ({
             }
           }}
           size={30}
-          strokeWidth={2}
+          strokeWidth={2} 
         />
         <AntDesign
-          onPress={() => dispatch(setToggleChangeResponseStyleWhileChatPopup(false))}
+          onPress={() =>dispatch(setToggleChangeResponseLLMWhileChatPopup(false))}
           name="close"
           size={24}
           color="black"
@@ -142,18 +211,18 @@ const CompareLLMOrStyleState = ({
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
             {forStyleOrLLM == "style" ? (
-              <FileText size={22} color="#888888" />
+              getResponseStyleIcon(firstStyleName)
             ) : (
               <Image
                 style={{height:25,width:25}}
-                source={firstResponse ? getProviderImage(firstResponse.generation?.llm?.name) : gemini}
+                source={getProviderImage(firstLLMProvider)}
               />
             )}
 
             <Text style={styles.title}>
               {forStyleOrLLM == "style"
-                ? "Concise"
-                : firstResponse?.generation?.llm?.name || "Loading..."}
+                ? firstStyleName
+                : firstLLMName}
             </Text>
           </View>
 
@@ -162,10 +231,38 @@ const CompareLLMOrStyleState = ({
           >
             <ChevronDown size={37} strokeWidth={1.25} color="#0C1A40" />
           </TouchableOpacity>
-          {(isExpandedFirst && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={true} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} /> :(isExpandedFirst && forStyleOrLLM == "LLM")?<OtherLLMPopup isFirst={true} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond}/>:null}
+          {(isExpandedFirst && forStyleOrLLM == "style")? (
+            <OtherStylesPopup
+              isFirst={true}
+              setIsExpandedSecond={setIsExpandedSecond}
+              setIsExpandedFirst={setIsExpandedFirst}
+              currentStyleName={firstStyleName}
+              otherSelectedStyleName={secondStyleName}
+              allAvailableStyles={allResponseStyles}
+              onStyleSelect={(style) => {
+                // Update local state immediately for title change
+                setLocalFirstStyleName(style.name);
+                // Handle style selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      response_style_id: style.id,
+                    },
+                    name: "compareAIResponseStylesFirst",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) :(isExpandedFirst && forStyleOrLLM == "LLM")?<OtherLLMPopup isFirst={true} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond}/>:null}
         </View>
         <View style={styles.responseBoxMain}>
-          {isLoading ? (
+          {isFirstLoading ? (
             <View style={styles.loadingContainer}>
               <Image
                 source={loadingGif}
@@ -175,16 +272,31 @@ const CompareLLMOrStyleState = ({
             </View>
           ) : (
             <ScrollView style={styles.responseBoxScroll}>
-              <Text
-                style={{
-                  fontFamily: "Mukta-Regular",
-                  lineHeight: 20,
-                  fontSize: scaleFont(18),
-                  color:"#5E5E5E"
-                }}
-              >
-                {firstResponse?.content || "No response available"}
-              </Text>
+              {firstResponse?.content ? (
+                <Markdown
+                  style={{
+                    body: {
+                      fontFamily: "Mukta-Regular",
+                      lineHeight: 20,
+                      fontSize: scaleFont(18),
+                      color: "#5E5E5E"
+                    }
+                  }}
+                >
+                  {firstResponse.content}
+                </Markdown>
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Mukta-Regular",
+                    lineHeight: 20,
+                    fontSize: scaleFont(18),
+                    color: "#5E5E5E"
+                  }}
+                >
+                  No response available
+                </Text>
+              )}
             </ScrollView>
           )}
         </View>
@@ -201,7 +313,7 @@ const CompareLLMOrStyleState = ({
           ]}
           onPress={handleSelectFirstResponse}
           activeOpacity={0.7}
-          disabled={isLoading || !firstResponse}
+          disabled={isFirstLoading || !firstResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
@@ -210,18 +322,18 @@ const CompareLLMOrStyleState = ({
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
             {forStyleOrLLM == "style" ? (
-              <ConversationalIcon/>
+              getResponseStyleIcon(secondStyleName)
             ) : (
               <Image
                 style={{height:25,width:25}}
-                source={secondResponse ? getProviderImage(secondResponse.generation?.llm?.name) : anthropic}
+                source={getProviderImage(secondLLMProvider)}
               />
             )}
 
             <Text style={styles.title}>
               {forStyleOrLLM == "style"
-                ? "Conversational"
-                : secondResponse?.generation?.llm?.name || "Loading..."}
+                ? secondStyleName
+                : secondLLMName}
             </Text>
           </View>
 
@@ -230,10 +342,43 @@ const CompareLLMOrStyleState = ({
           >
             <ChevronDown size={37} strokeWidth={1.25} color="#0C1A40" />
           </TouchableOpacity>
-          {(isExpandedSecond && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={false} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} />:(isExpandedSecond && forStyleOrLLM == "LLM")? <OtherLLMPopup isFirst={false} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond} />:null}
+          {(isExpandedSecond && forStyleOrLLM == "style") ? (
+            <OtherStylesPopup
+              isFirst={false}
+              setIsExpandedSecond={setIsExpandedSecond}
+              setIsExpandedFirst={setIsExpandedFirst}
+              currentStyleName={secondStyleName}
+              otherSelectedStyleName={firstStyleName}
+              allAvailableStyles={allResponseStyles}
+              onStyleSelect={(style) => {
+                // Update local state immediately for title change
+                setLocalSecondStyleName(style.name);
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      response_style_id: style.id,
+                    },
+                    name: "compareAIResponseStylesSecond",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : (isExpandedSecond && forStyleOrLLM == "LLM") ? (
+            <OtherLLMPopup
+              isFirst={false}
+              setIsExpandedFirst={setIsExpandedFirst}
+              setIsExpandedSecond={setIsExpandedSecond}
+            />
+          ) : null}
         </View>
         <View style={styles.responseBoxMain}>
-          {isLoading ? (
+          {isSecondLoading ? (
             <View style={styles.loadingContainer}>
               <Image
                 source={loadingGif}
@@ -243,16 +388,31 @@ const CompareLLMOrStyleState = ({
             </View>
           ) : (
             <ScrollView style={styles.responseBoxScroll}>
-              <Text
-                style={{
-                  fontFamily: "Mukta-Regular",
-                  lineHeight: 20,
-                  fontSize: scaleFont(18),
-                  color:"#5E5E5E"
-                }}
-              >
-                {secondResponse?.content || "No response available"}
-              </Text>
+              {secondResponse?.content ? (
+                <Markdown
+                  style={{
+                    body: {
+                      fontFamily: "Mukta-Regular",
+                      lineHeight: 20,
+                      fontSize: scaleFont(18),
+                      color: "#5E5E5E"
+                    }
+                  }}
+                >
+                  {secondResponse.content}
+                </Markdown>
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Mukta-Regular",
+                    lineHeight: 20,
+                    fontSize: scaleFont(18),
+                    color: "#5E5E5E"
+                  }}
+                >
+                  No response available
+                </Text>
+              )}
             </ScrollView>
           )}
         </View>
@@ -269,7 +429,7 @@ const CompareLLMOrStyleState = ({
           ]}
           onPress={handleSelectSecondResponse}
           activeOpacity={0.7}
-          disabled={isLoading || !secondResponse}
+          disabled={isSecondLoading || !secondResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
