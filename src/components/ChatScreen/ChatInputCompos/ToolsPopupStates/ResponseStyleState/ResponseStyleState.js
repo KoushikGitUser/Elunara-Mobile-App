@@ -67,14 +67,15 @@ const ResponseStyleState = () => {
 
   useEffect(() => {
     if (chatCustomisationStates?.selectedResponseStyle?.id) {
-      const index = allResponseStyles.findIndex(
-        (style) => style.id === chatCustomisationStates.selectedResponseStyle.id
-      );
-      if (index !== -1) {
-        setSelectedStyle(index);
-      }
+      // Set to the actual ID, not the index
+      setSelectedStyle(chatCustomisationStates.selectedResponseStyle.id);
     } else {
-      setSelectedStyle(0); // Default to Auto
+      // If no selection or Auto is selected, set to the first item's ID (Auto)
+      if (allResponseStyles.length > 0) {
+        setSelectedStyle(allResponseStyles[0]?.id || 0);
+      } else {
+        setSelectedStyle(0);
+      }
     }
   }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
 
@@ -86,7 +87,7 @@ const ResponseStyleState = () => {
     };
 
     dispatch(setSelectedResponseStyle(selectedData));
-    dispatch(setSelectedStyle(styleOption.id));
+    setSelectedStyle(styleOption.id);
   };
 
   const RadioButton = ({ selected }) => (

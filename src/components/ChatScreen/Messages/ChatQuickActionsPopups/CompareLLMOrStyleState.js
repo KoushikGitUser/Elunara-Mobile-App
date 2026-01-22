@@ -75,15 +75,12 @@ const CompareLLMOrStyleState = ({
     const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
     const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
-    if (aiMessageUuid) {
+    if (aiMessageUuid && firstResponse.comparison_id) {
       const storePayload = {
         method: "POST",
         url: `/messages/${aiMessageUuid}/compare/store`,
         data: {
-          content: firstResponse.content,
-          llm_id: firstResponse.generation?.llm?.id,
-          response_style_id: firstResponse.generation?.style?.id,
-          language_id: firstResponse.generation?.language?.id,
+          comparison_id: firstResponse.comparison_id,
         },
         name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
       };
@@ -101,15 +98,12 @@ const CompareLLMOrStyleState = ({
     const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
     const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
-    if (aiMessageUuid) {
+    if (aiMessageUuid && secondResponse.comparison_id) {
       const storePayload = {
         method: "POST",
         url: `/messages/${aiMessageUuid}/compare/store`,
         data: {
-          content: secondResponse.content,
-          llm_id: secondResponse.generation?.llm?.id,
-          response_style_id: secondResponse.generation?.style?.id,
-          language_id: secondResponse.generation?.language?.id,
+          comparison_id: secondResponse.comparison_id,
         },
         name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
       };

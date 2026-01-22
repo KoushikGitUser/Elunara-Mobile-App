@@ -22,11 +22,21 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
-      const payload = { 
+      const accessToken = await getToken();
+
+      // If no access token available, navigate to welcome screen
+      if (!accessToken) {
+        navigation.navigate("welcome");
+        return;
+      }
+
+      // If access token exists (with or without refresh token), fetch profile info
+      const payload = {
         method: "GET",
         url: "/settings/profile",
         name: "getAllProfileInfos",
       };
+
       dispatch(commonFunctionForAPICalls(payload));
     };
     checkAuthAndNavigate();
@@ -34,11 +44,24 @@ const SplashScreen = ({ navigation }) => {
 
   const { settingsStates } = useSelector((state) => state.API);
 
-  useEffect(()=>{
-    if(settingsStates.allPersonalisationsSettings.isPersonalInfosFetched == true){
-      navigation.navigate("chat");
-    }
-  },[settingsStates.allPersonalisationsSettings.isPersonalInfosFetched])
+  useEffect(() => {
+    const handleProfileFetchResult = async () => {
+      const accessToken = await getToken();
+
+      // Only process if access token exists
+      if (!accessToken) {
+        return;
+      }
+
+      if (settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true) {
+        navigation.navigate("chat");
+      } else if (settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === false) {
+        navigation.navigate("welcome");
+      }
+    };
+
+    handleProfileFetchResult();
+  }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched])
 
   return (
     <View style={styles.container}>

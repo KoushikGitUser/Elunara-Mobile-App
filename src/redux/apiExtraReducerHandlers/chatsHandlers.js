@@ -258,6 +258,8 @@ export const handleSendPromptAndGetMessageFromAI = {
   pending: (state) => {
     state.chatsStates.loaderStates.isMessagesFetched = "pending";
     state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.chatsStates.allChatsDatas.latestUserMessageData = null;
+    state.chatsStates.allChatsDatas.latestAiMessageData = null;
     // Reset isChatCreatedWithAI after using it to trigger send-message
     state.chatsStates.loaderStates.isChatCreatedWithAI = null;
   },
@@ -269,9 +271,24 @@ export const handleSendPromptAndGetMessageFromAI = {
     state.chatsStates.allChatsDatas.aiMessageContent =
       responseData?.assistant_message?.content || null;
 
+    // Store full user and AI message data including uuid for notes functionality
+    const userMessage = responseData?.user_message;
+    const aiMessage = responseData?.assistant_message;
+
+    // Store latest message data for updating chatMessagesArray with uuid
+    state.chatsStates.allChatsDatas.latestUserMessageData = userMessage ? {
+      uuid: userMessage.uuid || userMessage.id,
+      is_saved_to_notes: userMessage.is_saved_to_notes || false,
+    } : null;
+
+    state.chatsStates.allChatsDatas.latestAiMessageData = aiMessage ? {
+      uuid: aiMessage.uuid || aiMessage.id,
+      is_saved_to_notes: aiMessage.is_saved_to_notes || false,
+    } : null;
+
     // Store message IDs in the messageIDsArray
-    const userMessageId = responseData?.user_message?.id;
-    const aiMessageId = responseData?.assistant_message?.id;
+    const userMessageId = userMessage?.id;
+    const aiMessageId = aiMessage?.id;
 
     // Get current messageIDsArray from globalDataStates
     const currentMessageIds = state.globalDataStates?.messageIDsArray;
@@ -287,12 +304,18 @@ export const handleSendPromptAndGetMessageFromAI = {
   rejected: (state, { payload }) => {
     state.chatsStates.loaderStates.isMessagesFetched = false;
     state.chatsStates.allChatsDatas.aiMessageContent = null;
+    state.chatsStates.allChatsDatas.latestUserMessageData = null;
+    state.chatsStates.allChatsDatas.latestAiMessageData = null;
   },
 };
 
 export const handlePostAddToNotes = {
-  pending: (state) => {
+  pending: (state, action) => {
     state.chatsStates.loaderStates.isAddToNotesPending = "pending";
+    // Extract message UUID from the URL pattern /messages/{uuid}/add-to-notes
+    const url = action?.meta?.arg?.url || "";
+    const match = url.match(/\/messages\/([^/]+)\/add-to-notes/);
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = match ? match[1] : null;
   },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.addToNotes = action?.payload.data.data;
@@ -300,12 +323,17 @@ export const handlePostAddToNotes = {
   },
   rejected: (state, { payload }) => {
     state.chatsStates.loaderStates.isAddToNotesPending = false;
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = null;
   },
 };
 
 export const handlePostRemoveFromNotes = {
-  pending: (state) => {
+  pending: (state, action) => {
     state.chatsStates.loaderStates.isRemoveFromNotesPending = "pending";
+    // Extract message UUID from the URL pattern /messages/{uuid}/remove-from-notes
+    const url = action?.meta?.arg?.url || "";
+    const match = url.match(/\/messages\/([^/]+)\/remove-from-notes/);
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = match ? match[1] : null;
   },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.addToNotes = {};
@@ -313,6 +341,7 @@ export const handlePostRemoveFromNotes = {
   },
   rejected: (state, { payload }) => {
     state.chatsStates.loaderStates.isRemoveFromNotesPending = false;
+    state.chatsStates.allChatsDatas.lastNotesActionMessageUuid = null;
   },
 };
 
@@ -473,18 +502,32 @@ export const handleSwitchVersionsOfAIResponse = {
 
 export const handleCompareAIResponses = {
   pending: (state) => {
-    state.chatsStates.loaderStates.isCompareResponsesLoading = "pending";
-    state.chatsStates.allChatsDatas.comparisonResponses = null;
+    // Only set to pending on first call
+    if (state.chatsStates.loaderStates.isCompareResponsesLoading !== "pending") {
+      state.chatsStates.loaderStates.isCompareResponsesLoading = "pending";
+      // Initialize responses array to collect both responses
+      state.chatsStates.allChatsDatas.comparisonResponses = { responses: [] };
+    }
   },
   fulfilled: (state, action) => {
     const responseData = action?.payload.data.data;
-    console.log("Compare AI Responses - Full Response:", JSON.stringify(responseData, null, 2));
+    console.log("Compare AI Response - Single Response:", JSON.stringify(responseData, null, 2));
 
-    // Store the comparison responses
-    state.chatsStates.allChatsDatas.comparisonResponses = responseData;
-    state.chatsStates.loaderStates.isCompareResponsesLoading = true;
+    // Add this response to the responses array
+    if (!state.chatsStates.allChatsDatas.comparisonResponses) {
+      state.chatsStates.allChatsDatas.comparisonResponses = { responses: [] };
+    }
 
-    console.log("Comparison responses stored:", JSON.stringify(responseData));
+    // Add the response to the array
+    state.chatsStates.allChatsDatas.comparisonResponses.responses.push(responseData);
+
+    console.log("Current responses count:", state.chatsStates.allChatsDatas.comparisonResponses.responses.length);
+
+    // Mark as loaded when we have both responses
+    if (state.chatsStates.allChatsDatas.comparisonResponses.responses.length === 2) {
+      state.chatsStates.loaderStates.isCompareResponsesLoading = true;
+      console.log("Both comparison responses received:", state.chatsStates.allChatsDatas.comparisonResponses);
+    }
   },
   rejected: (state, { payload }) => {
     console.log(payload?.message || "Failed to compare AI responses");
@@ -501,8 +544,32 @@ export const handleStoreCompareResponses = {
     const responseData = action?.payload.data.data;
     console.log("Store Compare Response - Full Response:", JSON.stringify(responseData, null, 2));
 
+    // Store the response just like regeneration
+    state.chatsStates.allChatsDatas.regeneratedResponse = responseData;
+
+    // Store AI message content separately (flat structure)
+    state.chatsStates.allChatsDatas.aiMessageContent = responseData?.content || null;
+
+    // Store message ID in the messageIDsArray (flat structure)
+    const aiMessageId = responseData?.id;
+
+    if (aiMessageId) {
+      // Get current messageIDsArray from globalDataStates
+      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      // Add AI message ID
+      state.globalDataStates.messageIDsArray = [
+        ...currentMessageIds,
+        aiMessageId,
+      ];
+    }
+
     state.chatsStates.loaderStates.isStoreCompareResponsePending = true;
-    console.log("Compare response stored successfully");
+
+    // Close the popup by setting both toggles to false
+    state.toggleStates.toggleCompareStyleState = false;
+    state.toggleStates.toggleChangeResponseLLMWhileChatPopup = false;
+
+    console.log("Compare response stored successfully, popup closed");
   },
   rejected: (state, { payload }) => {
     console.log(payload?.message || "Failed to store compare response");
@@ -512,18 +579,32 @@ export const handleStoreCompareResponses = {
 
 export const handleCompareAIResponseStyles = {
   pending: (state) => {
-    state.chatsStates.loaderStates.isCompareStyleResponsesLoading = "pending";
-    state.chatsStates.allChatsDatas.comparisonStyleResponses = null;
+    // Only set to pending on first call
+    if (state.chatsStates.loaderStates.isCompareStyleResponsesLoading !== "pending") {
+      state.chatsStates.loaderStates.isCompareStyleResponsesLoading = "pending";
+      // Initialize responses array to collect both responses
+      state.chatsStates.allChatsDatas.comparisonStyleResponses = { responses: [] };
+    }
   },
   fulfilled: (state, action) => {
     const responseData = action?.payload.data.data;
-    console.log("Compare AI Response Styles - Full Response:", JSON.stringify(responseData, null, 2));
+    console.log("Compare AI Response Style - Single Response:", JSON.stringify(responseData, null, 2));
 
-    // Store the comparison responses
-    state.chatsStates.allChatsDatas.comparisonStyleResponses = responseData;
-    state.chatsStates.loaderStates.isCompareStyleResponsesLoading = true;
+    // Add this response to the responses array
+    if (!state.chatsStates.allChatsDatas.comparisonStyleResponses) {
+      state.chatsStates.allChatsDatas.comparisonStyleResponses = { responses: [] };
+    }
 
-    console.log("Style comparison responses stored:", JSON.stringify(responseData));
+    // Add the response to the array
+    state.chatsStates.allChatsDatas.comparisonStyleResponses.responses.push(responseData);
+
+    console.log("Current style responses count:", state.chatsStates.allChatsDatas.comparisonStyleResponses.responses.length);
+
+    // Mark as loaded when we have both responses
+    if (state.chatsStates.allChatsDatas.comparisonStyleResponses.responses.length === 2) {
+      state.chatsStates.loaderStates.isCompareStyleResponsesLoading = true;
+      console.log("Both style comparison responses received:", state.chatsStates.allChatsDatas.comparisonStyleResponses);
+    }
   },
   rejected: (state, { payload }) => {
     console.log(payload?.message || "Failed to compare AI response styles");
@@ -540,8 +621,32 @@ export const handleStoreCompareStyleResponses = {
     const responseData = action?.payload.data.data;
     console.log("Store Compare Style Response - Full Response:", JSON.stringify(responseData, null, 2));
 
+    // Store the response just like regeneration
+    state.chatsStates.allChatsDatas.regeneratedResponse = responseData;
+
+    // Store AI message content separately (flat structure)
+    state.chatsStates.allChatsDatas.aiMessageContent = responseData?.content || null;
+
+    // Store message ID in the messageIDsArray (flat structure)
+    const aiMessageId = responseData?.id;
+
+    if (aiMessageId) {
+      // Get current messageIDsArray from globalDataStates
+      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
+      // Add AI message ID
+      state.globalDataStates.messageIDsArray = [
+        ...currentMessageIds,
+        aiMessageId,
+      ];
+    }
+
     state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = true;
-    console.log("Compare style response stored successfully");
+
+    // Close the popup by setting both toggles to false
+    state.toggleStates.toggleCompareStyleState = false;
+    state.toggleStates.toggleChangeResponseStyleWhileChatPopup = false;
+
+    console.log("Compare style response stored successfully, popup closed");
   },
   rejected: (state, { payload }) => {
     console.log(payload?.message || "Failed to store compare style response");

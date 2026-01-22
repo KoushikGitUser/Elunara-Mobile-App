@@ -136,20 +136,6 @@ const ChangeResponseStylePopup = () => {
     </View>
   );
 
-  // Helper function to get user message ID from AI message index
-  const getUserMessageIdFromAIMessageIndex = (aiMessageIndex) => {
-    if (aiMessageIndex === null || aiMessageIndex === undefined) {
-      return null;
-    }
-
-    if (aiMessageIndex > 0) {
-      const userMessageId = globalDataStates.messageIDsArray[aiMessageIndex - 1];
-      return userMessageId;
-    }
-
-    return null;
-  };
-
   return (
     <Modal
       visible={toggleStates.toggleChangeResponseStyleWhileChatPopup}
@@ -392,33 +378,39 @@ const ChangeResponseStylePopup = () => {
                           // Get AI message UUID
                           const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
-                          // Get user message ID using helper function
-                          const userMessageUuid = getUserMessageIdFromAIMessageIndex(aiMessageIndex);
-
-                          if (aiMessageUuid && userMessageUuid) {
-                            console.log("Compare Styles API Payload:", {
-                              aiMessageUuid,
-                              userMessageUuid,
-                              styleIds: selectedStyleForCompare
-                            });
-
-                            // Call compare API
-                            const comparePayload = {
+                          if (aiMessageUuid) {
+                            // Make two separate API calls - one for each style
+                            const firstStylePayload = {
                               method: "POST",
                               url: `/messages/${aiMessageUuid}/compare`,
                               data: {
-                                user_message_id: userMessageUuid,
-                                response_style_ids: selectedStyleForCompare,
+                                response_style_id: selectedStyleForCompare[0],
                               },
                               name: "compareAIResponseStyles",
                             };
 
-                            dispatch(commonFunctionForAPICalls(comparePayload));
+                            const secondStylePayload = {
+                              method: "POST",
+                              url: `/messages/${aiMessageUuid}/compare`,
+                              data: {
+                                response_style_id: selectedStyleForCompare[1],
+                              },
+                              name: "compareAIResponseStyles",
+                            };
+
+                            console.log("Compare Styles API Payloads:", {
+                              firstStyle: firstStylePayload,
+                              secondStyle: secondStylePayload
+                            });
+
+                            // Call both APIs
+                            dispatch(commonFunctionForAPICalls(firstStylePayload));
+                            dispatch(commonFunctionForAPICalls(secondStylePayload));
 
                             // Navigate to compare state
                             dispatch(setToggleCompareStyleState(true));
                           } else {
-                            console.error("Missing required IDs:", { aiMessageUuid, userMessageUuid });
+                            console.error("Missing AI message UUID");
                           }
                         }
                       }

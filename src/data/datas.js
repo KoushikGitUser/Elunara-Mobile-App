@@ -17,7 +17,7 @@ import {
   GraduationCap,
   File,
   ArrowUpRight,
-  TextAlignJustify,
+  Menu,
 } from "lucide-react-native";
 import gemini from "../assets/images/gemini.png";
 import anthropic from "../assets/images/antropic.png";
@@ -1452,7 +1452,7 @@ export const topicsexploredArray = [
 
 export const guidedTourOptions = [
   {
-    icon:<TextAlignJustify strokeWidth={1.25} />,
+    icon:<Menu strokeWidth={1.25} />,
     title:"Navigation Basics",
     desc:"Find your way around Elunara and explore essential features."
   },

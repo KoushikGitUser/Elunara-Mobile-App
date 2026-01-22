@@ -23,14 +23,15 @@ import HavardIcon from "../../../../../../assets/SvgIconsComponent/CitationForma
 
 
 // Helper function to get citation icon based on name
-const getCitationIcon = (name) => {
+const getCitationIcon = (name, isSelected) => {
+  const color = isSelected ? "#24487C" : "#888888";
   const key = name?.toLowerCase();
   if (key?.includes("apa")) {
-    return <APAIcon />;
+    return <APAIcon color={color} />;
   } else if (key?.includes("harvard") || key?.includes("havard")) {
-    return <HavardIcon />;
+    return <HavardIcon color={color} />;
   }
-  return <APAIcon />; // Default to APA
+  return <APAIcon color={color} />; // Default to APA
 };
 
 const CitationState = () => {
@@ -53,14 +54,15 @@ const CitationState = () => {
 
   useEffect(() => {
     if (chatCustomisationStates?.selectedCitationFormat?.id) {
-      const index = allCitationFormats.findIndex(
-        (format) => format.id === chatCustomisationStates.selectedCitationFormat.id
-      );
-      if (index !== -1) {
-        setSelectedStyle(index);
-      }
+      // Set to the actual ID, not the index
+      setSelectedStyle(chatCustomisationStates.selectedCitationFormat.id);
     } else {
-      setSelectedStyle(0); // Default to first option (Harvard)
+      // If no selection, set to the first item's ID (Harvard)
+      if (allCitationFormats.length > 0) {
+        setSelectedStyle(allCitationFormats[0]?.id || 0);
+      } else {
+        setSelectedStyle(0);
+      }
     }
   }, [chatCustomisationStates?.selectedCitationFormat, allCitationFormats.length]);
 
@@ -107,7 +109,8 @@ const CitationState = () => {
         </Text>
         <View style={{ flexDirection: "column", gap: 25 }}>
           {(settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [])?.map((styleOptions, optionsIndex) => {
-            const icon = getCitationIcon(styleOptions.name);
+            const isSelected = selectedStyle === styleOptions.id;
+            const icon = getCitationIcon(styleOptions.name, isSelected);
 
             return (
               <TouchableOpacity

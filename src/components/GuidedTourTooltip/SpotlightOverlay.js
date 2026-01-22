@@ -2,11 +2,13 @@ import {
   View,
   StyleSheet,
   Dimensions,
+  Platform,
 } from "react-native";
 import React from "react";
 import Svg, { Defs, Rect, Mask, Path } from "react-native-svg";
+import { BlurView } from "@react-native-community/blur";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
 const SpotlightOverlay = ({
   targetRect,
@@ -17,6 +19,7 @@ const SpotlightOverlay = ({
 }) => {
   // If no target rect, just show dark overlay without cutout
   if (!targetRect) {
+    console.log("SpotlightOverlay: No target rect provided");
     return (
       <View style={styles.container}>
         <View style={styles.overlayBackground} />
@@ -26,6 +29,13 @@ const SpotlightOverlay = ({
   }
 
   const { x, y, width, height } = targetRect;
+  console.log("🎨 SpotlightOverlay: Rendering with rect:", { x, y, width, height });
+  console.log("   Border will be at:", {
+    x: x - borderWidth,
+    y: y - borderWidth,
+    width: width + borderWidth * 2,
+    height: height + borderWidth * 2
+  });
 
   // Create rounded rectangle path for the cutout
   const createRoundedRectPath = (x, y, width, height, radius) => {
@@ -47,16 +57,17 @@ const SpotlightOverlay = ({
   };
 
   return (
-    <View style={styles.container}>
-      {/* SVG overlay with rounded cutout */}
+    <View style={styles.container} pointerEvents="box-none">
+      {/* SVG overlay with rounded cutout - NO BlurView */}
       <Svg
         width={SCREEN_WIDTH}
         height={SCREEN_HEIGHT}
         style={styles.svgContainer}
+        pointerEvents="none"
       >
         <Defs>
           <Mask id="spotlight-mask">
-            {/* White background (visible area) */}
+            {/* White background (visible/darkened area) */}
             <Rect
               x="0"
               y="0"
@@ -64,7 +75,7 @@ const SpotlightOverlay = ({
               height={SCREEN_HEIGHT}
               fill="white"
             />
-            {/* Black rounded rectangle (cutout - transparent area) */}
+            {/* Black rounded rectangle (cutout - clear area) */}
             <Path
               d={createRoundedRectPath(x, y, width, height, borderRadius)}
               fill="black"
@@ -72,32 +83,35 @@ const SpotlightOverlay = ({
           </Mask>
         </Defs>
 
-        {/* Overlay with mask applied */}
+        {/* Semi-transparent dark overlay with mask applied */}
         <Rect
           x="0"
           y="0"
           width={SCREEN_WIDTH}
           height={SCREEN_HEIGHT}
-          fill="rgba(0, 0, 0, 0.3)"
+          fill="rgba(0, 0, 0, 0.6)"
           mask="url(#spotlight-mask)"
         />
       </Svg>
 
-      {/* Spotlight border around the target */}
-      <View
-        style={[
-          styles.spotlightBorder,
-          {
-            top: y - borderWidth,
-            left: x - borderWidth,
-            width: width + borderWidth * 2,
-            height: height + borderWidth * 2,
-            borderRadius: borderRadius,
-            borderWidth: borderWidth,
-            borderColor: borderColor,
-          },
-        ]}
-      />
+      {/* Spotlight border using SVG Rect for guaranteed visibility */}
+      <Svg
+        width={SCREEN_WIDTH}
+        height={SCREEN_HEIGHT}
+        style={{ position: 'absolute', zIndex: 10, pointerEvents: 'none' }}
+      >
+        <Rect
+          x={x - borderWidth}
+          y={y - borderWidth}
+          width={width + borderWidth * 2}
+          height={height + borderWidth * 2}
+          rx={borderRadius}
+          ry={borderRadius}
+          fill="none"
+          stroke={borderColor}
+          strokeWidth={borderWidth}
+        />
+      </Svg>
 
       {/* Children (tooltip content) */}
       {children}
@@ -109,19 +123,17 @@ const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 9999,
+    elevation: 9999,
   },
   svgContainer: {
     position: "absolute",
     top: 0,
     left: 0,
+    zIndex: 0,
   },
   overlayBackground: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
-  },
-  spotlightBorder: {
-    position: "absolute",
-    backgroundColor: "transparent",
   },
 });
 

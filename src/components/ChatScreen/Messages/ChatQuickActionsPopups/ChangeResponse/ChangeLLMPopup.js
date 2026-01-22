@@ -179,21 +179,6 @@ const ChangeLLMPopup = () => {
     }
   };
 
-  // Helper function to get user message ID from AI message index
-  const getUserMessageIdFromAIMessageIndex = (aiMessageIndex) => {
-    if (aiMessageIndex === null || aiMessageIndex === undefined) {
-      return null;
-    }
-
-    // If aiMessageIndex is stored, get the user message ID (previous index)
-    if (aiMessageIndex > 0) {
-      const userMessageId = globalDataStates.messageIDsArray[aiMessageIndex - 1];
-      return userMessageId;
-    }
-
-    return null;
-  };
-
   // Combine Auto option with LLMs from API
   const allLLMOptions = [
     {
@@ -543,36 +528,39 @@ const ChangeLLMPopup = () => {
                         // Get AI message UUID
                         const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
 
-                        // Get user message ID using helper function
-                        const userMessageUuid = getUserMessageIdFromAIMessageIndex(aiMessageIndex);
-
-                        if (aiMessageUuid && userMessageUuid) {
-                          // Extract LLM IDs from selected LLMs
-                          const llmIds = selectedLLMsForCompare.map(llm => llm.id);
-
-                          console.log("Compare API Payload:", {
-                            aiMessageUuid,
-                            userMessageUuid,
-                            llmIds
-                          });
-
-                          // Call compare API
-                          const comparePayload = {
+                        if (aiMessageUuid) {
+                          // Make two separate API calls - one for each LLM
+                          const firstLLMPayload = {
                             method: "POST",
                             url: `/messages/${aiMessageUuid}/compare`,
                             data: {
-                              user_message_id: userMessageUuid,
-                              llm_ids: llmIds,
+                              llm_id: selectedLLMsForCompare[0].id,
                             },
                             name: "compareAIResponses",
                           };
 
-                          dispatch(commonFunctionForAPICalls(comparePayload));
+                          const secondLLMPayload = {
+                            method: "POST",
+                            url: `/messages/${aiMessageUuid}/compare`,
+                            data: {
+                              llm_id: selectedLLMsForCompare[1].id,
+                            },
+                            name: "compareAIResponses",
+                          };
+
+                          console.log("Compare API Payloads:", {
+                            firstLLM: firstLLMPayload,
+                            secondLLM: secondLLMPayload
+                          });
+
+                          // Call both APIs
+                          dispatch(commonFunctionForAPICalls(firstLLMPayload));
+                          dispatch(commonFunctionForAPICalls(secondLLMPayload));
 
                           // Navigate to compare state
                           setCurrentStateOfPopup(3);
                         } else {
-                          console.error("Missing required IDs:", { aiMessageUuid, userMessageUuid });
+                          console.error("Missing AI message UUID");
                         }
                       }
                     }

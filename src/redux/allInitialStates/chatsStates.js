@@ -14,6 +14,10 @@ export const chatsStates = {
     switchedVersionData:{},
     comparisonResponses:null,
     comparisonStyleResponses:null,
+    latestUserMessageData:null,
+    latestAiMessageData:null,
+    addToNotes:{},
+    lastNotesActionMessageUuid:null,
     },
     loaderStates:{
         isAllRecentChatsFetched:null,

@@ -287,7 +287,11 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
     };
   }, []);
 
-  // Real API flow - when AI message is fetched, add it to chat messages array
+  // Get latest message data from API response
+  const latestUserMessageData = chatsStates.allChatsDatas.latestUserMessageData;
+  const latestAiMessageData = chatsStates.allChatsDatas.latestAiMessageData;
+
+  // Real API flow - when AI message is fetched, add it to chat messages array with uuid
   useEffect(() => {
     if (isMessagesFetched === true && aiMessageContent) {
       console.log("Full AI Response:", JSON.stringify(chatsStates.allChatsDatas.chatMessages));
@@ -318,6 +322,22 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
         currentVersionIndex: 0,
       };
 
+      // Update the last user message with uuid if available
+      let updatedMessages = [...globalDataStates.chatMessagesArray];
+
+      // Find and update the last user message with uuid
+      if (latestUserMessageData && updatedMessages.length > 0) {
+        const lastIndex = updatedMessages.length - 1;
+        if (updatedMessages[lastIndex].role === "user") {
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            uuid: latestUserMessageData.uuid,
+            is_saved_to_notes: latestUserMessageData.is_saved_to_notes,
+          };
+        }
+      }
+
+      // Add AI message with uuid
       dispatch(
         setChatMessagesArray([
           ...globalDataStates.chatMessagesArray,
@@ -330,7 +350,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
     if (isMessagesFetched === false && toggleStates.toggleIsWaitingForResponse) {
       dispatch(setToggleIsWaitingForResponse(false));
     }
-  }, [isMessagesFetched, aiMessageContent]);
+  }, [isMessagesFetched, aiMessageContent, latestUserMessageData, latestAiMessageData]);
 
   // Reset input height when text is cleared
   useEffect(() => {
@@ -583,7 +603,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
             </TouchableOpacity>
           </View>
           <View style={styles.inputRightActionIcons}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={handleMicPress}
               style={[
                 isRecording && {
@@ -594,7 +614,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
               ]}
             >
               <MicIcon color={isRecording ? 'white' : undefined} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {(globalDataStates.userMessagePrompt !== "" ||
               globalDataStates.selectedFiles.length > 0) && (
               <TouchableOpacity
