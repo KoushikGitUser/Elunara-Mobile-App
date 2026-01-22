@@ -38,6 +38,8 @@ import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
 import AccountNotRecoveredPopup from "../../../components/SignUp/AccountNotRecoveredPopup";
+import TermsOfUseModal from "../../../components/WelcomeScreen/TermsOfUseModal";
+import PrivacyPolicyModal from "../../../components/WelcomeScreen/PrivacyPolicyModal";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -53,6 +55,8 @@ const SignUp = () => {
   const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [toggleAccNotRecovered, setToggleAccNotRecovered] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -634,14 +638,14 @@ const SignUp = () => {
             <View style={styles.textContainer}>
               <Text style={styles.text}>I agree to the </Text>
               <TouchableOpacity
-                onPress={() => setMobileVerificationPopup(true)}
+                onPress={() => setShowTermsModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("changepass")}
+                onPress={() => setShowPrivacyModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.link}>Privacy Policy</Text>
@@ -742,6 +746,16 @@ const SignUp = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Terms of Use and Privacy Policy Modals */}
+      <TermsOfUseModal
+        visible={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
+      <PrivacyPolicyModal
+        visible={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </SafeAreaView>
   );
 };
