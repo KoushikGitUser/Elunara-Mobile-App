@@ -8,24 +8,38 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { ChevronRight } from "lucide-react-native";
 import { guidedTourOptions } from "../../../data/datas";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import { setChatFunctionsGuideTourSteps, setLearningLabsGuideTourSteps, setManualGuidedTourRunning, setNavigationBasicsGuideTourSteps } from "../../../redux/slices/globalDataSlice";
-import { setToggleChatScreenGuideStart } from "../../../redux/slices/toggleSlice";
+import DemoPreviewScreen from "./DemoPreviewScreen";
+
 const screenHeight = Dimensions.get("window").height;
 
-const GuidedTourStartPopup = ({ popupState, setPopupState }) => {
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
+const DemoPopup = ({ popupState, setPopupState }) => {
+  const [showDemoPreview, setShowDemoPreview] = useState(false);
+  const [selectedDemoType, setSelectedDemoType] = useState("navigation");
+
+  const handleDemoOptionPress = (optionIndex) => {
+    // Map option index to demo type
+    const demoTypes = ["navigation", "chatFunctions", "learningLabs"];
+    setSelectedDemoType(demoTypes[optionIndex]);
+    setShowDemoPreview(true);
+  };
+
+  const handleCloseDemoPreview = () => {
+    setShowDemoPreview(false);
+  };
 
   return (
+    <>
+      <DemoPreviewScreen
+        visible={showDemoPreview}
+        onClose={handleCloseDemoPreview}
+        demoType={selectedDemoType}
+      />
     <Modal
       visible={popupState}
       transparent={true}
@@ -34,7 +48,6 @@ const GuidedTourStartPopup = ({ popupState, setPopupState }) => {
     >
       <View style={styles.container}>
         {/* Blur Background */}
-
         <BlurView
           style={styles.blurView}
           blurType="light"
@@ -65,7 +78,7 @@ const GuidedTourStartPopup = ({ popupState, setPopupState }) => {
 
             {/* Description */}
             <Text style={styles.description}>
-              Get the most out of your AI learning companion. Choose a
+             Get the most out of your AI learning companion. Choose a
               walkthrough below to master navigation, harness chat tools, or
               organize work with Rooms.
             </Text>
@@ -84,27 +97,8 @@ const GuidedTourStartPopup = ({ popupState, setPopupState }) => {
                     <TouchableOpacity
                       style={[styles.card]}
                       onPress={() => {
-                        setPopupState(false);
-                        // Disable automatic tour and enable manual tour
-                        dispatch(setToggleChatScreenGuideStart(false));
-                        dispatch(setManualGuidedTourRunning(true));
-
-                        // Set tour step first, then navigate after a short delay
-                        // This ensures Redux state is updated before navigation
-                        if(optionIndex == 0){
-                            dispatch(setNavigationBasicsGuideTourSteps(1));
-                        }
-                        else if(optionIndex == 1){
-                            dispatch(setChatFunctionsGuideTourSteps(1));
-                        }
-                        else{
-                            dispatch(setLearningLabsGuideTourSteps(1));
-                        }
-
-                        // Small delay to ensure state updates before navigation
-                        setTimeout(() => {
-                            navigation.navigate("chat");
-                        }, 50);
+                        // Show the demo preview screen for this tour type
+                        handleDemoOptionPress(optionIndex);
                       }}
                       activeOpacity={0.7}
                     >
@@ -149,6 +143,7 @@ const GuidedTourStartPopup = ({ popupState, setPopupState }) => {
         </View>
       </View>
     </Modal>
+    </>
   );
 };
 
@@ -185,10 +180,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
   },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-  },
   content: {
     paddingHorizontal: 24,
     paddingTop: 24,
@@ -222,39 +213,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     maxHeight: screenHeight * 0.5,
   },
-  optionsMain: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 20,
-  },
-  selectedOption: {
-    backgroundColor: "#FAFAFA",
-    borderWidth: 1,
-    borderColor: "#D3DAE5",
-    borderRadius: 50,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  button: {
-    backgroundColor: "#081A35",
-    paddingVertical: 13,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  btnsMain: {
-    paddingTop: 20,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFont(14),
-    fontWeight: "500",
-    fontFamily: "Mukta-Bold",
-    letterSpacing: 0.3,
-  },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -273,43 +231,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 5,
   },
-  radioOuter: {
-    width: 23,
-    height: 23,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: "#D3DAE5",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ffffff",
-  },
-  radioInner: {
-    width: "80%",
-    height: "80%",
-    borderRadius: 50,
-    backgroundColor: "#000000ff",
-  },
-  inputLarge: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#D1D5DB",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    color: "#1F2937",
-    letterSpacing: 0.2,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "100%",
-    height: 130,
-  },
-  inputText: {
-    backgroundColor: "#FFFFFF",
-    fontSize: scaleFont(12),
-    fontFamily: "Mukta-Regular",
-    color: "#1F2937",
-  },
 });
 
-export default GuidedTourStartPopup;
+export default DemoPopup;

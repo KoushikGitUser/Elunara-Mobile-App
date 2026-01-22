@@ -190,14 +190,14 @@ const UniversalTooltip = ({
       <Modal
         visible={isVisible}
         transparent={true}
-        animationType="fade"
+        animationType="none"
         onRequestClose={() => {}}
       >
         <SpotlightOverlay
           targetRect={spotlightRect}
           borderColor="#FFFFFF"
           borderRadius={12}
-          borderWidth={2}
+          borderWidth={4}
           blurAmount={7}
         >
           <TouchableOpacity
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    zIndex: 1,
   },
   pointer: {
     height: 16,
@@ -255,6 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#24487C",
     borderRadius: 19,
     width: width - 100,
+    zIndex: 10,
   },
   btnsMain: {
     width: "100%",
