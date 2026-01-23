@@ -2,7 +2,10 @@
   "expo": {
     "name": "Elunara",
     "slug": "elunara",
-    "scheme": ["elunara", "elunaraapp"],
+    "scheme": [
+      "elunara",
+      "elunaraapp"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,7 +32,15 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+  "expo-build-properties",
+  {
+    "android": {
+      "usesCleartextTraffic": true
+    }
+  }
+]
     ],
     "ios": {
       "supportsTablet": true,

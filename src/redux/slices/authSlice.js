@@ -494,7 +494,7 @@ const authSlice = createSlice({
          triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
           Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         if (payload?.status == 201) {
-          state.authStates.isSignedUp = true;
+          state.authStates.isSignedUp = true; 
         }
       })
       .addCase(userSignUp.rejected, (state, { payload }) => {
