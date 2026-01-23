@@ -8,7 +8,9 @@ import {
   ActivityIndicator,
   Linking,
   BackHandler,
+  Modal,
 } from "react-native";
+import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect, useMemo, useState } from "react";
@@ -45,6 +47,9 @@ const WelcomeScreen = () => {
 
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [showPostsModal, setShowPostsModal] = useState(false);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -55,6 +60,22 @@ const WelcomeScreen = () => {
     if (fontsLoaded) {
     }
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoadingPosts(true);
+      try {
+        const response = await axios.get("https://jsonplaceholder.typicode.com/posts");
+        setPosts(response.data);
+        setShowPostsModal(true);
+      } catch (error) {
+        console.log("Error fetching posts:", error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+    fetchPosts();
+  }, [])
 
 
   useEffect(() => {
@@ -174,6 +195,40 @@ const WelcomeScreen = () => {
         visible={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}
       />
+
+      {/* Posts Modal */}
+      <Modal
+        visible={showPostsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPostsModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" }}>
+          <View style={{ backgroundColor: "#fff", width: "90%", maxHeight: "80%", borderRadius: 10, padding: 15 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>Posts</Text>
+              <TouchableOpacity onPress={() => setShowPostsModal(false)}>
+                <AntDesign name="close" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+            {loadingPosts ? (
+              <ActivityIndicator size="large" color={appColors.primary} />
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={true}>
+                {posts.map((post) => (
+                  <View key={post.id} style={{ marginBottom: 15, padding: 10, backgroundColor: "#f5f5f5", borderRadius: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
+                      {post.id}. {post.title}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: "#666" }}>{post.body}</Text>
+                    <Text style={{ fontSize: 10, color: "#999", marginTop: 5 }}>User ID: {post.userId}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
