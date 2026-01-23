@@ -23,7 +23,7 @@ import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
 import SettingLLMState from "./SettingLLMState";
 import IntegtrateAiState from "./IntegtrateAiState";
 import FindAPIKeyState from "./FindAPIKeyState";
-import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetCompareStates } from "../../../../../redux/slices/apiCommonSlice";
 import gemini from "../../../../../assets/images/gemini.png";
 import anthropic from "../../../../../assets/images/antropic.png";
 import mistral from "../../../../../assets/images/mistral.png";
@@ -106,6 +106,14 @@ const ChangeLLMPopup = () => {
       setSelectedStyle(0);
     }
   }, [chatCustomisationStates?.selectedLLM]);
+
+  // Reset comparison state when modal opens
+  useEffect(() => {
+    if (toggleStates.toggleChangeResponseLLMWhileChatPopup) {
+      dispatch(resetCompareStates());
+      setSelectedLLMsForCompare([]);
+    }
+  }, [toggleStates.toggleChangeResponseLLMWhileChatPopup, dispatch]);
 
   // Handle LLM selection
   const handleLLMSelection = (llmOption, index) => {

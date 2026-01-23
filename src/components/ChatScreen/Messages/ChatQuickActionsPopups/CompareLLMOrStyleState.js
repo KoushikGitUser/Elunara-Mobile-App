@@ -78,12 +78,15 @@ const CompareLLMOrStyleState = ({
   // Local state to track user's dropdown selections (for immediate title update)
   const [localFirstStyleName, setLocalFirstStyleName] = useState(null);
   const [localSecondStyleName, setLocalSecondStyleName] = useState(null);
+  const [localFirstLLMName, setLocalFirstLLMName] = useState(null);
+  const [localSecondLLMName, setLocalSecondLLMName] = useState(null);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
-  // Get all available styles
+  // Get all available styles and LLMs
   const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+  const allAvailableLLMs = settingsStates?.settingsMasterDatas?.allLLMsAvailable || [];
 
   // Get comparison responses from Redux based on type - using separate storage locations
   const firstResponse = forStyleOrLLM === "LLM"
@@ -109,9 +112,9 @@ const CompareLLMOrStyleState = ({
   const firstStyle = selectedStylesForCompare?.[0];
   const secondStyle = selectedStylesForCompare?.[1];
 
-  // Determine which data to use for display (prefer response data, fallback to selected items)
-  const firstLLMName = firstResponse?.generation?.llm?.name || firstLLM?.name || "Loading...";
-  const secondLLMName = secondResponse?.generation?.llm?.name || secondLLM?.name || "Loading...";
+  // Determine which data to use for display (prefer local selection, then response data, fallback to selected items)
+  const firstLLMName = localFirstLLMName || firstResponse?.generation?.llm?.name || firstLLM?.name || "Loading...";
+  const secondLLMName = localSecondLLMName || secondResponse?.generation?.llm?.name || secondLLM?.name || "Loading...";
 
   const firstLLMProvider = firstResponse?.generation?.llm?.name || firstLLM?.provider || firstLLM?.name;
   const secondLLMProvider = secondResponse?.generation?.llm?.name || secondLLM?.provider || secondLLM?.name;
@@ -259,7 +262,35 @@ const CompareLLMOrStyleState = ({
                 }
               }}
             />
-          ) :(isExpandedFirst && forStyleOrLLM == "LLM")?<OtherLLMPopup isFirst={true} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond}/>:null}
+          ) : (isExpandedFirst && forStyleOrLLM == "LLM") ? (
+            <OtherLLMPopup
+              isFirst={true}
+              setIsExpandedFirst={setIsExpandedFirst}
+              setIsExpandedSecond={setIsExpandedSecond}
+              currentLLMName={firstLLMName}
+              otherSelectedLLMName={secondLLMName}
+              allAvailableLLMs={allAvailableLLMs}
+              onLLMSelect={(llm) => {
+                // Update local state immediately for title change
+                setLocalFirstLLMName(llm.name);
+                // Handle LLM selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      llm_id: llm.id,
+                    },
+                    name: "compareAIResponsesFirst",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : null}
         </View>
         <View style={styles.responseBoxMain}>
           {isFirstLoading ? (
@@ -374,6 +405,28 @@ const CompareLLMOrStyleState = ({
               isFirst={false}
               setIsExpandedFirst={setIsExpandedFirst}
               setIsExpandedSecond={setIsExpandedSecond}
+              currentLLMName={secondLLMName}
+              otherSelectedLLMName={firstLLMName}
+              allAvailableLLMs={allAvailableLLMs}
+              onLLMSelect={(llm) => {
+                // Update local state immediately for title change
+                setLocalSecondLLMName(llm.name);
+                // Handle LLM selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      llm_id: llm.id,
+                    },
+                    name: "compareAIResponsesSecond",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
             />
           ) : null}
         </View>

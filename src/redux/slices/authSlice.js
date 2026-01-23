@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 import apiInstance from "../helper";
 import { triggerToast } from "../../services/toast";
 import {
@@ -10,17 +11,22 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { resetAllStates } from "../actions/resetActions";
 import { allInitialStates } from "../allInitialStates";
+import { Alert } from "react-native";
 
 export const userSignUp = createAsyncThunk(
   "/userSignUp",
   async (registerDetails, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.post("/register", registerDetails, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      let res = await axios.post(
+        "http://api.elunara.ai/api/v1/register",
+        registerDetails,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
       return {
         data: res.data,
         status: res.status,
@@ -485,12 +491,16 @@ const authSlice = createSlice({
         state.authStates.isSignedUp = "pending";
       })
       .addCase(userSignUp.fulfilled, (state, { payload }) => {
+         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
+          Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         if (payload?.status == 201) {
           state.authStates.isSignedUp = true;
         }
       })
       .addCase(userSignUp.rejected, (state, { payload }) => {
         state.authStates.isSignedUp = false;
+        triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
+         Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         if (payload?.status == 422) {
           if (payload?.data?.data?.account_recoverable === true) {
             state.authStates.isAccountRecoverable = true;
@@ -513,10 +523,12 @@ const authSlice = createSlice({
       })
       .addCase(userSignIn.fulfilled, (state, action) => {
         const { payload } = action;
+        Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
+         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
         state.authStates.isSignedIn = true;
         // Store token in secure storage
         if (payload.data?.data?.access_token) {
-          storeToken(payload.data.data.access_token);
+          storeToken(payload.data.data.access_token); 
         }
         // Store refresh token in secure storage
         if (payload.data?.data?.refresh_token) {
@@ -529,12 +541,15 @@ const authSlice = createSlice({
             "success",
             3000
           );
+           triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
+            Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         }, 300);
       })
       .addCase(userSignIn.rejected, (state, action) => {
         console.log("userSignIn rejected - request payload:", action.meta.arg);
         const { payload } = action;
         state.authStates.isSignedIn = false;
+         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
         setTimeout(() => {
           triggerToast("Login failed", `${payload.message}`, "error", 3000);
         }, 300);

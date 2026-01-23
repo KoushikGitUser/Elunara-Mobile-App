@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import apiInstance from "../helper";
+import apiInstance, { baseURL } from "../helper";
 import { allInitialStates } from "../allInitialStates";
 import { addCasePending } from "../addCases/pending";
 import { addCaseFulfilled } from "../addCases/fulfilled";
@@ -69,6 +69,20 @@ const apiCommonSlice = createSlice({
     resetVersionSwitched:(state)=>{
       state.chatsStates.loaderStates.isVersionSwitched = null;
     },
+    resetCompareStates:(state)=>{
+      // Reset loader states for compare
+      state.chatsStates.loaderStates.isFirstCompareResponseLoading = null;
+      state.chatsStates.loaderStates.isSecondCompareResponseLoading = null;
+      state.chatsStates.loaderStates.isFirstCompareStyleResponseLoading = null;
+      state.chatsStates.loaderStates.isSecondCompareStyleResponseLoading = null;
+      state.chatsStates.loaderStates.isStoreCompareResponsePending = null;
+      state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = null;
+      // Reset comparison data
+      state.chatsStates.allChatsDatas.firstComparisonResponse = null;
+      state.chatsStates.allChatsDatas.secondComparisonResponse = null;
+      state.chatsStates.allChatsDatas.firstComparisonStyleResponse = null;
+      state.chatsStates.allChatsDatas.secondComparisonStyleResponse = null;
+    },
     resetChatDeleted:(state)=>{
       state.chatsStates.loaderStates.isChatDeleted = null;
     },
@@ -103,7 +117,7 @@ const apiCommonSlice = createSlice({
   },
 });
 
-export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched,resetChatTitleUpdated,resetChatPinUnpinUpdated,resetChatArchiveUnarchiveUpdated,resetChatDeleted,resetChatDeleteUndone,resetBulkOperationCompleted,setCurrentActionChatDetails,resetAIResponseRegenerated,resetVersionSwitched} =
+export const { setIsCountrySelectionChanged, setSelectedCountryCode,setIsAnythingChangedInGeneralSettings,setIsGeneralSettingsRestored,setIsAnythingChangedInPersonalisationSettings,setIsPersonalInfosFetched,resetChatTitleUpdated,resetChatPinUnpinUpdated,resetChatArchiveUnarchiveUpdated,resetChatDeleted,resetChatDeleteUndone,resetBulkOperationCompleted,setCurrentActionChatDetails,resetAIResponseRegenerated,resetVersionSwitched,resetCompareStates} =
   apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

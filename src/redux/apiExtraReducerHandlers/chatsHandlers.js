@@ -374,17 +374,16 @@ export const handleRegenerateAIResponse = {
     state.chatsStates.allChatsDatas.aiMessageContent =
       responseData?.content || null;
 
-    // Store message ID in the messageIDsArray (flat structure)
+    // Update message ID in the messageIDsArray at the correct index
     const aiMessageId = responseData?.id;
+    const messageIndex = state.globalDataStates.currentAIMessageIndexForRegeneration;
 
-    if (aiMessageId) {
-      // Get current messageIDsArray from globalDataStates
-      const currentMessageIds = state.globalDataStates?.messageIDsArray || [];
-      // Add AI message ID
-      state.globalDataStates.messageIDsArray = [
-        ...currentMessageIds,
-        aiMessageId,
-      ];
+    if (aiMessageId && messageIndex !== null && messageIndex >= 0) {
+      // Replace the ID at the message index instead of appending
+      const updatedMessageIds = [...(state.globalDataStates?.messageIDsArray || [])];
+      updatedMessageIds[messageIndex] = aiMessageId;
+      state.globalDataStates.messageIDsArray = updatedMessageIds;
+      console.log("Updated messageIDsArray at index:", messageIndex, "with ID:", aiMessageId);
     }
     state.chatsStates.loaderStates.isAIResponseRegenerated = true;
     state.toggleStates.toggleIsWaitingForResponse = false;
@@ -490,6 +489,15 @@ export const handleSwitchVersionsOfAIResponse = {
 
       state.globalDataStates.chatMessagesArray = updatedChatMessagesArray;
       console.log("Updated chatMessagesArray:", JSON.stringify(updatedChatMessagesArray[messageIndex], null, 2));
+
+      // Update messageIDsArray with the new ID at the same index
+      const newMessageId = responseData?.id;
+      if (newMessageId) {
+        const updatedMessageIds = [...(state.globalDataStates?.messageIDsArray || [])];
+        updatedMessageIds[messageIndex] = newMessageId;
+        state.globalDataStates.messageIDsArray = updatedMessageIds;
+        console.log("Updated messageIDsArray at index:", messageIndex, "with ID:", newMessageId);
+      }
     }
 
     state.chatsStates.loaderStates.isVersionSwitched = true;
@@ -607,6 +615,15 @@ export const handleStoreCompareResponses = {
 
       state.globalDataStates.chatMessagesArray = updatedChatMessagesArray;
       console.log("Updated chatMessagesArray with compare response:", JSON.stringify(updatedChatMessagesArray[messageIndex], null, 2));
+
+      // Update messageIDsArray with the new ID at the same index
+      const newMessageId = responseData?.id;
+      if (newMessageId) {
+        const updatedMessageIds = [...(state.globalDataStates?.messageIDsArray || [])];
+        updatedMessageIds[messageIndex] = newMessageId;
+        state.globalDataStates.messageIDsArray = updatedMessageIds;
+        console.log("Updated messageIDsArray at index:", messageIndex, "with ID:", newMessageId);
+      }
     }
 
     // Store the response for AIMessageBox to read
@@ -736,6 +753,15 @@ export const handleStoreCompareStyleResponses = {
 
       state.globalDataStates.chatMessagesArray = updatedChatMessagesArray;
       console.log("Updated chatMessagesArray with compare style response:", JSON.stringify(updatedChatMessagesArray[messageIndex], null, 2));
+
+      // Update messageIDsArray with the new ID at the same index
+      const newMessageId = responseData?.id;
+      if (newMessageId) {
+        const updatedMessageIds = [...(state.globalDataStates?.messageIDsArray || [])];
+        updatedMessageIds[messageIndex] = newMessageId;
+        state.globalDataStates.messageIDsArray = updatedMessageIds;
+        console.log("Updated messageIDsArray at index:", messageIndex, "with ID:", newMessageId);
+      }
     }
 
     // Store the response for AIMessageBox to read

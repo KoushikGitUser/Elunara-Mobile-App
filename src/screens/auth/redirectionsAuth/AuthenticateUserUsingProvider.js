@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   BackHandler,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -50,6 +51,7 @@ const AuthenticateUserUsingProvider = ({ route }) => {
       if (isVerified == true) {
         navigation.navigate("chat");
         console.log(token,"token");
+        Alert.alert("Token",token);
         storeToken(token);
         triggerToast(
           "Logged in",

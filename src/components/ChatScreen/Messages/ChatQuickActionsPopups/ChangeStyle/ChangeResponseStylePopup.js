@@ -24,7 +24,7 @@ import {
 import CompareStyleCards from "./CompareStyleCards";
 import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
 import Toaster from "../../../../UniversalToaster/Toaster";
-import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetCompareStates } from "../../../../../redux/slices/apiCommonSlice";
 import ChakraIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
 import ConciseIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
 import FormalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
@@ -93,6 +93,7 @@ const ChangeResponseStylePopup = () => {
   useEffect(() => {
     if (toggleStates.toggleChangeResponseStyleWhileChatPopup) {
       dispatch(setToggleCompareStyleState(false));
+      dispatch(resetCompareStates());
       setSelectedStyleForCompare([]);
       setSelectedStyleObjectsForCompare([]);
     }
