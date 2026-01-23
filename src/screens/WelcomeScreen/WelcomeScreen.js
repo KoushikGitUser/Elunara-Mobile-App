@@ -9,6 +9,7 @@ import {
   Linking,
   BackHandler,
   Modal,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -69,6 +70,7 @@ const WelcomeScreen = () => {
         setPosts(response.data);
         setShowPostsModal(true);
       } catch (error) {
+        Alert.alert("Error",`${error}Error fetching posts`)
         console.log("Error fetching posts:", error);
       } finally {
         setLoadingPosts(false);

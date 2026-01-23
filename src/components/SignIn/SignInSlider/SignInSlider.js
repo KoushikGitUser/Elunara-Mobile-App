@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -39,6 +39,22 @@ const SignInSlider = () => {
     const index = Math.round(scrollPosition / SCREEN_WIDTH);
     setCurrentIndex(index);
   };
+
+  // Auto-slide functionality
+  useEffect(() => {
+    const autoSlideInterval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % slides.length;
+        scrollViewRef.current?.scrollTo({
+          x: nextIndex * SCREEN_WIDTH,
+          animated: true,
+        });
+        return nextIndex;
+      });
+    }, 3000);
+
+    return () => clearInterval(autoSlideInterval);
+  }, []);
 
   return (
     <View style={styles.container}>
