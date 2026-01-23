@@ -721,7 +721,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
               );
             }}
             style={styles.socialButton}
@@ -735,7 +735,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
               );
             }}
             style={styles.socialButton}
