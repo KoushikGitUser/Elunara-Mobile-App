@@ -3,7 +3,7 @@ import axios from "axios";
 import apiInstance from "../helper";
 import { triggerToast } from "../../services/toast";
 import {
-  storeToken,
+  storeToken, 
   removeToken,
   storeRefreshToken,
   getToken,
@@ -56,11 +56,21 @@ export const userSignIn = createAsyncThunk(
         status: res.status,
       };
     } catch (error) {
-      return rejectWithValue({
-        message: error.response?.data?.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
+      // Handle both server errors (with response) and network errors (without response)
+      if (error.response) {
+        return rejectWithValue({
+          message: error.response?.data?.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
+      } else {
+        // Network error (no response) - common in release builds
+        return rejectWithValue({
+          message: error.message || "Network error. Please check your connection.",
+          status: 0,
+          data: null,
+        });
+      }
     }
   }
 );
@@ -314,6 +324,7 @@ export const requestForEmailChange = createAsyncThunk(
       let res = await apiInstance.post("/settings/profile/email/request",userDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -338,6 +349,7 @@ export const verifyEmailChangeRequest = createAsyncThunk(
       let res = await apiInstance.post("/settings/profile/email/verify",userDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -362,6 +374,7 @@ export const updatePasswordWithCurrent = createAsyncThunk(
       let res = await apiInstance.put("/settings/profile/password",userDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -386,6 +399,7 @@ export const forgotPasswordFromProfile = createAsyncThunk(
       let res = await apiInstance.post("/settings/profile/password/forgot",userDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {
@@ -410,6 +424,7 @@ export const updatePasswordForgotProfile = createAsyncThunk(
       let res = await apiInstance.post("/settings/profile/password/forgot",userDetails, {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
       return {

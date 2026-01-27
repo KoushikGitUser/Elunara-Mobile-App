@@ -34,13 +34,13 @@
       "expo-font",
       "expo-secure-store",
       [
-  "expo-build-properties",
-  {
-    "android": {
-      "usesCleartextTraffic": true
-    }
-  }
-]
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
@@ -57,14 +57,17 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.smgdev.elunara"
+      "package": "com.smgdev.elunara",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "5e992e34-2def-4f1d-94b6-5bb7cc5ea66e"
+        "projectId": "61667c80-0d74-4e22-bd7f-1aa0d5b3655b"
       }
     }
   }
