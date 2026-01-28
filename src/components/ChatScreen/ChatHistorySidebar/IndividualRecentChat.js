@@ -55,10 +55,31 @@ const IndividualRecentChat = ({ item, translateX }) => {
     dispatch(setToggleIsChattingWithAI(true));
   };
 
+  const closeSidebarAndNavigate = () => {
+    // Check if already on chat screen
+    const currentRoute = navigation.getState()?.routes?.slice(-1)[0]?.name;
+
+    // Navigate to chat only if not already there
+    if (currentRoute !== "chat") {
+      navigation.navigate("chat");
+    }
+
+    // Close sidebar with animation
+    dispatch(setToggleChatHistorySidebar(false));
+    Animated.timing(translateX, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      // Fetch chat messages after animation completes
+      fetchAllMessagesOfChat();
+    });
+  };
+
   return (
     <TouchableOpacity
       onPress={() => {
-        fetchAllMessagesOfChat();
+        closeSidebarAndNavigate();
       }}
       onLongPress={() => {
         fetchAllMessagesOfChat();

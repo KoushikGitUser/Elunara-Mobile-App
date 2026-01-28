@@ -14,10 +14,13 @@ import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/P
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
 import { appColors } from "../../themes/appColors";
 
-const ChatFilterPopup = ({close, top, right, onFilterSelect}) => {
+const ChatFilterPopup = ({close, top, right, onFilterSelect, currentFilter}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [selectedFilter, setSelectedFilter] = useState(null);
+
+  // Map filter values to indices for radio button selection
+  const filterToIndex = { "active": 0, "pinned": 1, "archived": 2 };
+  const [selectedFilter, setSelectedFilter] = useState(currentFilter ? filterToIndex[currentFilter] : null);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>

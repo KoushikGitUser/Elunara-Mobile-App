@@ -49,6 +49,8 @@ const AllChatsPage = () => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [checked, setChecked] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [currentFilter, setCurrentFilter] = useState(null);
+  const [currentSort, setCurrentSort] = useState(null);
 
   const isLoading = chatsStates.loaderStates.isAllUserChatsFetched === "pending" && isInitialLoad;
   const allUserChats = chatsStates.allChatsDatas.allUserChatsAvailable;
@@ -127,18 +129,33 @@ const AllChatsPage = () => {
   };
 
   const handleSort = (sortValue) => {
+    setCurrentSort(sortValue);
+    // Build URL with both filter and sort if filter exists
+    let url = `/chats?page=1&per_page=20`;
+    if (currentFilter) {
+      url += `&filter=${currentFilter}`;
+    }
+    url += `&sort=${sortValue}`;
+
     const payload = {
       method: "GET",
-      url: `/chats?page=1&per_page=20&sort=${sortValue}`,
+      url,
       name: "fetchAllUserChatsAvailable"
     };
     dispatch(commonFunctionForAPICalls(payload));
   };
 
   const handleFilter = (filterValue) => {
+    setCurrentFilter(filterValue);
+    // Build URL with both filter and sort if sort exists
+    let url = `/chats?page=1&per_page=20&filter=${filterValue}`;
+    if (currentSort) {
+      url += `&sort=${currentSort}`;
+    }
+
     const payload = {
       method: "GET",
-      url: `/chats?page=1&per_page=20&filter=${filterValue}`,
+      url,
       name: "fetchAllUserChatsAvailable"
     };
     dispatch(commonFunctionForAPICalls(payload));
@@ -286,6 +303,8 @@ const AllChatsPage = () => {
             onSortSelect={handleSort}
             onFilterSelect={handleFilter}
             onSearch={handleSearch}
+            currentSort={currentSort}
+            currentFilter={currentFilter}
           />
         )}
         <ScrollView

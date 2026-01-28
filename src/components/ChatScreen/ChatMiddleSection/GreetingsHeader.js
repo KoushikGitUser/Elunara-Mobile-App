@@ -26,15 +26,28 @@ const GreetingsHeader = () => {
       return null;
     }
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+
+        if (hour >= 5 && hour < 12) {
+            return "Good Morning,";
+        } else if (hour >= 12 && hour < 17) {
+            return "Good Afternoon,";
+        } else if (hour >= 17 && hour < 21) {
+            return "Good Evening,";
+        } else {
+            return "Hello,";
+        }
+    };
+
   const belowText = "Pick a topic below, or just start typing \n— I've got you."
   return (
     <View style={styles.greetingsMain}>
       <View>
       <View style={styles.greetingPlusname}>
         <GradientText
-          children="Good Morning,"
+          children={getGreeting()}
           fullWidth={false}
-          widthNumber={0.52}
           fontSize={24}
         />
         <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>{firstName}!</Text>
@@ -61,7 +74,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    gap: 10,
+    gap: 0,
   },
   image: {
       height: 115,

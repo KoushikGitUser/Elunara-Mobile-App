@@ -68,8 +68,9 @@ import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQ
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
-import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetChatArchiveUnarchiveUpdated } from "../../redux/slices/apiCommonSlice";
 import { BlurView } from "@react-native-community/blur";
+import { appColors } from "../../themes/appColors";
 
 // Mock chat messages for Chat Functions tour step 2
 const mockChatMessages = [
@@ -91,7 +92,7 @@ const ChatScreen = () => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -152,6 +153,31 @@ const ChatScreen = () => {
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
 
+  // Fetch profile info on mount
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/settings/profile",
+      name: "getAllProfileInfos",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Handle archive/unarchive success - refresh recent chats
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatArchiveUnarchiveUpdated === true) {
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
+
+      // Reset loader state
+      dispatch(resetChatArchiveUnarchiveUpdated());
+    }
+  }, [chatsStates.loaderStates.isChatArchiveUnarchiveUpdated]);
+
   // Populate chatCustomisationStates when general settings are loaded
   useEffect(() => {
     if (settingsStates?.allGeneralSettings) {
@@ -211,17 +237,48 @@ const ChatScreen = () => {
         previousChatUuidRef.current = createdChatDetails.id;
         setIsWaitingForMessages(true);
         const chatId = createdChatDetails.id;
+
+        const messageData = {
+          content:
+            globalDataStates.chatMessagesArray[
+              globalDataStates.chatMessagesArray.length - 1
+            ]?.message || "Hello",
+          content_type: "text",
+          attachment_ids: [],
+        };
+
+        // Add LLM ID if not null
+        if (chatCustomisationStates?.selectedLLM?.id !== null) {
+          messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+            ? chatCustomisationStates.selectedLLM.id
+            : parseInt(chatCustomisationStates.selectedLLM.id);
+        }
+
+        // Add Response Style ID if not null
+        if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+          messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+            ? chatCustomisationStates.selectedResponseStyle.id
+            : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+        }
+
+        // Add Language ID if not null
+        if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+          messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+            ? chatCustomisationStates.selectedLanguage.id
+            : parseInt(chatCustomisationStates.selectedLanguage.id);
+        }
+
+        // Add Citation Format ID if not null
+        if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+          messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+            ? chatCustomisationStates.selectedCitationFormat.id
+            : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+        }
+
         const payload = {
           method: "POST",
           url: `/chats/${chatId}/messages`,
-          data: {
-            content:
-              globalDataStates.chatMessagesArray[
-                globalDataStates.chatMessagesArray.length - 1
-              ]?.message || "Hello",
-            content_type: "text",
-            attachment_ids: [],
-          },
+          data: messageData,
           name: "sendPromptAndGetMessageFromAI",
         };
         dispatch(commonFunctionForAPICalls(payload));
@@ -1161,43 +1218,93 @@ const ChatScreen = () => {
           {/* middle section */}
 
           {/* chatInput section */}
-          <View style={{ width: "100%", marginBottom: 30 }}>
-            {/* Editing Message Banner */}
-            {toggleStates.isEditingUserMessage && (
-              <View
+          {(createdChatDetails?.is_archived || createdChatDetails?.archived) ? (
+            <View style={{ width: "100%", paddingHorizontal: 20, paddingVertical: 30 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: "#6B7280",
+                  fontFamily: "Mukta-Regular",
+                  textAlign: "center",
+                  marginBottom: 12,
+                  marginTop:10,
+                }}
+              >
+                Archived chats are read-only. Unarchive to continue the conversation.
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  const chatId = createdChatDetails?.id;
+                  if (chatId) {
+                    const payload = {
+                      method: "POST",
+                      url: `/chats/${chatId}/unarchive`,
+                      name: "archiveOrUnarchiveChat"
+                    };
+                    dispatch(commonFunctionForAPICalls(payload));
+                  }
+                }}
                 style={{
                   width: "100%",
-                  paddingHorizontal: 20,
-                  paddingVertical: 12,
-                  backgroundColor: "#F9FAFB",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  backgroundColor: appColors.navyBlueShade,
+                  paddingVertical: 10,
+                  marginTop:10,
+                  borderRadius: 50,
                   alignItems: "center",
+                  justifyContent: "center",
                 }}
+                activeOpacity={0.8}
               >
                 <Text
                   style={{
-                    fontSize: 14,
-                    color: "#374151",
+                    color: "#FFFFFF",
+                    fontSize: 15,
                     fontFamily: "Mukta-Medium",
                   }}
                 >
-                  Editing message
+                  Unarchive
                 </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    dispatch(setIsEditingUserMessage(false));
-                  }}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={{ width: "100%", marginBottom: 30 }}>
+              {/* Editing Message Banner */}
+              {toggleStates.isEditingUserMessage && (
+                <View
                   style={{
-                    padding: 4,
+                    width: "100%",
+                    paddingHorizontal: 20,
+                    paddingVertical: 12,
+                    backgroundColor: "#F9FAFB",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  <Feather name="x" size={20} color="#6B7280" />
-                </TouchableOpacity>
-              </View>
-            )}
-            <ChatInputMain ref={chatInputRef} />
-          </View>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: "#374151",
+                      fontFamily: "Mukta-Medium",
+                    }}
+                  >
+                    Editing message
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch(setIsEditingUserMessage(false));
+                    }}
+                    style={{
+                      padding: 4,
+                    }}
+                  >
+                    <Feather name="x" size={20} color="#6B7280" />
+                  </TouchableOpacity>
+                </View>
+              )}
+              <ChatInputMain ref={chatInputRef} />
+            </View>
+          )}
           {/* chatInput section */}
         </View>
       </Animated.View>

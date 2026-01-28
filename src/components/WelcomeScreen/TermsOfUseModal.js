@@ -42,7 +42,7 @@ const TermsOfUseModal = ({ visible, onClose }) => {
         <View style={[styles.modalSheet, { marginTop: 30 }]}>
           {/* Header */}
           <View style={styles.headerSection}>
-            <Text style={styles.headerLabel}>Updated: 24 July 2025</Text>
+            <Text style={styles.headerLabel}></Text>
             <Text style={styles.title}>Terms of Use</Text>
             <Text style={styles.introText}>
               By using our app and services, you agree to the following Terms of

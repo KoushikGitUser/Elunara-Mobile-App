@@ -43,6 +43,13 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
 
       const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
 
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
+
       // Show toast with undo action
       setTimeout(() => {
         triggerToastWithAction(
@@ -73,12 +80,26 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
   useEffect(() => {
     if (chatsStates.loaderStates.isBulkOperationCompleted === true) {
       dispatch(setToggleDeleteChatConfirmPopup(false));
+
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
     }
   }, [chatsStates.loaderStates.isBulkOperationCompleted]);
 
   // Handle undo delete success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatDeleteUndone === true) {
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
+
       dispatch(resetChatDeleteUndone());
     }
   }, [chatsStates.loaderStates.isChatDeleteUndone]);

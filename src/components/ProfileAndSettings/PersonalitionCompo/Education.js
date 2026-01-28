@@ -192,6 +192,7 @@ const Education = () => {
           placeholder="Select specialisation..."
           triggerAPICall={updateSpecialization}
           initialValue={settingsStates.allPersonalisationsSettings.academicCareer.specialisation}
+          maxHeightPercent={0.2}
         />
       </View>
       <View style={{ marginTop: 10, marginBottom: 20 }}>

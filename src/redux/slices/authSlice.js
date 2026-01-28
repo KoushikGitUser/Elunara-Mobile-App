@@ -17,16 +17,12 @@ export const userSignUp = createAsyncThunk(
   "/userSignUp",
   async (registerDetails, { rejectWithValue }) => {
     try {
-      let res = await axios.post(
-        "http://api.elunara.ai/api/v1/register",
-        registerDetails,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let res = await apiInstance.post("/register", registerDetails, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
       return {
         data: res.data,
         status: res.status,
@@ -56,21 +52,11 @@ export const userSignIn = createAsyncThunk(
         status: res.status,
       };
     } catch (error) {
-      // Handle both server errors (with response) and network errors (without response)
-      if (error.response) {
-        return rejectWithValue({
-          message: error.response?.data?.message,
-          status: error.response?.status,
-          data: error.response?.data,
-        });
-      } else {
-        // Network error (no response) - common in release builds
-        return rejectWithValue({
-          message: error.message || "Network error. Please check your connection.",
-          status: 0,
-          data: null,
-        });
-      }
+      return rejectWithValue({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
     }
   }
 );
@@ -506,16 +492,12 @@ const authSlice = createSlice({
         state.authStates.isSignedUp = "pending";
       })
       .addCase(userSignUp.fulfilled, (state, { payload }) => {
-         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
-          Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         if (payload?.status == 201) {
-          state.authStates.isSignedUp = true; 
+          state.authStates.isSignedUp = true;
         }
       })
       .addCase(userSignUp.rejected, (state, { payload }) => {
         state.authStates.isSignedUp = false;
-        triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
-         Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         if (payload?.status == 422) {
           if (payload?.data?.data?.account_recoverable === true) {
             state.authStates.isAccountRecoverable = true;
@@ -538,12 +520,10 @@ const authSlice = createSlice({
       })
       .addCase(userSignIn.fulfilled, (state, action) => {
         const { payload } = action;
-        Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
-         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
         state.authStates.isSignedIn = true;
         // Store token in secure storage
         if (payload.data?.data?.access_token) {
-          storeToken(payload.data.data.access_token); 
+          storeToken(payload.data.data.access_token);
         }
         // Store refresh token in secure storage
         if (payload.data?.data?.refresh_token) {
@@ -556,15 +536,12 @@ const authSlice = createSlice({
             "success",
             3000
           );
-           triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
-            Alert.alert("error",`payload msg - ${payload.message}, payload - ${payload}, status - ${payload.status}`)
         }, 300);
       })
       .addCase(userSignIn.rejected, (state, action) => {
         console.log("userSignIn rejected - request payload:", action.meta.arg);
         const { payload } = action;
         state.authStates.isSignedIn = false;
-         triggerToast(payload.status,`payload msg - ${payload.message}, payload - ${payload},` ,"error",20000)
         setTimeout(() => {
           triggerToast("Login failed", `${payload.message}`, "error", 3000);
         }, 300);
@@ -608,6 +585,7 @@ const authSlice = createSlice({
         state.authStates.isPasswordReset = true;
       })
       .addCase(resetPassword.rejected, (state, { payload }) => {
+        console.log("resetPassword rejected - full response:", JSON.stringify(payload, null, 2));
         state.authStates.isPasswordReset = false;
         if (payload.status == 400) {
           triggerToast(

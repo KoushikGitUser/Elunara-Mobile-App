@@ -241,7 +241,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
           })}
         </View>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setToggleIntegrateAi(true)}
           style={[
             styles.card,
@@ -289,7 +289,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
             Link your account to tailor responses and enjoy the benefits of your
             subscription.
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
             <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
               <Text
                 style={{

@@ -121,22 +121,10 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       return;
     }
 
-    const payload = {
-      method: "POST",
-      url: `/chats/${chatUuid}/messages`,
-      data: {
-        content: globalDataStates.userMessagePrompt,
-        content_type: "text",
-        attachment_ids: [],
-      },
-      name: "sendPromptAndGetMessageFromAI",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
-  };
-
-  const createChatWithAIFunction = () => {
     const data = {
-      name: "Chatting with AI",
+      content: globalDataStates.userMessagePrompt,
+      content_type: "text",
+      attachment_ids: [],
     };
 
     // Add LLM ID if not null
@@ -169,8 +157,20 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
 
     const payload = {
       method: "POST",
-      url: "/chats",
+      url: `/chats/${chatUuid}/messages`,
       data,
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const createChatWithAIFunction = () => {
+    const payload = {
+      method: "POST",
+      url: "/chats",
+      data: {
+        name: "Chatting with AI",
+      },
       name: "createChatWithAI",
     };
     dispatch(commonFunctionForAPICalls(payload));
@@ -221,14 +221,44 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
     };
 
     // Call send message API (not regenerate) with the chat UUID
+    const sendMessageData = {
+      content: updatedMessage,
+      content_type: "text",
+      attachment_ids: [],
+    };
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      sendMessageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      sendMessageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      sendMessageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      sendMessageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
     const sendMessagePayload = {
       method: "POST",
       url: `/chats/${chatUuid}/messages`,
-      data: {
-        content: updatedMessage,
-        content_type: "text",
-        attachment_ids: [],
-      },
+      data: sendMessageData,
       name: "sendPromptAndGetMessageFromAI",
     };
 
@@ -615,8 +645,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
             >
               <MicIcon color={isRecording ? 'white' : undefined} />
             </TouchableOpacity> */}
-            {(globalDataStates.userMessagePrompt !== "" ||
-              globalDataStates.selectedFiles.length > 0) && (
+            {globalDataStates.userMessagePrompt !== "" && (
               <TouchableOpacity
                 onPress={() => {
                   // Check if in editing mode

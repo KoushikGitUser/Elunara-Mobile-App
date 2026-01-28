@@ -141,8 +141,15 @@ export const handleArchiveOrUnarchiveChat = {
   fulfilled: (state, action) => {
     state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = true;
     console.log(action?.payload.data);
+    // Check if it's archive or unarchive action
+    const isArchived = action?.meta?.arg?.url?.includes("/archive") && !action?.meta?.arg?.url?.includes("/unarchive");
+
+    // Update createdChatDetails.is_archived for ChatScreen UI
+    if (state.chatsStates.allChatsDatas.createdChatDetails) {
+      state.chatsStates.allChatsDatas.createdChatDetails.is_archived = isArchived;
+    }
+
     // Show toast based on action with delay to ensure popup is closed
-    const isArchived = action?.meta?.arg?.url?.includes("/archive");
     setTimeout(() => {
       triggerToast(
         isArchived ? "Chat Archived" : "Chat Unarchived",

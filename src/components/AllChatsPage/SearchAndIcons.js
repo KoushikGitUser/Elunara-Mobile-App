@@ -11,7 +11,7 @@ import ChatFilterPopup from "./ChatFilterPopup";
 import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 import { setUserMessagePrompt, setSelecetdFiles, setChatInputContentLinesNumber } from "../../redux/slices/globalDataSlice";
 
-const SearchAndIcons = ({ isSearching, setIsSearching, onSortSelect, onFilterSelect, onSearch }) => {
+const SearchAndIcons = ({ isSearching, setIsSearching, onSortSelect, onFilterSelect, onSearch, currentSort, currentFilter }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -50,10 +50,17 @@ const SearchAndIcons = ({ isSearching, setIsSearching, onSortSelect, onFilterSel
     };
   }, [searchText]);
 
+  // Active icon style
+  const activeIconStyle = {
+    backgroundColor: "#E7ECF5",
+    borderRadius: 5,
+    padding: 4,
+  };
+
   return (
     <View style={styles.searchAndIcons}>
-       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} onSortSelect={onSortSelect} from="chats" />}
-      {toggleFilterPopup && <ChatFilterPopup close={setToggleFilterPopup} top={50} right={30} onFilterSelect={onFilterSelect} />}
+       {toggleSortingPopup && <RoomsSortingPopup close={setToggleSortingPopup} top={50} right={55} onSortSelect={onSortSelect} from="chats" currentSort={currentSort} />}
+      {toggleFilterPopup && <ChatFilterPopup close={setToggleFilterPopup} top={50} right={30} onFilterSelect={onFilterSelect} currentFilter={currentFilter} />}
       <View
         style={[
           styles.searchInputMain,
@@ -79,12 +86,18 @@ const SearchAndIcons = ({ isSearching, setIsSearching, onSortSelect, onFilterSel
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
-        <TouchableOpacity onPress={()=>setToggleSortingPopup(true)}>
-        <ArrowUpDownIcon />
+        <TouchableOpacity
+          onPress={()=>setToggleSortingPopup(true)}
+          style={toggleSortingPopup ? activeIconStyle : { padding: 4 }}
+        >
+          <ArrowUpDownIcon />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={()=>setToggleFilterPopup(true)}>
-        <FilterIcon />
+        <TouchableOpacity
+          onPress={()=>setToggleFilterPopup(true)}
+          style={toggleFilterPopup ? activeIconStyle : { padding: 4 }}
+        >
+          <FilterIcon />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => {

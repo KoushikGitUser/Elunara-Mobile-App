@@ -48,7 +48,7 @@ const GenderDropdown = ({ triggerAPICall }) => {
   };
 
   const handleSelect = (item) => {
-    setSelected(item);
+    setSelected(item?.name ?? item);
     setVisible(false);
     triggerAPICall(item?.id);
   };
@@ -111,12 +111,12 @@ const GenderDropdown = ({ triggerAPICall }) => {
                 (item, itemIndex) => {
                   return (
                     <TouchableOpacity
-                      key={itemIndex}
+                      key={item?.id ?? itemIndex}
                       style={styles.option}
                       onPress={() => handleSelect(item)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.description}>{item}</Text>
+                      <Text style={styles.description}>{item?.name ?? item}</Text>
                     </TouchableOpacity>
                   );
                 }

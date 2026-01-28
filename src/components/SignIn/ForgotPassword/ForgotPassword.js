@@ -57,7 +57,8 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
 
   useEffect(() => {
     if (authStates.isOTPReceivedForAccountRecovery == true) {
-      navigation.navigate("changepass",{ 
+      close(false); // Close the modal before navigating
+      navigation.navigate("changepass",{
         recoveryToken: null,
         isForTokenOrOTP: "OTP",
       });

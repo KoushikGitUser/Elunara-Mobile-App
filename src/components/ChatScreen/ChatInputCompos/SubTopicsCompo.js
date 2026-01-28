@@ -90,24 +90,10 @@ const SubTopicsCompo = () => {
       return;
     }
 
-    const payload = {
-      method: "POST",
-      url: `/chats/${chatUuid}/messages`,
-      data: {
-        content: belowSearchText,
-        content_type: "text",
-        attachment_ids: [],
-      },
-      name: "sendPromptAndGetMessageFromAI",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
-  };
-
-  const createChatWithAIFunction = () => {
     const data = {
-      name: belowSearchText,
-      subject_id: globalDataStates.selectedSubjectID,
-      topic_id: globalDataStates.selectedTopicsID,
+      content: belowSearchText,
+      content_type: "text",
+      attachment_ids: [],
     };
 
     // Add LLM ID if not null
@@ -140,8 +126,22 @@ const SubTopicsCompo = () => {
 
     const payload = {
       method: "POST",
-      url: "/chats",
+      url: `/chats/${chatUuid}/messages`,
       data,
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const createChatWithAIFunction = () => {
+    const payload = {
+      method: "POST",
+      url: "/chats",
+      data: {
+        name: belowSearchText,
+        subject_id: globalDataStates.selectedSubjectID,
+        topic_id: globalDataStates.selectedTopicsID,
+      },
       name: "createChatWithAI",
     };
     dispatch(commonFunctionForAPICalls(payload));

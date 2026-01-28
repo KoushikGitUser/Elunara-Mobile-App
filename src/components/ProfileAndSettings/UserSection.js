@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     marginRight: 20,
+    borderRadius:10
   },
   mobileVerifyButton: {
     width: "100%",

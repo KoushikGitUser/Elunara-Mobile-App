@@ -52,34 +52,34 @@ const ChatOptionsPopup = () => {
 
   // Dynamic actions based on is_pinned and is_archived states
   const currentChatDetails = chatsStates.allChatsDatas.currentActionChatDetails;
-  const isPinned = currentChatDetails?.is_pinned;
-  const isArchived = currentChatDetails?.is_archived;
+  const createdChatDetails = chatsStates.allChatsDatas.createdChatDetails;
+  const isPinned = currentChatDetails?.is_pinned || createdChatDetails?.is_pinned;
+  // Check both possible field names from API
+  const isArchived = currentChatDetails?.is_archived || currentChatDetails?.archived ||
+                     createdChatDetails?.is_archived || createdChatDetails?.archived;
 
-  const actions = [
-    { title: "Add to Learning Lab", icon: folder },
-    { title: "Rename", icon: pencil },
-    {
-      title: isPinned ? "Unpin" : "Pin",
-      icon: isPinned ? pinGrey : pin
-    },
-    {
-      title: isArchived ? "Unarchive" : "Archive",
-      icon: isArchived ? archiveBox : archive
-    },
-    { title: "Delete", icon: deleteBin },
-  ];
+  // Show limited options when chat is archived
+  const actions = isArchived
+    ? [
+        { title: "Unarchive", icon: archiveBox, action: "unarchive" },
+        { title: "Delete", icon: deleteBin, action: "delete" },
+      ]
+    : [
+        { title: "Add to Learning Lab", icon: folder, action: "addToLearningLab" },
+        { title: "Rename", icon: pencil, action: "rename" },
+        { title: isPinned ? "Unpin" : "Pin", icon: isPinned ? pinGrey : pin, action: "pinUnpin" },
+        { title: "Archive", icon: archive, action: "archive" },
+        { title: "Delete", icon: deleteBin, action: "delete" },
+      ];
 
-  const commonFunctions = (index) => {
-    if (index === 0) {
-      // Add to Learning Lab
+  const commonFunctions = (actionType) => {
+    if (actionType === "addToLearningLab") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
-    } else if (index === 1) {
-      // Rename
+    } else if (actionType === "rename") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleRenameChatPopup(true));
-    } else if (index === 2) {
-      // Pin/Unpin
+    } else if (actionType === "pinUnpin") {
       if (!chatId) {
         triggerToast("Error", "Chat ID not found", "error", 3000);
         return;
@@ -94,8 +94,7 @@ const ChatOptionsPopup = () => {
 
       dispatch(commonFunctionForAPICalls(payload));
       dispatch(setToggleChatMenuPopup(false));
-    } else if (index === 3) {
-      // Archive/Unarchive
+    } else if (actionType === "archive" || actionType === "unarchive") {
       if (!chatId) {
         triggerToast("Error", "Chat ID not found", "error", 3000);
         return;
@@ -110,8 +109,7 @@ const ChatOptionsPopup = () => {
 
       dispatch(commonFunctionForAPICalls(payload));
       dispatch(setToggleChatMenuPopup(false));
-    } else if (index === 4) {
-      // Delete
+    } else if (actionType === "delete") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleDeleteChatConfirmPopup(true));
       dispatch(setDeleteConfirmPopupFrom("chatOptions"));
@@ -135,8 +133,8 @@ const ChatOptionsPopup = () => {
       >
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
-      <View style={styles.menuModalMain}>
-        {actions.map((action, actionIndex) => {
+      <View style={[styles.menuModalMain, isArchived && { minHeight: 'auto' }]}>
+        {actions.map((actionItem, actionIndex) => {
           return (
             <Pressable
               style={({ pressed }) => [
@@ -147,13 +145,13 @@ const ChatOptionsPopup = () => {
               ]}
               onPress={(e) => {
                 e.stopPropagation();
-                commonFunctions(actionIndex);
+                commonFunctions(actionItem.action);
               }}
               key={actionIndex}
             >
               <Image
                 style={{ height: 20, width: 20, resizeMode: "contain" }}
-                source={action.icon}
+                source={actionItem.icon}
               />
               <Text
                 numberOfLines={1}
@@ -164,7 +162,7 @@ const ChatOptionsPopup = () => {
                   marginLeft: 12,
                 }}
               >
-                {action.title}
+                {actionItem.title}
               </Text>
             </Pressable>
           );

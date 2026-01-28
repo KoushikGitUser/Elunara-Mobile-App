@@ -96,6 +96,19 @@ export const handleUpdatePersonalisationsSettings = {
   fulfilled: (state, action) => {
     state.settingsStates.allPersonalisationsSettings.isAnythingChangedInPersonalisationSettings = true;
     state.settingsStates.fetchingAllGeneralSettings = false;
+    // Update state with API response data
+    if (action.payload?.data?.data) {
+      const data = action.payload.data.data;
+      if (data.personal_info) {
+        state.settingsStates.allPersonalisationsSettings.personalInfos = data.personal_info;
+      }
+      if (data.academic_career) {
+        state.settingsStates.allPersonalisationsSettings.academicCareer = data.academic_career;
+      }
+      if (data.learning_devices) {
+        state.settingsStates.allPersonalisationsSettings.learningDevices = data.learning_devices;
+      }
+    }
   },
   rejected: (state, action) => {
     state.settingsStates.fetchingAllGeneralSettings = false;
@@ -197,7 +210,10 @@ export const handleUpdateProfileName = {
 };
 
 export const handleUpdateProfileImage = {
-  pending: (state) => {},
+  pending: (state) => {
+    console.log("pro pic update pendinding");
+    
+  },
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;

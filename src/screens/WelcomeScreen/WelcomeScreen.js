@@ -5,15 +5,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ActivityIndicator,
   Linking,
   BackHandler,
-  Modal,
-  Alert,
 } from "react-native";
-import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect, useMemo, useState } from "react";
 import mainLogo from "../../assets/images/Knowledge Chakra 1.png";
 import chakraLogo from "../../assets/images/Knowledge Chakra 2.png";
@@ -23,7 +18,6 @@ import apple from "../../assets/images/apple-logo.png";
 import SignInSlider from "../../components/SignIn/SignInSlider/SignInSlider";
 import { createStyles } from "./WelcomeScreen.styles";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -31,8 +25,6 @@ import {
   signWithApple,
   signWithLinkedIn,
 } from "../../redux/slices/authSlice";
-import { appColors } from "../../themes/appColors";
-import apiInstance from "../../redux/helper";
 import TermsOfUseModal from "../../components/WelcomeScreen/TermsOfUseModal";
 import PrivacyPolicyModal from "../../components/WelcomeScreen/PrivacyPolicyModal";
 
@@ -48,9 +40,6 @@ const WelcomeScreen = () => {
 
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [posts, setPosts] = useState([]);
-  const [showPostsModal, setShowPostsModal] = useState(false);
-  const [loadingPosts, setLoadingPosts] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
@@ -62,22 +51,6 @@ const WelcomeScreen = () => {
     }
   }, [fontsLoaded]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setLoadingPosts(true);
-      try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/posts");
-        setPosts(response.data);
-        setShowPostsModal(true);
-      } catch (error) {
-        Alert.alert("Error",`${error}Error fetching posts`)
-        console.log("Error fetching posts:", error);
-      } finally {
-        setLoadingPosts(false);
-      }
-    };
-    fetchPosts();
-  }, [])
 
 
   useEffect(() => {
@@ -197,40 +170,6 @@ const WelcomeScreen = () => {
         visible={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}
       />
-
-      {/* Posts Modal */}
-      <Modal
-        visible={showPostsModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowPostsModal(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" }}>
-          <View style={{ backgroundColor: "#fff", width: "90%", maxHeight: "80%", borderRadius: 10, padding: 15 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>Posts</Text>
-              <TouchableOpacity onPress={() => setShowPostsModal(false)}>
-                <AntDesign name="close" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-            {loadingPosts ? (
-              <ActivityIndicator size="large" color={appColors.primary} />
-            ) : (
-              <ScrollView showsVerticalScrollIndicator={true}>
-                {posts.map((post) => (
-                  <View key={post.id} style={{ marginBottom: 15, padding: 10, backgroundColor: "#f5f5f5", borderRadius: 8 }}>
-                    <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
-                      {post.id}. {post.title}
-                    </Text>
-                    <Text style={{ fontSize: 12, color: "#666" }}>{post.body}</Text>
-                    <Text style={{ fontSize: 10, color: "#999", marginTop: 5 }}>User ID: {post.userId}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };

@@ -42,6 +42,13 @@ const DeleteChatPopup = () => {
         name: "fetchAllUserChatsAvailable"
       }));
 
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
+
       // Show toast with undo action
       setTimeout(() => {
         triggerToastWithAction(
@@ -76,6 +83,13 @@ const DeleteChatPopup = () => {
         method: "GET",
         url: "/chats?page=1&per_page=20",
         name: "fetchAllUserChatsAvailable"
+      }));
+
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
       }));
 
       dispatch(resetChatDeleteUndone());

@@ -28,7 +28,7 @@ const SignInSlider = () => {
         "Tap into multiple powerful AI models for nuanced answers, create dynamic learning goals. Always in your control.",
     },
     {
-      heading: [" Your Learning", "Universe, Lynk-ed."],
+      heading: ["Your Learning", "Universe, Lynk-ed."],
       description:
         "Save insights from Lynk AI chat, write rich notes, and organize everything in one seamless space.",
     },

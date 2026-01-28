@@ -23,10 +23,10 @@ import SuccessCheckMark from "./SuccessCheckMark";
 import { appColors } from "../../themes/appColors";
 import { useNavigation } from "@react-navigation/native";
 
-const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
+const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPopup }) => {
   const animatedValue = useState(new Animated.Value(0))[0];
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
@@ -167,8 +167,9 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
                         You can now {""}
                       </Text>
                       <TouchableOpacity
-                        onPress={() =>{ 
+                        onPress={() =>{
                           close(false);
+                          closeVerificationMailPopup(false);
                           navigation.navigate("signin");
                         }}
                         activeOpacity={0.7}
@@ -186,7 +187,7 @@ const VerifyMailOtpPopup = ({ close, verifyMailOtpPopup }) => {
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.title}>Enter the 4-digit code</Text>
+                    <Text style={styles.title}>Enter the 6-digit code</Text>
                     {/* Description */}
                     <Text style={styles.description}>
                       We've sent a one-time password (OTP) to
@@ -363,19 +364,18 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     marginBottom: 35,
     marginTop: 5,
-    gap: 17,
   },
   otpInput: {
-    width: "15%",
-    height: 57,
+    width: "14%",
+    height: 50,
     borderWidth: 1,
     borderColor: "#B5BECE",
     backgroundColor: "white",
     color: "#828282",
-    borderRadius: 16,
+    borderRadius: 12,
     textAlign: "center",
     fontSize: scaleFont(15),
     fontWeight: "600",

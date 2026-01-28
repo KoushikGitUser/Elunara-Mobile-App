@@ -8,13 +8,14 @@ import { resetAllStates } from "../actions/resetActions";
 
 export const commonFunctionForAPICalls = createAsyncThunk(
   "/common-api-call",
-  async ({ method, url, data, params }, { rejectWithValue }) => {
+  async ({ method, url, data, params, headers }, { rejectWithValue }) => {
     try {
       let res = await apiInstance({
         method,
         url,
         data,
         params,
+        headers,
       });
       return {
         data: res.data,

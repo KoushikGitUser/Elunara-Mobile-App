@@ -50,8 +50,6 @@ const AuthenticateUserUsingProvider = ({ route }) => {
     setTimeout(() => {
       if (isVerified == true) {
         navigation.navigate("chat");
-        console.log(token,"token");
-        Alert.alert("Token",token);
         storeToken(token);
         triggerToast(
           "Logged in",

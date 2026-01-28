@@ -25,15 +25,14 @@ const ArchiveChatPopup = () => {
   const dispatch = useDispatch();
 
   const currentChat = chatsStates.allChatsDatas.currentActionChatDetails;
-  const isArchived = currentChat?.is_archived;
+  // Check both possible field names from API
+  const isArchived = currentChat?.is_archived || currentChat?.archived;
 
   const isLoading = chatsStates.loaderStates.isChatArchiveUnarchiveUpdated === "pending";
 
   // Handle archive/unarchive success
   useEffect(() => {
     if (chatsStates.loaderStates.isChatArchiveUnarchiveUpdated === true) {
-      dispatch(setToggleArchiveChatPopup(false));
-
       // Refetch all chats
       dispatch(commonFunctionForAPICalls({
         method: "GET",
@@ -41,8 +40,18 @@ const ArchiveChatPopup = () => {
         name: "fetchAllUserChatsAvailable"
       }));
 
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
+
       // Reset loader state
       dispatch(resetChatArchiveUnarchiveUpdated());
+
+      // Close popup
+      dispatch(setToggleArchiveChatPopup(false));
     }
   }, [chatsStates.loaderStates.isChatArchiveUnarchiveUpdated]);
 

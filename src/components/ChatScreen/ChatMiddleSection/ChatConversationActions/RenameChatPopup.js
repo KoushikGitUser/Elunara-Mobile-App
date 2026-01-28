@@ -78,12 +78,22 @@ const RenameChatPopup = () => {
   // Handle success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatTitleUpdated === true) {
+      // Refresh recent chats list first (before closing popup)
+      const recentChatsPayload = {
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats",
+      };
+      dispatch(commonFunctionForAPICalls(recentChatsPayload));
+
+      // Reset the loader state
+      dispatch(resetChatTitleUpdated());
+
+      // Close popup and show toast
       dispatch(setToggleRenameChatPopup(false));
       setTimeout(() => {
         triggerToast("Renamed!", "Your chat has been successfully renamed", "success", 3000);
       }, 300);
-      // Reset the loader state for next time
-      dispatch(resetChatTitleUpdated());
     }
   }, [chatsStates.loaderStates.isChatTitleUpdated]);
 
