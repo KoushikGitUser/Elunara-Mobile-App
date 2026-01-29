@@ -5,6 +5,8 @@ import {
   StatusBar,
   BackHandler,
   Alert,
+  Modal,
+  Image,
 } from "react-native";
 import React, {
   useEffect,
@@ -258,12 +260,21 @@ const ChatScreen = () => {
 
   // When chat is created, send message to get AI response
   useEffect(() => {
+    console.log("🔔 ChatScreen: isChatCreatedWithAI =", isChatCreatedWithAI, "chatId =", createdChatDetails?.id);
+
     if (isChatCreatedWithAI === true && createdChatDetails?.id) {
+      console.log("✅ Chat created condition met!");
+      console.log("📋 Previous UUID:", previousChatUuidRef.current, "New UUID:", createdChatDetails.id);
+
       // Only proceed if this is a new chat (different ID)
       if (previousChatUuidRef.current !== createdChatDetails.id) {
+        console.log("🆕 NEW CHAT! Sending first message...");
         previousChatUuidRef.current = createdChatDetails.id;
         setIsWaitingForMessages(true);
         const chatId = createdChatDetails.id;
+
+        console.log("📨 ChatMessagesArray:", globalDataStates.chatMessagesArray);
+        console.log("📝 Last message:", globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1]);
 
         const messageData = {
           content:
@@ -273,6 +284,8 @@ const ChatScreen = () => {
           content_type: "text",
           attachment_ids: [],
         };
+
+        console.log("📤 Sending message data:", messageData);
 
         // Add LLM ID if not null
         if (chatCustomisationStates?.selectedLLM?.id !== null) {

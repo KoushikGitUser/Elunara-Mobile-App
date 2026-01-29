@@ -152,6 +152,11 @@ const SubTopicsCompo = () => {
       return;
     }
 
+    console.log("🎯 STARTING CHAT FROM TOPICS");
+    console.log("📝 Message:", belowSearchText);
+    console.log("💬 Current chatMessagesArray length:", globalDataStates.chatMessagesArray.length);
+    console.log("🔄 toggleIsChattingWithAI:", toggleStates.toggleIsChattingWithAI);
+
     // Add user message to chat array
     dispatch(
       setChatMessagesArray([
@@ -166,12 +171,16 @@ const SubTopicsCompo = () => {
       ])
     );
 
+    console.log("✅ User message added to array");
+
     // Check if already chatting with AI
     if (toggleStates.toggleIsChattingWithAI) {
       // Direct message send flow - chat already exists
+      console.log("📤 Sending message directly (chat exists)");
       sendMessageDirectly();
     } else {
       // Initial flow - create new chat
+      console.log("🆕 Creating new chat first");
       createChatWithAIFunction();
       dispatch(setToggleIsChattingWithAI(true));
     }
@@ -183,6 +192,8 @@ const SubTopicsCompo = () => {
     dispatch(setChatInputContentLinesNumber(1));
     dispatch(setToggleIsWaitingForResponse(true));
     dispatch(setToggleTopicsPopup(false));
+
+    console.log("🏁 handleSendButton completed");
   };
 
   return (

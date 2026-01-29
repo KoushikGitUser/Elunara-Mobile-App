@@ -323,7 +323,10 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
 
   // Real API flow - when AI message is fetched, add it to chat messages array with uuid
   useEffect(() => {
+    console.log("🔍 useEffect triggered! isMessagesFetched:", isMessagesFetched, "aiMessageContent:", aiMessageContent ? "EXISTS" : "NULL");
+
     if (isMessagesFetched === true && aiMessageContent) {
+      console.log("✨ CONDITION MET! Processing AI response...");
       console.log("Full AI Response:", JSON.stringify(chatsStates.allChatsDatas.chatMessages));
       console.log("Current messageIDsArray:", globalDataStates.messageIDsArray);
 
@@ -368,16 +371,23 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       }
 
       // Add AI message with uuid
+      console.log("🚀 Adding AI message to array:", newAIMessage);
+      console.log("📊 Current chatMessagesArray:", globalDataStates.chatMessagesArray);
+      console.log("📏 Array length before:", globalDataStates.chatMessagesArray.length);
+
       dispatch(
         setChatMessagesArray([
           ...globalDataStates.chatMessagesArray,
           newAIMessage,
         ])
       );
+
+      console.log("✅ Dispatched setChatMessagesArray with", globalDataStates.chatMessagesArray.length + 1, "messages");
       dispatch(setToggleIsWaitingForResponse(false));
     }
     // Handle error case
     if (isMessagesFetched === false && toggleStates.toggleIsWaitingForResponse) {
+      console.log("❌ Message fetch failed, clearing loader");
       dispatch(setToggleIsWaitingForResponse(false));
     }
   }, [isMessagesFetched, aiMessageContent, latestUserMessageData, latestAiMessageData]);
