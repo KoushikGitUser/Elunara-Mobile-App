@@ -14,7 +14,7 @@ import roomLogo from "../../assets/images/Group 40427.png";
 import { moderateScale, scaleFont } from "../../utils/responsive";
 import { Brain, Link } from "lucide-react-native";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
-import GradientText from "../common/GradientText";
+import AuthGradientText from "../common/AuthGradientText";
 import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
 import ChatsComponent from "../AllChatsPage/ChatsComponent";
 import SearchIconsHeader from "./SearchIconsHeader";
@@ -164,14 +164,15 @@ const RoomsMiddle = ({ roomName }) => {
           >
             <View style={styles.noResultMain}>
               <BigSearchIcon />
-              <GradientText
+              <AuthGradientText
                 marginBottom={0}
                 marginTop={15}
-                children="Start Something Great Today!"
                 fullWidth={false}
-                widthNumber={0.55}
+                widthMultiplier={0.55}
                 fontSize={scaleFont(20)}
-              />
+              >
+                Start Something Great Today!
+              </AuthGradientText>
               <Text
                 style={{
                   fontSize: scaleFont(14),

@@ -68,6 +68,13 @@ const ChatOptionsPopup = ({ chatUuid }) => {
     createdChatDetails?.is_archived ||
     createdChatDetails?.archived;
 
+  // Check if chat already belongs to a room
+  const hasRoom =
+    currentChatDetails?.room ||
+    currentChatDetails?.room_id ||
+    createdChatDetails?.room ||
+    createdChatDetails?.room_id;
+
   // Show limited options when chat is archived
   const actions = isArchived
     ? [
@@ -76,11 +83,15 @@ const ChatOptionsPopup = ({ chatUuid }) => {
       ]
     : [
         { title: "Open Notes", icon: bookmarkIcon, action: "openNotes" },
-        {
-          title: "Add to Learning Lab",
-          icon: folder,
-          action: "addToLearningLab",
-        },
+        ...(!hasRoom
+          ? [
+              {
+                title: "Add to Learning Lab",
+                icon: folder,
+                action: "addToLearningLab",
+              },
+            ]
+          : []),
         { title: "Rename", icon: pencil, action: "rename" },
         {
           title: isPinned ? "Unpin" : "Pin",

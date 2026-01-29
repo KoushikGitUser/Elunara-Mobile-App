@@ -146,7 +146,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
           </Text>
           {roomName && (
             <TouchableOpacity style={styles.topicNamemain}>
-              <IndianRupee size={15} color="#406DD8" strokeWidth={1.25} />
+              
               <Text
                 style={{
                   fontSize: 12,

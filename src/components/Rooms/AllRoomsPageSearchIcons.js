@@ -35,10 +35,6 @@ const AllRoomsPageSearchIcons = ({
     <View
       style={[styles.searchAndIcons, { paddingHorizontal: 20, marginTop: 15 }]}
     >
-      {toggleSortingPopup && (
-        <RoomsSortingPopup close={setToggleSortingPopup} />
-      )}
-      {toggleFilterPopup && <RoomsFilterPopup close={setToggleFilterPopup} />}
       <View
         style={[
           styles.searchInputMain,
@@ -76,12 +72,22 @@ const AllRoomsPageSearchIcons = ({
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
-        <TouchableOpacity onPress={() => setToggleSortingPopup(true)}>
-          <ArrowUpDownIcon />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setToggleFilterPopup(true)}>
-          <FilterIcon />
-        </TouchableOpacity>
+        <View style={[styles.iconWrapper, toggleSortingPopup && { zIndex: 1000 }]}>
+          <TouchableOpacity onPress={() => setToggleSortingPopup(true)}>
+            <ArrowUpDownIcon />
+          </TouchableOpacity>
+          {toggleSortingPopup && (
+            <RoomsSortingPopup close={setToggleSortingPopup} />
+          )}
+        </View>
+        <View style={[styles.iconWrapper, toggleFilterPopup && { zIndex: 1000 }]}>
+          <TouchableOpacity onPress={() => setToggleFilterPopup(true)}>
+            <FilterIcon />
+          </TouchableOpacity>
+          {toggleFilterPopup && (
+            <RoomsFilterPopup close={setToggleFilterPopup} />
+          )}
+        </View>
         <TouchableOpacity
           onPress={() => dispatch(setToggleLearningLabUnlockPopup(true))}
         >
@@ -126,6 +132,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     gap: 20,
+  },
+  iconWrapper: {
+    position: "relative",
   },
 });
 

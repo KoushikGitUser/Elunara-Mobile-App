@@ -31,7 +31,7 @@ const Rooms = ({ route }) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { roomsStates } = useSelector((state) => state.API);
   const translateX = React.useRef(new Animated.Value(0)).current;
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded] = useFonts({ 
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
   });

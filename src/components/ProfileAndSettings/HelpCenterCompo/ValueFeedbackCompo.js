@@ -20,6 +20,7 @@ import ToolsContainers from "../../ChatScreen/ChatInputCompos/ToolsContainers";
 import { feedbackOptions } from "../../../data/datas";
 import { triggerToast } from "../../../services/toast";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import Toaster from "../../UniversalToaster/Toaster";
 
 const screenHeight = Dimensions.get("window").height;
 const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
@@ -61,6 +62,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
       animationType="slide"
       onRequestClose={() => setPopupState(false)}
     >
+      <Toaster/>
       <View style={styles.container}>
         {/* Blur Background */}
 

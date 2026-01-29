@@ -74,6 +74,20 @@ const AcademicLinks = () => {
     setActivePopupIndex(null);
   };
 
+  const handleAddLink = () => {
+    const currentLinks = settingsStates.academicLinks?.userLinks || [];
+    if (currentLinks.length >= 2) {
+      triggerToast(
+        "Limit reached",
+        "Only 2 academic links can be added",
+        "error",
+        3000
+      );
+      return;
+    }
+    dispatch(setToggleAddLinkPopup(true));
+  };
+
   return (
     <View style={styles.container}>
       {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
@@ -117,7 +131,7 @@ const AcademicLinks = () => {
 
           {/* Plus Button - Centered to left content */}
           <TouchableOpacity
-            onPress={() => dispatch(setToggleAddLinkPopup(true))}
+            onPress={handleAddLink}
             style={styles.addButton}
           >
             <Plus size={28} color="#1F2937" strokeWidth={1.5} />

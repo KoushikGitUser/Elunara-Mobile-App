@@ -19,6 +19,7 @@ import { triggerToast } from "../../services/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import Toaster from '../UniversalToaster/Toaster'
 
 const AddLinkPopup = ({ onLinkAdded }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -63,6 +64,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleAddLinkPopup(false))}
     >
+    <Toaster/>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}
