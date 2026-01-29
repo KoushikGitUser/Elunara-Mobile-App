@@ -49,6 +49,7 @@ const GreetingsHeader = () => {
           children={getGreeting()}
           fullWidth={false}
           fontSize={24}
+          measureWidth={true}
         />
         <Text style={{ fontSize: 22, fontWeight: 500,fontFamily:'Mukta-Bold'}}>{firstName}!</Text>
       </View>

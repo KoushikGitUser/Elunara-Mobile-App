@@ -4,7 +4,7 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
-} from "react-native";
+} from "react-native"; 
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +23,7 @@ const AllChatsHeader = ({ isSearching,setIsSearching,translateX }) => {
   const dispatch = useDispatch();
 
   return (
-    <View style={[styles.chatHeader]}>
+    <View style={[styles.chatHeader]}> 
       <TouchableOpacity
         onPress={() => {
           Animated.timing(translateX, {

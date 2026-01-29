@@ -24,7 +24,7 @@ import apple from "../../../assets/images/apple-logo.png";
 import SignInSlider from "../../../components/SignIn/SignInSlider/SignInSlider";
 import { useNavigation } from "@react-navigation/native";
 import ForgotPassword from "../../../components/SignIn/ForgotPassword/ForgotPassword";
-import GradientText from "../../../components/common/GradientText";
+import AuthGradientText from "../../../components/common/AuthGradientText";
 import { scaleFont } from "../../../utils/responsive";
 import { triggerToast } from "../../../services/toast";
 import { useFonts } from "expo-font";
@@ -191,15 +191,16 @@ const SignIn = () => {
             <TouchableOpacity onPress={() => navigation.navigate("welcome")}>
               <BackArrowLeftIcon />
             </TouchableOpacity>
-            {
-              <GradientText
-                marginBottom={0}
-                marginTop={20}
-                children="Welcome back"
-                fullWidth={true}
-                fontSize={scaleFont(24)}
-              />
-            }
+            <AuthGradientText
+              marginBottom={0}
+              marginTop={20}
+              fullWidth={true}
+              textAlign="left"
+              fontSize={scaleFont(25)}
+              fontWeight="700"
+            >
+              Welcome back
+            </AuthGradientText>
             <Text style={styles.headDesc}>
               Pick up right where you left off
             </Text>

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { scaleFont, verticalScale } from "../../../utils/responsive";
-import GradientText from "../../common/GradientText";
+import AuthGradientText from "../../common/AuthGradientText";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const SignInSlider = () => {
@@ -74,7 +74,15 @@ const SignInSlider = () => {
               <View style={styles.headingContainer}>
                 {slide.heading?.map((heads, headIndex) => {
                   return (
-                    <GradientText fullWidth={true} key={headIndex} fontSize={scaleFont(35)} children={heads} />
+                    <AuthGradientText
+                      fullWidth={true}
+                      key={headIndex}
+                      fontSize={scaleFont(35)}
+                      fontWeight="700"
+                      textAlign="left"
+                    >
+                      {heads}
+                    </AuthGradientText>
                   );
                 })}
               </View>

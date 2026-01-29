@@ -1,5 +1,5 @@
 import { DarkTheme, useNavigation } from "@react-navigation/native";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -18,13 +18,19 @@ import { useDispatch, useSelector } from "react-redux";
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const hasNavigated = useRef(false); // Track if we've already navigated
+  const isInitialMount = useRef(true); // Track if this is the initial mount
 
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
+      // Prevent re-running if already navigated
+      if (hasNavigated.current) return;
+
       const accessToken = await getToken();
 
       // If no access token available, navigate to welcome screen
       if (!accessToken) {
+        hasNavigated.current = true;
         navigation.navigate("welcome");
         return;
       }
@@ -45,6 +51,10 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
     const handleProfileFetchResult = async () => {
+      // Only handle navigation on initial mount, ignore subsequent state changes
+      if (!isInitialMount.current) return;
+      if (hasNavigated.current) return;
+
       const accessToken = await getToken();
 
       // Only process if access token exists
@@ -52,16 +62,16 @@ const SplashScreen = ({ navigation }) => {
         return;
       }
 
+      // Only navigate to chat when profile is successfully fetched (true)
+      // Ignore false states as they could be "loading" or "error"
+      // If there's an auth error, the axios interceptor will handle logout
       if (
         settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
         true
       ) {
+        hasNavigated.current = true;
+        isInitialMount.current = false;
         navigation.navigate("chat");
-      } else if (
-        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
-        false
-      ) {
-        navigation.navigate("welcome");
       }
     };
 

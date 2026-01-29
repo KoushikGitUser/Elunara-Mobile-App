@@ -15,6 +15,7 @@ const GradientText = ({
   marginBottom,
   fullWidth,
   lineHeight,
+  measureWidth = false, // Only measure width for greetings on ChatScreen and SignUp
 }) => {
   const [measuredWidth, setMeasuredWidth] = useState(0);
 
@@ -44,25 +45,35 @@ const GradientText = ({
 
   return (
     <View style={{ marginTop: marginTop, marginBottom: marginBottom }}>
-      {/* Hidden text for measuring */}
-      <RNText
-        style={{
-          position: "absolute",
-          opacity: 0,
-          fontSize: finalFontSize,
-          fontWeight: finalFontWeight,
-          fontFamily: "Mukta-Bold",
-          letterSpacing: 1,
-        }}
-        onLayout={handleTextLayout}
-      >
-        {children}
-      </RNText>
+      {/* Hidden text for measuring - only when measureWidth is true */}
+      {measureWidth && (
+        <RNText
+          style={{
+            position: "absolute",
+            opacity: 0,
+            fontSize: finalFontSize,
+            fontWeight: finalFontWeight,
+            fontFamily: "Mukta-Bold",
+            letterSpacing: 1,
+          }}
+          onLayout={handleTextLayout}
+        >
+          {children}
+        </RNText>
+      )}
 
       <Svg
         height={finalHeight}
-        width={fullWidth ? "100%" : measuredWidth || finalFontSize}
-        style={{ opacity: measuredWidth > 0 || fullWidth ? 1 : 0 }}
+        width={
+          fullWidth
+            ? "100%"
+            : measureWidth
+            ? measuredWidth || finalFontSize
+            : "100%"
+        }
+        style={{
+          opacity: measureWidth ? (measuredWidth > 0 || fullWidth ? 1 : 0) : 1,
+        }}
       >
         <Defs>
           <LinearGradient id="grad" x1={x1} y1={y1} x2={x2} y2={y2}>

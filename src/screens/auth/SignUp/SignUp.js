@@ -274,6 +274,7 @@ const SignUp = () => {
               widthNumber={0.48}
               fontSize={scaleFont(25)}
               lineHeight={40}
+              measureWidth={true}
             />
             <Text
               style={[
