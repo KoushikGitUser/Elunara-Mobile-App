@@ -46,7 +46,7 @@ const LLMState = () => {
   const handleSave = () => {
     if (selectedCountsArray.length > 0) {
       dispatch(
-        setTempRoomProperty({ key: "llm_id", value: selectedCountsArray[0] })
+        setTempRoomProperty({ key: "llm_id", value: selectedCountsArray[0] }),
       );
     }
     setIsLLMSaved(true);
@@ -147,7 +147,7 @@ const LLMState = () => {
               selectedId={selectedCountsArray[1]}
               onSelect={(item) => updateSelection(1, item.id)}
             />
-            <Text
+            {/* <Text
               style={{
                 fontSize: moderateScale(11),
                 color: "#5E5E5E",

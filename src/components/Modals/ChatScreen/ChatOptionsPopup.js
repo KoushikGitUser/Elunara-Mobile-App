@@ -30,12 +30,14 @@ import archive from "../../../assets/images/Archive.png";
 import folder from "../../../assets/images/FolderSimple.png";
 import pencil from "../../../assets/images/PencilSimple.png";
 import { useEffect } from "react";
+import bookmarkIcon from "../../../assets/images/BookmarkSimple.png";
 
 const ChatOptionsPopup = ({ chatUuid }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { chatsStates } = useSelector((state) => state.API);
   const { width, height } = Dimensions.get("window");
@@ -73,6 +75,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
         { title: "Delete", icon: deleteBin, action: "delete" },
       ]
     : [
+        { title: "Open Notes", icon: bookmarkIcon, action: "openNotes" },
         {
           title: "Add to Learning Lab",
           icon: folder,
@@ -89,7 +92,10 @@ const ChatOptionsPopup = ({ chatUuid }) => {
       ];
 
   const commonFunctions = (actionType) => {
-    if (actionType === "addToLearningLab") {
+    if (actionType === "openNotes") {
+      dispatch(setToggleChatMenuPopup(false));
+      navigation.navigate("notes");
+    } else if (actionType === "addToLearningLab") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
     } else if (actionType === "rename") {

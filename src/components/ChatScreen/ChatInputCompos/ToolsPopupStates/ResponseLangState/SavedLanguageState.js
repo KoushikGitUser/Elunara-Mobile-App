@@ -7,24 +7,84 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
-import { setLanguages } from "../../../../../data/datas";
-import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
+import {
+  setSelectedLanguage,
+  setToggleToolsPopup,
+} from "../../../../../redux/slices/toggleSlice";
 
 const SavedLanguageState = () => {
   const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
+  const navigation = useNavigation();
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { settingsStates } = useSelector((state) => state.API);
 
-  // Initialize from tempRoomSettings or default to 0. Subtract 1 for local 0-based index.
-  const initialSelection =
-    roomsStates.tempRoomSettings?.response_language_id !== null &&
-    roomsStates.tempRoomSettings?.response_language_id !== undefined
-      ? roomsStates.tempRoomSettings.response_language_id - 1
-      : 0;
+  // Get saved languages from responseLanguageSettings
+  const savedLanguages = useMemo(() => {
+    const langSettings =
+      settingsStates?.allGeneralSettings?.responseLanguageSettings;
+    const languages = [];
 
-  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
+    if (langSettings?.response_language_1) {
+      languages.push({
+        id: langSettings.response_language_1.id,
+        lang:
+          langSettings.response_language_1.name ||
+          langSettings.response_language_1.lang,
+      });
+    }
+    if (langSettings?.response_language_2) {
+      languages.push({
+        id: langSettings.response_language_2.id,
+        lang:
+          langSettings.response_language_2.name ||
+          langSettings.response_language_2.lang,
+      });
+    }
+    if (langSettings?.response_language_3) {
+      languages.push({
+        id: langSettings.response_language_3.id,
+        lang:
+          langSettings.response_language_3.name ||
+          langSettings.response_language_3.lang,
+      });
+    }
+
+    // Fallback to English if no languages are saved
+    if (languages.length === 0) {
+      languages.push({ id: 0, lang: "English" });
+    }
+
+    return languages;
+  }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
+
+  // Initialize from Redux state
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedLanguage?.name) {
+      const index = savedLanguages.findIndex(
+        (lang) => lang.lang === chatCustomisationStates.selectedLanguage.name,
+      );
+      if (index !== -1) {
+        setSelectedStyle(index);
+      }
+    } else {
+      setSelectedStyle(0); // Default to first saved language
+    }
+  }, [chatCustomisationStates?.selectedLanguage, savedLanguages]);
+
+  // Handle language selection
+  const handleLanguageSelection = (language, index) => {
+    setSelectedStyle(index);
+
+    const selectedData = {
+      id: language.id,
+      name: language.lang,
+    };
+
+    dispatch(setSelectedLanguage(selectedData));
+  };
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
       {selected && <View style={styles.radioInner} />}
@@ -32,13 +92,7 @@ const SavedLanguageState = () => {
   );
 
   const handleSelection = (langIndex) => {
-    setSelectedStyle(langIndex);
-    dispatch(
-      setTempRoomProperty({
-        key: "response_language_id",
-        value: langIndex + 1, // Add 1 for backend 1-based index
-      })
-    );
+    handleLanguageSelection(savedLanguages[langIndex], langIndex);
   };
 
   return (
@@ -53,7 +107,7 @@ const SavedLanguageState = () => {
       </Text>
 
       <View style={styles.langContainer}>
-        {setLanguages.map((langs, langIndex) => {
+        {savedLanguages.map((langs, langIndex) => {
           return (
             <TouchableOpacity
               key={langIndex}

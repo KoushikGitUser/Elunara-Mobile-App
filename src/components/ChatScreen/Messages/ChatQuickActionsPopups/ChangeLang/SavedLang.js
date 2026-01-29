@@ -7,7 +7,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
@@ -24,30 +24,49 @@ const SavedLang = () => {
   const { chatCustomisationStates, toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
 
-  // Fetch all available languages
-  useEffect(() => {
-    const languagesPayload = {
-      method: "GET",
-      url: "/master/languages",
-      name: "getAllLanguagesAvailable",
-    };
-    dispatch(commonFunctionForAPICalls(languagesPayload));
-  }, []);
+  // Get saved languages from responseLanguageSettings (up to 3)
+  const savedLanguages = useMemo(() => {
+    const langSettings = settingsStates?.allGeneralSettings?.responseLanguageSettings;
+    const languages = [];
 
-  // Get all available languages from master data
-  const allLanguagesAvailable = settingsStates?.settingsMasterDatas?.allLanguagesAvailable || [];
+    if (langSettings?.response_language_1) {
+      languages.push({
+        id: langSettings.response_language_1.id,
+        name: langSettings.response_language_1.name || langSettings.response_language_1.lang,
+      });
+    }
+    if (langSettings?.response_language_2) {
+      languages.push({
+        id: langSettings.response_language_2.id,
+        name: langSettings.response_language_2.name || langSettings.response_language_2.lang,
+      });
+    }
+    if (langSettings?.response_language_3) {
+      languages.push({
+        id: langSettings.response_language_3.id,
+        name: langSettings.response_language_3.name || langSettings.response_language_3.lang,
+      });
+    }
+
+    // Fallback to English if no languages are saved
+    if (languages.length === 0) {
+      languages.push({ id: 0, name: "English" });
+    }
+
+    return languages;
+  }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
 
   // Initialize selected language from Redux state
   useEffect(() => {
-    if (chatCustomisationStates?.selectedLanguage?.id && allLanguagesAvailable.length > 0) {
-      const index = allLanguagesAvailable.findIndex(
+    if (chatCustomisationStates?.selectedLanguage?.id && savedLanguages.length > 0) {
+      const index = savedLanguages.findIndex(
         (lang) => lang.id === chatCustomisationStates.selectedLanguage.id
       );
       if (index !== -1) {
         setSelectedLanguageIndex(index);
       }
     }
-  }, [chatCustomisationStates?.selectedLanguage, allLanguagesAvailable]);
+  }, [chatCustomisationStates?.selectedLanguage, savedLanguages]);
 
   // Handle language selection
   const handleLanguageSelection = (language, index) => {
@@ -120,7 +139,7 @@ const SavedLang = () => {
         style={{ maxHeight: SCREEN_HEIGHT * 0.55 }}
       >
         <View style={styles.langContainer}>
-          {allLanguagesAvailable.map((language, langIndex) => {
+          {savedLanguages.map((language, langIndex) => {
             return (
               <TouchableOpacity
                 key={langIndex}

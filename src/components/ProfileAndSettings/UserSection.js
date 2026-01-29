@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import React, { useState, useEffect } from "react";
-import userImg from "../../assets/images/profilepic.png";
+import userImg from "../../assets/images/defaultUserPic.png";
 import corporateAvatar from "../../assets/images/Corporate2.png";
 import teacherAvatar from "../../assets/images/Teacher2.png";
 import maleStudentAvatar from "../../assets/images/Student Male2.png";
@@ -198,7 +198,8 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     marginRight: 20,
-    borderRadius:10
+    borderRadius:10,
+    objectFit:"contain"
   },
   mobileVerifyButton: {
     width: "100%",

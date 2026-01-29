@@ -24,7 +24,8 @@ import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"
 
 const ToolsContainers = () => {
   const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
+  const { roomsStates, settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
   useEffect(() => {
     const responseStylesPayload = {
@@ -110,26 +111,9 @@ const ToolsContainers = () => {
         }
         break;
       case 3: // Citation Format
-        if (
-          tempRoomSettings.citation_format_id !== null &&
-          tempRoomSettings.citation_format_id !== undefined
-        ) {
-          const citation = citationStyles.find(
-            (item) => item.id == tempRoomSettings.citation_format_id - 1,
-          );
-          return citation ? citation.style : tool.selection;
-        } else if (roomsStates.currentRoom?.citation_format_id) {
-          const citation = citationStyles.find(
-            (item) => item.id == roomsStates.currentRoom.citation_format_id - 1,
-          );
-          return citation ? citation.style : tool.selection;
-        } else if (roomsStates.currentRoom?.citation_format?.id) {
-          const citation = citationStyles.find(
-            (item) => item.id == roomsStates.currentRoom.citation_format.id - 1,
-          );
-          return citation ? citation.style : tool.selection;
-        }
-        break;
+        return chatCustomisationStates?.selectedCitationFormat?.name || "APA";
+      default:
+        return "";
     }
     return tool.selection;
   };

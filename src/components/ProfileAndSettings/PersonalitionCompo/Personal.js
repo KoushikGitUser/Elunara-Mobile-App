@@ -146,10 +146,10 @@ const Personal = () => {
       clearTimeout(hobbiesDebounceRef.current);
     }
 
-    // Set new timer
+    // Set new timer - 1 second delay after user stops typing
     hobbiesDebounceRef.current = setTimeout(() => {
       updateUserHobbies(hobbiesText);
-    }, 500);
+    }, 1000);
 
     // Cleanup on unmount or when hobbiesText changes
     return () => {
@@ -170,10 +170,10 @@ const Personal = () => {
       clearTimeout(aboutDebounceRef.current);
     }
 
-    // Set new timer
+    // Set new timer - 1 second delay after user stops typing
     aboutDebounceRef.current = setTimeout(() => {
       updateUserAbout(aboutText);
-    }, 500);
+    }, 1000);
 
     // Cleanup on unmount or when aboutText changes
     return () => {

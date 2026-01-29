@@ -59,9 +59,15 @@ const CitationState = () => {
       // Set to the actual ID, not the index
       setSelectedStyle(chatCustomisationStates.selectedCitationFormat.id);
     } else {
-      // If no selection, set to the first item's ID (Harvard)
+      // If no selection, set to the first item's ID (APA) and dispatch to Redux
       if (allCitationFormats.length > 0) {
-        setSelectedStyle(allCitationFormats[0]?.id || 0);
+        const firstFormat = allCitationFormats[0];
+        setSelectedStyle(firstFormat?.id || 0);
+        // Also dispatch to Redux so ToolsContainers shows the same value
+        dispatch(setSelectedCitationFormat({
+          id: firstFormat.id,
+          name: firstFormat.name,
+        }));
       } else {
         setSelectedStyle(0);
       }
