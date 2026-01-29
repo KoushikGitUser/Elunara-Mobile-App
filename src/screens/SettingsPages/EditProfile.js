@@ -11,7 +11,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../utils/responsive";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
-import profilePic from "../../assets/images/profilepic.png";
+import profilePic from "../../assets/images/defaultUserPic.png";
 import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
 import { triggerToast } from "../../services/toast";
@@ -71,13 +71,17 @@ const EditProfile = () => {
     }
   };
 
-  useEffect(() => { 
+  const fetchProfileInfo = () => {
     const payload = {
       method: "GET",
       url: "/settings/profile",
       name: "getAllProfileInfos",
     };
     dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  useEffect(() => {
+    fetchProfileInfo();
   }, []);
 
 
@@ -204,7 +208,10 @@ const EditProfile = () => {
         isFromProfile={true}
       />
       {toggleStates.toggleUpdateProfilePicPopup && (
-        <UpdateProfilePicPopup setSelectedImage={setSelectedImage} />
+        <UpdateProfilePicPopup
+          setSelectedImage={setSelectedImage}
+          onProfileUpdated={fetchProfileInfo}
+        />
       )}
       <View style={styles.profileImgContainer}>
         <View style={{ height: 120, width: 120 }}>
@@ -216,7 +223,7 @@ const EditProfile = () => {
                   : selectedImage
                 : profilePic
             }
-            style={{ height: "100%", width: "100%", borderRadius: 20 }}
+            style={{ height: "100%", width: "100%", borderRadius: 20,objectFit:"contain" }}
           />
           <TouchableOpacity
             onPress={() => dispatch(setToggleUpdateProfilePicPopup(true))}

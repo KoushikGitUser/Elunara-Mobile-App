@@ -13,10 +13,20 @@ const EducationDropDowns = ({dataArray, placeholder, triggerAPICall, initialValu
       const selectorRef = useRef(null);
 
       useEffect(() => {
-        if (initialValue) {
-          setSelected(initialValue);
+        if (initialValue !== null && initialValue !== undefined && initialValue !== "") {
+          // Find the matching item from dataArray
+          const matchedItem = dataArray?.find((item) => {
+            // Handle both object and string formats
+            if (typeof item === "object") {
+              return item.id === initialValue || item.name === initialValue ||
+                     item.name?.toLowerCase() === initialValue?.toLowerCase();
+            }
+            // Case-insensitive comparison for strings
+            return item === initialValue || item?.toLowerCase() === initialValue?.toLowerCase();
+          });
+          setSelected(matchedItem || initialValue);
         }
-      }, [initialValue]);
+      }, [initialValue, dataArray]);
 
       const toggleDropdown = () => {
         if (selectorRef.current) {

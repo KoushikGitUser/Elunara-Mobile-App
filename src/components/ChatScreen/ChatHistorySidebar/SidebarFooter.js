@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
-import profilePic from "../../../assets/images/profilepic.png";
+import profilePic from "../../../assets/images/defaultUserPic.png";
 import corporateAvatar from "../../../assets/images/Corporate2.png";
 import teacherAvatar from "../../../assets/images/Teacher2.png";
 import maleStudentAvatar from "../../../assets/images/Student Male2.png";

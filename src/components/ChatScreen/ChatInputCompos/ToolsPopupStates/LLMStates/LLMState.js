@@ -203,7 +203,7 @@ const LLMState = () => {
               setSelectedCounts={setSelectedCountsArray}
               selectOptionsArray={LLMOptionsAvailable}
             />
-            <Text
+            {/* <Text
               style={{
                 fontSize: moderateScale(11),
                 color: "#5E5E5E",
@@ -221,7 +221,7 @@ const LLMState = () => {
               selectedCounts={selectedCountsArray}
               setSelectedCounts={setSelectedCountsArray}
               selectOptionsArray={LLMOptionsAvailable}
-            />
+            /> */}
 
             {/* Button */}
             <TouchableOpacity

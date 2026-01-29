@@ -25,13 +25,27 @@ const Learning = () => {
 
   // Initialize values from API
   useEffect(() => {
-    if (learningDevices.primary_device) {
-      setPrimaryDevice(learningDevices.primary_device);
+    console.log("=== LEARNING DEVICES DEBUG ===");
+    console.log("Full learningDevices object:", JSON.stringify(learningDevices, null, 2));
+    console.log("primary_device:", learningDevices.primary_device);
+    console.log("prefers_group_study:", learningDevices.prefers_group_study);
+    console.log("has_quiet_study_place:", learningDevices.has_quiet_study_place);
+    console.log("internet_quality:", learningDevices.internet_quality);
+    console.log("=== END DEBUG ===");
+
+    if (learningDevices.primary_device !== null && learningDevices.primary_device !== undefined && learningDevices.primary_device !== "") {
+      // Capitalize first letter for display (API returns lowercase)
+      const device = learningDevices.primary_device;
+      const capitalizedDevice = device.charAt(0).toUpperCase() + device.slice(1);
+      setPrimaryDevice(capitalizedDevice);
     }
-    if (learningDevices.prefers_group_study) {
-      setGroupStudyPreference(learningDevices.prefers_group_study);
+    if (learningDevices.prefers_group_study !== null && learningDevices.prefers_group_study !== undefined && learningDevices.prefers_group_study !== "") {
+      // Capitalize first letter for display (API returns lowercase)
+      const study = learningDevices.prefers_group_study;
+      const capitalizedStudy = study.charAt(0).toUpperCase() + study.slice(1);
+      setGroupStudyPreference(capitalizedStudy);
     }
-    if (typeof learningDevices.has_quiet_study_place === "boolean") {
+    if (learningDevices.has_quiet_study_place !== null && learningDevices.has_quiet_study_place !== undefined) {
       setQuietPlacePreference(learningDevices.has_quiet_study_place);
     }
   }, [learningDevices]);
@@ -46,19 +60,34 @@ const Learning = () => {
       data,
       name: "updatePersonalizationSettings",
     };
-    dispatch(commonFunctionForAPICalls(payload));
+    console.log("=== UPDATE LEARNING DEVICES ===");
+    console.log("Updating key:", dataKey);
+    console.log("Updating value:", value);
+    console.log("Full payload:", JSON.stringify(payload, null, 2));
+    console.log("=== END UPDATE ===");
+    dispatch(commonFunctionForAPICalls(payload))
+      .then((response) => {
+        console.log("=== UPDATE RESPONSE ===");
+        console.log("Response for", dataKey, ":", JSON.stringify(response, null, 2));
+        console.log("=== END RESPONSE ===");
+      })
+      .catch((error) => {
+        console.log("=== UPDATE ERROR ===");
+        console.log("Error for", dataKey, ":", error);
+        console.log("=== END ERROR ===");
+      });
   };
 
-  const updateInternetQuality = (id) => updateLearningDevices("internet_quality", id);
+  const updateInternetQuality = (value) => updateLearningDevices("internet_quality", value.toLowerCase());
 
   const handlePrimaryDeviceChange = (value) => {
     setPrimaryDevice(value);
-    updateLearningDevices("primary_device", value);
+    updateLearningDevices("primary_device", value.toLowerCase());
   };
 
   const handleGroupStudyChange = (value) => {
     setGroupStudyPreference(value);
-    updateLearningDevices("prefers_group_study", value);
+    updateLearningDevices("prefers_group_study", value.toLowerCase());
   };
 
   const handleQuietPlaceChange = (value) => {

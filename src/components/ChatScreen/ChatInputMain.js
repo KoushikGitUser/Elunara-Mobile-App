@@ -154,7 +154,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
         ? chatCustomisationStates.selectedCitationFormat.id
         : parseInt(chatCustomisationStates.selectedCitationFormat.id);
     }
-
+ 
     const payload = {
       method: "POST",
       url: `/chats/${chatUuid}/messages`,

@@ -151,6 +151,14 @@ const ChatScreen = () => {
       name: "getAllGeneralSettings",
     };
     dispatch(commonFunctionForAPICalls(payload));
+
+    // Also fetch available LLMs
+    const llmPayload = {
+      method: "GET",
+      url: "/master/llms",
+      name: "getAllLLMsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(llmPayload));
   }, []);
 
   // Fetch profile info on mount
@@ -183,13 +191,23 @@ const ChatScreen = () => {
     if (settingsStates?.allGeneralSettings) {
       const { preferredLLMs, responseLanguageSettings, adSettings } =
         settingsStates.allGeneralSettings;
+      const allLLMsAvailable = settingsStates?.settingsMasterDatas?.allLLMsAvailable;
 
-      // Set LLM preference
-      if (preferredLLMs) {
+      // Set LLM preference - if no preference, use first available LLM
+      if (preferredLLMs?.llm_id) {
         dispatch(
           setSelectedLLM({
-            id: preferredLLMs.llm_id || null,
+            id: preferredLLMs.llm_id,
             name: preferredLLMs.llm_name || "Auto",
+          }),
+        );
+      } else if (allLLMsAvailable?.length > 0) {
+        // Set first available LLM if no preference is set
+        const firstLLM = allLLMsAvailable[0];
+        dispatch(
+          setSelectedLLM({
+            id: firstLLM.id,
+            name: firstLLM.name,
           }),
         );
       }
@@ -224,7 +242,7 @@ const ChatScreen = () => {
         );
       }
     }
-  }, [settingsStates?.allGeneralSettings]);
+  }, [settingsStates?.allGeneralSettings, settingsStates?.settingsMasterDatas?.allLLMsAvailable]);
 
   // Track previous chat UUID to detect new chat creation
   const previousChatUuidRef = useRef(null);

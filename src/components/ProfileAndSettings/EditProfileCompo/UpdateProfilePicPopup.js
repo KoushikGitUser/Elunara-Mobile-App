@@ -33,7 +33,7 @@ import maleStudentAvatar from '../../../assets/images/Student Male2.png';
 import femaleStudentAvatar from '../../../assets/images/Student Female2.png';
 
  
-const UpdateProfilePicPopup = ({setSelectedImage}) => {
+const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
 
@@ -48,7 +48,13 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
         avatar_type: avatarType,
       },
     };
-    dispatch(commonFunctionForAPICalls(payload));
+    dispatch(commonFunctionForAPICalls(payload))
+      .then(() => {
+        // Re-fetch profile info after avatar update
+        if (onProfileUpdated) {
+          onProfileUpdated();
+        }
+      });
   };
 
     const triggerImagePicker = async () => {
@@ -118,8 +124,14 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
             },
           };
           console.log("inside pro img update2222", payload);
-          dispatch(commonFunctionForAPICalls(payload));
-          console.log("inside pro img update33333");
+          dispatch(commonFunctionForAPICalls(payload))
+            .then(() => {
+              console.log("inside pro img update33333");
+              // Re-fetch profile info after image upload
+              if (onProfileUpdated) {
+                onProfileUpdated();
+              }
+            });
         } else {
           Alert.alert(
             "Invalid type",

@@ -33,6 +33,7 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const [savedToNotes,setSavedToNotes] = useState(isSavedToNotes);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [isRemovingFromNotes, setIsRemovingFromNotes] = useState(false);
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
 
   // Get message data from chatMessagesArray
   const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
@@ -74,6 +75,9 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
 
   // Check if generation data is available (for badges)
   const hasGenerationData = generationData?.llm || generationData?.style || generationData?.language;
+
+  // Get sources from currentMessage
+  const sources = currentMessage?.sources || [];
 
   // Update state when currentMessage changes (e.g., when chat is loaded)
   useEffect(() => {
@@ -324,7 +328,40 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
          <Markdown>
            {currentMessage?.message || message}
           </Markdown>
-      </View>
+
+        {/* Resources Dropdown - Only show when sources array is not empty */}
+        {sources.length > 0 && (
+          <View style={styles.resourcesWrapper}>
+            <View style={styles.resourcesContainer}>
+              <TouchableOpacity
+                style={styles.resourcesHeader}
+                onPress={() => setIsResourcesOpen(!isResourcesOpen)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.resourcesLeftSection}>
+                  <View style={styles.apaBadge}>
+                    <Text style={styles.apaText}>APA</Text>
+                    <SwitchIcon width={14} height={14} />
+                  </View>
+                  <Text style={styles.resourcesTitle}>Resources</Text>
+                </View>
+                <ChevronDown
+                  size={20}
+                  strokeWidth={1.5}
+                  color="#1F2937"
+                  style={{ transform: [{ rotate: isResourcesOpen ? '180deg' : '0deg' }] }}
+                />
+              </TouchableOpacity>
+
+              {isResourcesOpen && (
+                <View style={styles.resourcesDropdown}>
+                  <Text style={styles.noResourcesText}>There is no resources available</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+      </View> 
 
       {/* Customization Badges - Show when generation data is available */}
       {hasGenerationData && (
@@ -395,7 +432,10 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
           <CopyIcon/>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setSharePopup(true)}>
+        <TouchableOpacity
+          onPress={() => setSharePopup(true)}
+          style={sharePopup ? styles.activeIconStyle : styles.iconStyle}
+        >
           <ShareIcon/>
         </TouchableOpacity>
 
@@ -403,19 +443,23 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
           {savedToNotes ? <BookmarkFilledIcon/> : <BookMarkIcon/>}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setFeedbackPopup(true)}>
+        <TouchableOpacity
+          onPress={() => setFeedbackPopup(true)}
+          style={feedbackPopup ? styles.activeIconStyle : styles.iconStyle}
+        >
           <FeedbackIcon/>
         </TouchableOpacity>
 
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity onPress={() => {
+        <TouchableOpacity
+          style={[{ flexDirection: "row", alignItems: "center" }, changeResponsePopup ? styles.activeIconStyle : styles.iconStyle]}
+          onPress={() => {
             dispatch(setCurrentAIMessageIndexForRegeneration(messageIndex));
             setChangeResponsePopup(true);
-          }}>
-            <SwitchIcon/>
-          </TouchableOpacity>
+          }}
+        >
+          <SwitchIcon/>
           <ChevronDown strokeWidth={1.25} />
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -440,9 +484,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "stretch",
   },
   message: {
     fontSize: moderateScale(15),
@@ -474,6 +518,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+  activeIconStyle: {
+    backgroundColor: "#E7ECF5",
+    borderRadius: 5,
+    padding: 4,
+  },
+  iconStyle: {
+    padding: 4,
+  },
   versionNavigation: {
     flexDirection: "row",
     alignItems: "center",
@@ -488,6 +540,68 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#1F2937",
     fontFamily: "Mukta-Medium",
+  },
+  resourcesWrapper: {
+    marginHorizontal: -20,
+    marginTop: 16,
+    marginBottom: -16,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  resourcesContainer: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  resourcesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  resourcesLeftSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  apaBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#F3F3F3",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+  },
+  apaText: {
+    fontSize: moderateScale(13),
+    fontWeight: "600",
+    color: "#1F2937",
+    fontFamily: "Mukta-SemiBold",
+  },
+  resourcesTitle: {
+    fontSize: moderateScale(15),
+    fontWeight: "600",
+    color: "#1F2937",
+    fontFamily: "Mukta-SemiBold",
+  },
+  resourcesDropdown: {
+    borderTopWidth: 1,
+    borderTopColor: "#D3DAE5",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  noResourcesText: {
+    fontSize: moderateScale(14),
+    color: "#6B7280",
+    fontFamily: "Mukta-Regular",
+    textAlign: "center",
   },
 });
 

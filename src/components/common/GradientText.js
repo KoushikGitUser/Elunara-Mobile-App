@@ -62,6 +62,7 @@ const GradientText = ({
       <Svg
         height={finalHeight}
         width={fullWidth ? "100%" : measuredWidth || finalFontSize}
+        style={{ opacity: measuredWidth > 0 || fullWidth ? 1 : 0 }}
       >
         <Defs>
           <LinearGradient id="grad" x1={x1} y1={y1} x2={x2} y2={y2}>

@@ -27,11 +27,14 @@ import pencil from "../../../assets/images/PencilSimple.png";
 import deleteBin from "../../../assets/images/Trash.png";
 import pin from "../../../assets/images/PushPin.png";
 import pinGrey from "../../../assets/images/pinGrey.png";
+import bookmarkIcon from "../../../assets/images/BookmarkSimple.png";
+import { useNavigation } from "@react-navigation/native";
 
 const ChatOptionsPopup = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { chatsStates } = useSelector((state) => state.API);
   const { width, height } = Dimensions.get("window");
@@ -65,6 +68,7 @@ const ChatOptionsPopup = () => {
         { title: "Delete", icon: deleteBin, action: "delete" },
       ]
     : [
+        { title: "Open Notes", icon: bookmarkIcon, action: "openNotes" },
         { title: "Add to Learning Lab", icon: folder, action: "addToLearningLab" },
         { title: "Rename", icon: pencil, action: "rename" },
         { title: isPinned ? "Unpin" : "Pin", icon: isPinned ? pinGrey : pin, action: "pinUnpin" },
@@ -73,7 +77,10 @@ const ChatOptionsPopup = () => {
       ];
 
   const commonFunctions = (actionType) => {
-    if (actionType === "addToLearningLab") {
+    if (actionType === "openNotes") {
+      dispatch(setToggleChatMenuPopup(false));
+      navigation.navigate("notes");
+    } else if (actionType === "addToLearningLab") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
     } else if (actionType === "rename") {

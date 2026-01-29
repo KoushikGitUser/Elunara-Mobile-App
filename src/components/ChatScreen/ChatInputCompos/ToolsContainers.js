@@ -46,7 +46,7 @@ const ToolsContainers = () => {
       case 2: // Response Language
         return chatCustomisationStates?.selectedLanguage?.name || "English";
       case 3: // Citation Format
-        return chatCustomisationStates?.selectedCitationFormat?.name || "Harvard";
+        return chatCustomisationStates?.selectedCitationFormat?.name || "APA";
       default:
         return "";
     }
