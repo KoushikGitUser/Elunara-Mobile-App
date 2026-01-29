@@ -19,7 +19,7 @@ import { triggerToast } from "../../services/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
-import Toaster from '../UniversalToaster/Toaster'
+import Toaster from "../UniversalToaster/Toaster";
 
 const AddLinkPopup = ({ onLinkAdded }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -64,7 +64,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleAddLinkPopup(false))}
     >
-    <Toaster/>
+      <Toaster />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.container]}
@@ -162,22 +162,29 @@ const AddLinkPopup = ({ onLinkAdded }) => {
                         "Invalid URL",
                         "Please enter a valid URL starting with http:// or https://",
                         "error",
-                        3000
+                        3000,
                       );
                       return;
                     }
 
-                    dispatch(
-                      commonFunctionForAPICalls({
-                        method: "POST",
-                        url: "/settings/academic-links",
-                        data: {
-                          url: url.trim(),
-                          description: description.trim() || undefined,
-                        },
-                        name: "addAcademicLink",
-                      })
-                    );
+                    if (onLinkAdded) {
+                      onLinkAdded({
+                        url: url.trim(),
+                        description: description.trim(),
+                      });
+                    } else {
+                      dispatch(
+                        commonFunctionForAPICalls({
+                          method: "POST",
+                          url: "/settings/academic-links",
+                          data: {
+                            url: url.trim(),
+                            description: description.trim() || undefined,
+                          },
+                          name: "addAcademicLink",
+                        }),
+                      );
+                    }
 
                     dispatch(setToggleAddLinkPopup(false));
                     setUrl("");

@@ -121,6 +121,9 @@ const ChatsScrollForAllRoomsPage = ({
           onPress={() => {
             dispatch(setToggleAllChatsOptionsPopup(true));
             setOptionsIndex(index);
+            if (room) {
+              dispatch(setCurrentRoom(room));
+            }
           }}
         >
           <MoreVertical size={24} color="#000000ff" strokeWidth={2} />

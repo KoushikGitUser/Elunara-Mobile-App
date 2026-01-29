@@ -33,7 +33,12 @@ const NotesOptions = ({ close, setFindInNotes, setToggleDeleteNotePopup }) => {
           <Text>Find in Notes</Text>
         </Pressable>
         <Pressable
-        onPress={()=>setToggleDeleteNotePopup(true)}
+          onPress={() => {
+            close(false);
+            setTimeout(() => {
+              setToggleDeleteNotePopup(true);
+            }, 300);
+          }}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",

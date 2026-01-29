@@ -10,6 +10,8 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  Modal,
+  Platform,
 } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
 import AddRoomDetailsHeader from "../../components/Rooms/AddRoomDetailsHeader";
@@ -22,11 +24,17 @@ import ToolsContainers from "../../components/ChatScreen/ChatInputCompos/ToolsCo
 import { MoreVertical, Paperclip, Plus, Trash2 } from "lucide-react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
+import { Feather } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
-import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
+import {
+  setToggleAddedRoomDetails,
+  setToggleAddLinkPopup,
+} from "../../redux/slices/toggleSlice";
 import pdfLogo from "../../assets/images/pdf.png";
+import deleteBin from "../../assets/images/deleteBin.png";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
+import { BlurView } from "@react-native-community/blur";
 import { triggerToast } from "../../services/toast";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import {
@@ -40,6 +48,11 @@ const AddRoomDetails = () => {
   const [sourcesPopup, setSourcesPopup] = useState(false);
   const [description, setDescription] = useState("");
   const [instructions, setInstructions] = useState("");
+
+  // Delete Popup States
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sourceToDelete, setSourceToDelete] = useState(null);
+  const [isDeletingSource, setIsDeletingSource] = useState(false);
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false },
@@ -145,11 +158,59 @@ const AddRoomDetails = () => {
     dispatch(setToggleAddedRoomDetails(true));
   };
 
+  const handleAddLink = (linkData) => {
+    // Fallback: Append link to instructions since API doesn't support link attachments yet
+    const newLinkText = `\n\nReference: ${linkData.url} ${linkData.description ? `(${linkData.description})` : ""}`;
+    const newInstructions = instructions
+      ? instructions + newLinkText
+      : `Reference: ${linkData.url} ${linkData.description ? `(${linkData.description})` : ""}`;
+
+    setInstructions(newInstructions);
+
+    // Auto-save the room with new instructions
+    const payload = {
+      method: "PUT",
+      url: `/rooms/${roomUuid}`,
+      name: "update-room",
+      data: {
+        description: description,
+        instructions: newInstructions,
+        llm_id: roomsStates.tempRoomSettings.llm_id,
+        response_style_id: roomsStates.tempRoomSettings.response_style_id,
+        response_language_id: roomsStates.tempRoomSettings.response_language_id,
+        citation_format_id: roomsStates.tempRoomSettings.citation_format_id,
+        attachments:
+          roomsStates.currentRoom?.attachments?.map((a) => a.id || a.uuid) ||
+          [],
+      },
+    };
+
+    dispatch(commonFunctionForAPICalls(payload))
+      .then(() => {
+        // Refresh room
+        dispatch(
+          commonFunctionForAPICalls({
+            method: "GET",
+            url: `/rooms/${roomUuid}`,
+            name: "get-room",
+          }),
+        );
+        triggerToast("Success", "Link added to instructions", "success", 3000);
+      })
+      .catch((err) => {
+        triggerToast("Error", "Failed to save link", "error", 3000);
+      });
+
+    dispatch(setToggleAddLinkPopup(false));
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, width: "100%", backgroundColor: "#FAFAFA" }}
     >
-      {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
+      {toggleStates.toggleAddLinkPopup && (
+        <AddLinkPopup onLinkAdded={handleAddLink} />
+      )}
       {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
       <AddRoomDetailsHeader scrollY={scrollY} />
       <ScrollView
@@ -224,9 +285,12 @@ const AddRoomDetails = () => {
               </View>
 
               {/* Description */}
-              <Text style={[styles.description, { width: "100%" }]}>
-                Share references you want the AI to use
-              </Text>
+              {(!roomsStates.currentRoom?.attachments ||
+                roomsStates.currentRoom.attachments.length === 0) && (
+                <Text style={[styles.description, { width: "100%" }]}>
+                  Share references you want the AI to use
+                </Text>
+              )}
             </View>
 
             {/* Plus Button - Centered to left content */}
@@ -237,65 +301,117 @@ const AddRoomDetails = () => {
               <Plus size={28} color="#1F2937" strokeWidth={1.5} />
             </TouchableOpacity>
           </View>
-          {/* Dynamic File List */}
-          {roomsStates.currentRoom?.attachments?.map((file, index) => (
-            <TouchableOpacity key={index} style={styles.linksMain}>
-              {/* Link Icon based on type (simplified for now to PDF logo or generic) */}
-              <View style={styles.pdfLogoContainer}>
-                <Image
-                  source={pdfLogo}
-                  style={{ height: 25, width: 25, objectFit: "contain" }}
-                />
-              </View>
 
-              {/* Link Details */}
-              <View style={styles.linkDetails}>
-                <Text style={styles.url}>{file.filename || file.name} </Text>
-                <Text style={styles.description}>
-                  {file.type === "document" ? "PDF" : "File"}{" "}
-                </Text>
-              </View>
+          {/* Dynamic File List - Merging Attachments and Links from Instructions */}
+          {(() => {
+            // 1. Get real attachments
+            const realAttachments = roomsStates.currentRoom?.attachments || [];
 
-              {/* More Options Button acting as Delete for now */}
-              <TouchableOpacity
-                style={styles.moreButton}
-                onPress={() => {
-                  Alert.alert(
-                    "Delete Attachment",
-                    "Are you sure you want to delete this attachment?",
-                    [
-                      { text: "Cancel", style: "cancel" },
-                      {
-                        text: "Delete",
-                        style: "destructive",
-                        onPress: () => {
-                          const payload = {
-                            method: "DELETE",
-                            url: `/attachments/${file.id || file.uuid}`, // Ensure correct ID field
-                            name: "delete-attachment",
-                          };
-                          dispatch(commonFunctionForAPICalls(payload)).then(
-                            () => {
-                              // Refresh room
-                              dispatch(
-                                commonFunctionForAPICalls({
-                                  method: "GET",
-                                  url: `/rooms/${roomUuid}`,
-                                  name: "get-room",
-                                }),
+            // 2. Parse links from instructions
+            const linkRegex =
+              /Reference:\s*(https?:\/\/[^\s]+)(?:\s*\((.*?)\))?/g;
+            const instructionLinks = [];
+            let match;
+            // Use locally managed instructions state to be instant
+            if (instructions) {
+              while ((match = linkRegex.exec(instructions)) !== null) {
+                instructionLinks.push({
+                  type: "link_instruction",
+                  url: match[1],
+                  name: match[2] || match[1],
+                  filename: match[2] || match[1],
+                  originalString: match[0], // to help with deletion
+                });
+              }
+            }
+
+            const allSources = [...realAttachments, ...instructionLinks];
+
+            return allSources.map((file, index) => (
+              <TouchableOpacity key={index} style={styles.linksMain}>
+                {/* Link Icon based on type */}
+                <View style={styles.pdfLogoContainer}>
+                  {file.type === "link_instruction" ? (
+                    <Feather name="link" size={24} color="#1F2937" />
+                  ) : (
+                    <Image
+                      source={pdfLogo}
+                      style={{ height: 25, width: 25, objectFit: "contain" }}
+                    />
+                  )}
+                </View>
+
+                {/* Link Details */}
+                <View style={styles.linkDetails}>
+                  <Text style={styles.url} numberOfLines={1}>
+                    {file.filename || file.name}{" "}
+                  </Text>
+                  <Text style={styles.description}>
+                    {file.type === "document"
+                      ? "PDF"
+                      : file.type === "link_instruction"
+                        ? "Link"
+                        : "File"}{" "}
+                  </Text>
+                </View>
+
+                {/* More Options Button acting as Delete */}
+                <TouchableOpacity
+                  style={styles.moreButton}
+                  onPress={() => {
+                    Alert.alert(
+                      "Delete Source",
+                      "Are you sure you want to delete this source?",
+                      [
+                        { text: "Cancel", style: "cancel" },
+                        {
+                          text: "Delete",
+                          style: "destructive",
+                          onPress: () => {
+                            if (file.type === "link_instruction") {
+                              // Delete Link: Remove text string from instructions
+                              const newInstructions = instructions
+                                .replace(file.originalString, "")
+                                .trim();
+                              setInstructions(newInstructions);
+                              handleSaveDetails(); // Save immediately
+                              triggerToast(
+                                "Success",
+                                "Link removed",
+                                "success",
+                                3000,
                               );
-                            },
-                          );
+                            } else {
+                              // Delete Attachment: API Call
+                              const payload = {
+                                method: "DELETE",
+                                url: `/attachments/${file.id || file.uuid}`,
+                                name: "delete-attachment",
+                              };
+                              dispatch(commonFunctionForAPICalls(payload)).then(
+                                () => {
+                                  // Refresh room
+                                  dispatch(
+                                    commonFunctionForAPICalls({
+                                      method: "GET",
+                                      url: `/rooms/${roomUuid}`,
+                                      name: "get-room",
+                                    }),
+                                  );
+                                },
+                              );
+                            }
+                          },
                         },
-                      },
-                    ],
-                  );
-                }}
-              >
-                <Trash2 size={20} color="#EF4444" strokeWidth={2} />
+                      ],
+                    );
+                  }}
+                >
+                  <Trash2 size={20} color="#EF4444" strokeWidth={2} />
+                </TouchableOpacity>
               </TouchableOpacity>
-            </TouchableOpacity>
-          ))}
+            ));
+          })()}
           <TouchableOpacity
             style={[styles.verifyButton, { marginBottom: 25 }]}
             onPress={handleSaveDetails}
@@ -310,6 +426,157 @@ const AddRoomDetails = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={showDeleteModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowDeleteModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <BlurView
+            style={styles.blurView}
+            blurType="light"
+            blurAmount={7}
+            reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.43)"
+          />
+          <View style={styles.androidBlur} />
+
+          <TouchableOpacity
+            style={styles.backdrop}
+            activeOpacity={1}
+            onPress={() => setShowDeleteModal(false)}
+          />
+
+          <View style={styles.modalSheet}>
+            <View style={styles.handleContainer}>
+              <View style={styles.handle} />
+            </View>
+
+            <View style={styles.modalContent}>
+              <View style={styles.modalIconContainer}>
+                <Image source={deleteBin} style={styles.verifiedIcon} />
+              </View>
+
+              <Text style={[styles.modalTitle, { fontFamily: "Mukta-Bold" }]}>
+                Delete Source?
+              </Text>
+
+              <Text
+                style={[
+                  styles.modalDescription,
+                  { fontFamily: "Mukta-Regular" },
+                ]}
+              >
+                Are you sure you want to delete this{" "}
+                {sourceToDelete?.type === "link_instruction" ? "link" : "file"}?
+              </Text>
+
+              <View style={styles.btnsMain}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonCancel]}
+                  onPress={() => setShowDeleteModal(false)}
+                >
+                  <Text style={[styles.modalButtonText, { color: "black" }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  disabled={isDeletingSource}
+                  onPress={() => {
+                    setIsDeletingSource(true);
+
+                    if (sourceToDelete?.type === "link_instruction") {
+                      // Delete Link: Remove text string from instructions
+                      // CRITICAL: use 'instructions' from closure, but we are inside component so it's fresh?
+                      // No, it's fresh enough.
+                      // Construct payload MANUALLY to ensure consistency
+                      const newInstructions = instructions
+                        .replace(sourceToDelete.originalString, "")
+                        .trim();
+                      setInstructions(newInstructions);
+
+                      const payload = {
+                        method: "PUT",
+                        url: `/rooms/${roomUuid}`,
+                        name: "update-room",
+                        data: {
+                          description: description,
+                          instructions: newInstructions, // USE THE NEW VALUE
+                          llm_id: roomsStates.tempRoomSettings.llm_id,
+                          response_style_id:
+                            roomsStates.tempRoomSettings.response_style_id,
+                          response_language_id:
+                            roomsStates.tempRoomSettings.response_language_id,
+                          citation_format_id:
+                            roomsStates.tempRoomSettings.citation_format_id,
+                          attachments:
+                            roomsStates.currentRoom?.attachments?.map(
+                              (a) => a.id || a.uuid,
+                            ) || [],
+                        },
+                      };
+
+                      dispatch(commonFunctionForAPICalls(payload))
+                        .then(() => {
+                          dispatch(
+                            commonFunctionForAPICalls({
+                              method: "GET",
+                              url: `/rooms/${roomUuid}`,
+                              name: "get-room",
+                            }),
+                          );
+                          triggerToast(
+                            "Success",
+                            "Link removed",
+                            "success",
+                            3000,
+                          );
+                          setIsDeletingSource(false);
+                          setShowDeleteModal(false);
+                        })
+                        .catch(() => {
+                          setIsDeletingSource(false);
+                          setShowDeleteModal(false);
+                        });
+                    } else {
+                      // Delete Attachment
+                      const payload = {
+                        method: "DELETE",
+                        url: `/attachments/${sourceToDelete?.id || sourceToDelete?.uuid}`,
+                        name: "delete-attachment",
+                      };
+                      dispatch(commonFunctionForAPICalls(payload))
+                        .then(() => {
+                          dispatch(
+                            commonFunctionForAPICalls({
+                              method: "GET",
+                              url: `/rooms/${roomUuid}`,
+                              name: "get-room",
+                            }),
+                          );
+                          setIsDeletingSource(false);
+                          setShowDeleteModal(false);
+                        })
+                        .catch(() => {
+                          setIsDeletingSource(false);
+                          setShowDeleteModal(false);
+                        });
+                    }
+                  }}
+                >
+                  <Text style={styles.modalButtonText}>
+                    {isDeletingSource ? "Deleting..." : "Delete"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -499,6 +766,108 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  blurView: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  androidBlur: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.18)",
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalSheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 20,
+  },
+  modalContent: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
+  },
+  modalIconContainer: {
+    marginBottom: 24,
+  },
+  verifiedIcon: {
+    height: 55,
+    width: 50,
+    objectFit: "contain",
+  },
+  modalTitle: {
+    fontSize: scaleFont(26),
+    color: "#1F2937",
+    marginBottom: 16,
+    letterSpacing: -0.5,
+  },
+  modalDescription: {
+    fontSize: scaleFont(13),
+    lineHeight: 24,
+    color: "#6B7280",
+    marginBottom: 32,
+    letterSpacing: 0.2,
+  },
+  btnsMain: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  modalButton: {
+    width: "48%",
+    backgroundColor: "#081A35",
+    paddingVertical: 13,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalButtonCancel: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "black",
+  },
+  modalButtonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(13),
+    fontWeight: "500",
+    letterSpacing: 0.3,
+    fontFamily: "Mukta-Regular",
+  },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 10,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 2,
   },
 });
 

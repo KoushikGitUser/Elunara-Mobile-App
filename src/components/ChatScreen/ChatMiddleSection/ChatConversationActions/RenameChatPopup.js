@@ -75,14 +75,24 @@ const RenameChatPopup = () => {
   }, []);
 
   // Set initial chat name from API data when modal opens
+  // Set initial chat name from API data when modal opens
   useEffect(() => {
-    if (
-      toggleStates.toggleRenameChatPopup &&
-      chatsStates.allChatsDatas.currentActionChatDetails?.name
-    ) {
-      setChatName(chatsStates.allChatsDatas.currentActionChatDetails.name);
+    if (toggleStates.toggleRenameChatPopup) {
+      // If we have a current room context, we might be renaming the room
+      // But we need to be careful not to override if we are actually renaming a chat inside the room
+      // logic: If currentActionChatDetails is set, we are renaming that chat.
+      // If NOT, and we have a currentRoom, we are renaming the room.
+      if (chatsStates.allChatsDatas.currentActionChatDetails?.name) {
+        setChatName(chatsStates.allChatsDatas.currentActionChatDetails.name);
+      } else if (roomsStates.currentRoom?.name) {
+        setChatName(roomsStates.currentRoom.name);
+      }
     }
-  }, [toggleStates.toggleRenameChatPopup]);
+  }, [
+    toggleStates.toggleRenameChatPopup,
+    chatsStates.allChatsDatas.currentActionChatDetails,
+    roomsStates.currentRoom,
+  ]);
 
   // Handle success case
   useEffect(() => {

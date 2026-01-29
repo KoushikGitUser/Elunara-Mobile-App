@@ -105,6 +105,7 @@ const Notes = () => {
   const { notesStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const route = useRoute();
+  const navigation = useNavigation();
   const chatUuid = route.params?.chatUuid;
 
   useEffect(() => {
@@ -154,7 +155,9 @@ const Notes = () => {
         name: "update-notes",
         data: { content: noteContent },
       };
-      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(commonFunctionForAPICalls(payload)).then(() => {
+        navigation.goBack();
+      });
     }
   };
 
@@ -404,7 +407,7 @@ const Notes = () => {
 
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
-  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.notesMainWrapper}>
       {toggleOptionsPopup && (

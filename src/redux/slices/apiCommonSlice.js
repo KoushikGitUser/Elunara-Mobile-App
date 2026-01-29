@@ -68,6 +68,10 @@ const apiCommonSlice = createSlice({
         citation_format_id: null,
       };
     },
+    resetAcademicLinkFlags: (state) => {
+      state.settingsStates.academicLinkAdded = null;
+      state.settingsStates.academicLinkDeleted = null;
+    },
     resetChatArchiveUnarchiveUpdated: (state) => {
       state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = null;
     },
@@ -141,6 +145,7 @@ export const {
   resetAIResponseRegenerated,
   resetVersionSwitched,
   resetCompareStates,
+  resetAcademicLinkFlags,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

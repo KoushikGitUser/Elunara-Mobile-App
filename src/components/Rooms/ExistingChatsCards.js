@@ -33,8 +33,15 @@ const ExistingChatsCards = ({ chatName, projects, chat }) => {
       // Usually better to close and let background handle it, or show loading.
       // For now, mirroring previous behavior + API call.
       dispatch(setToggleAddExistingChatToRoomPopup(false));
-      // Toast is handled by the reducer handler now (Step 14, line 259 triggers success toast)
-      // So we can remove the manual triggerToast here to avoid double toasts.
+
+      // Refresh room chats list
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: `/rooms/${roomsStates.currentRoom.uuid}/chats`,
+          name: "get-room-chats",
+        }),
+      );
     } else {
       triggerToast("Error", "Could not identify room or chat", "error", 3000);
     }

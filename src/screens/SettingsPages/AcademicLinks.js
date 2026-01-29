@@ -22,7 +22,10 @@ import { triggerToast } from "../../services/toast";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import {
+  commonFunctionForAPICalls,
+  resetAcademicLinkFlags,
+} from "../../redux/slices/apiCommonSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,7 +42,7 @@ const AcademicLinks = () => {
         method: "GET",
         url: "/settings/academic-links",
         name: "getAcademicLinks",
-      })
+      }),
     );
   }, []);
 
@@ -54,8 +57,9 @@ const AcademicLinks = () => {
           method: "GET",
           url: "/settings/academic-links",
           name: "getAcademicLinks",
-        })
+        }),
       );
+      dispatch(resetAcademicLinkFlags());
     }
   }, [settingsStates.academicLinkAdded, settingsStates.academicLinkDeleted]);
 
@@ -63,13 +67,13 @@ const AcademicLinks = () => {
     setActivePopupIndex(activePopupIndex === index ? null : index);
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = (id) => {
     dispatch(
       commonFunctionForAPICalls({
         method: "DELETE",
-        url: `/settings/academic-links/${index}`,
+        url: `/settings/academic-links/${id}`,
         name: "deleteAcademicLink",
-      })
+      }),
     );
     setActivePopupIndex(null);
   };
@@ -81,7 +85,7 @@ const AcademicLinks = () => {
         "Limit reached",
         "Only 2 academic links can be added",
         "error",
-        3000
+        3000,
       );
       return;
     }
@@ -130,10 +134,7 @@ const AcademicLinks = () => {
           </View>
 
           {/* Plus Button - Centered to left content */}
-          <TouchableOpacity
-            onPress={handleAddLink}
-            style={styles.addButton}
-          >
+          <TouchableOpacity onPress={handleAddLink} style={styles.addButton}>
             <Plus size={28} color="#1F2937" strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
@@ -152,8 +153,8 @@ const AcademicLinks = () => {
 
               {/* Link Details */}
               <View style={styles.linkDetails}>
-                <Text style={styles.url}>{links.link} </Text>
-                <Text style={styles.description}>{links.linkDesc} </Text>
+                <Text style={styles.url}>{links.url} </Text>
+                <Text style={styles.description}>{links.description} </Text>
               </View>
 
               {/* More Options Button */}
@@ -172,11 +173,9 @@ const AcademicLinks = () => {
                       style={styles.popupOverlay}
                       onPress={() => {
                         setActivePopupIndex(null);
-                        triggerToast(
-                          "Link deleted",
-                          "Link has been deleted successfully",
-                          "success",
-                          3000
+                        // backend uses 0-based index
+                        handleDelete(
+                          links.index !== undefined ? links.index : linkIndex,
                         );
                       }}
                     ></TouchableOpacity>
@@ -184,15 +183,13 @@ const AcademicLinks = () => {
                       <View style={styles.deletePopup}>
                         <TouchableOpacity
                           style={styles.deleteOption}
-                          onPress={() => {
-                            setActivePopupIndex(null);
-                            triggerToast(
-                              "Link deleted",
-                              "Link has been deleted successfully",
-                              "success",
-                              3000
-                            );
-                          }}
+                          onPress={() =>
+                            handleDelete(
+                              links.index !== undefined
+                                ? links.index
+                                : linkIndex,
+                            )
+                          }
                         >
                           <Trash2 size={18} color="#3A3A3A" strokeWidth={2} />
                           <Text style={styles.deleteText}>Delete</Text>
@@ -204,7 +201,7 @@ const AcademicLinks = () => {
               </View>
             </View>
           );
-        }
+        },
       )}
     </View>
   );

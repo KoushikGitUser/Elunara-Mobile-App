@@ -21,6 +21,7 @@ const { width, height } = Dimensions.get("window");
 
 const SourcesPopup = ({ setSourcesPopup }) => {
   const { roomsStates } = useSelector((state) => state.API);
+  const dispatch = useDispatch();
 
   const handleAddFile = async () => {
     // Request media library permissions
@@ -62,7 +63,8 @@ const SourcesPopup = ({ setSourcesPopup }) => {
       if (response?.payload?.data?.status === "success") {
         const newAttachmentId = response.payload.data.data.id;
         const currentAttachmentIds =
-          roomsStates.currentRoom?.attachments?.map((a) => a.id) || [];
+          roomsStates.currentRoom?.attachments?.map((a) => a.id || a.uuid) ||
+          [];
         const updatedAttachmentIds = [...currentAttachmentIds, newAttachmentId];
 
         const updatePayload = {
