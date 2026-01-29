@@ -23,6 +23,7 @@ import Analytics from "../../screens/SettingsPages/Analytics";
 import PaymentBilling from "../../screens/SettingsPages/PaymentBilling";
 import adImg from "../../assets/images/Upgrade.jpg";
 import { setToggleAdFreeExpPopup, setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
+import { appColors } from "../../themes/appColors";
 
 const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
   const navigation = useNavigation();
@@ -76,7 +77,7 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
 
       {/* Upgrade button */}
       <TouchableOpacity style={styles.upgradeBtn}>
-        <SparkleIcon />
+        <SparkleIcon color={appColors.navyBlueShade} />
         <View>
           <GradientText
             children="Upgrade plan"

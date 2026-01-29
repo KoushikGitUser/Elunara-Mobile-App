@@ -21,11 +21,21 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
+      const accessToken = await getToken();
+
+      // If no access token available, navigate to welcome screen
+      if (!accessToken) {
+        navigation.navigate("welcome");
+        return;
+      }
+
+      // If access token exists (with or without refresh token), fetch profile info
       const payload = {
         method: "GET",
         url: "/settings/profile",
         name: "getAllProfileInfos",
       };
+
       dispatch(commonFunctionForAPICalls(payload));
     };
     checkAuthAndNavigate();
@@ -34,29 +44,28 @@ const SplashScreen = ({ navigation }) => {
   const { settingsStates } = useSelector((state) => state.API);
 
   useEffect(() => {
-    if (
-      settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true
-    ) {
-      navigation.replace("chat");
-    } else if (
-      settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
-      false
-    ) {
-      // Check if the API call has completed (either success or failure)
-      // If allProfileInfos is empty and fetch completed, user is not authenticated
-      const hasProfileData =
-        settingsStates.allProfileInfos &&
-        Object.keys(settingsStates.allProfileInfos).length > 0;
+    const handleProfileFetchResult = async () => {
+      const accessToken = await getToken();
 
-      // Add a small delay to ensure the API call has had time to complete
-      const timer = setTimeout(() => {
-        if (!hasProfileData) {
-          navigation.replace("welcome");
-        }
-      }, 1500);
+      // Only process if access token exists
+      if (!accessToken) {
+        return;
+      }
 
-      return () => clearTimeout(timer);
-    }
+      if (
+        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
+        true
+      ) {
+        navigation.navigate("chat");
+      } else if (
+        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
+        false
+      ) {
+        navigation.navigate("welcome");
+      }
+    };
+
+    handleProfileFetchResult();
   }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched]);
 
   return (

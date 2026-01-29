@@ -24,7 +24,7 @@ import {
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
-import { setChatMessagesArray, setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
+import { setChatMessagesArray, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
@@ -45,7 +45,8 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
 
   // Get chat details
   const chatDetails = chatsStates.allChatsDatas.createdChatDetails;
-  const chatTitle = chatDetails?.name || "Chat Name";
+  const fullChatTitle = chatDetails?.name || "Chat Name";
+  const chatTitle = fullChatTitle.length > 15 ? fullChatTitle.substring(0, 15) + "..." : fullChatTitle;
   const roomName = chatDetails?.room?.name;
 
   // Refs for guided tour measurement
@@ -113,6 +114,14 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
                 !toggleStates.toggleChatHistorySidebar
               )
             );
+
+            // If in Navigation Basics tour step 1, advance to step 2
+            if (globalDataStates.manualGuidedTourRunning &&
+                globalDataStates.navigationBasicsGuideTourSteps === 1) {
+              setTimeout(() => {
+                dispatch(setNavigationBasicsGuideTourSteps(2));
+              }, 350);
+            }
           }}
         >
           <Feather name="menu" size={30} color="black" />
@@ -181,6 +190,9 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
           onPress={async() => {
             dispatch(setChatMessagesArray([]));
             dispatch(setToggleIsChattingWithAI(false));
+            // Clear chat input text and attachments
+            dispatch(setUserMessagePrompt(""));
+            dispatch(setSelecetdFiles([]));
             // dispatch(setToggleChatScreenGuideStart(true));
             // dispatch(setGuidedTourStepsCount(1))
             //  await AsyncStorage.setItem("isNewUser", "true");

@@ -3,10 +3,41 @@ import React, { useState } from 'react'
 import { moderateScale, scaleFont } from '../../../../../utils/responsive';
 import LanguageDropdown from '../../../ChatInputCompos/ToolsPopupStates/ResponseLangState/LanguageDropdown';
 import { languages } from '../../../../../data/datas';
+import { useDispatch } from 'react-redux';
+import { commonFunctionForAPICalls } from '../../../../../redux/slices/apiCommonSlice';
+import { useNavigation } from '@react-navigation/native';
+import { setToggleChangeLangWhileChatPopup } from '../../../../../redux/slices/toggleSlice';
+
 const screenHeight = Dimensions.get("window").height;
 
-const SettingLang = ({setIsLanguageSaved}) => {
-      const [selectedCounts, setSelectedCounts] = useState([]);
+const SettingLang = ({setCurrentStateOfPopup}) => {
+  const [selectedCounts, setSelectedCounts] = useState([]);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const handleSaveLanguagePreferences = () => {
+    if (selectedCounts.length >= 1) {
+      // Prepare language IDs array (up to 3)
+      const languageIds = selectedCounts.slice(0, 3).map(lang => lang.id);
+
+      // Call update general settings API
+      const payload = {
+        method: "PUT",
+        url: "/settings/general",
+        data: {
+          language_preferences: {
+            language_ids: languageIds
+          }
+        },
+        name: "updateGeneralSettings",
+      };
+
+      dispatch(commonFunctionForAPICalls(payload));
+
+      // Move to state 2 (SavedLang)
+      setCurrentStateOfPopup(2);
+    }
+  };
 
   return (
     <>
@@ -80,13 +111,14 @@ const SettingLang = ({setIsLanguageSaved}) => {
             styles.button,
             {
               backgroundColor:
-                selectedCounts?.length >= 3 ? "#081A35" : "#CDD5DC",
+                selectedCounts?.length >= 1 ? "#081A35" : "#CDD5DC",
             },
           ]}
-          onPress={() => setIsLanguageSaved(true)}
+          onPress={handleSaveLanguagePreferences}
           activeOpacity={0.8}
+          disabled={selectedCounts?.length < 1}
         >
-          <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save LLM Preferences</Text>
+          <Text style={[styles.buttonText,{fontFamily: "Mukta-Regular" }]}>Save Language Preferences</Text>
         </TouchableOpacity>
             <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
               <Text
@@ -97,9 +129,15 @@ const SettingLang = ({setIsLanguageSaved}) => {
                   fontFamily: "Mukta-Regular",
                 }}
               >
-                More LLMS? Update your list in{" "}
+                More Languages? Update your list in{" "}
               </Text>
-              <Pressable style={{borderBottomWidth:2}}>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleChangeLangWhileChatPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
                 <Text style={{
                   fontSize: moderateScale(13),
                   lineHeight:15,

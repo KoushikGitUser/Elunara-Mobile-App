@@ -23,7 +23,7 @@ import CompareLLMOrStyleState from "../CompareLLMOrStyleState";
 import SettingLLMState from "./SettingLLMState";
 import IntegtrateAiState from "./IntegtrateAiState";
 import FindAPIKeyState from "./FindAPIKeyState";
-import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetCompareStates } from "../../../../../redux/slices/apiCommonSlice";
 import gemini from "../../../../../assets/images/gemini.png";
 import anthropic from "../../../../../assets/images/antropic.png";
 import mistral from "../../../../../assets/images/mistral.png";
@@ -41,7 +41,7 @@ const providerImages = {
 
 const getProviderImage = (provider) => {
   const key = provider?.toLowerCase();
-  return providerImages[key] || anthropic;
+  return providerImages[key] || anthropic; 
 };
 
 // Helper function to generate badge text based on provider
@@ -106,6 +106,14 @@ const ChangeLLMPopup = () => {
       setSelectedStyle(0);
     }
   }, [chatCustomisationStates?.selectedLLM]);
+
+  // Reset comparison state when modal opens
+  useEffect(() => {
+    if (toggleStates.toggleChangeResponseLLMWhileChatPopup) {
+      dispatch(resetCompareStates());
+      setSelectedLLMsForCompare([]);
+    }
+  }, [toggleStates.toggleChangeResponseLLMWhileChatPopup, dispatch]);
 
   // Handle LLM selection
   const handleLLMSelection = (llmOption, index) => {
@@ -521,7 +529,48 @@ const ChangeLLMPopup = () => {
                   ]}
                   onPress={() => {
                     if (selectedLLMsForCompare.length === 2) {
-                      setCurrentStateOfPopup(3);
+                      // Get the AI message index
+                      const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+
+                      if (aiMessageIndex !== null && aiMessageIndex !== undefined) {
+                        // Get AI message UUID
+                        const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                        if (aiMessageUuid) {
+                          // Make two separate API calls - one for each LLM with separate handler names
+                          const firstLLMPayload = {
+                            method: "POST",
+                            url: `/messages/${aiMessageUuid}/compare`,
+                            data: {
+                              llm_id: selectedLLMsForCompare[0].id,
+                            },
+                            name: "compareAIResponsesFirst",
+                          };
+
+                          const secondLLMPayload = {
+                            method: "POST",
+                            url: `/messages/${aiMessageUuid}/compare`,
+                            data: {
+                              llm_id: selectedLLMsForCompare[1].id,
+                            },
+                            name: "compareAIResponsesSecond",
+                          };
+
+                          console.log("Compare API Payloads:", {
+                            firstLLM: firstLLMPayload,
+                            secondLLM: secondLLMPayload
+                          });
+
+                          // Call both APIs independently
+                          dispatch(commonFunctionForAPICalls(firstLLMPayload));
+                          dispatch(commonFunctionForAPICalls(secondLLMPayload));
+
+                          // Navigate to compare state
+                          setCurrentStateOfPopup(3);
+                        } else {
+                          console.error("Missing AI message UUID");
+                        }
+                      }
                     }
                   }}
                   activeOpacity={0.8}
@@ -535,7 +584,11 @@ const ChangeLLMPopup = () => {
             </View>
           </View>
         ) : currentStateOfPopup == 3 ? (
-          <CompareLLMOrStyleState setCurrentStateOfPopup={setCurrentStateOfPopup} forStyleOrLLM="LLM" />
+          <CompareLLMOrStyleState
+            setCurrentStateOfPopup={setCurrentStateOfPopup}
+            forStyleOrLLM="LLM"
+            selectedLLMsForCompare={selectedLLMsForCompare}
+          />
         ) : currentStateOfPopup == 4 ? (
           <IntegtrateAiState setCurrentStateOfPopup={setCurrentStateOfPopup} />
         ) : (

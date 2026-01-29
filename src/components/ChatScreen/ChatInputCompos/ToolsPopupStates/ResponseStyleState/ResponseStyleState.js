@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { scaleFont, verticalScale } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
   setToggleTopicsPopup,
+  setSelectedResponseStyle,
 } from "../../../../../redux/slices/toggleSlice";
 import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
 import { responseStyles } from "../../../../../data/datas";
@@ -24,7 +25,8 @@ const screenHeight = Dimensions.get("window").height;
 
 const ResponseStyleState = () => {
   const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
+  const { roomsStates, settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
   const initialSelection =
     roomsStates.tempRoomSettings?.response_style_id !== null &&
@@ -32,7 +34,39 @@ const ResponseStyleState = () => {
       ? roomsStates.tempRoomSettings.response_style_id - 1
       : 0;
 
-  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
+  // Initialize selected style from Redux state
+  const allResponseStyles =
+    settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedResponseStyle?.id) {
+      // Set to the actual ID, not the index
+      setSelectedStyle(chatCustomisationStates.selectedResponseStyle.id);
+    } else {
+      // If no selection or Auto is selected, set to the first item's ID (Auto)
+      if (allResponseStyles.length > 0) {
+        setSelectedStyle(allResponseStyles[0]?.id || 0);
+      } else {
+        setSelectedStyle(0);
+      }
+    }
+  }, [
+    chatCustomisationStates?.selectedResponseStyle,
+    allResponseStyles.length,
+  ]);
+
+  // Handle response style selection
+  const handleStyleSelection = (styleOption) => {
+    const selectedData = {
+      id: styleOption.name?.toLowerCase().includes("auto")
+        ? null
+        : styleOption.id,
+      name: styleOption.name,
+    };
+
+    dispatch(setSelectedResponseStyle(selectedData));
+    setSelectedStyle(styleOption.id);
+  };
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -91,13 +125,7 @@ const ResponseStyleState = () => {
                       },
                     ]}
                     onPress={() => {
-                      setSelectedStyle(styleOptions.id);
-                      dispatch(
-                        setTempRoomProperty({
-                          key: "response_style_id",
-                          value: styleOptions.id + 1, // Map 0 -> 1, 1 -> 2
-                        })
-                      );
+                      handleStyleSelection(styleOptions);
                     }}
                     activeOpacity={0.7}
                   >

@@ -90,7 +90,7 @@ const VerifyEmailWhileSignup = ({ route }) => {
           </View>
         </View>
       ) : isVerified == false ? (
-        <View style={styles.wrapper}>
+        <View style={styles.wrapper}> 
           <RejectedCrossMark />
           <Text
             style={[

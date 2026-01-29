@@ -11,7 +11,7 @@ import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import chatLoader from "../../../assets/images/Loading chat mob.gif";
 
-const  ChatMiddleWrapper = () => {
+const  ChatMiddleWrapper = () => { 
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -100,11 +100,8 @@ const  ChatMiddleWrapper = () => {
                 return (
                   <AIMessageBox
                     message={chats.message}
-                    messageUuid={chats.uuid}
                     messageIndex={chatsIndex}
                     isSavedToNotes={chats.is_saved_to_notes}
-                    version={chats.version || 1}
-                    totalVersions={chats.total_versions || 1}
                     key={chatsIndex}
                   />
                 );

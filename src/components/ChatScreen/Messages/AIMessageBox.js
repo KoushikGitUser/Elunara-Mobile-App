@@ -2,17 +2,15 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, verticalScale } from "../../../utils/responsive";
-import { EvilIcons, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ChevronDown } from "lucide-react-native";
 import copy from "../../../assets/images/copy.png";
 import share from "../../../assets/images/Share.png";
-import bookmark from "../../../assets/images/Bookmarks.png";
+import bookmark from "../../../assets/images/Bookmarks.png"; 
 import feedback from "../../../assets/images/Feedback.png";
 import repeat from "../../../assets/images/Repeat.png";
 import * as Clipboard from 'expo-clipboard';
 import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
 import ShareIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/ShareIcon";
-import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
 import BookMarkIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookMarkIcon";
 import FeedbackIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/FeedbackIcon";
 import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
@@ -22,12 +20,13 @@ import MessageSharePopup from "../../Modals/ChatScreen/Messages/MessageSharePopu
 import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookmarkFilledIcon";
 import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
 import { commonFunctionForAPICalls, resetVersionSwitched } from "../../../redux/slices/apiCommonSlice";
-import { setCurrentAIMessageIndexForRegeneration } from "../../../redux/slices/globalDataSlice";
+import { setCurrentAIMessageIndexForRegeneration, setChatMessagesArray } from "../../../redux/slices/globalDataSlice";
+import Markdown from 'react-native-markdown-display';
 
-const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = false, version = 1, totalVersions = 1 }) => {
+const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
   const dispatch = useDispatch();
   const { chatsStates } = useSelector((state) => state.API);
-  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { globalDataStates } = useSelector((state) => state.Global);
   const [changeResponsePopup,setChangeResponsePopup] = useState(false);
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
@@ -35,29 +34,217 @@ const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = fal
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [isRemovingFromNotes, setIsRemovingFromNotes] = useState(false);
 
+  // Get message data from chatMessagesArray
+  const currentMessage = globalDataStates.chatMessagesArray[messageIndex];
+
+  // Local state for version management - initialize from message data
+  const [currentVersion, setCurrentVersion] = useState(currentMessage?.version || 1);
+  const [totalVersions, setTotalVersions] = useState(currentMessage?.total_versions || 1);
+
+  // Local state for customization badges (generation data) - initialize from message data
+  const [generationData, setGenerationData] = useState(() => {
+    if (currentMessage?.generation) {
+      return {
+        llm: currentMessage.generation.llm || null,
+        style: currentMessage.generation.style || null,
+        language: currentMessage.generation.language || null
+      };
+    }
+    return {
+      llm: null,
+      style: null,
+      language: null
+    };
+  });
+
+  // Local state for switched version message content
+  const [switchedVersionMessageContent, setSwitchedVersionMessageContent] = useState(null);
+
   const isAddToNotesPending = chatsStates?.loaderStates?.isAddToNotesPending;
   const isRemoveFromNotesPending = chatsStates?.loaderStates?.isRemoveFromNotesPending;
 
-  // Watch for add to notes success
+  // Get message UUID
+  const messageUuid = globalDataStates.messageIDsArray[messageIndex] || "";
+
+  // Get switchedVersionData from API response
+  const switchedVersionData = chatsStates?.allChatsDatas?.switchedVersionData;
+
+  // Get regenerated response data
+  const regeneratedResponse = chatsStates?.allChatsDatas?.regeneratedResponse;
+
+  // Check if generation data is available (for badges)
+  const hasGenerationData = generationData?.llm || generationData?.style || generationData?.language;
+
+  // Update state when currentMessage changes (e.g., when chat is loaded)
   useEffect(() => {
-    if (isAddingToNotes && isAddToNotesPending === true) {
+    if (currentMessage) {
+      // Update version info
+      if (currentMessage.version !== undefined) {
+        setCurrentVersion(currentMessage.version);
+      }
+      if (currentMessage.total_versions !== undefined) {
+        setTotalVersions(currentMessage.total_versions);
+      }
+      // Update generation data
+      if (currentMessage.generation) {
+        setGenerationData({
+          llm: currentMessage.generation.llm || null,
+          style: currentMessage.generation.style || null,
+          language: currentMessage.generation.language || null
+        });
+      }
+    }
+  }, [currentMessage?.version, currentMessage?.total_versions, currentMessage?.generation]);
+
+  // Watch for regeneration success - update versions and generation data from regeneratedResponse
+  const isAIResponseRegenerated = chatsStates?.loaderStates?.isAIResponseRegenerated;
+  const currentAIMessageIndexForRegeneration = globalDataStates.currentAIMessageIndexForRegeneration;
+
+  useEffect(() => {
+    if (
+      isAIResponseRegenerated === true &&
+      regeneratedResponse &&
+      currentAIMessageIndexForRegeneration === messageIndex
+    ) {
+      // Update versions from regeneration response
+      if (regeneratedResponse.version !== undefined) {
+        setCurrentVersion(regeneratedResponse.version);
+      }
+      if (regeneratedResponse.total_versions !== undefined) {
+        setTotalVersions(regeneratedResponse.total_versions);
+      }
+
+      // Update generation data (customization badges) from regeneration response
+      if (regeneratedResponse.generation) {
+        setGenerationData({
+          llm: regeneratedResponse.generation.llm || { name: "Auto" },
+          style: regeneratedResponse.generation.style || { name: "Auto" },
+          language: regeneratedResponse.generation.language || { name: "Auto" }
+        });
+      }
+    }
+  }, [isAIResponseRegenerated, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex]);
+
+  // Watch for compare store success - treat it like regeneration
+  const isStoreCompareResponsePending = chatsStates?.loaderStates?.isStoreCompareResponsePending;
+  const isStoreCompareStyleResponsePending = chatsStates?.loaderStates?.isStoreCompareStyleResponsePending;
+
+  useEffect(() => {
+    if (
+      (isStoreCompareResponsePending === true || isStoreCompareStyleResponsePending === true) &&
+      regeneratedResponse &&
+      currentAIMessageIndexForRegeneration === messageIndex
+    ) {
+      // Update versions from compare store response (stored in regeneratedResponse)
+      if (regeneratedResponse.version !== undefined) {
+        setCurrentVersion(regeneratedResponse.version);
+      }
+      if (regeneratedResponse.total_versions !== undefined) {
+        setTotalVersions(regeneratedResponse.total_versions);
+      }
+
+      // Update generation data (customization badges) from compare store response
+      if (regeneratedResponse.generation) {
+        setGenerationData({
+          llm: regeneratedResponse.generation.llm || { name: "Auto" },
+          style: regeneratedResponse.generation.style || { name: "Auto" },
+          language: regeneratedResponse.generation.language || { name: "Auto" }
+        });
+      }
+
+      // Show toast notification
+      triggerToast(`Comparison response selected - Version ${regeneratedResponse.version}`, "", "success", 3000);
+    }
+  }, [isStoreCompareResponsePending, isStoreCompareStyleResponsePending, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex]);
+
+  // Watch for version switch success - update versions from switchedVersionData
+  const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
+
+  useEffect(() => {
+    if (
+      isVersionSwitched === true &&
+      switchedVersionData &&
+      currentAIMessageIndexForRegeneration === messageIndex
+    ) {
+      // Update versions from switch version response
+      if (switchedVersionData.version !== undefined) {
+        setCurrentVersion(switchedVersionData.version);
+      }
+      if (switchedVersionData.total_versions !== undefined) {
+        setTotalVersions(switchedVersionData.total_versions);
+      }
+
+      // Update generation data (customization badges) from switch version response
+      if (switchedVersionData.generation) {
+        setGenerationData({
+          llm: switchedVersionData.generation.llm || { name: "Auto" },
+          style: switchedVersionData.generation.style || { name: "Auto" },
+          language: switchedVersionData.generation.language || { name: "Auto" }
+        });
+      }
+
+      // Set switched version message content
+      if (switchedVersionData.content) {
+        setSwitchedVersionMessageContent(switchedVersionData.content);
+
+        // Update the chatMessagesArray to show the new content
+        const updatedChatMessagesArray = globalDataStates.chatMessagesArray.map((msg, index) => {
+          if (index === messageIndex) {
+            return {
+              ...msg,
+              message: switchedVersionData.content,
+              version: switchedVersionData.version,
+              total_versions: switchedVersionData.total_versions,
+              generation: switchedVersionData.generation
+            };
+          }
+          return msg;
+        });
+
+        // Dispatch the updated array to Redux
+        dispatch(setChatMessagesArray(updatedChatMessagesArray));
+      }
+
+      // Show toast notification
+      triggerToast(`Switched to version ${switchedVersionData.version}`, "", "normal", 3000);
+      dispatch(resetVersionSwitched());
+    }
+  }, [isVersionSwitched, switchedVersionData, currentAIMessageIndexForRegeneration, messageIndex]);
+  const lastNotesActionMessageUuid = chatsStates?.allChatsDatas?.lastNotesActionMessageUuid;
+
+  // Helper function to update message's is_saved_to_notes in chatMessagesArray
+  const updateMessageNotesStatus = (isSaved) => {
+    const updatedMessages = globalDataStates.chatMessagesArray.map((msg) => {
+      if (msg.uuid === messageUuid) {
+        return { ...msg, is_saved_to_notes: isSaved };
+      }
+      return msg;
+    });
+    dispatch(setChatMessagesArray(updatedMessages));
+  };
+
+  // Watch for add to notes success - only update if this message was the one acted upon
+  useEffect(() => {
+    if (isAddingToNotes && isAddToNotesPending === true && lastNotesActionMessageUuid === messageUuid) {
       setSavedToNotes(true);
+      updateMessageNotesStatus(true);
       triggerToastWithAction("Response saved in note", "Response saved in note", "success", 5000, "View", () => console.log("View"));
       setIsAddingToNotes(false);
     }
-  }, [isAddToNotesPending, isAddingToNotes]);
+  }, [isAddToNotesPending, isAddingToNotes, lastNotesActionMessageUuid, messageUuid]);
 
-  // Watch for remove from notes success
+  // Watch for remove from notes success - only update if this message was the one acted upon
   useEffect(() => {
-    if (isRemovingFromNotes && isRemoveFromNotesPending === true) {
+    if (isRemovingFromNotes && isRemoveFromNotesPending === true && lastNotesActionMessageUuid === messageUuid) {
       setSavedToNotes(false);
+      updateMessageNotesStatus(false);
       triggerToast("Response removed from notes", "", "normal", 3000);
       setIsRemovingFromNotes(false);
     }
-  }, [isRemoveFromNotesPending, isRemovingFromNotes]);
+  }, [isRemoveFromNotesPending, isRemovingFromNotes, lastNotesActionMessageUuid, messageUuid]);
 
   const handleCopy = async() => {
-    await Clipboard.setStringAsync(message);
+    await Clipboard.setStringAsync(currentMessage?.message || message);
     triggerToast("Message copied!","","normal",3000)
   };
 
@@ -90,95 +277,115 @@ const AIMessageBox = ({ message, messageUuid, messageIndex, isSavedToNotes = fal
   };
 
   const handlePreviousVersion = () => {
-    // Calculate previous version number
-    const previousVersionNumber = version - 1;
+    // Calculate previous version number based on current version from Redux
+    const previousVersionNumber = currentVersion - 1;
 
     if (previousVersionNumber >= 1) {
-      console.log("oihyoughiouh");
-      
+      console.log("qiwudgiuqgwdiuqgwd");
+
+      // Store the message index for the handler to use
+      dispatch(setCurrentAIMessageIndexForRegeneration(messageIndex));
+
       // Call API to switch version
       const payload = {
         method: "POST",
         url: `/messages/${messageUuid}/versions/${previousVersionNumber}`,
-        name: "switchVersionsOfAIResponse", // Pass messageIndex for handler to update correct message
+        name: "switchVersionsOfAIResponse",
       };
       dispatch(commonFunctionForAPICalls(payload));
     }
   };
 
   const handleNextVersion = () => {
-    // Calculate next version number
-    const nextVersionNumber = version + 1;
+    // Calculate next version number based on current version from Redux
+    const nextVersionNumber = currentVersion + 1;
 
     if (nextVersionNumber <= totalVersions) {
+      // Store the message index for the handler to use
+      dispatch(setCurrentAIMessageIndexForRegeneration(messageIndex));
+
       // Call API to switch version
       const payload = {
         method: "POST",
         url: `/messages/${messageUuid}/versions/${nextVersionNumber}`,
-        name: "switchVersionsOfAIResponse", // Pass messageIndex for handler to update correct message
+        name: "switchVersionsOfAIResponse",
       };
       dispatch(commonFunctionForAPICalls(payload));
     }
   };
 
-  // Watch for version switch success and show toast
-  const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
-  const switchedVersionData = chatsStates?.allChatsDatas?.switchedVersionData;
-
-  useEffect(() => {
-    if (isVersionSwitched === true && switchedVersionData) {
-      const switchedVersion = switchedVersionData.version;
-      triggerToast(`Switched to version ${switchedVersion}`, "", "normal", 3000);
-      dispatch(resetVersionSwitched());
-    }
-  }, [isVersionSwitched, switchedVersionData]);
+  // Check if arrows should be disabled
+  const isPrevDisabled = currentVersion <= 1;
+  const isNextDisabled = currentVersion >= totalVersions;
 
   return (
     <View style={styles.mainBox}>
       <View style={styles.messageBox}>
-        <Text style={[styles.message,{fontFamily:'Mukta-Regular'}]}>{message}</Text>
+         <Markdown>
+           {currentMessage?.message || message}
+          </Markdown>
       </View>
 
-      {/* Customization Badges */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.badgesContainer}
-      >
-        {chatCustomisationStates.selectedLLM?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>LLM: {chatCustomisationStates.selectedLLM.name}</Text>
-          </View>
-        )}
-        {chatCustomisationStates.selectedResponseStyle?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>Style: {chatCustomisationStates.selectedResponseStyle.name}</Text>
-          </View>
-        )}
-        {chatCustomisationStates.selectedLanguage?.name && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>Language: {chatCustomisationStates.selectedLanguage.name}</Text>
-          </View>
-        )}
-      </ScrollView>
+      {/* Customization Badges - Show when generation data is available */}
+      {hasGenerationData && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.badgesContainer}
+        >
+          {generationData?.llm?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>LLM: {generationData.llm.name}</Text>
+            </View>
+          )}
+          {generationData?.style?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>Style: {generationData.style.name}</Text>
+            </View>
+          )}
+          {generationData?.language?.name && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>Language: {generationData.language.name}</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
 
       {/* Actions Container - Everything on Left Side */}
       <View style={styles.actionsContainer}>
        {changeResponsePopup && <ChangeResponsePopup setChangeResponsePopup={setChangeResponsePopup}/>}
-       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup}/>}
+       {sharePopup && <MessageSharePopup setSharePopup={setSharePopup} messageContent={currentMessage?.message || message} />}
        {feedbackPopup && <FeedbackPopup close={setFeedbackPopup} />}
 
         {/* Version Navigation - Left Side */}
         {totalVersions > 1 && (
           <View style={styles.versionNavigation}>
-            <TouchableOpacity style={styles.versionArrow} onPress={handlePreviousVersion}>
-              <ChevronDown style={{ transform: [{ rotate: '90deg' }] }} size={23} strokeWidth={1} />
+            <TouchableOpacity
+              style={styles.versionArrow}
+              onPress={handlePreviousVersion}
+              disabled={isPrevDisabled}
+            >
+              <ChevronDown
+                style={{ transform: [{ rotate: '90deg' }] }}
+                size={23}
+                strokeWidth={1}
+                color={isPrevDisabled ? "#D1D5DB" : "#1F2937"}
+              />
             </TouchableOpacity>
             <Text style={styles.versionText}>
-              {version}/{totalVersions}
+              {currentVersion}/{totalVersions}
             </Text>
-            <TouchableOpacity style={styles.versionArrow} onPress={handleNextVersion}>
-              <ChevronDown style={{ transform: [{ rotate: '-90deg' }] }} size={23} strokeWidth={1} />
+            <TouchableOpacity
+              style={styles.versionArrow}
+              onPress={handleNextVersion}
+              disabled={isNextDisabled}
+            >
+              <ChevronDown
+                style={{ transform: [{ rotate: '-90deg' }] }}
+                size={23}
+                strokeWidth={1}
+                color={isNextDisabled ? "#D1D5DB" : "#1F2937"}
+              />
             </TouchableOpacity>
           </View>
         )}

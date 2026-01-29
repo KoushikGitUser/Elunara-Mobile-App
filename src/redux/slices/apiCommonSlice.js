@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import apiInstance from "../helper";
+import apiInstance, { baseURL } from "../helper";
 import { allInitialStates } from "../allInitialStates";
 import { addCasePending } from "../addCases/pending";
 import { addCaseFulfilled } from "../addCases/fulfilled";
@@ -7,13 +7,14 @@ import { addCaseRejected } from "../addCases/rejected";
 
 export const commonFunctionForAPICalls = createAsyncThunk(
   "/common-api-call",
-  async ({ method, url, data, params }, { rejectWithValue }) => {
+  async ({ method, url, data, params, headers }, { rejectWithValue }) => {
     try {
       let res = await apiInstance({
         method,
         url,
         data,
         params,
+        headers,
       });
       return {
         data: res.data,
@@ -67,6 +68,41 @@ const apiCommonSlice = createSlice({
         citation_format_id: null,
       };
     },
+    resetChatArchiveUnarchiveUpdated: (state) => {
+      state.chatsStates.loaderStates.isChatArchiveUnarchiveUpdated = null;
+    },
+    resetAIResponseRegenerated: (state) => {
+      state.chatsStates.loaderStates.isAIResponseRegenerated = null;
+    },
+    resetVersionSwitched: (state) => {
+      state.chatsStates.loaderStates.isVersionSwitched = null;
+    },
+    resetCompareStates: (state) => {
+      // Reset loader states for compare
+      state.chatsStates.loaderStates.isFirstCompareResponseLoading = null;
+      state.chatsStates.loaderStates.isSecondCompareResponseLoading = null;
+      state.chatsStates.loaderStates.isFirstCompareStyleResponseLoading = null;
+      state.chatsStates.loaderStates.isSecondCompareStyleResponseLoading = null;
+      state.chatsStates.loaderStates.isStoreCompareResponsePending = null;
+      state.chatsStates.loaderStates.isStoreCompareStyleResponsePending = null;
+      // Reset comparison data
+      state.chatsStates.allChatsDatas.firstComparisonResponse = null;
+      state.chatsStates.allChatsDatas.secondComparisonResponse = null;
+      state.chatsStates.allChatsDatas.firstComparisonStyleResponse = null;
+      state.chatsStates.allChatsDatas.secondComparisonStyleResponse = null;
+    },
+    resetChatDeleted: (state) => {
+      state.chatsStates.loaderStates.isChatDeleted = null;
+    },
+    resetChatDeleteUndone: (state) => {
+      state.chatsStates.loaderStates.isChatDeleteUndone = null;
+    },
+    resetBulkOperationCompleted: (state) => {
+      state.chatsStates.loaderStates.isBulkOperationCompleted = null;
+    },
+    setCurrentActionChatDetails: (state, action) => {
+      state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -94,6 +130,17 @@ export const {
   setCurrentRoom,
   setTempRoomProperty,
   resetTempRoomSettings,
+  setIsPersonalInfosFetched,
+  resetChatTitleUpdated,
+  resetChatPinUnpinUpdated,
+  resetChatArchiveUnarchiveUpdated,
+  resetChatDeleted,
+  resetChatDeleteUndone,
+  resetBulkOperationCompleted,
+  setCurrentActionChatDetails,
+  resetAIResponseRegenerated,
+  resetVersionSwitched,
+  resetCompareStates,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

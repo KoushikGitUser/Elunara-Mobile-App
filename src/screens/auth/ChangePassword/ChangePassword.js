@@ -28,7 +28,7 @@ const ChangePassword = ({ route }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
@@ -56,7 +56,7 @@ const ChangePassword = ({ route }) => {
   // Error states (only show errors after user starts typing)
   const hasPasswordError =
     hasStartedTypingPassword && (!hasMinLength || !hasNumberAndSpecial);
-  const showConfirmError = hasStartedTypingConfirm && !passwordsMatch;
+  const showConfirmError = hasStartedTypingConfirm && !passwordsMatch; 
 
 
 
@@ -66,7 +66,7 @@ const ChangePassword = ({ route }) => {
       newOtp[index] = value;
       setOtp(newOtp);
 
-      if (value && index < 3) {
+      if (value && index < 5) {
         inputRefs.current[index + 1]?.focus();
       }
     }
@@ -80,10 +80,12 @@ const ChangePassword = ({ route }) => {
 
   const handleResend = () => {
     if (!canResend) return;
-    setOtp(["", "", "", ""]);
+    setOtp(["", "", "", "", "", ""]);
     inputRefs.current[0]?.focus();
     const formData = new FormData();
     formData.append("email", globalDataStates.userMailIDOnForgotPassword);
+    console.log(globalDataStates.userMailIDOnForgotPassword);
+    
     dispatch(recoverAccount(formData));
     // Reset timer
     setResendTimer(30);
@@ -187,7 +189,7 @@ const ChangePassword = ({ route }) => {
     } else {
       const formData = new FormData();
       formData.append("email", globalDataStates.userMailIDOnForgotPassword == ""?globalDataStates.userMailIDOnSignup:globalDataStates.userMailIDOnForgotPassword);
-      formData.append("otp", globalDataStates.userOTPOnForgotPassword);
+      formData.append("otp", otp.join(""));
       formData.append("password", password);
       formData.append("password_confirmation", confirmPassword);
       dispatch(resetPassword(formData));

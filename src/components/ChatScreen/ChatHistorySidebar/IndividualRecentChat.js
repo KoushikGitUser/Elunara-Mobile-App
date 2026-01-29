@@ -37,19 +37,49 @@ const IndividualRecentChat = ({ item, translateX }) => {
   };
 
   const fetchAllMessagesOfChat = () => {
-    const payload = {
+    // First, fetch chat details to get the chat name
+    const chatDetailsPayload = {
+      method: "GET",
+      url: `/chats/${item?.id}`,
+      name: "getAllDetailsOfChatByID",
+    };
+    dispatch(commonFunctionForAPICalls(chatDetailsPayload));
+
+    // Then, fetch all messages of the chat
+    const messagesPayload = {
       method: "GET",
       url: `/chats/${item?.id}/messages`,
       name: "getAllMessagesOfParticularChat",
     };
-    dispatch(commonFunctionForAPICalls(payload));
+    dispatch(commonFunctionForAPICalls(messagesPayload));
     dispatch(setToggleIsChattingWithAI(true));
+  };
+
+  const closeSidebarAndNavigate = () => {
+    // Check if already on chat screen
+    const currentRoute = navigation.getState()?.routes?.slice(-1)[0]?.name;
+
+    // Navigate to chat only if not already there
+    if (currentRoute !== "chat") {
+      navigation.navigate("chat");
+    }
+
+    // Close sidebar with animation
+    dispatch(setToggleChatHistorySidebar(false));
+    Animated.timing(translateX, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      // Fetch chat messages after animation completes
+      fetchAllMessagesOfChat();
+    });
   };
 
   return (
     <TouchableOpacity
       onPress={() => {
-        fetchAllMessagesOfChat();
+        closeSidebarAndNavigate();
       }}
       onLongPress={() => {
         fetchAllMessagesOfChat();

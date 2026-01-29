@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -14,23 +14,81 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
-  setToggleTopicsPopup,
+  setSelectedCitationFormat,
 } from "../../../../../redux/slices/toggleSlice";
-import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
-import { citationStyles } from "../../../../../data/datas";
-import PenNib from "../../../../../assets/images/penNib2.svg";
+import {
+  commonFunctionForAPICalls,
+  setTempRoomProperty,
+} from "../../../../../redux/slices/apiCommonSlice";
+import APAIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/APAIcon";
+import HavardIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/HavardIcon";
+
+// Helper function to get citation icon based on name
+const getCitationIcon = (name, isSelected) => {
+  const color = isSelected ? "#24487C" : "#888888";
+  const key = name?.toLowerCase();
+  if (key?.includes("apa")) {
+    return <APAIcon color={color} />;
+  } else if (key?.includes("harvard") || key?.includes("havard")) {
+    return <HavardIcon color={color} />;
+  }
+  return <APAIcon color={color} />; // Default to APA
+};
 
 const CitationState = () => {
   const dispatch = useDispatch();
   const { roomsStates } = useSelector((state) => state.API);
+  const { settingsStates, chatCustomisationStates } = useSelector(
+    (state) => state.API,
+  );
 
   const initialSelection =
     roomsStates.tempRoomSettings?.citation_format_id !== null &&
     roomsStates.tempRoomSettings?.citation_format_id !== undefined
-      ? roomsStates.tempRoomSettings.citation_format_id - 1
-      : 0;
+      ? roomsStates.tempRoomSettings.citation_format_id
+      : 0; // Use the ID directly, not index-1
 
   const [selectedStyle, setSelectedStyle] = useState(initialSelection);
+
+  // Initialize selected citation from Redux state
+  const allCitationFormats =
+    settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [];
+
+  useEffect(() => {
+    if (chatCustomisationStates?.selectedCitationFormat?.id) {
+      // Set to the actual ID, not the index
+      setSelectedStyle(chatCustomisationStates.selectedCitationFormat.id);
+    } else {
+      // If no selection, set to the first item's ID (Harvard)
+      if (allCitationFormats.length > 0) {
+        setSelectedStyle(allCitationFormats[0]?.id || 0);
+      } else {
+        setSelectedStyle(0);
+      }
+    }
+  }, [
+    chatCustomisationStates?.selectedCitationFormat,
+    allCitationFormats.length,
+  ]);
+
+  // Handle citation selection
+  const handleCitationSelection = (citationOption) => {
+    const selectedData = {
+      id: citationOption.id,
+      name: citationOption.name,
+    };
+
+    dispatch(setSelectedCitationFormat(selectedData));
+    setSelectedStyle(citationOption.id);
+
+    // Also update temp room property for backward compatibility if needed
+    dispatch(
+      setTempRoomProperty({
+        key: "citation_format_id",
+        value: citationOption.id,
+      }),
+    );
+  };
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
@@ -65,62 +123,62 @@ const CitationState = () => {
           submissions.
         </Text>
         <View style={{ flexDirection: "column", gap: 25 }}>
-          {citationStyles.map((styleOptions, optionsIndex) => (
-            <TouchableOpacity
-              key={optionsIndex}
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    selectedStyle == styleOptions.id ? "#EEF4FF" : "white",
-                  borderColor:
-                    selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
-                },
-              ]}
-              onPress={() => {
-                setSelectedStyle(styleOptions.id);
-                dispatch(
-                  setTempRoomProperty({
-                    key: "citation_format_id",
-                    value: styleOptions.id + 1, // Map 0 -> 1, 1 -> 2
-                  })
-                );
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.contentMain}>
-                <View style={styles.iconContainer}>{styleOptions.icon}</View>
-                <View style={styles.textContainer}>
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      {
-                        fontSize: scaleFont(18),
-                        fontWeight: 600,
-                        fontFamily: "Mukta-Bold",
-                      },
-                    ]}
-                  >
-                    {styleOptions.style}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.optionDescription,
-                      {
-                        fontSize: scaleFont(14),
-                        fontWeight: 400,
-                        color: "#8F8F8F",
-                        fontFamily: "Mukta-Regular",
-                      },
-                    ]}
-                  >
-                    {styleOptions.description}
-                  </Text>
+          {(
+            settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable ||
+            []
+          )?.map((styleOptions, optionsIndex) => {
+            const isSelected = selectedStyle === styleOptions.id;
+            const icon = getCitationIcon(styleOptions.name, isSelected);
+
+            return (
+              <TouchableOpacity
+                key={styleOptions.id || optionsIndex}
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor:
+                      selectedStyle == styleOptions.id ? "#EEF4FF" : "white",
+                    borderColor:
+                      selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
+                  },
+                ]}
+                onPress={() => handleCitationSelection(styleOptions)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.contentMain}>
+                  <View style={styles.iconContainer}>{icon}</View>
+                  <View style={styles.textContainer}>
+                    <Text
+                      style={[
+                        styles.optionTitle,
+                        {
+                          fontSize: scaleFont(18),
+                          fontWeight: 600,
+                          fontFamily: "Mukta-Bold",
+                        },
+                      ]}
+                    >
+                      {styleOptions.name}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.optionDescription,
+                        {
+                          fontSize: scaleFont(14),
+                          fontWeight: 400,
+                          color: "#8F8F8F",
+                          fontFamily: "Mukta-Regular",
+                        },
+                      ]}
+                    >
+                      {styleOptions.description}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <RadioButton selected={selectedStyle === styleOptions.id} />
-            </TouchableOpacity>
-          ))}
+                <RadioButton selected={selectedStyle === styleOptions.id} />
+              </TouchableOpacity>
+            );
+          })}
         </View>
         <Text
           style={{

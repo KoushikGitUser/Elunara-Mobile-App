@@ -3,11 +3,11 @@ import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useDispatch } from "react-redux";
 import { MessageCircle, MoreVertical, Check } from "lucide-react-native";
-import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
+import { setToggleAllChatsOptionsPopup, setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
 import { appColors } from "../../themes/appColors";
-import { setCurrentActionChatDetails } from "../../redux/slices/apiCommonSlice";
+import { setCurrentActionChatDetails, commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const ChatsComponent = ({
   title,
@@ -34,6 +34,33 @@ const ChatsComponent = ({
       dispatch(setCurrentActionChatDetails(chatData));
       dispatch(setToggleAllChatsOptionsPopup(true));
     });
+  };
+
+  const handleChatPress = () => {
+    // Navigate first
+    navigation.navigate("chat");
+
+    // Then fetch chat details and messages after a small delay to ensure ChatScreen has mounted
+    setTimeout(() => {
+      // Fetch chat details
+      const chatDetailsPayload = {
+        method: "GET",
+        url: `/chats/${chatData?.id}`,
+        name: "getAllDetailsOfChatByID",
+      };
+      dispatch(commonFunctionForAPICalls(chatDetailsPayload));
+
+      // Fetch all messages of the chat
+      const messagesPayload = {
+        method: "GET",
+        url: `/chats/${chatData?.id}/messages`,
+        name: "getAllMessagesOfParticularChat",
+      };
+      dispatch(commonFunctionForAPICalls(messagesPayload));
+
+      // Set chatting state after ChatScreen has mounted and cleared its state
+      dispatch(setToggleIsChattingWithAI(true));
+    }, 100);
   };  
 
   const CheckBox = ({ selected }) => {
@@ -68,7 +95,7 @@ const ChatsComponent = ({
           }
         }
         else {
-          navigation.navigate("chat")
+          handleChatPress();
         }
       }}
     >

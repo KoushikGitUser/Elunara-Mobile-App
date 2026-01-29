@@ -16,10 +16,13 @@ import {
   CalendarX,
 } from "lucide-react-native";
 
-const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms"}) => {
+const RoomsSortingPopup = ({close, top, right, onSortSelect, from = "rooms", currentSort}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [selectedStyle, setSelectedStyle] = useState(null);
+
+  // Map sort values to indices for radio button selection
+  const sortToIndex = { "newest": 0, "oldest": 1, "a-z": 2, "z-a": 3 };
+  const [selectedStyle, setSelectedStyle] = useState(currentSort ? sortToIndex[currentSort] : null);
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>

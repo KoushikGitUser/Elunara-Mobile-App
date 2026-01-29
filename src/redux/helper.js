@@ -4,12 +4,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { reset } from "../services/navigationService";
 import { triggerToast } from "../services/toast";
 
-let mainURL = "http://api.elunara.ai/api/v1";
+let mainURL = "https://api.elunara.ai/api/v1";
 export const baseURL = mainURL;
 let apiInstance = axios.create({ baseURL });
 
 export const photoFetch = (mediaUrl) => {
-  return `http://api.elunara.ai/api/v1/${mediaUrl}`;
+  return `https://api.elunara.ai/api/v1/${mediaUrl}`;
 };
 
 let isRefreshing = false;

@@ -10,10 +10,11 @@ import {
   ActivityIndicator,
   Linking,
   BackHandler,
-} from "react-native";
+  Keyboard,
+} from "react-native"; 
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { createStyles } from "./SignIn.styles";
 import mainLogo from "../../../assets/images/Knowledge Chakra 1.png";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
@@ -51,6 +52,10 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+
+  // Ref for keyboard navigation
+  const passwordRef = useRef(null);
+
   const { authStates } = useSelector((state) => state.Auth);
   const dispatch = useDispatch();
 
@@ -190,7 +195,7 @@ const SignIn = () => {
               <GradientText
                 marginBottom={0}
                 marginTop={20}
-                children=" Welcome back"
+                children="Welcome back"
                 fullWidth={true}
                 fontSize={scaleFont(24)}
               />
@@ -243,6 +248,8 @@ const SignIn = () => {
               onBlur={() => setFocusedInput(null)}
               keyboardType="email-address"
               autoCapitalize="none"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
             />
             {errors.email && (
               <AlertCircle
@@ -277,6 +284,7 @@ const SignIn = () => {
             ]}
           >
             <TextInput
+              ref={passwordRef}
               style={styles.passwordInput}
               placeholder="Enter your password"
               placeholderTextColor="#B0B7C3"
@@ -291,6 +299,8 @@ const SignIn = () => {
               }}
               onFocus={() => setFocusedInput("password")}
               onBlur={() => setFocusedInput(null)}
+              returnKeyType="done"
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
             {errors.password && (
               <AlertCircle
@@ -373,7 +383,7 @@ const SignIn = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
               );
             }}
             style={styles.socialButton}
@@ -387,7 +397,7 @@ const SignIn = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
               );
             }}
             style={styles.socialButton}

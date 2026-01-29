@@ -20,7 +20,10 @@ import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleRenameChatPopup } from "../../../../redux/slices/toggleSlice";
 import { Delete } from "lucide-react-native";
-import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
+import {
+  commonFunctionForAPICalls,
+  resetChatTitleUpdated,
+} from "../../../../redux/slices/apiCommonSlice";
 import { triggerToast } from "../../../../services/toast";
 
 const { width } = Dimensions.get("window");
@@ -28,7 +31,7 @@ const { width } = Dimensions.get("window");
 const RenameChatPopup = () => {
   const inputRef = useRef(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { roomsStates } = useSelector((state) => state.API);
+  const { roomsStates, chatsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
@@ -71,6 +74,42 @@ const RenameChatPopup = () => {
     }, 500);
   }, []);
 
+  // Set initial chat name from API data when modal opens
+  useEffect(() => {
+    if (
+      toggleStates.toggleRenameChatPopup &&
+      chatsStates.allChatsDatas.currentActionChatDetails?.name
+    ) {
+      setChatName(chatsStates.allChatsDatas.currentActionChatDetails.name);
+    }
+  }, [toggleStates.toggleRenameChatPopup]);
+
+  // Handle success case
+  useEffect(() => {
+    if (chatsStates.loaderStates.isChatTitleUpdated === true) {
+      // Refresh recent chats list first (before closing popup)
+      const recentChatsPayload = {
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats",
+      };
+      dispatch(commonFunctionForAPICalls(recentChatsPayload));
+
+      // Reset the loader state
+      dispatch(resetChatTitleUpdated());
+
+      // Close popup and show toast
+      dispatch(setToggleRenameChatPopup(false));
+      setTimeout(() => {
+        triggerToast(
+          "Renamed!",
+          "Your chat has been successfully renamed",
+          "success",
+          3000,
+        );
+      }, 300);
+    }
+  }, [chatsStates.loaderStates.isChatTitleUpdated]);
   return (
     <Modal
       visible={toggleStates.toggleRenameChatPopup}
@@ -172,17 +211,41 @@ const RenameChatPopup = () => {
                           },
                         };
                         dispatch(commonFunctionForAPICalls(payload));
-                      }
+                        // Close popup immediately for room updates (old logic)
+                        dispatch(setToggleRenameChatPopup(false));
+                        setTimeout(() => {
+                          triggerToast(
+                            "Renamed!",
+                            "Your chat has been successfully renamed",
+                            "success",
+                            3000,
+                          );
+                        }, 500);
+                      } else {
+                        // New logic for chats
+                        const chatUUID =
+                          chatsStates.allChatsDatas.currentActionChatDetails
+                            ?.id ||
+                          chatsStates.allChatsDatas.createdChatDetails?.id;
+                        if (!chatUUID) {
+                          triggerToast(
+                            "Error",
+                            "Chat UUID not found",
+                            "error",
+                            3000,
+                          );
+                          return;
+                        }
 
-                      dispatch(setToggleRenameChatPopup(false));
-                      setTimeout(() => {
-                        triggerToast(
-                          "Renamed!",
-                          "Your chat has been successfully renamed",
-                          "success",
-                          3000,
-                        );
-                      }, 500);
+                        const payload = {
+                          method: "PUT",
+                          url: `/chats/${chatUUID}`,
+                          data: { name: chatName },
+                          name: "renameAndUpdateChatTitle",
+                        };
+
+                        dispatch(commonFunctionForAPICalls(payload));
+                      }
                     }}
                     style={[
                       styles.verifyButton,

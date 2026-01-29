@@ -5,12 +5,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ActivityIndicator,
   Linking,
   BackHandler,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect, useMemo, useState } from "react";
 import mainLogo from "../../assets/images/Knowledge Chakra 1.png";
 import chakraLogo from "../../assets/images/Knowledge Chakra 2.png";
@@ -20,7 +18,6 @@ import apple from "../../assets/images/apple-logo.png";
 import SignInSlider from "../../components/SignIn/SignInSlider/SignInSlider";
 import { createStyles } from "./WelcomeScreen.styles";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,8 +25,6 @@ import {
   signWithApple,
   signWithLinkedIn,
 } from "../../redux/slices/authSlice";
-import { appColors } from "../../themes/appColors";
-import apiInstance from "../../redux/helper";
 import TermsOfUseModal from "../../components/WelcomeScreen/TermsOfUseModal";
 import PrivacyPolicyModal from "../../components/WelcomeScreen/PrivacyPolicyModal";
 
@@ -55,6 +50,7 @@ const WelcomeScreen = () => {
     if (fontsLoaded) {
     }
   }, [fontsLoaded]);
+
 
 
   useEffect(() => {
@@ -93,7 +89,7 @@ const WelcomeScreen = () => {
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                  "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
                 );
               }}
               style={styles.socialButton}
@@ -107,7 +103,7 @@ const WelcomeScreen = () => {
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                  "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
                 );
               }}
               style={styles.socialButton}

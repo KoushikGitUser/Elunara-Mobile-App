@@ -9,9 +9,10 @@ import {
   ActivityIndicator,
   BackHandler,
   Linking,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import google from "../../../assets/images/search.png";
 import LinkedIn from "../../../assets/images/linkedin.png";
@@ -38,6 +39,8 @@ import { triggerToast } from "../../../services/toast";
 import VerifyMailOtpPopup from "../../../components/SignUp/VerifyMailOtpPopup";
 import { setUserMailIDOnSignup } from "../../../redux/slices/globalDataSlice";
 import AccountNotRecoveredPopup from "../../../components/SignUp/AccountNotRecoveredPopup";
+import TermsOfUseModal from "../../../components/WelcomeScreen/TermsOfUseModal";
+import PrivacyPolicyModal from "../../../components/WelcomeScreen/PrivacyPolicyModal";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -46,13 +49,15 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [verificationMailSent, setVerificationMailSent] = useState(false);
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [verifyMailOtpPopup, setVerifyMailOtpPopup] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [toggleAccNotRecovered, setToggleAccNotRecovered] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -61,6 +66,13 @@ const SignUp = () => {
     confirmPassword: "",
     checkbox: "",
   });
+
+  // Refs for keyboard navigation
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
+
   const { authStates } = useSelector((state) => state.Auth);
 
   useEffect(() => {
@@ -218,6 +230,7 @@ const SignUp = () => {
       {verifyMailOtpPopup && (
         <VerifyMailOtpPopup
           close={setVerifyMailOtpPopup}
+          closeVerificationMailPopup={setVerificationMailSent}
           verifyMailOtpPopup={verifyMailOtpPopup}
         />
       )}
@@ -258,22 +271,24 @@ const SignUp = () => {
               marginTop={20}
               children="Join Elunara"
               fullWidth={false}
-              widthNumber={0.5}
+              widthNumber={0.48}
               fontSize={scaleFont(25)}
+              lineHeight={40}
             />
             <Text
               style={[
                 styles.headTitle,
                 {
-                  marginTop: 15,
+                  marginTop: 25,
                   color: "black",
                   fontSize: scaleFont(24),
-                  paddingLeft: 10,
+                  paddingLeft: 0,
                   fontFamily: "Mukta-Regular",
+                  lineHeight:30
                 },
               ]}
             >
-              - Your AI
+              -  Your AI
             </Text>
           </View>
           {/* </View> */}
@@ -354,6 +369,8 @@ const SignUp = () => {
                   }}
                   onFocus={() => setFocusedInput("firstName")}
                   onBlur={() => setFocusedInput(null)}
+                  returnKeyType="next"
+                  onSubmitEditing={() => lastNameRef.current?.focus()}
                 />
                 {errors.firstName && (
                   <AlertCircle
@@ -394,6 +411,7 @@ const SignUp = () => {
                 ]}
               >
                 <TextInput
+                  ref={lastNameRef}
                   style={{
                     flex: 1,
                     height: "100%",
@@ -413,6 +431,8 @@ const SignUp = () => {
                   }}
                   onFocus={() => setFocusedInput("lastName")}
                   onBlur={() => setFocusedInput(null)}
+                  returnKeyType="next"
+                  onSubmitEditing={() => emailRef.current?.focus()}
                 />
                 {errors.lastName && (
                   <AlertCircle
@@ -450,6 +470,7 @@ const SignUp = () => {
             ]}
           >
             <TextInput
+              ref={emailRef}
               style={styles.passwordInput}
               placeholder="Enter your Email ID"
               placeholderTextColor="#B0B7C3"
@@ -460,6 +481,8 @@ const SignUp = () => {
               }}
               onFocus={() => setFocusedInput("email")}
               onBlur={() => setFocusedInput(null)}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
             />
             {errors.email && (
               <AlertCircle
@@ -492,6 +515,7 @@ const SignUp = () => {
             ]}
           >
             <TextInput
+              ref={passwordRef}
               style={styles.passwordInput}
               placeholder="Enter your Password"
               placeholderTextColor="#B0B7C3"
@@ -509,6 +533,8 @@ const SignUp = () => {
               }}
               onFocus={() => setFocusedInput("password")}
               onBlur={() => setFocusedInput(null)}
+              returnKeyType="next"
+              onSubmitEditing={() => confirmPasswordRef.current?.focus()}
             />
             {errors.password && (
               <AlertCircle
@@ -556,6 +582,7 @@ const SignUp = () => {
             ]}
           >
             <TextInput
+              ref={confirmPasswordRef}
               style={styles.passwordInput}
               placeholder="Enter your Password Again"
               placeholderTextColor="#B0B7C3"
@@ -570,6 +597,8 @@ const SignUp = () => {
               }}
               onFocus={() => setFocusedInput("confirmPassword")}
               onBlur={() => setFocusedInput(null)}
+              returnKeyType="done"
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
             {errors.confirmPassword && (
               <AlertCircle
@@ -634,14 +663,14 @@ const SignUp = () => {
             <View style={styles.textContainer}>
               <Text style={styles.text}>I agree to the </Text>
               <TouchableOpacity
-                onPress={() => setMobileVerificationPopup(true)}
+                onPress={() => setShowTermsModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.link}>Terms of Use</Text>
               </TouchableOpacity>
               <Text style={styles.text}> and </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("changepass")}
+                onPress={() => setShowPrivacyModal(true)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.link}>Privacy Policy</Text>
@@ -717,7 +746,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
               );
             }}
             style={styles.socialButton}
@@ -731,7 +760,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
               );
             }}
             style={styles.socialButton}
@@ -742,6 +771,16 @@ const SignUp = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Terms of Use and Privacy Policy Modals */}
+      <TermsOfUseModal
+        visible={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
+      <PrivacyPolicyModal
+        visible={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </SafeAreaView>
   );
 };

@@ -40,7 +40,7 @@ import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarI
 import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"; 
 
 const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const [recentChatsOpened, setRecentChatsOpened] = useState(false);
@@ -78,21 +78,27 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   }, []);
 
   const fetchAllRecentChats = () => {
-    const payload = {
-      method: "GET",
-      url: "/chats/recent?limit=10",
-      name: "getAllRecentChats",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    // Only fetch if not already fetched (check if loader state is not true)
+    if (chatsStates.loaderStates.isAllRecentChatsFetched !== true) {
+      const payload = {
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
   };
 
   const fetchAllPinnedChats = () => {
-    const payload = {
-      method: "GET",
-      url: "/chats",
-      name: "fetchAllUserChatsAvailable",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    // Only fetch if not already fetched (check if loader state is not true)
+    if (chatsStates.loaderStates.isAllUserChatsFetched !== true) {
+      const payload = {
+        method: "GET",
+        url: "/chats",
+        name: "fetchAllUserChatsAvailable",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
+    }
   };
 
   // Expose measurement methods via ref
@@ -133,7 +139,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
           }}
           style={styles.pinnedBtn}
         >
-          <PinIcon />
+          <PinIcon color="#888888" />
           <Text
             style={{
               fontSize: moderateScale(12.5),
@@ -219,7 +225,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
           onPress={() => setPinnedRoomsOpened(!pinnedRoomsOpened)}
           style={styles.pinnedBtn}
         >
-          <PinIcon />
+          <PinIcon color="#888888" />
           <Text
             style={{
               fontSize: moderateScale(12.5),

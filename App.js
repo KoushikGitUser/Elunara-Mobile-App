@@ -5,6 +5,7 @@ import Store from "./src/redux/store/Store";
 import { View } from "react-native";
 import Toaster from "./src/components/UniversalToaster/Toaster";
 import { useFonts } from "expo-font";
+import NetworkProvider from "./src/providers/NetworkProvider";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,11 +24,11 @@ export default function App() {
   }
 
   return (
-    <>
+    <NetworkProvider>
       <Provider store={Store}>
         <AppNavigator />
         <Toaster />
       </Provider>
-    </>
+    </NetworkProvider>
   );
 }

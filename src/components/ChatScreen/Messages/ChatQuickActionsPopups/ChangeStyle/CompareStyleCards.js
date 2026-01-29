@@ -18,6 +18,8 @@ const CompareStyleCards = ({
   item,
   selectedStyleForCompare,
   setSelectedStyleForCompare,
+  selectedStyleObjectsForCompare,
+  setSelectedStyleObjectsForCompare,
 }) => {
   const dispatch = useDispatch();
   const { globalDataStates } = useSelector((state) => state.Global);
@@ -61,7 +63,11 @@ const CompareStyleCards = ({
             const newArr = selectedStyleForCompare.filter((items) => {
               return items !== item.id;
             });
+            const newObjArr = selectedStyleObjectsForCompare.filter((obj) => {
+              return obj.id !== item.id;
+            });
             setSelectedStyleForCompare(newArr);
+            setSelectedStyleObjectsForCompare(newObjArr);
           } else {
             triggerToast(
               "Error",
@@ -75,9 +81,14 @@ const CompareStyleCards = ({
             const newArr = selectedStyleForCompare.filter((items) => {
               return items !== item.id;
             });
+            const newObjArr = selectedStyleObjectsForCompare.filter((obj) => {
+              return obj.id !== item.id;
+            });
             setSelectedStyleForCompare(newArr);
+            setSelectedStyleObjectsForCompare(newObjArr);
           } else {
             setSelectedStyleForCompare([...selectedStyleForCompare, item.id]);
+            setSelectedStyleObjectsForCompare([...selectedStyleObjectsForCompare, item]);
             dispatch(setCompareResponseStyleItemsArray([...globalDataStates.compareResponseStyleItemsArray,{
                 title:item?.title
             }]))

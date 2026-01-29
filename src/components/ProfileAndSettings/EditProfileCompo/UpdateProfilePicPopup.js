@@ -95,6 +95,8 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
           selectedAsset.mimeType == "image/jpg" ||
           selectedAsset.mimeType == "image/jpeg"
         ) {
+          console.log("inside pro img update");
+          
           // Add selected photo to Redux
           setSelectedImage(selectedAsset.uri);
 
@@ -109,13 +111,15 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
           const payload = {
             method: "POST",
             url: "/settings/profile/photo",
-            name: "updateProfileImage",
             data: formData,
+            name: "updateProfileImage",
             headers: {
               "Content-Type": "multipart/form-data",
             },
           };
+          console.log("inside pro img update2222", payload);
           dispatch(commonFunctionForAPICalls(payload));
+          console.log("inside pro img update33333");
         } else {
           Alert.alert(
             "Invalid type",
@@ -163,8 +167,10 @@ const UpdateProfilePicPopup = ({setSelectedImage}) => {
             </Text>
 
             <TouchableOpacity onPress={()=>{
-                triggerImagePicker();
-                dispatch(setToggleUpdateProfilePicPopup(false))
+                dispatch(setToggleUpdateProfilePicPopup(false));
+                setTimeout(() => {
+                  triggerImagePicker();
+                }, 300);
             }} activeOpacity={0.7} style={styles.uploadBoxMain}>
               <View style={styles.innerContent}>
                 <ProfilePicUploadIcon />

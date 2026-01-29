@@ -152,7 +152,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
           })}
         </View>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setToggleIntegrateAi(true)}
           style={[
             styles.card,
@@ -206,7 +206,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
             Link your account to tailor responses and enjoy the benefits of your
             subscription.
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View
           style={{
             flexDirection: "row",
@@ -225,12 +225,18 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
           >
             More LLMS? Update your list in{" "}
           </Text>
-          <Pressable style={{ borderBottomWidth: 2 }}>
+          <Pressable
+            style={{ borderBottomWidth: 2 }}
+            onPress={() => {
+              dispatch(setToggleToolsPopup(false));
+              navigation.navigate("settingsInnerPages", { page: 0 });
+            }}
+          >
             <Text
               style={{
                 fontSize: moderateScale(13),
                 lineHeight: 15,
-                fontWeight: 600,
+                fontWeight: "600",
                 textAlign: "center",
                 fontFamily: "Mukta-Bold",
               }}

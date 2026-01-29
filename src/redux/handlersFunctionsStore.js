@@ -50,6 +50,14 @@ import {
   handleSwitchVersionsOfAIResponse,
   handleAddToRoom,
   handleRemoveFromRoom,
+  handleCompareAIResponses,
+  handleStoreCompareResponses,
+  handleCompareAIResponseStyles,
+  handleStoreCompareStyleResponses,
+  handleCompareAIResponsesFirst,
+  handleCompareAIResponsesSecond,
+  handleCompareAIResponseStylesFirst,
+  handleCompareAIResponseStylesSecond,
 } from "./apiExtraReducerHandlers/chatsHandlers";
 
 import {
@@ -157,6 +165,15 @@ export const chatsHandlersFunctions = {
   //  Room operations
   addToRoom: handleAddToRoom,
   removeFromRoom: handleRemoveFromRoom,
+  // Comparison operations
+  compareAIResponses: handleCompareAIResponses,
+  storeCompareResponses: handleStoreCompareResponses,
+  compareAIResponseStyles: handleCompareAIResponseStyles,
+  storeCompareStyleResponses: handleStoreCompareStyleResponses,
+  compareAIResponsesFirst: handleCompareAIResponsesFirst,
+  compareAIResponsesSecond: handleCompareAIResponsesSecond,
+  compareAIResponseStylesFirst: handleCompareAIResponseStylesFirst,
+  compareAIResponseStylesSecond: handleCompareAIResponseStylesSecond,
 };
 
 // Rooms Handlers

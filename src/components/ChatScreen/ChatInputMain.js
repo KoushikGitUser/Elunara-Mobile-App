@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  PermissionsAndroid,
 } from "react-native";
 import React, {
   useMemo,
@@ -18,14 +19,6 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  LibraryBig,
-  Mic,
-  Paperclip,
-  Send,
-  TouchpadOff,
-} from "lucide-react-native";
 import { createStyles } from "./ChatHistorySidebar/chatSidebarStyles.styles";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -41,11 +34,6 @@ import {
 } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls, resetAIResponseRegenerated } from "../../redux/slices/apiCommonSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
-import topicsIcon from "../../assets/images/TopicsIcon.png";
-import toolsIcon from "../../assets/images/toolsIcon.png";
-import clipIcon from "../../assets/images/clip.png";
-import mic from "../../assets/images/mic.png";
-import send from "../../assets/images/sendIcon.png";
 import {
   setUserMessagePrompt,
   removeSelectedFile,
@@ -82,6 +70,8 @@ const ChatInputMain = forwardRef((props, ref) => {
   const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL; // ~36px for 1 line
   const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL; // ~76px for 3 lines
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recognizedText, setRecognizedText] = useState("");
 
   // Refs for guided tour measurement
   const inputSectionRef = useRef(null);
@@ -118,6 +108,12 @@ const ChatInputMain = forwardRef((props, ref) => {
     dispatch(setChatInputContentLinesNumber(1));
   }, []);
 
+
+  // Handle mic button press
+  const handleMicPress = () => {
+Alert.alert("Feature not available","Currently this feature is not implemented")
+  };
+
   const sendMessageDirectly = () => {
     const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
     if (!chatUuid) {
@@ -125,22 +121,10 @@ const ChatInputMain = forwardRef((props, ref) => {
       return;
     }
 
-    const payload = {
-      method: "POST",
-      url: `/chats/${chatUuid}/messages`,
-      data: {
-        content: globalDataStates.userMessagePrompt,
-        content_type: "text",
-        attachment_ids: [],
-      },
-      name: "sendPromptAndGetMessageFromAI",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
-  };
-
-  const createChatWithAIFunction = () => {
     const data = {
-      title: "New Chat",
+      content: globalDataStates.userMessagePrompt,
+      content_type: "text",
+      attachment_ids: [],
     };
 
     // Add LLM ID if not null
@@ -173,8 +157,20 @@ const ChatInputMain = forwardRef((props, ref) => {
 
     const payload = {
       method: "POST",
-      url: "/chats",
+      url: `/chats/${chatUuid}/messages`,
       data,
+      name: "sendPromptAndGetMessageFromAI",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const createChatWithAIFunction = () => {
+    const payload = {
+      method: "POST",
+      url: "/chats",
+      data: {
+        name: "Chatting with AI",
+      },
       name: "createChatWithAI",
     };
     dispatch(commonFunctionForAPICalls(payload));
@@ -225,14 +221,44 @@ const ChatInputMain = forwardRef((props, ref) => {
     };
 
     // Call send message API (not regenerate) with the chat UUID
+    const sendMessageData = {
+      content: updatedMessage,
+      content_type: "text",
+      attachment_ids: [],
+    };
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      sendMessageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      sendMessageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      sendMessageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      sendMessageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
     const sendMessagePayload = {
       method: "POST",
       url: `/chats/${chatUuid}/messages`,
-      data: {
-        content: updatedMessage,
-        content_type: "text",
-        attachment_ids: [],
-      },
+      data: sendMessageData,
       name: "sendPromptAndGetMessageFromAI",
     };
 
@@ -291,7 +317,11 @@ const ChatInputMain = forwardRef((props, ref) => {
     };
   }, []);
 
-  // Real API flow - when AI message is fetched, add it to chat messages array
+  // Get latest message data from API response
+  const latestUserMessageData = chatsStates.allChatsDatas.latestUserMessageData;
+  const latestAiMessageData = chatsStates.allChatsDatas.latestAiMessageData;
+
+  // Real API flow - when AI message is fetched, add it to chat messages array with uuid
   useEffect(() => {
     if (isMessagesFetched === true && aiMessageContent) {
       console.log("Full AI Response:", JSON.stringify(chatsStates.allChatsDatas.chatMessages));
@@ -322,6 +352,22 @@ const ChatInputMain = forwardRef((props, ref) => {
         currentVersionIndex: 0,
       };
 
+      // Update the last user message with uuid if available
+      let updatedMessages = [...globalDataStates.chatMessagesArray];
+
+      // Find and update the last user message with uuid
+      if (latestUserMessageData && updatedMessages.length > 0) {
+        const lastIndex = updatedMessages.length - 1;
+        if (updatedMessages[lastIndex].role === "user") {
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            uuid: latestUserMessageData.uuid,
+            is_saved_to_notes: latestUserMessageData.is_saved_to_notes,
+          };
+        }
+      }
+
+      // Add AI message with uuid
       dispatch(
         setChatMessagesArray([
           ...globalDataStates.chatMessagesArray,
@@ -334,7 +380,7 @@ const ChatInputMain = forwardRef((props, ref) => {
     if (isMessagesFetched === false && toggleStates.toggleIsWaitingForResponse) {
       dispatch(setToggleIsWaitingForResponse(false));
     }
-  }, [isMessagesFetched, aiMessageContent]);
+  }, [isMessagesFetched, aiMessageContent, latestUserMessageData, latestAiMessageData]);
 
   // Reset input height when text is cleared
   useEffect(() => {
@@ -392,6 +438,7 @@ const ChatInputMain = forwardRef((props, ref) => {
               uuid: newVersion.uuid,
               version: actualTotalVersions, // Current version number
               total_versions: actualTotalVersions, // Total versions available
+              generation: regeneratedMessage?.generation || msg.generation, // Store generation data for badges
               versions: updatedVersions,
               currentVersionIndex: updatedVersions.length - 1,
             };
@@ -490,10 +537,37 @@ const ChatInputMain = forwardRef((props, ref) => {
           </ScrollView>
         )}
 
+        {isRecording && (
+          <View style={{
+            paddingHorizontal: 15,
+            paddingVertical: 10,
+            backgroundColor: '#FEE2E2',
+            borderRadius: 10,
+            marginBottom: 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+          }}>
+            <View style={{
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: '#EF4444',
+            }} />
+            <Text style={{
+              fontFamily: 'Mukta-Regular',
+              fontSize: 14,
+              color: '#DC2626',
+            }}>
+              Listening...
+            </Text>
+          </View>
+        )}
+
         <TextInput
           value={globalDataStates.userMessagePrompt}
           onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
-          placeholder="Ask anything"
+          placeholder={isRecording ? "Speak now..." : "Ask anything"}
           placeholderTextColor="grey"
           style={[
             styles.textInput,
@@ -504,7 +578,7 @@ const ChatInputMain = forwardRef((props, ref) => {
           onContentSizeChange={handleContentSizeChange}
           scrollEnabled={inputHeight >= MAX_HEIGHT}
           returnKeyType="default"
-          editable={!isWaitingForResponse}
+          editable={!isWaitingForResponse && !isRecording}
         />
         <View style={styles.inputActionIconsMainWrapper}>
           <View style={styles.inputLeftActionIcons}>
@@ -559,15 +633,19 @@ const ChatInputMain = forwardRef((props, ref) => {
             </TouchableOpacity>
           </View>
           <View style={styles.inputRightActionIcons}>
-            <TouchableOpacity
-              onPress={() =>
-                dispatch(setToggleUnlockPersonalisationLimitPopup(true))
-              }
+            {/* <TouchableOpacity
+              onPress={handleMicPress}
+              style={[
+                isRecording && {
+                  backgroundColor: '#EF4444',
+                  borderRadius: 25,
+                  padding: 8,
+                }
+              ]}
             >
-              <MicIcon />
-            </TouchableOpacity>
-            {(globalDataStates.userMessagePrompt !== "" ||
-              globalDataStates.selectedFiles.length > 0) && (
+              <MicIcon color={isRecording ? 'white' : undefined} />
+            </TouchableOpacity> */}
+            {globalDataStates.userMessagePrompt !== "" && (
               <TouchableOpacity
                 onPress={() => {
                   // Check if in editing mode

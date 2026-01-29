@@ -33,36 +33,50 @@ const OptionsPopup = ({ popupPosition }) => {
 
   const currentChat = chatsStates.allChatsDatas.currentActionChatDetails;
   const isPinned = currentChat?.is_pinned;
-  const isArchived = currentChat?.is_archived;
+  // Check both possible field names from API
+  const isArchived = currentChat?.is_archived || currentChat?.archived;
 
   // Dynamic options based on chat data
-  const dynamicOptions = [
-    {
-      title: "Add to Room",
-      icon: <FolderIconDark />,
-      action: "addToRoom"
-    },
-    {
-      title: "Rename",
-      icon: <RenameIcon />,
-      action: "rename"
-    },
-    {
-      title: isPinned ? "Unpin" : "Pin",
-      icon: <PinIcon />,
-      action: "pinUnpin"
-    },
-    {
-      title: isArchived ? "Unarchive" : "Archive",
-      icon: <ArchiveIcon />,
-      action: "archiveUnarchive"
-    },
-    {
-      title: "Delete",
-      icon: <TrashIcon />,
-      action: "delete"
-    },
-  ];
+  const dynamicOptions = isArchived
+    ? [
+        {
+          title: "Unarchive",
+          icon: <ArchiveIcon />,
+          action: "archiveUnarchive"
+        },
+        {
+          title: "Delete",
+          icon: <TrashIcon />,
+          action: "delete"
+        },
+      ]
+    : [
+        {
+          title: "Add to Room",
+          icon: <FolderIconDark />,
+          action: "addToRoom"
+        },
+        {
+          title: "Rename",
+          icon: <RenameIcon />,
+          action: "rename"
+        },
+        {
+          title: isPinned ? "Unpin" : "Pin",
+          icon: <PinIcon />,
+          action: "pinUnpin"
+        },
+        {
+          title: "Archive",
+          icon: <ArchiveIcon />,
+          action: "archiveUnarchive"
+        },
+        {
+          title: "Delete",
+          icon: <TrashIcon />,
+          action: "delete"
+        },
+      ];
 
   const commonFunctions = (action) => {
     const chatId = currentChat?.id;
@@ -105,6 +119,13 @@ const OptionsPopup = ({ popupPosition }) => {
         method: "GET",
         url: "/chats?page=1&per_page=20",
         name: "fetchAllUserChatsAvailable"
+      }));
+
+      // Refresh recent chats list
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
       }));
 
       // Reset loader state

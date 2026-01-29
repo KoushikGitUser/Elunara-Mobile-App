@@ -1,4 +1,14 @@
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
@@ -9,6 +19,7 @@ const EducationDropDowns = ({
   placeholder,
   triggerAPICall,
   initialValue,
+  maxHeightPercent = 0.4,
 }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -24,7 +35,7 @@ const EducationDropDowns = ({
       setSelected(
         typeof initialValue === "object" && initialValue !== null
           ? initialValue.name
-          : initialValue
+          : initialValue,
       );
     }
   }, [initialValue]);
@@ -71,7 +82,7 @@ const EducationDropDowns = ({
                 fontFamily: "Mukta-Regular",
               }}
             >
-              {selected ? selected : placeholder}
+              {selected ? (selected?.name ?? selected) : placeholder}
             </Text>
           </View>
 
@@ -101,25 +112,29 @@ const EducationDropDowns = ({
                   top: dropdownPosition.top,
                   left: dropdownPosition.left,
                   width: dropdownPosition.width,
+                  maxHeight: SCREEN_HEIGHT * maxHeightPercent,
                 },
               ]}
             >
-              {dataArray?.map((item, itemIndex) => {
-                return (
-                  <TouchableOpacity
-                    key={itemIndex}
-                    style={styles.option}
-                    onPress={() => handleSelect(item)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.description}>
-                      {typeof item === "object" && item !== null
-                        ? item.name
-                        : item}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+              <ScrollView
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+              >
+                {dataArray?.map((item, itemIndex) => {
+                  return (
+                    <TouchableOpacity
+                      key={item?.id ?? itemIndex}
+                      style={styles.option}
+                      onPress={() => handleSelect(item)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.description}>
+                        {item?.name ?? item}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
           </TouchableOpacity>
         </Modal>

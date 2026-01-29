@@ -7,18 +7,61 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { ArrowLeft, ChevronDown, FileText } from "lucide-react-native";
 import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import ChatIcon from "../../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import ConversationalIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
-import { setToggleChangeResponseStyleWhileChatPopup, setToggleCompareStyleState } from "../../../../redux/slices/toggleSlice";
+import ChakraIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import DetailedIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+import { setToggleChangeResponseLLMWhileChatPopup, setToggleChangeResponseStyleWhileChatPopup, setToggleCompareStyleState } from "../../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 import OtherStylesPopup from "./ChangeStyle/OtherStylesPopup";
 import gemini from '../../../../assets/images/gemini.png'
 import anthropic from "../../../../assets/images/antropic.png"
+import mistral from "../../../../assets/images/mistral.png"
+import chatgpt from "../../../../assets/images/chatgpt.png"
+import loadingGif from "../../../../assets/images/Loading chat mob.gif"
 import OtherLLMPopup from "./ChangeResponse/OtherLLMPopup";
+import Markdown from 'react-native-markdown-display';
+
+// Helper function to map provider names to icons
+const providerImages = {
+  google: gemini,
+  anthropic: anthropic,
+  "mistral ai": mistral,
+  "open ai": chatgpt,
+  openai: chatgpt,
+};
+
+const getProviderImage = (provider) => {
+  const key = provider?.toLowerCase();
+  return providerImages[key] || anthropic;
+};
+
+// Helper function to get response style icon based on name
+const getResponseStyleIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("auto") || key?.includes("chakra")) {
+    return <ChakraIcon />;
+  } else if (key?.includes("concise")) {
+    return <ConciseIcon />;
+  } else if (key?.includes("formal")) {
+    return <FormalIcon />;
+  } else if (key?.includes("conversational")) {
+    return <ConversationalIcon />;
+  } else if (key?.includes("detailed")) {
+    return <DetailedIcon />;
+  } else if (key?.includes("creative")) {
+    return <CreativeIcon />;
+  }
+  return <FileText size={22} color="#888888" />; // Default icon
+};
 
 const CompareLLMOrStyleState = ({
   forStyleOrLLM,
@@ -26,12 +69,121 @@ const CompareLLMOrStyleState = ({
   icon2,
   title1,
   title2,
-  setCurrentStateOfPopup
+  setCurrentStateOfPopup,
+  selectedLLMsForCompare,
+  selectedStylesForCompare
 }) => {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
+  // Local state to track user's dropdown selections (for immediate title update)
+  const [localFirstStyleName, setLocalFirstStyleName] = useState(null);
+  const [localSecondStyleName, setLocalSecondStyleName] = useState(null);
+  const [localFirstLLMName, setLocalFirstLLMName] = useState(null);
+  const [localSecondLLMName, setLocalSecondLLMName] = useState(null);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
+
+  // Get all available styles and LLMs
+  const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+  const allAvailableLLMs = settingsStates?.settingsMasterDatas?.allLLMsAvailable || [];
+
+  // Get comparison responses from Redux based on type - using separate storage locations
+  const firstResponse = forStyleOrLLM === "LLM"
+    ? chatsStates?.allChatsDatas?.firstComparisonResponse
+    : chatsStates?.allChatsDatas?.firstComparisonStyleResponse;
+
+  const secondResponse = forStyleOrLLM === "LLM"
+    ? chatsStates?.allChatsDatas?.secondComparisonResponse
+    : chatsStates?.allChatsDatas?.secondComparisonStyleResponse;
+
+  // Check loading state for each response independently
+  const isFirstLoading = forStyleOrLLM === "LLM"
+    ? chatsStates?.loaderStates?.isFirstCompareResponseLoading === "pending"
+    : chatsStates?.loaderStates?.isFirstCompareStyleResponseLoading === "pending";
+
+  const isSecondLoading = forStyleOrLLM === "LLM"
+    ? chatsStates?.loaderStates?.isSecondCompareResponseLoading === "pending"
+    : chatsStates?.loaderStates?.isSecondCompareStyleResponseLoading === "pending";
+
+  // Get LLM/Style details from selectedLLMsForCompare/selectedStylesForCompare for display
+  const firstLLM = selectedLLMsForCompare?.[0];
+  const secondLLM = selectedLLMsForCompare?.[1];
+  const firstStyle = selectedStylesForCompare?.[0];
+  const secondStyle = selectedStylesForCompare?.[1];
+
+  // Determine which data to use for display (prefer local selection, then response data, fallback to selected items)
+  const firstLLMName = localFirstLLMName || firstResponse?.generation?.llm?.name || firstLLM?.name || "Loading...";
+  const secondLLMName = localSecondLLMName || secondResponse?.generation?.llm?.name || secondLLM?.name || "Loading...";
+
+  const firstLLMProvider = firstResponse?.generation?.llm?.name || firstLLM?.provider || firstLLM?.name;
+  const secondLLMProvider = secondResponse?.generation?.llm?.name || secondLLM?.provider || secondLLM?.name;
+
+  // For styles, use local selection first, then response data, then initial selection
+  const firstStyleName = localFirstStyleName || firstResponse?.generation?.response_style?.name || firstStyle?.title || "Loading...";
+  const secondStyleName = localSecondStyleName || secondResponse?.generation?.response_style?.name || secondStyle?.title || "Loading...";
+
+  // Listen for successful store compare response and close popup
+  const isStoreCompareResponsePending = chatsStates?.loaderStates?.isStoreCompareResponsePending;
+  const isStoreCompareStyleResponsePending = chatsStates?.loaderStates?.isStoreCompareStyleResponsePending;
+
+  useEffect(() => {
+    if (isStoreCompareResponsePending === true || isStoreCompareStyleResponsePending === true) {
+      // Close all comparison popups
+      if (forStyleOrLLM === "LLM") {
+        dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
+      } else {
+        dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
+      }
+      dispatch(setToggleCompareStyleState(false));
+    }
+  }, [isStoreCompareResponsePending, isStoreCompareStyleResponsePending, forStyleOrLLM, dispatch]);
+
+  // Handler for selecting first response
+  const handleSelectFirstResponse = () => {
+    if (!firstResponse) return;
+
+    // Get the AI message index and UUID
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+    if (aiMessageUuid && firstResponse.comparison_id) {
+      const storePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/compare/store`,
+        data: {
+          comparison_id: firstResponse.comparison_id,
+        },
+        name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
+      };
+
+      console.log("Store First Response Payload:", storePayload);
+      dispatch(commonFunctionForAPICalls(storePayload));
+    }
+  };
+
+  // Handler for selecting second response
+  const handleSelectSecondResponse = () => {
+    if (!secondResponse) return;
+
+    // Get the AI message index and UUID
+    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+    if (aiMessageUuid && secondResponse.comparison_id) {
+      const storePayload = {
+        method: "POST",
+        url: `/messages/${aiMessageUuid}/compare/store`,
+        data: {
+          comparison_id: secondResponse.comparison_id,
+        },
+        name: forStyleOrLLM === "LLM" ? "storeCompareResponses" : "storeCompareStyleResponses",
+      };
+
+      console.log("Store Second Response Payload:", storePayload);
+      dispatch(commonFunctionForAPICalls(storePayload));
+    }
+  };
 
   return (
     <View style={styles.modalSheet}>
@@ -47,10 +199,10 @@ const CompareLLMOrStyleState = ({
             }
           }}
           size={30}
-          strokeWidth={2}
+          strokeWidth={2} 
         />
         <AntDesign
-          onPress={() => dispatch(setToggleChangeResponseStyleWhileChatPopup(false))}
+          onPress={() =>dispatch(setToggleChangeResponseLLMWhileChatPopup(false))}
           name="close"
           size={24}
           color="black"
@@ -61,9 +213,20 @@ const CompareLLMOrStyleState = ({
       <View style={styles.content}>
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
-            {forStyleOrLLM == "style"? <FileText size={22} color="#888888" />:<Image style={{height:25,width:25}} source={gemini} />}
-           
-              <Text style={styles.title}>{forStyleOrLLM == "style"?"Concise":"Google Gemini"}</Text>
+            {forStyleOrLLM == "style" ? (
+              getResponseStyleIcon(firstStyleName)
+            ) : (
+              <Image
+                style={{height:25,width:25}}
+                source={getProviderImage(firstLLMProvider)}
+              />
+            )}
+
+            <Text style={styles.title}>
+              {forStyleOrLLM == "style"
+                ? firstStyleName
+                : firstLLMName}
+            </Text>
           </View>
 
           <TouchableOpacity
@@ -71,32 +234,102 @@ const CompareLLMOrStyleState = ({
           >
             <ChevronDown size={37} strokeWidth={1.25} color="#0C1A40" />
           </TouchableOpacity>
-          {(isExpandedFirst && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={true} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} /> :(isExpandedFirst && forStyleOrLLM == "LLM")?<OtherLLMPopup isFirst={true} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond}/>:null}
+          {(isExpandedFirst && forStyleOrLLM == "style")? (
+            <OtherStylesPopup
+              isFirst={true}
+              setIsExpandedSecond={setIsExpandedSecond}
+              setIsExpandedFirst={setIsExpandedFirst}
+              currentStyleName={firstStyleName}
+              otherSelectedStyleName={secondStyleName}
+              allAvailableStyles={allResponseStyles}
+              onStyleSelect={(style) => {
+                // Update local state immediately for title change
+                setLocalFirstStyleName(style.name);
+                // Handle style selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      response_style_id: style.id,
+                    },
+                    name: "compareAIResponseStylesFirst",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : (isExpandedFirst && forStyleOrLLM == "LLM") ? (
+            <OtherLLMPopup
+              isFirst={true}
+              setIsExpandedFirst={setIsExpandedFirst}
+              setIsExpandedSecond={setIsExpandedSecond}
+              currentLLMName={firstLLMName}
+              otherSelectedLLMName={secondLLMName}
+              allAvailableLLMs={allAvailableLLMs}
+              onLLMSelect={(llm) => {
+                // Update local state immediately for title change
+                setLocalFirstLLMName(llm.name);
+                // Handle LLM selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      llm_id: llm.id,
+                    },
+                    name: "compareAIResponsesFirst",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : null}
         </View>
         <View style={styles.responseBoxMain}>
-          <ScrollView style={styles.responseBoxScroll}>
-            <Text
-              style={{
-                fontFamily: "Mukta-Regular",
-                lineHeight: 20,
-                fontSize: scaleFont(18),
-                  color:"#5E5E5E"
-              }}
-            >
-              Finance is the comprehensive management of money, credit,
-              investments, and other financial assets and liabilities. It's
-              about how individuals, businesses, and governments acquire and
-              utilize funds, aiming to maximize value and minimize risk. Finance
-              is the comprehensive management of money, credit, investments, and
-              other financial assets and liabilities. It's about how
-              individuals, businesses, and governments acquire and utilize
-              funds, aiming to maximize value and minimize risk. Finance is the
-              comprehensive management of money, credit, investments, and other
-              financial assets and liabilities. It's about how individuals,
-              businesses, and governments acquire and utilize funds, aiming to
-              maximize value and minimize risk.
-            </Text>
-          </ScrollView>
+          {isFirstLoading ? (
+            <View style={styles.loadingContainer}>
+              <Image
+                source={loadingGif}
+                style={styles.loadingGif}
+                resizeMode="contain"
+              />
+            </View>
+          ) : (
+            <ScrollView style={styles.responseBoxScroll}>
+              {firstResponse?.content ? (
+                <Markdown
+                  style={{
+                    body: {
+                      fontFamily: "Mukta-Regular",
+                      lineHeight: 20,
+                      fontSize: scaleFont(18),
+                      color: "#5E5E5E"
+                    }
+                  }}
+                >
+                  {firstResponse.content}
+                </Markdown>
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Mukta-Regular",
+                    lineHeight: 20,
+                    fontSize: scaleFont(18),
+                    color: "#5E5E5E"
+                  }}
+                >
+                  No response available
+                </Text>
+              )}
+            </ScrollView>
+          )}
         </View>
         <TouchableOpacity
           style={[
@@ -109,6 +342,9 @@ const CompareLLMOrStyleState = ({
               marginTop: 15,
             },
           ]}
+          onPress={handleSelectFirstResponse}
+          activeOpacity={0.7}
+          disabled={isFirstLoading || !firstResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
@@ -116,9 +352,20 @@ const CompareLLMOrStyleState = ({
         </TouchableOpacity>
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
-            {forStyleOrLLM == "style"? <ConversationalIcon/>:<Image style={{height:25,width:25}} source={anthropic} />}
-            
-            <Text style={styles.title}>{forStyleOrLLM == "style"?"Conversational":"Anthropic"}</Text>
+            {forStyleOrLLM == "style" ? (
+              getResponseStyleIcon(secondStyleName)
+            ) : (
+              <Image
+                style={{height:25,width:25}}
+                source={getProviderImage(secondLLMProvider)}
+              />
+            )}
+
+            <Text style={styles.title}>
+              {forStyleOrLLM == "style"
+                ? secondStyleName
+                : secondLLMName}
+            </Text>
           </View>
 
           <TouchableOpacity
@@ -126,32 +373,101 @@ const CompareLLMOrStyleState = ({
           >
             <ChevronDown size={37} strokeWidth={1.25} color="#0C1A40" />
           </TouchableOpacity>
-          {(isExpandedSecond && forStyleOrLLM == "style")? <OtherStylesPopup isFirst={false} setIsExpandedSecond={setIsExpandedSecond} setIsExpandedFirst={setIsExpandedFirst} />:(isExpandedSecond && forStyleOrLLM == "LLM")? <OtherLLMPopup isFirst={false} setIsExpandedFirst={setIsExpandedFirst} setIsExpandedSecond={setIsExpandedSecond} />:null}
+          {(isExpandedSecond && forStyleOrLLM == "style") ? (
+            <OtherStylesPopup
+              isFirst={false}
+              setIsExpandedSecond={setIsExpandedSecond}
+              setIsExpandedFirst={setIsExpandedFirst}
+              currentStyleName={secondStyleName}
+              otherSelectedStyleName={firstStyleName}
+              allAvailableStyles={allResponseStyles}
+              onStyleSelect={(style) => {
+                // Update local state immediately for title change
+                setLocalSecondStyleName(style.name);
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      response_style_id: style.id,
+                    },
+                    name: "compareAIResponseStylesSecond",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : (isExpandedSecond && forStyleOrLLM == "LLM") ? (
+            <OtherLLMPopup
+              isFirst={false}
+              setIsExpandedFirst={setIsExpandedFirst}
+              setIsExpandedSecond={setIsExpandedSecond}
+              currentLLMName={secondLLMName}
+              otherSelectedLLMName={firstLLMName}
+              allAvailableLLMs={allAvailableLLMs}
+              onLLMSelect={(llm) => {
+                // Update local state immediately for title change
+                setLocalSecondLLMName(llm.name);
+                // Handle LLM selection - trigger new comparison API call
+                const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+                const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
+
+                if (aiMessageUuid) {
+                  const payload = {
+                    method: "POST",
+                    url: `/messages/${aiMessageUuid}/compare`,
+                    data: {
+                      llm_id: llm.id,
+                    },
+                    name: "compareAIResponsesSecond",
+                  };
+                  dispatch(commonFunctionForAPICalls(payload));
+                }
+              }}
+            />
+          ) : null}
         </View>
         <View style={styles.responseBoxMain}>
-          <ScrollView style={styles.responseBoxScroll}>
-            <Text
-              style={{
-                fontFamily: "Mukta-Regular",
-                lineHeight: 20,
-                fontSize: scaleFont(18),
-                color:"#5E5E5E"
-              }}
-            >
-              Finance is the comprehensive management of money, credit,
-              investments, and other financial assets and liabilities. It's
-              about how individuals, businesses, and governments acquire and
-              utilize funds, aiming to maximize value and minimize risk. Finance
-              is the comprehensive management of money, credit, investments, and
-              other financial assets and liabilities. It's about how
-              individuals, businesses, and governments acquire and utilize
-              funds, aiming to maximize value and minimize risk. Finance is the
-              comprehensive management of money, credit, investments, and other
-              financial assets and liabilities. It's about how individuals,
-              businesses, and governments acquire and utilize funds, aiming to
-              maximize value and minimize risk.
-            </Text>
-          </ScrollView>
+          {isSecondLoading ? (
+            <View style={styles.loadingContainer}>
+              <Image
+                source={loadingGif}
+                style={styles.loadingGif}
+                resizeMode="contain"
+              />
+            </View>
+          ) : (
+            <ScrollView style={styles.responseBoxScroll}>
+              {secondResponse?.content ? (
+                <Markdown
+                  style={{
+                    body: {
+                      fontFamily: "Mukta-Regular",
+                      lineHeight: 20,
+                      fontSize: scaleFont(18),
+                      color: "#5E5E5E"
+                    }
+                  }}
+                >
+                  {secondResponse.content}
+                </Markdown>
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Mukta-Regular",
+                    lineHeight: 20,
+                    fontSize: scaleFont(18),
+                    color: "#5E5E5E"
+                  }}
+                >
+                  No response available
+                </Text>
+              )}
+            </ScrollView>
+          )}
         </View>
         <TouchableOpacity
           style={[
@@ -164,6 +480,9 @@ const CompareLLMOrStyleState = ({
               marginTop: 15,
             },
           ]}
+          onPress={handleSelectSecondResponse}
+          activeOpacity={0.7}
+          disabled={isSecondLoading || !secondResponse}
         >
           <Text style={[styles.buttonText, { color: "#081A35" }]}>
             Select this Response
@@ -230,6 +549,19 @@ const styles = StyleSheet.create({
   responseBoxScroll: {
     flex: 1,
     width: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    width: "100%",
+    height: "100%",
+    paddingLeft: 10,
+    paddingBottom: 10,
+  },
+  loadingGif: {
+    width: 80,
+    height: 80,
   },
   btnsMain: {
     width: "100%",

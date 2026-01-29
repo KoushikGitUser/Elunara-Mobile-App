@@ -2,7 +2,10 @@
   "expo": {
     "name": "Elunara",
     "slug": "elunara",
-    "scheme": ["elunara", "elunaraapp"],
+    "scheme": [
+      "elunara",
+      "elunaraapp"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,14 +32,23 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app requires camera access to take photos.",
         "NSPhotoLibraryUsageDescription": "This app requires photo library access to select images.",
-        "NSMicrophoneUsageDescription": "This app requires microphone access for audio features."
+        "NSMicrophoneUsageDescription": "This app requires microphone access for speech-to-text and audio features.",
+        "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text."
       }
     },
     "android": {
@@ -47,11 +59,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.smgdev.elunara",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO"
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -59,7 +67,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "5e992e34-2def-4f1d-94b6-5bb7cc5ea66e"
+        "projectId": "61667c80-0d74-4e22-bd7f-1aa0d5b3655b"
       }
     }
   }

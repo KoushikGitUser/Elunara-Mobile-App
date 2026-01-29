@@ -99,7 +99,7 @@ const SetLLMPreference = () => {
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
       />
-      <Text
+      {/* <Text
         style={{
           fontSize: moderateScale(12),
           color: "#5E5E5E",
@@ -116,7 +116,7 @@ const SetLLMPreference = () => {
         triggerAPICall={updateLLM3}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
-      />
+      /> */}
     </View>
   );
 };
