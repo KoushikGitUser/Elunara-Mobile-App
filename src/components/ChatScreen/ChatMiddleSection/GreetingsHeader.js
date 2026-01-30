@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
 import GradientText from "../../common/GradientText";
-import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 
@@ -57,8 +56,6 @@ const GreetingsHeader = () => {
          {belowText}
       </Text>
       </View>
-
-      <Image style={styles.image} source={chakraLogo} />
     </View>
   );
 };
@@ -76,14 +73,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     gap: 0,
-  },
-  image: {
-      height: 115,
-      width: 80,
-      position: "absolute",
-      right: -25,
-      zIndex: 1,
-      top:-50
   },
 });
 

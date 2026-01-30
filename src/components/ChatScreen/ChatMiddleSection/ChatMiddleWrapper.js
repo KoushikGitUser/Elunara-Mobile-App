@@ -51,10 +51,22 @@ const  ChatMiddleWrapper = () => {
 
   return (
     <View style={styles.chatMiddleSectionWrapper}>
-      {toggleStates.toggleIsChattingWithAI && (
-        <Image source={chakraLogo} style={styles.chakraLogoRight} />
-      )}
-      {!toggleStates.toggleIsChattingWithAI && <GreetingsHeader />}
+      {/* Chakra logo - positioned outside ScrollView for independent positioning */}
+      <Image
+        source={chakraLogo}
+        style={
+          toggleStates.toggleIsChattingWithAI
+            ? styles.chakraLogoRight
+            : {
+                height: 115,
+                width: 80,
+                position: "absolute",
+                right: -20,
+                top: 60,
+                zIndex: 1,
+              }
+        }
+      />
       {toggleStates.toggleIsChattingWithAI ? (
         <ScrollView
           ref={scrollViewRef}
@@ -63,7 +75,7 @@ const  ChatMiddleWrapper = () => {
             justifyContent: "flex-end",
             gap: 25,
             alignItems: "center",
-          }} 
+          }}
           style={[styles.messagesContainer,]}
         >
           <View style={{height:120}}></View>
@@ -115,7 +127,7 @@ const  ChatMiddleWrapper = () => {
           {toggleStates.toggleIsWaitingForResponse && (
             <View style={styles.chatLoaderMain}>
               <Image
-                source={chatLoader} 
+                source={chatLoader}
                 style={{ height: 70, width: 100, objectFit: "contain" }}
               />
             </View>
@@ -123,7 +135,19 @@ const  ChatMiddleWrapper = () => {
           <View style={{height:5}}></View>
         </ScrollView>
       ) : (
-        <ChatTopicsMain />
+        // Greetings and Topics wrapped in ScrollView - positioned below absolute ChatHeader
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "flex-end",
+            paddingTop: 100, // Space for absolute ChatHeader (top:30 + header height)
+          }}
+          style={{ flex: 1, width: "100%" }}
+        >
+          <GreetingsHeader />
+          <ChatTopicsMain />
+        </ScrollView>
       )}
     </View>
   );
