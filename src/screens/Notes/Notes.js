@@ -463,6 +463,7 @@ const Notes = () => {
       </View>
       {/* header */}
 
+
       {/* middle */}
       <ScrollView
         style={styles.textPlusImgArea}
@@ -505,6 +506,101 @@ const Notes = () => {
           }}
           style={{ minHeight: 300, flex: 1 }}
         />
+
+        {/* Display Bookmarked Q&A Pairs */}
+        {notesStates.currentChatNotes?.qa_pairs &&
+          notesStates.currentChatNotes.qa_pairs.length > 0 && (
+            <View style={{ paddingHorizontal: 20, paddingBottom: 100 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginVertical: 15,
+                  gap: 10,
+                }}
+              >
+                <View
+                  style={{ flex: 1, height: 1, backgroundColor: "#E5E7EB" }}
+                />
+                <Text
+                  style={{
+                    color: "#6B7280",
+                    fontSize: 14,
+                    fontWeight: "600",
+                    fontFamily: "Mukta-Bold",
+                  }}
+                >
+                  Bookmarked Messages
+                </Text>
+                <View
+                  style={{ flex: 1, height: 1, backgroundColor: "#E5E7EB" }}
+                />
+              </View>
+
+              {notesStates.currentChatNotes.qa_pairs.map((pair, index) => (
+                <View
+                  key={index}
+                  style={{
+                    marginBottom: 20,
+                    backgroundColor: "#F9FAFB",
+                    borderRadius: 12,
+                    padding: 15,
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                  }}
+                >
+                  {/* User Message */}
+                  <View style={{ marginBottom: 12 }}>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#9CA3AF",
+                        marginBottom: 4,
+                        fontFamily: "Mukta-Medium",
+                      }}
+                    >
+                      YOU
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: "#1F2937",
+                        fontFamily: "Mukta-Regular",
+                        lineHeight: 22,
+                      }}
+                    >
+                      {pair.user_message.content}
+                    </Text>
+                  </View>
+
+                  {/* Assistant Message */}
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#9CA3AF",
+                        marginBottom: 4,
+                        fontFamily: "Mukta-Medium",
+                      }}
+                    >
+                      AI RESPONSE
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: "#374151",
+                        fontFamily: "Mukta-Regular",
+                        lineHeight: 22,
+                      }}
+                    >
+                      {pair.assistant_message.content}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
         <View style={{ height: keyboardVisible ? screenHeight : 100 }} />
       </ScrollView>
 

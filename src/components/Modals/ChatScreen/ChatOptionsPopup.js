@@ -77,9 +77,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
 
   // Get room name for header
   const roomName =
-    currentChatDetails?.room?.name ||
-    createdChatDetails?.room?.name ||
-    "Room";
+    currentChatDetails?.room?.name || createdChatDetails?.room?.name || "Room";
 
   // Show limited options when chat is archived
   const actions = isArchived
@@ -117,7 +115,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
   const commonFunctions = (actionType) => {
     if (actionType === "openNotes") {
       dispatch(setToggleChatMenuPopup(false));
-      navigation.navigate("notes");
+      navigation.navigate("notes", { chatUuid: chatId });
     } else if (actionType === "addToLearningLab") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleAddChatToLearningLabPopup(true));
@@ -171,7 +169,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
           method: "DELETE",
           url: `/chats/${chatId}/room`,
           name: "remove-chat-from-room",
-        })
+        }),
       )
         .unwrap()
         .then(() => {
@@ -181,13 +179,18 @@ const ChatOptionsPopup = ({ chatUuid }) => {
               method: "GET",
               url: `/chats/${chatId}`,
               name: "getAllDetailsOfChatByID",
-            })
+            }),
           );
           triggerToast("Success", "Chat removed from room", "success", 3000);
         })
         .catch((error) => {
           console.error("Failed to remove chat from room:", error);
-          triggerToast("Error", "Failed to remove chat from room", "error", 3000);
+          triggerToast(
+            "Error",
+            "Failed to remove chat from room",
+            "error",
+            3000,
+          );
         });
     }
   };
@@ -226,7 +229,12 @@ const ChatOptionsPopup = ({ chatUuid }) => {
             }}
           >
             <Image
-              style={{ height: 20, width: 20, resizeMode: "contain", marginRight: 12 }}
+              style={{
+                height: 20,
+                width: 20,
+                resizeMode: "contain",
+                marginRight: 12,
+              }}
               source={folder}
             />
             <View style={{ alignItems: "flex-start", flex: 1 }}>

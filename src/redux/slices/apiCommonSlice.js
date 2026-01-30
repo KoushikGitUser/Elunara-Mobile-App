@@ -104,6 +104,9 @@ const apiCommonSlice = createSlice({
     resetBulkOperationCompleted: (state) => {
       state.chatsStates.loaderStates.isBulkOperationCompleted = null;
     },
+    resetChatTitleUpdated: (state) => {
+      state.chatsStates.loaderStates.isChatTitleUpdated = null;
+    },
     setCurrentActionChatDetails: (state, action) => {
       state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     },
