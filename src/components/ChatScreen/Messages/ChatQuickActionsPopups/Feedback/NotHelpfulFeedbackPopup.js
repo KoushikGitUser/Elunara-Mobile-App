@@ -6,8 +6,12 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  Keyboard,
+  Dimensions,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont } from "../../../../../utils/responsive";
 import { setToggleNotHelpfulFeedbackPopup } from "../../../../../redux/slices/toggleSlice";
@@ -15,6 +19,10 @@ import { BlurView } from "@react-native-community/blur";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { triggerToast } from "../../../../../services/toast";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import Toaster from "../../../../UniversalToaster/Toaster";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
   const navigation = useNavigation();
@@ -22,6 +30,28 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
   const dispatch = useDispatch();
   const [selectedItems, setSelectedItems] = useState([]);
   const [feedbackText, setFeedbackText] = useState("");
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
+  }, []);
 
   const handlePress = (item) => {
     setFeedbackText(item);
@@ -34,19 +64,78 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
     "The tone felt off",
     "Too vague or generic",
     "Missing important context",
-    "formatting issues",
+    "Formatting issues",
   ];
+
+  const handleSubmit = async () => {
+    Keyboard.dismiss();
+
+    // Validate feedback message
+    if (!feedbackText || feedbackText.trim().length === 0) {
+      triggerToast(
+        "Error",
+        "Please select an option or provide feedback",
+        "error",
+        3000
+      );
+      return;
+    }
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Submit feedback to API with type "bug" and wait for response
+      await dispatch(
+        commonFunctionForAPICalls({
+          method: "POST",
+          url: "/settings/help-center/feedback",
+          data: {
+            type: "bug",
+            message: feedbackText.trim(),
+          },
+          name: "submitHelpCenterFeedback",
+        })
+      ).unwrap();
+
+      dispatch(setToggleNotHelpfulFeedbackPopup(false));
+      setFeedbackText("");
+      setSelectedItems([]);
+      triggerToast(
+        "Submitted",
+        "Your feedback has been successfully submitted",
+        "success",
+        3000
+      );
+    } catch (error) {
+      console.error("Feedback submission error:", error);
+      triggerToast(
+        "Error",
+        "Failed to submit feedback. Please try again.",
+        "error",
+        3000
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    Keyboard.dismiss();
+    dispatch(setToggleNotHelpfulFeedbackPopup(false));
+  };
 
   return (
     <Modal
       visible={toggleStates.toggleNotHelpfulFeedbackPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => dispatch(setToggleNotHelpfulFeedbackPopup(false))}
+      onRequestClose={handleClose}
     >
+      <Toaster/>
       <View style={styles.container}>
         {/* Blur Background */}
-
         <BlurView
           style={styles.blurView}
           blurType="light"
@@ -58,14 +147,18 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => dispatch(setToggleNotHelpfulFeedbackPopup(false))}
+          onPress={handleClose}
         />
-        <View style={styles.modalSheet}>
-          {/* Handle Bar */}
+
+        <View style={[
+          styles.modalSheet,
+          { maxHeight: keyboardHeight > 0 ? SCREEN_HEIGHT * 1 : SCREEN_HEIGHT * 0.8 }
+        ]}>
+          {/* Close Button */}
           <View style={styles.closeModalMain}>
             <AntDesign
               style={{ marginRight: 20 }}
-              onPress={() => dispatch(setToggleNotHelpfulFeedbackPopup(false))}
+              onPress={handleClose}
               name="close"
               size={20}
               color="black"
@@ -73,7 +166,11 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
           </View>
 
           {/* Content */}
-          <View style={styles.content}>
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             {/* Title */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
               Help us improve this response
@@ -83,63 +180,73 @@ const NotHelpfulFeedbackPopup = ({ multiSelect = true }) => {
               Tell us what didn't work — your feedback helps make answers
               better.
             </Text>
-            <View style={styles.chipsWrapper}>
-              {FEEDBACK_OPTIONS.map((item, index) => {
-                const isSelected = selectedItems.includes(item);
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    activeOpacity={0.7}
-                    onPress={() => handlePress(item)}
-                    style={[styles.chip, isSelected && styles.chipSelected]}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        isSelected && styles.chipTextSelected,
-                      ]}
+
+            {/* Chips */}
+              <View style={styles.chipsWrapper}>
+                {FEEDBACK_OPTIONS.map((item, index) => {
+                  const isSelected = selectedItems.includes(item);
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      activeOpacity={0.7}
+                      onPress={() => handlePress(item)}
+                      style={[styles.chip, isSelected && styles.chipSelected]}
                     >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          isSelected && styles.chipTextSelected,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
 
-            <View style={[styles.inputLarge, { marginBottom: 20 }]}>
-              <TextInput
-                value={feedbackText}
-                onChangeText={setFeedbackText}
-                style={styles.inputText}
-                placeholder="Provide other feedback..."
-                placeholderTextColor="#9CA3AF"
-                returnKeyType="done"
-              />
-            </View>
+              {/* TextInput */}
+              <View style={[styles.inputLarge, { marginBottom: 20 }]}>
+                <TextInput
+                  value={feedbackText}
+                  onChangeText={(text) => {
+                    setFeedbackText(text);
+                    // Clear chip selection when user types custom text
+                    if (!FEEDBACK_OPTIONS.includes(text)) {
+                      setSelectedItems([]);
+                    }
+                  }}
+                  style={styles.inputText}
+                  placeholder="Provide other feedback..."
+                  placeholderTextColor="#9CA3AF"
+                  returnKeyType="done"
+                  multiline={true}
+                  textAlignVertical="top"
+                  blurOnSubmit={true}
+                  onSubmitEditing={Keyboard.dismiss}
+                />
+              </View>
 
-            {/* Button */}
-            <View style={styles.btnsMain}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  dispatch(setToggleNotHelpfulFeedbackPopup(false));
-                  setTimeout(() => {
-                    triggerToast(
-                      "Submitted",
-                      "Your feedback has been successfully submitted",
-                      "success",
-                      3000
-                    );
-                  }, 200);
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.buttonText}>Submit Feedback</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              {/* Button */}
+              <View style={styles.btnsMain}>
+                <TouchableOpacity
+                  style={[styles.button, isSubmitting && { opacity: 0.7 }]}
+                  onPress={handleSubmit}
+                  activeOpacity={0.8}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.buttonText}>Submit Feedback</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+            {/* Keyboard spacer */}
+            {keyboardHeight > 0 && <View style={{ height: keyboardHeight }} />}
+          </ScrollView>
         </View>
-        {/* Modal Sheet */}
       </View>
     </Modal>
   );
@@ -176,7 +283,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    paddingBottom:54,
+    maxHeight: SCREEN_HEIGHT * 0.8,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -186,24 +294,16 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 20,
   },
-  btnsMain: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
-  },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
-  iconContainer: {
-    marginBottom: 10,
+  closeModalMain: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 20,
   },
   title: {
     fontSize: scaleFont(25),
@@ -218,100 +318,7 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     marginBottom: 18,
     letterSpacing: 0.2,
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#081A35",
-    paddingVertical: 13,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFont(12),
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-
-  closeModalMain: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 20,
-  },
-  categorySections: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  sectionText: {
-    color: "#757575",
-  },
-  sections: {
-    width: "50%",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderColor: "lightgrey",
-    paddingVertical: 10,
-  },
-  currentLLMMain: {
-    width: "100%",
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 22,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: "#D8DCE4",
-    marginBottom: 20,
-  },
-  currentResponse: {
-    fontSize: scaleFont(16),
-    fontWeight: "600",
-    color: "#1A1A1A",
-    fontFamily: "Mukta-Bold",
-  },
-  badge: {
-    backgroundColor: "#F3F3F3",
-    borderColor: "#D8DCE4",
-    borderWidth: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 15,
-    borderRadius: 50,
-  },
-  btnText: {
-    fontSize: scaleFont(12),
-    fontWeight: "400",
-    color: "#1A1A1A",
     fontFamily: "Mukta-Regular",
-  },
-  inputLarge: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#D1D5DB",
-    borderRadius: 22,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    color: "#1F2937",
-    letterSpacing: 0.2,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "100%",
-    height: 130,
-  },
-  inputText: {
-    backgroundColor: "#FFFFFF",
-    fontSize: scaleFont(10),
-    color: "#1F2937",
-    letterSpacing: 0.2,
   },
   chipsWrapper: {
     flexDirection: "row",
@@ -335,13 +342,56 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: scaleFont(12),
     fontWeight: "400",
-    fontFamily: "Mukta-Bold",
+    fontFamily: "Mukta-Regular",
     color: "#333333",
     textAlign: "center",
   },
   chipTextSelected: {
     color: "#1A1A1A",
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
+  },
+  inputLarge: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#D1D5DB",
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    width: "100%",
+    height: 120,
+  },
+  inputText: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#1F2937",
+    letterSpacing: 0.2,
+    textAlignVertical: "top",
+    paddingTop: 0,
+  },
+  btnsMain: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  button: {
+    width: "100%",
+    backgroundColor: "#081A35",
+    paddingVertical: 13,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom:50
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(12),
+    fontWeight: "500",
+    fontFamily: "Mukta-Bold",
+    letterSpacing: 0.3,
   },
 });
 

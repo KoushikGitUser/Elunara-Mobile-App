@@ -3,7 +3,9 @@ export const globalDataStates = {
   messageIDsArray: [], // Stores message IDs in order: [userMessageId, aiMessageId, userMessageId, aiMessageId, ...]
   userMessagePrompt: "",
   allMessagesForAChat: null,
-  selectedFiles: [], 
+  selectedFiles: [],
+  uploadedAttachmentIds: [], // Stores uploaded attachment IDs for sending with message
+  isUploadingAttachment: false, // Tracks if attachment is currently uploading 
   noteForIndividualChat: null,
   chatInputContentLinesNumber:0,
   currentSelectedTopic: null,

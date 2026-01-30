@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     elevation: 10,
     shadowColor: "#c5c5c5ff",
-    zIndex: 99999999999,
+    zIndex: 9999999999,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,

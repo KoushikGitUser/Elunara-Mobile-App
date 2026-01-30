@@ -8,29 +8,76 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { scaleFont, verticalScale } from "../../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { Plus, Search } from "lucide-react-native";
-import { existingRooms } from "../../../../data/datas";
 import ExistingRoomsCards from "./ExistingRoomsCards";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { setToggleAddChatToLearningLabPopup } from "../../../../redux/slices/toggleSlice";
+import { setToggleAddChatToLearningLabPopup, setToggleRoomCreationPopup } from "../../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
+import Toaster from "../../../UniversalToaster/Toaster";
 
 const AddChatToLearningLabPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
+  const { chatsStates, roomsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const inputRef = useRef();
 
+  // Get rooms from redux state
+  const rooms = roomsStates?.rooms || [];
+  const isLoading = roomsStates?.fetchingRooms;
+
+  // Get current chat details for the API call - try both currentActionChatDetails and createdChatDetails
+  const currentActionChatDetails = chatsStates?.allChatsDatas?.currentActionChatDetails;
+  const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
+
+  // Use id or uuid from either source
+  const currentChatId =
+    currentActionChatDetails?.id ||
+    currentActionChatDetails?.uuid ||
+    createdChatDetails?.id ||
+    createdChatDetails?.uuid;
+
+  // Debug logging
+  console.log("🏠 LEARNING LAB POPUP:", {
+    roomsCount: rooms.length,
+    isLoading,
+    currentChatId,
+    currentActionChatDetails,
+    createdChatDetails,
+    firstRoom: rooms[0],
+  });
+
+  // Filter rooms based on search
+  const filteredRooms = rooms.filter((room) =>
+    room?.name?.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Fetch rooms when popup opens
   useEffect(() => {
-    if (!isSearching) {
+    if (toggleStates.toggleAddChatToLearningLabPopup) {
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: "/rooms",
+          name: "get-rooms",
+        })
+      );
+    }
+  }, [toggleStates.toggleAddChatToLearningLabPopup]);
+
+  useEffect(() => {
+    if (!isSearching && inputRef.current) {
       inputRef.current.blur();
     }
   }, [isSearching]);
@@ -42,6 +89,7 @@ const AddChatToLearningLabPopup = () => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleAddChatToLearningLabPopup(false))}
     >
+      <Toaster/>
       <View style={styles.container}>
         {/* Blur Background */}
 
@@ -96,9 +144,13 @@ const AddChatToLearningLabPopup = () => {
                   alignItems: "center",
                   gap: 5,
                 }}
+                onPress={() => {
+                  dispatch(setToggleAddChatToLearningLabPopup(false));
+                  setTimeout(() => {
+                    dispatch(setToggleRoomCreationPopup(true));
+                  }, 300);
+                }}
               >
-               
-
                 <Text
                   style={{
                     fontSize: scaleFont(13),
@@ -122,6 +174,9 @@ const AddChatToLearningLabPopup = () => {
               <TextInput
                 ref={inputRef}
                 onFocus={() => setIsSearching(true)}
+                onBlur={() => setIsSearching(false)}
+                value={searchText}
+                onChangeText={setSearchText}
                 placeholder="Search"
                 placeholderTextColor="#B5BECE"
                 style={[
@@ -131,18 +186,30 @@ const AddChatToLearningLabPopup = () => {
               />
             </View>
             <ScrollView
-            showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               style={[styles.chatsScroll, { maxHeight: SCREEN_HEIGHT * 0.5 }]}
             >
-              {existingRooms?.map((item, itemIndex) => {
-                return (
+              {isLoading ? (
+                <View style={{ paddingVertical: 40, alignItems: "center" }}>
+                  <ActivityIndicator size="small" color="#081A35" />
+                </View>
+              ) : filteredRooms.length > 0 ? (
+                filteredRooms.map((room, roomIndex) => (
                   <ExistingRoomsCards
-                    key={itemIndex}
-                    roomName={item?.name}
-                    chats={item?.chatsQuantity}
+                    key={room?.id || room?.uuid || roomIndex}
+                    roomId={room?.id || room?.uuid}
+                    roomName={room?.name}
+                    chats={room?.chats_count || 0}
+                    chatUuid={currentChatId}
                   />
-                );
-              })}
+                ))
+              ) : (
+                <View style={{ paddingVertical: 40, alignItems: "center" }}>
+                  <Text style={{ color: "#757575", fontFamily: "Mukta-Regular" }}>
+                    {searchText ? "No rooms found" : "No learning labs available"}
+                  </Text>
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>

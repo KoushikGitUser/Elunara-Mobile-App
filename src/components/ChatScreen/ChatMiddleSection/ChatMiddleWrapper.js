@@ -97,12 +97,16 @@ const  ChatMiddleWrapper = () => {
                   <UserMessageBox chat={chats} messageIndex={chatsIndex} key={chatsIndex} />
                 );
               } else {
+                // Check if this is the last AI message in the array
+                const isLastAIMessage = chatsIndex === globalDataStates.chatMessagesArray.length - 1;
                 return (
                   <AIMessageBox
                     message={chats.message}
                     messageIndex={chatsIndex}
                     isSavedToNotes={chats.is_saved_to_notes}
                     key={chatsIndex}
+                    suggestions={chats.suggestions}
+                    showSuggestions={isLastAIMessage && !toggleStates.toggleIsWaitingForResponse}
                   />
                 );
               }

@@ -4,26 +4,109 @@ import {
   TouchableOpacity,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import FolderIcon from "../../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import { CirclePlus } from "lucide-react-native";
 import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch } from "react-redux";
 import { setToggleAddChatToLearningLabPopup } from "../../../../redux/slices/toggleSlice";
-import {  triggerToastWithAction } from "../../../../services/toast";
+import { triggerToastWithAction, triggerToast } from "../../../../services/toast";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
 
-const ExistingRoomsCards = ({ roomName, chats }) => {
+const ExistingRoomsCards = ({ roomId, roomName, chats, chatUuid }) => {
   const dispatch = useDispatch();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToRoom = async () => {
+    console.log("🏠 ADD TO ROOM: Pressed", { roomId, roomName, chatUuid });
+
+    if (isAdding) {
+      console.log("🏠 ADD TO ROOM: Already adding, skipping");
+      return;
+    }
+
+    if (!chatUuid) {
+      console.log("🏠 ADD TO ROOM: chatUuid is missing");
+      triggerToast("Error", "No chat selected to add", "error", 3000);
+      return;
+    }
+
+    if (!roomId) {
+      console.log("🏠 ADD TO ROOM: roomId is missing");
+      triggerToast("Error", "Room ID is missing", "error", 3000);
+      return;
+    }
+
+    setIsAdding(true);
+
+    try {
+      console.log("🏠 ADD TO ROOM: Making API call", {
+        url: `/chats/${chatUuid}/room`,
+        data: { room_id: roomId },
+      });
+
+      await dispatch(
+        commonFunctionForAPICalls({
+          method: "POST",
+          url: `/chats/${chatUuid}/room`,
+          data: { room_id: roomId },
+          name: "add-chat-to-room",
+        })
+      ).unwrap();
+
+      console.log("🏠 ADD TO ROOM: Success!");
+
+      // Refetch chat details to update room name under chat title
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: `/chats/${chatUuid}`,
+          name: "getAllDetailsOfChatByID",
+        })
+      );
+
+      dispatch(setToggleAddChatToLearningLabPopup(false));
+
+      setTimeout(() => {
+        triggerToastWithAction(
+          "Successfully added!",
+          `Your chat has been added to ${roomName}`,
+          "success",
+          5000,
+          "Undo",
+          async () => {
+            // Undo action - remove from room
+            await dispatch(
+              commonFunctionForAPICalls({
+                method: "DELETE",
+                url: `/chats/${chatUuid}/room`,
+                name: "remove-chat-from-room",
+              })
+            ).unwrap();
+
+            // Refetch chat details to remove room name from chat title
+            dispatch(
+              commonFunctionForAPICalls({
+                method: "GET",
+                url: `/chats/${chatUuid}`,
+                name: "getAllDetailsOfChatByID",
+              })
+            );
+          }
+        );
+      }, 500);
+    } catch (error) {
+      console.error("🏠 ADD TO ROOM: Failed", error);
+      triggerToast("Error", "Failed to add chat to room", "error", 3000);
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
-    <TouchableOpacity onPress={() => {
-        dispatch(setToggleAddChatToLearningLabPopup(false));
-        setTimeout(() => {
-            triggerToastWithAction("Successfully added!","Your chat has been added to <Learning lab Name>","success",5000,"Undo",()=>{})
-        }, 500);
-        
-    }} style={styles.cardContainer}>
+    <TouchableOpacity onPress={handleAddToRoom} style={styles.cardContainer}>
       <View style={[styles.cardContent]}>
         {/* Chat Icon */}
         <View style={styles.iconContainer}>
@@ -38,16 +121,14 @@ const ExistingRoomsCards = ({ roomName, chats }) => {
           </View>
         </View>
 
-        {/* Menu Icon */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuButton,
-            pressed && styles.menuPressed,
-          ]}
-          onPress={() => {}}
-        >
-          <CirclePlus strokeWidth={2} size={27} />
-        </Pressable>
+        {/* Add Icon / Loader */}
+        <View style={styles.menuButton}>
+          {isAdding ? (
+            <ActivityIndicator size="small" color="#081A35" />
+          ) : (
+            <CirclePlus strokeWidth={2} size={27} />
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );

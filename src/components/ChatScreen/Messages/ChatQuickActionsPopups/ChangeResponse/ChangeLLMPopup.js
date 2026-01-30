@@ -394,7 +394,7 @@ const ChangeLLMPopup = () => {
                   })}
                 </View>
 
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => setCurrentStateOfPopup(4)}
                   style={[
                     styles.card,
@@ -441,7 +441,7 @@ const ChangeLLMPopup = () => {
                   <Text style={{ fontSize: scaleFont(13), color: "#757575", fontFamily: "Mukta-Regular" }}>
                     Link your account to tailor responses and enjoy the benefits of your subscription.
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </ScrollView>
               ) : (
                 <ScrollView

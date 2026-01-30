@@ -15,6 +15,27 @@ const globalDataSlice = createSlice({
         (_, index) => index !== action.payload
       );
     },
+    setUploadedAttachmentIds: (state, action) => {
+      state.globalDataStates.uploadedAttachmentIds = action.payload;
+    },
+    addUploadedAttachmentId: (state, action) => {
+      console.log("🔴 REDUX: Adding attachment ID:", action.payload);
+      console.log("🔴 REDUX: Current IDs before add:", state.globalDataStates.uploadedAttachmentIds);
+      state.globalDataStates.uploadedAttachmentIds.push(action.payload);
+      console.log("🔴 REDUX: IDs after add:", state.globalDataStates.uploadedAttachmentIds);
+    },
+    removeUploadedAttachmentId: (state, action) => {
+      state.globalDataStates.uploadedAttachmentIds = state.globalDataStates.uploadedAttachmentIds.filter(
+        (id) => id !== action.payload
+      );
+    },
+    clearUploadedAttachmentIds: (state) => {
+      console.log("🔴 REDUX: Clearing attachment IDs. Current:", state.globalDataStates.uploadedAttachmentIds);
+      state.globalDataStates.uploadedAttachmentIds = [];
+    },
+    setIsUploadingAttachment: (state, action) => {
+      state.globalDataStates.isUploadingAttachment = action.payload;
+    },
     setUserMessagePrompt: (state, action) => {
       state.globalDataStates.userMessagePrompt = action.payload;
     },
@@ -134,6 +155,11 @@ const globalDataSlice = createSlice({
 export const {
   setSelecetdFiles,
   removeSelectedFile,
+  setUploadedAttachmentIds,
+  addUploadedAttachmentId,
+  removeUploadedAttachmentId,
+  clearUploadedAttachmentIds,
+  setIsUploadingAttachment,
   setUserMessagePrompt,
   setChatInputContentLinesNumber,
   setChatMessagesArray,

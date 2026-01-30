@@ -75,6 +75,12 @@ const ChatOptionsPopup = ({ chatUuid }) => {
     createdChatDetails?.room ||
     createdChatDetails?.room_id;
 
+  // Get room name for header
+  const roomName =
+    currentChatDetails?.room?.name ||
+    createdChatDetails?.room?.name ||
+    "Room";
+
   // Show limited options when chat is archived
   const actions = isArchived
     ? [
@@ -83,15 +89,21 @@ const ChatOptionsPopup = ({ chatUuid }) => {
       ]
     : [
         { title: "Open Notes", icon: bookmarkIcon, action: "openNotes" },
-        ...(!hasRoom
+        ...(hasRoom
           ? [
+              {
+                title: "Remove from Room",
+                icon: folder,
+                action: "removeFromRoom",
+              },
+            ]
+          : [
               {
                 title: "Add to Learning Lab",
                 icon: folder,
                 action: "addToLearningLab",
               },
-            ]
-          : []),
+            ]),
         { title: "Rename", icon: pencil, action: "rename" },
         {
           title: isPinned ? "Unpin" : "Pin",
@@ -145,6 +157,38 @@ const ChatOptionsPopup = ({ chatUuid }) => {
     } else if (actionType === "delete") {
       dispatch(setToggleChatMenuPopup(false));
       dispatch(setToggleDeleteChatConfirmPopup(true));
+    } else if (actionType === "removeFromRoom") {
+      if (!chatId) {
+        triggerToast("Error", "Chat ID not found", "error", 3000);
+        return;
+      }
+
+      dispatch(setToggleChatMenuPopup(false));
+
+      // Remove chat from room
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "DELETE",
+          url: `/chats/${chatId}/room`,
+          name: "remove-chat-from-room",
+        })
+      )
+        .unwrap()
+        .then(() => {
+          // Refetch chat details to remove room name
+          dispatch(
+            commonFunctionForAPICalls({
+              method: "GET",
+              url: `/chats/${chatId}`,
+              name: "getAllDetailsOfChatByID",
+            })
+          );
+          triggerToast("Success", "Chat removed from room", "success", 3000);
+        })
+        .catch((error) => {
+          console.error("Failed to remove chat from room:", error);
+          triggerToast("Error", "Failed to remove chat from room", "error", 3000);
+        });
     }
   };
 
@@ -166,6 +210,50 @@ const ChatOptionsPopup = ({ chatUuid }) => {
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
       <View style={[styles.menuModalMain, isArchived && { minHeight: "auto" }]}>
+        {/* Room Header - shown when chat is in a room */}
+        {hasRoom && !isArchived && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderBottomWidth: 1,
+              borderBottomColor: "#E5E7EB",
+              marginBottom: 5,
+              width: "100%",
+            }}
+          >
+            <Image
+              style={{ height: 20, width: 20, resizeMode: "contain", marginRight: 12 }}
+              source={folder}
+            />
+            <View style={{ alignItems: "flex-start", flex: 1 }}>
+              <Text
+                style={{
+                  fontSize: moderateScale(11),
+                  color: "#757575",
+                  fontFamily: "Mukta-Regular",
+                  lineHeight: 14,
+                }}
+              >
+                Part of
+              </Text>
+              <Text
+                style={{
+                  fontSize: moderateScale(13),
+                  color: "#1F2937",
+                  fontFamily: "Mukta-Regular",
+                  lineHeight: 18,
+                }}
+                numberOfLines={1}
+              >
+                {roomName}
+              </Text>
+            </View>
+          </View>
+        )}
         {actions.map((actionItem, actionIndex) => {
           return (
             <Pressable

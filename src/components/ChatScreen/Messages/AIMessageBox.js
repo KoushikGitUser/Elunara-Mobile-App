@@ -19,14 +19,17 @@ import ChangeResponsePopup from "../../Modals/ChatScreen/Messages/ChangeResponse
 import MessageSharePopup from "../../Modals/ChatScreen/Messages/MessageSharePopup";
 import BookmarkFilledIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookmarkFilledIcon";
 import FeedbackPopup from "../../Modals/ChatScreen/Messages/FeedbackPopup";
-import { commonFunctionForAPICalls, resetVersionSwitched } from "../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetVersionSwitched, resetCompareStates } from "../../../redux/slices/apiCommonSlice";
 import { setCurrentAIMessageIndexForRegeneration, setChatMessagesArray } from "../../../redux/slices/globalDataSlice";
+import { setToggleIsWaitingForResponse } from "../../../redux/slices/toggleSlice";
 import Markdown from 'react-native-markdown-display';
+import SuggestionsSection from "./SuggestionsSection";
 
-const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
+const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestions, showSuggestions = false }) => {
   const dispatch = useDispatch();
   const { chatsStates } = useSelector((state) => state.API);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
   const [changeResponsePopup,setChangeResponsePopup] = useState(false);
   const [sharePopup,setSharePopup] = useState(false);
   const [feedbackPopup,setFeedbackPopup] = useState(false);
@@ -78,6 +81,66 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
 
   // Get sources from currentMessage
   const sources = currentMessage?.sources || [];
+
+  // Handle suggestion press - send as new user message
+  const handleSuggestionPress = (suggestion) => {
+    const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+    if (!chatUuid) {
+      return;
+    }
+
+    // Add user message to chat messages array
+    const newUserMessage = {
+      role: "user",
+      message: suggestion,
+    };
+    dispatch(setChatMessagesArray([...globalDataStates.chatMessagesArray, newUserMessage]));
+
+    // Prepare API payload
+    const data = {
+      content: suggestion,
+      content_type: "text",
+      attachment_ids: [],
+    };
+
+    // Add LLM ID if available
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      data.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if available
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      data.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if available
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      data.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if available
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      data.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
+    const payload = {
+      method: "POST",
+      url: `/chats/${chatUuid}/messages`,
+      data,
+      name: "sendPromptAndGetMessageFromAI",
+    };
+
+    dispatch(commonFunctionForAPICalls(payload));
+    dispatch(setToggleIsWaitingForResponse(true));
+  };
 
   // Update state when currentMessage changes (e.g., when chat is loaded)
   useEffect(() => {
@@ -158,8 +221,11 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
 
       // Show toast notification
       triggerToast(`Comparison response selected - Version ${regeneratedResponse.version}`, "", "success", 3000);
+
+      // Reset the compare states to prevent toast from showing again when switching chats
+      dispatch(resetCompareStates());
     }
-  }, [isStoreCompareResponsePending, isStoreCompareStyleResponsePending, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex]);
+  }, [isStoreCompareResponsePending, isStoreCompareStyleResponsePending, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex, dispatch]);
 
   // Watch for version switch success - update versions from switchedVersionData
   const isVersionSwitched = chatsStates?.loaderStates?.isVersionSwitched;
@@ -348,7 +414,7 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
                 <ChevronDown
                   size={20}
                   strokeWidth={1.5}
-                  color="#1F2937"
+                  color="#1F2937" 
                   style={{ transform: [{ rotate: isResourcesOpen ? '180deg' : '0deg' }] }}
                 />
               </TouchableOpacity>
@@ -461,6 +527,14 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false }) => {
           <ChevronDown strokeWidth={1.25} />
         </TouchableOpacity>
       </View>
+
+      {/* Suggestions Section - only show if suggestions exist */}
+      {showSuggestions && suggestions && suggestions.length > 0 && (
+        <SuggestionsSection
+          suggestions={suggestions}
+          onSuggestionPress={handleSuggestionPress}
+        />
+      )}
     </View>
   );
 };

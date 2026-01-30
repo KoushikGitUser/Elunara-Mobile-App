@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   PermissionsAndroid,
+  ActivityIndicator,
 } from "react-native";
 import React, {
   useMemo,
@@ -43,9 +44,12 @@ import {
   setCurrentSelectedTopic,
   setMessageIDsArray,
   setEditingMessageData,
+  removeUploadedAttachmentId,
+  clearUploadedAttachmentIds,
 } from "../../redux/slices/globalDataSlice";
 import ImageFile from "./ChatInputCompos/SelectedFilesCompo/ImageFile";
 import PdfFile from "./ChatInputCompos/SelectedFilesCompo/PdfFile";
+import DocumentFile, { SUPPORTED_DOCUMENT_TYPES } from "./ChatInputCompos/SelectedFilesCompo/DocumentFile";
 import ClipIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ClipIcon";
 import TopicsBooksIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/TopicsBooksIcon";
 import ToolsIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ToolsIcon";
@@ -109,6 +113,27 @@ const ChatInputMain = forwardRef((props, ref) => {
   }, []);
 
 
+  // Handle file removal with API delete
+  const handleRemoveFile = async (fileIndex) => {
+    const file = globalDataStates.selectedFiles[fileIndex];
+    const attachmentId = file?.attachmentId;
+
+    // Remove from local state first
+    dispatch(removeSelectedFile(fileIndex));
+
+    // Delete from API if attachment ID exists
+    if (attachmentId) {
+      dispatch(removeUploadedAttachmentId(attachmentId));
+
+      const deletePayload = {
+        method: "DELETE",
+        url: `/attachments/${attachmentId}`,
+        name: "delete-attachment",
+      };
+      dispatch(commonFunctionForAPICalls(deletePayload));
+    }
+  };
+
   // Handle mic button press
   const handleMicPress = () => {
 Alert.alert("Feature not available","Currently this feature is not implemented")
@@ -121,11 +146,24 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       return;
     }
 
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("📨 SEND MESSAGE DIRECTLY - START");
+    console.log("📨 Chat UUID:", chatUuid);
+    console.log("📨 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+    console.log("📨 uploadedAttachmentIds length:", globalDataStates.uploadedAttachmentIds?.length);
+    console.log("📨 uploadedAttachmentIds type:", typeof globalDataStates.uploadedAttachmentIds);
+    console.log("📨 selectedFiles from Redux:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));
+
+    const attachmentIdsToSend = globalDataStates.uploadedAttachmentIds || [];
+    console.log("📨 attachmentIdsToSend:", JSON.stringify(attachmentIdsToSend));
+
     const data = {
       content: globalDataStates.userMessagePrompt,
       content_type: "text",
-      attachment_ids: [],
+      attachment_ids: attachmentIdsToSend,
     };
+
+    console.log("📨 SEND: Message payload data:", JSON.stringify(data, null, 2));
 
     // Add LLM ID if not null
     if (chatCustomisationStates?.selectedLLM?.id !== null) {
@@ -161,6 +199,9 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       data,
       name: "sendPromptAndGetMessageFromAI",
     };
+    console.log("📨 SEND: Full API payload:", JSON.stringify(payload, null, 2));
+    console.log("📨 SEND: data.attachment_ids specifically:", JSON.stringify(data.attachment_ids));
+    console.log("═══════════════════════════════════════════════════════");
     dispatch(commonFunctionForAPICalls(payload));
   };
 
@@ -204,6 +245,9 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       {
         role: "user",
         message: updatedMessage,
+        attachments: globalDataStates.selectedFiles?.length > 0
+          ? [...globalDataStates.selectedFiles]
+          : [],
       }
     ];
 
@@ -224,7 +268,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
     const sendMessageData = {
       content: updatedMessage,
       content_type: "text",
-      attachment_ids: [],
+      attachment_ids: globalDataStates.uploadedAttachmentIds || [],
     };
 
     // Add LLM ID if not null
@@ -271,6 +315,8 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
 
     // Clear input and reset editing state
     dispatch(setUserMessagePrompt(""));
+    dispatch(setSelecetdFiles([]));
+    dispatch(clearUploadedAttachmentIds());
     dispatch(setChatInputContentLinesNumber(1));
     dispatch(setIsEditingUserMessage(false));
     dispatch(setEditingMessageData(null));
@@ -341,6 +387,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
         message: aiMessageContent,
         uuid: aiMessageId || null,
         is_saved_to_notes: false,
+        suggestions: latestAiMessageData?.suggestions || [],
         version: 1,
         total_versions: 1,
         versions: [{
@@ -488,7 +535,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
           },
         ]}
       >
-        {globalDataStates.selectedFiles?.length > 0 && (
+        {(globalDataStates.selectedFiles?.length > 0 || globalDataStates.isUploadingAttachment) && (
           <ScrollView
             showsHorizontalScrollIndicator={false}
             horizontal
@@ -515,24 +562,50 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
                     <ImageFile
                       key={fileIndex}
                       file={files}
-                      onRemove={() => dispatch(removeSelectedFile(fileIndex))}
+                      onRemove={() => handleRemoveFile(fileIndex)}
                     />
                   );
-                } else if (files.mimeType == "application/pdf") {
+                } else if (files.mimeType === "application/pdf") {
                   return (
                     <PdfFile
                       key={fileIndex}
-                      onRemove={() => dispatch(removeSelectedFile(fileIndex))}
+                      onRemove={() => handleRemoveFile(fileIndex)}
                       file={files}
                     />
                   );
-                } else {
-                  Alert.alert(
-                    "Invalid File Type",
-                    "Selected file type is not supported"
+                } else if (
+                  SUPPORTED_DOCUMENT_TYPES.includes(files.mimeType) ||
+                  ["docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt", "md", "json", "yaml", "yml", "html", "htm", "log"].includes(
+                    files.name?.split(".").pop()?.toLowerCase()
+                  )
+                ) {
+                  return (
+                    <DocumentFile
+                      key={fileIndex}
+                      file={files}
+                      onRemove={() => handleRemoveFile(fileIndex)}
+                    />
                   );
                 }
+                return null;
               })}
+              {/* Uploading loader */}
+              {globalDataStates.isUploadingAttachment && (
+                <View style={{
+                  width: 100,
+                  height: 65,
+                  backgroundColor: "#EBF1FB",
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: "#ABB8CC",
+                  borderStyle: "dashed",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}>
+                  <ActivityIndicator size="small" color="#1F2937" />
+                  <Text style={{ fontSize: 11, color: "#6B7280", marginTop: 4, fontFamily: "Mukta-Regular" }}>Uploading...</Text>
+                </View>
+              )}
             </View>
           </ScrollView>
         )}
@@ -654,16 +727,24 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
                     return;
                   }
 
-                  // Add user message to chat array
+                  console.log("═══════════════════════════════════════════════════════");
+                  console.log("🔵 SEND BUTTON PRESSED!");
+                  console.log("🔵 uploadedAttachmentIds:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+                  console.log("🔵 uploadedAttachmentIds length:", globalDataStates.uploadedAttachmentIds?.length);
+                  console.log("🔵 selectedFiles:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));
+                  console.log("🔵 isChattingWithAI:", toggleStates.toggleIsChattingWithAI);
+                  console.log("═══════════════════════════════════════════════════════");
+
+                  // Add user message to chat array with attachments
                   dispatch(
                     setChatMessagesArray([
                       ...globalDataStates.chatMessagesArray,
                       {
                         role: "user",
                         message: globalDataStates.userMessagePrompt,
-                        file: globalDataStates.selectedFiles
-                          ? globalDataStates.selectedFiles[0]
-                          : null,
+                        attachments: globalDataStates.selectedFiles?.length > 0
+                          ? [...globalDataStates.selectedFiles]
+                          : [],
                       },
                     ])
                   );
@@ -672,15 +753,18 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
                   if (toggleStates.toggleIsChattingWithAI) {
                     // Direct message send flow - chat already exists
                     sendMessageDirectly();
+                    // Clear attachments only for direct send (ChatScreen handles new chat cleanup)
+                    dispatch(setSelecetdFiles([]));
+                    dispatch(clearUploadedAttachmentIds());
                   } else {
                     // Initial flow - create new chat
+                    // DON'T clear attachments here - ChatScreen useEffect needs them
                     createChatWithAIFunction();
                     dispatch(setToggleIsChattingWithAI(true));
                   }
 
-                  // Common cleanup
+                  // Common cleanup (except attachments for new chat flow)
                   dispatch(setUserMessagePrompt(""));
-                  dispatch(setSelecetdFiles([]));
                   dispatch(setChatInputContentLinesNumber(1));
                   dispatch(setToggleIsWaitingForResponse(true));
                 }}

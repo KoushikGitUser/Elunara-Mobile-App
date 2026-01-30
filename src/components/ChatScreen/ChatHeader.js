@@ -24,7 +24,7 @@ import {
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
-import { setChatMessagesArray, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles } from "../../redux/slices/globalDataSlice";
+import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
@@ -189,6 +189,8 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
         <TouchableOpacity
           onPress={async() => {
             dispatch(setChatMessagesArray([]));
+            dispatch(setMessageIDsArray([]));
+            dispatch(setCurrentAIMessageIndexForRegeneration(null));
             dispatch(setToggleIsChattingWithAI(false));
             // Clear chat input text and attachments
             dispatch(setUserMessagePrompt(""));

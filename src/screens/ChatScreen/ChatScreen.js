@@ -46,8 +46,11 @@ import {
   resetAllGuidedTourSteps,
   setChatMessagesArray,
   setMessageIDsArray,
+  setCurrentAIMessageIndexForRegeneration,
   setChatTitleOnLongPress,
   setSettingsInnerPageHeaderTitle,
+  setSelecetdFiles,
+  clearUploadedAttachmentIds,
 } from "../../redux/slices/globalDataSlice";
 import ChatOptionsPopup from "../../components/Modals/ChatScreen/ChatOptionsPopup";
 import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
@@ -256,13 +259,19 @@ const ChatScreen = () => {
         setIsWaitingForMessages(true);
         const chatId = createdChatDetails.id;
 
+        console.log("═══════════════════════════════════════════════════════");
+        console.log("🟢 CHAT SCREEN: Chat created, sending first message");
+        console.log("🟢 Chat ID:", chatId);
+        console.log("🟢 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+        console.log("🟢 selectedFiles from Redux:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));
+
         const messageData = {
           content:
             globalDataStates.chatMessagesArray[
               globalDataStates.chatMessagesArray.length - 1
             ]?.message || "Hello",
           content_type: "text",
-          attachment_ids: [],
+          attachment_ids: globalDataStates.uploadedAttachmentIds || [],
         };
 
         // Add LLM ID if not null
@@ -299,7 +308,16 @@ const ChatScreen = () => {
           data: messageData,
           name: "sendPromptAndGetMessageFromAI",
         };
+
+        console.log("🟢 CHAT SCREEN: Full API payload:", JSON.stringify(payload, null, 2));
+        console.log("🟢 CHAT SCREEN: attachment_ids specifically:", JSON.stringify(messageData.attachment_ids));
+        console.log("═══════════════════════════════════════════════════════");
+
         dispatch(commonFunctionForAPICalls(payload));
+
+        // Clear attachments after sending (for new chat flow)
+        dispatch(setSelecetdFiles([]));
+        dispatch(clearUploadedAttachmentIds());
       }
     }
   }, [isChatCreatedWithAI, createdChatDetails]);
@@ -540,6 +558,8 @@ const ChatScreen = () => {
 
   useEffect(() => {
     dispatch(setChatMessagesArray([]));
+    dispatch(setMessageIDsArray([]));
+    dispatch(setCurrentAIMessageIndexForRegeneration(null));
     dispatch(setToggleIsChattingWithAI(false));
   }, []);
  

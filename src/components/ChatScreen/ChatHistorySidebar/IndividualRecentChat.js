@@ -19,7 +19,7 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { scaleFont } from "../../../utils/responsive";
-import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
+import { setChatTitleOnLongPress, setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration } from "../../../redux/slices/globalDataSlice";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
 const IndividualRecentChat = ({ item, translateX }) => {
@@ -37,6 +37,11 @@ const IndividualRecentChat = ({ item, translateX }) => {
   };
 
   const fetchAllMessagesOfChat = () => {
+    // Clear existing messages and IDs before loading new chat
+    dispatch(setChatMessagesArray([]));
+    dispatch(setMessageIDsArray([]));
+    dispatch(setCurrentAIMessageIndexForRegeneration(null));
+
     // First, fetch chat details to get the chat name
     const chatDetailsPayload = {
       method: "GET",

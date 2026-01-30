@@ -5,22 +5,67 @@ import {
   Pressable,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { ThumbsDown, ThumbsUp } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setToggleNotHelpfulFeedbackPopup } from "../../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
+import { triggerToast } from "../../../../services/toast";
 
 const FeedbackPopup = ({ close }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "" }]}>
       {selected && <View style={styles.radioInner} />}
     </View>
   );
+
+  const handleHelpfulPress = async () => {
+    if (isSubmitting) return;
+
+    setSelectedStyle(0);
+    setIsSubmitting(true);
+
+    try {
+      // Submit helpful feedback to API and wait for response
+      await dispatch(
+        commonFunctionForAPICalls({
+          method: "POST",
+          url: "/settings/help-center/feedback",
+          data: {
+            type: "general",
+            message: "The response is really helpful to me and I would recommend to all",
+          },
+          name: "submitHelpCenterFeedback",
+        })
+      ).unwrap();
+
+      close(false);
+      triggerToast(
+        "Thank You!",
+        "Your feedback has been submitted",
+        "success",
+        3000
+      );
+    } catch (error) {
+      console.error("Feedback submission error:", error);
+      triggerToast(
+        "Error",
+        "Failed to submit feedback. Please try again.",
+        "error",
+        3000
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -38,24 +83,25 @@ const FeedbackPopup = ({ close }) => {
           <Text style={{ fontWeight: 600,color:"#3A3A3A",fontFamily:"Mukta-Bold" }}>This response is</Text>
         </View>
         <Pressable
-          onPress={() => {
-            setSelectedStyle(0);
-            setTimeout(() => {
-              close(false)
-            }, 300);
-          }}
+          onPress={handleHelpfulPress}
+          disabled={isSubmitting}
           style={({ pressed }) => [
             {
               backgroundColor: pressed ? "#EEF4FF" : "transparent",
+              opacity: isSubmitting ? 0.6 : 1,
             },
             styles.notesPopupOptions,
           ]}
         >
-          <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <ThumbsUp strokeWidth={1.25} />
             <Text style={{fontFamily:"Mukta-Regular",fontSize:17}}>Helpful</Text>
           </View>
-          <RadioButton selected={selectedStyle === 0} />
+          {isSubmitting && selectedStyle === 0 ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <RadioButton selected={selectedStyle === 0} />
+          )}
         </Pressable>
         <Pressable
           onPress={() => {

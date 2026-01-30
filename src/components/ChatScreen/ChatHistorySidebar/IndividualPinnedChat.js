@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import chat from "../../../assets/images/ChatTeardrop.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatActionsPopupOnLongPress, setToggleChatHistorySidebar, setToggleIsChattingWithAI } from "../../../redux/slices/toggleSlice";
-import { setChatTitleOnLongPress } from "../../../redux/slices/globalDataSlice";
+import { setChatTitleOnLongPress, setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration } from "../../../redux/slices/globalDataSlice";
 import { setCurrentActionChatDetails, commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { scaleFont } from "../../../utils/responsive";
@@ -31,6 +31,11 @@ const IndividualPinnedChat = ({ title, item, translateX }) => {
 
   const fetchAllMessagesOfChat = () => {
     if (!item?.id) return;
+
+    // Clear existing messages and IDs before loading new chat
+    dispatch(setChatMessagesArray([]));
+    dispatch(setMessageIDsArray([]));
+    dispatch(setCurrentAIMessageIndexForRegeneration(null));
 
     // First, fetch chat details to get the chat name
     const chatDetailsPayload = {

@@ -343,6 +343,8 @@ export const handleSendPromptAndGetMessageFromAI = {
       ? {
           uuid: aiMessage.uuid || aiMessage.id,
           is_saved_to_notes: aiMessage.is_saved_to_notes || false,
+          suggestions: aiMessage.suggestions || [],
+          generation: aiMessage.generation || null,
         }
       : null;
 
@@ -473,11 +475,14 @@ export const handleRegenerateAIResponse = {
 
 export const handleGetAllMessagesOfParticularChat = {
   pending: (state) => {
+    console.log("📨 FETCHING MESSAGES: Starting to fetch all messages for chat...");
     state.chatsStates.loaderStates.isAllMessagesOfChatFetched = "pending";
   },
   fulfilled: (state, action) => {
+    console.log("📨 MESSAGES RESPONSE - FULL PAYLOAD:", JSON.stringify(action?.payload, null, 2));
+    console.log("📨 MESSAGES RESPONSE - data.data:", JSON.stringify(action?.payload?.data?.data, null, 2));
     const responseData = action?.payload.data.data;
-    console.log(JSON.stringify(action?.payload.data.data), "all messages");
+    console.log("📨 MESSAGES: Total messages received:", Array.isArray(responseData) ? responseData.length : 0);
 
     // Response is directly an array of messages
     const messages = Array.isArray(responseData) ? responseData : [];
@@ -488,6 +493,7 @@ export const handleGetAllMessagesOfParticularChat = {
       message: msg.content,
       uuid: msg.id, // Use 'id' from API response
       is_saved_to_notes: msg.added_to_notes || false, // Use 'added_to_notes' from API response
+      suggestions: msg.suggestions || [], // Store suggestions from API
       version: msg.version || 1,
       total_versions: msg.total_versions || 1,
       versions: [
@@ -519,7 +525,8 @@ export const handleGetAllMessagesOfParticularChat = {
     console.log("Message IDs array:", messageIDsArray);
   },
   rejected: (state, { payload }) => {
-    console.log(payload?.message || "Failed to fetch messages");
+    console.log("📨 MESSAGES FETCH FAILED - Error:", JSON.stringify(payload, null, 2));
+    console.log("📨 MESSAGES FETCH FAILED - Message:", payload?.message || "Failed to fetch messages");
     state.chatsStates.loaderStates.isAllMessagesOfChatFetched = false;
   },
 };
