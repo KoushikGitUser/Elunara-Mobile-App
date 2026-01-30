@@ -9,13 +9,12 @@ import {
 } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { moderateScale, scaleFont } from "../../../../../utils/responsive";
-import {
-  setSelectedLanguage,
-  setToggleToolsPopup,
-} from "../../../../../redux/slices/toggleSlice";
+import { setSelectedLanguage, setToggleToolsPopup } from "../../../../../redux/slices/toggleSlice";
 
 const SavedLanguageState = () => {
+  const [selectedStyle, setSelectedStyle] = useState(0);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { chatCustomisationStates } = useSelector((state) => state.Toggle);
@@ -23,32 +22,25 @@ const SavedLanguageState = () => {
 
   // Get saved languages from responseLanguageSettings
   const savedLanguages = useMemo(() => {
-    const langSettings =
-      settingsStates?.allGeneralSettings?.responseLanguageSettings;
+    const langSettings = settingsStates?.allGeneralSettings?.responseLanguageSettings;
     const languages = [];
 
     if (langSettings?.response_language_1) {
       languages.push({
         id: langSettings.response_language_1.id,
-        lang:
-          langSettings.response_language_1.name ||
-          langSettings.response_language_1.lang,
+        lang: langSettings.response_language_1.name || langSettings.response_language_1.lang,
       });
     }
     if (langSettings?.response_language_2) {
       languages.push({
         id: langSettings.response_language_2.id,
-        lang:
-          langSettings.response_language_2.name ||
-          langSettings.response_language_2.lang,
+        lang: langSettings.response_language_2.name || langSettings.response_language_2.lang,
       });
     }
     if (langSettings?.response_language_3) {
       languages.push({
         id: langSettings.response_language_3.id,
-        lang:
-          langSettings.response_language_3.name ||
-          langSettings.response_language_3.lang,
+        lang: langSettings.response_language_3.name || langSettings.response_language_3.lang,
       });
     }
 
@@ -64,7 +56,7 @@ const SavedLanguageState = () => {
   useEffect(() => {
     if (chatCustomisationStates?.selectedLanguage?.name) {
       const index = savedLanguages.findIndex(
-        (lang) => lang.lang === chatCustomisationStates.selectedLanguage.name,
+        (lang) => lang.lang === chatCustomisationStates.selectedLanguage.name
       );
       if (index !== -1) {
         setSelectedStyle(index);
@@ -91,16 +83,10 @@ const SavedLanguageState = () => {
     </View>
   );
 
-  const handleSelection = (langIndex) => {
-    handleLanguageSelection(savedLanguages[langIndex], langIndex);
-  };
-
   return (
     <>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-        Response Language
-      </Text>
+      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Language</Text>
       {/* Description */}
       <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
         Choose your response language — ideal for bilinguals or fluent speakers.
@@ -111,51 +97,42 @@ const SavedLanguageState = () => {
           return (
             <TouchableOpacity
               key={langIndex}
-              onPress={() => handleSelection(langIndex)}
+              onPress={() => handleLanguageSelection(langs, langIndex)}
               style={styles.langsMain}
             >
-              <Text
-                style={{ fontFamily: "Mukta-Regular", fontSize: scaleFont(15) }}
-              >
-                {langs.lang}
-              </Text>
+              <Text style={{fontFamily:"Mukta-Regular",fontSize:scaleFont(15)}}>{langs.lang}</Text>
               <RadioButton selected={selectedStyle === langIndex} />
             </TouchableOpacity>
           );
         })}
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: moderateScale(13),
-            fontWeight: 400,
-            textAlign: "center",
-            fontFamily: "Mukta-Regular",
-          }}
-        >
-          More LLMS? Update your list in{" "}
-        </Text>
-        <Pressable style={{ borderBottomWidth: 2 }}>
-          <Text
-            style={{
-              fontSize: moderateScale(13),
-              lineHeight: 15,
-              fontWeight: 600,
-              textAlign: "center",
-              fontFamily: "Mukta-Bold",
-            }}
-          >
-            Settings
-          </Text>
-        </Pressable>
-      </View>
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+              <Text
+                style={{
+                  fontSize: moderateScale(13),
+                  fontWeight: 400,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                More LLMS? Update your list in{" "}
+              </Text>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleToolsPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
+              </Pressable>
+            </View>
     </>
   );
 };

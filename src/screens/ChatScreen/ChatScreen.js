@@ -1,12 +1,14 @@
 import {
   View,
+  Text,
+  TouchableOpacity,
   Dimensions,
   Animated,
   StatusBar,
   BackHandler,
   Alert,
-  Modal,
   Image,
+  Modal,
 } from "react-native";
 import React, {
   useEffect,
@@ -16,11 +18,8 @@ import React, {
   useRef,
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  useNavigation,
-  useFocusEffect,
-  useRoute,
-} from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import ChatHeader from "../../components/ChatScreen/ChatHeader";
@@ -28,7 +27,6 @@ import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/Cha
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import {
   setToggleChatScreenGuideStart,
   setToggleChatHistorySidebar,
@@ -70,10 +68,7 @@ import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQ
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
-import {
-  commonFunctionForAPICalls,
-  resetChatArchiveUnarchiveUpdated,
-} from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetChatArchiveUnarchiveUpdated } from "../../redux/slices/apiCommonSlice";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
 
@@ -96,12 +91,8 @@ const ChatScreen = () => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
-  const route = useRoute();
-  const chatUuid = route.params?.chatUuid;
   const dispatch = useDispatch();
-  const { toggleStates, chatCustomisationStates } = useSelector(
-    (state) => state.Toggle,
-  );
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates, settingsStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -184,13 +175,11 @@ const ChatScreen = () => {
   useEffect(() => {
     if (chatsStates.loaderStates.isChatArchiveUnarchiveUpdated === true) {
       // Refresh recent chats list
-      dispatch(
-        commonFunctionForAPICalls({
-          method: "GET",
-          url: "/chats/recent?limit=10",
-          name: "getAllRecentChats",
-        }),
-      );
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats"
+      }));
 
       // Reset loader state
       dispatch(resetChatArchiveUnarchiveUpdated());
@@ -260,21 +249,12 @@ const ChatScreen = () => {
 
   // When chat is created, send message to get AI response
   useEffect(() => {
-    console.log("🔔 ChatScreen: isChatCreatedWithAI =", isChatCreatedWithAI, "chatId =", createdChatDetails?.id);
-
     if (isChatCreatedWithAI === true && createdChatDetails?.id) {
-      console.log("✅ Chat created condition met!");
-      console.log("📋 Previous UUID:", previousChatUuidRef.current, "New UUID:", createdChatDetails.id);
-
       // Only proceed if this is a new chat (different ID)
       if (previousChatUuidRef.current !== createdChatDetails.id) {
-        console.log("🆕 NEW CHAT! Sending first message...");
         previousChatUuidRef.current = createdChatDetails.id;
         setIsWaitingForMessages(true);
         const chatId = createdChatDetails.id;
-
-        console.log("📨 ChatMessagesArray:", globalDataStates.chatMessagesArray);
-        console.log("📝 Last message:", globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1]);
 
         const messageData = {
           content:
@@ -285,39 +265,32 @@ const ChatScreen = () => {
           attachment_ids: [],
         };
 
-        console.log("📤 Sending message data:", messageData);
-
         // Add LLM ID if not null
         if (chatCustomisationStates?.selectedLLM?.id !== null) {
-          messageData.llm_id =
-            typeof chatCustomisationStates.selectedLLM.id === "number"
-              ? chatCustomisationStates.selectedLLM.id
-              : parseInt(chatCustomisationStates.selectedLLM.id);
+          messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+            ? chatCustomisationStates.selectedLLM.id
+            : parseInt(chatCustomisationStates.selectedLLM.id);
         }
 
         // Add Response Style ID if not null
         if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
-          messageData.response_style_id =
-            typeof chatCustomisationStates.selectedResponseStyle.id === "number"
-              ? chatCustomisationStates.selectedResponseStyle.id
-              : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+          messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+            ? chatCustomisationStates.selectedResponseStyle.id
+            : parseInt(chatCustomisationStates.selectedResponseStyle.id);
         }
 
         // Add Language ID if not null
         if (chatCustomisationStates?.selectedLanguage?.id !== null) {
-          messageData.language_id =
-            typeof chatCustomisationStates.selectedLanguage.id === "number"
-              ? chatCustomisationStates.selectedLanguage.id
-              : parseInt(chatCustomisationStates.selectedLanguage.id);
+          messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+            ? chatCustomisationStates.selectedLanguage.id
+            : parseInt(chatCustomisationStates.selectedLanguage.id);
         }
 
         // Add Citation Format ID if not null
         if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
-          messageData.citation_format_id =
-            typeof chatCustomisationStates.selectedCitationFormat.id ===
-            "number"
-              ? chatCustomisationStates.selectedCitationFormat.id
-              : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+          messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+            ? chatCustomisationStates.selectedCitationFormat.id
+            : parseInt(chatCustomisationStates.selectedCitationFormat.id);
         }
 
         const payload = {
@@ -369,7 +342,7 @@ const ChatScreen = () => {
   useEffect(() => {
     const checkNewUser = async () => {
       const isNewUser = await AsyncStorage.getItem("isNewUser");
-      if (isNewUser === null) {
+      if (isNewUser === null && !globalDataStates.manualGuidedTourRunning) {
         dispatch(setToggleChatScreenGuideStart(true));
         dispatch(setGuidedTourStepsCount(1));
       }
@@ -569,7 +542,7 @@ const ChatScreen = () => {
     dispatch(setChatMessagesArray([]));
     dispatch(setToggleIsChattingWithAI(false));
   }, []);
-
+ 
   useEffect(() => {
     const backAction = () => {
       setToggleExitAppConfirmPopup(true);
@@ -583,6 +556,116 @@ const ChatScreen = () => {
 
     return () => backHandler.remove(); // clean up
   }, [toggleExitAppConfirmPopup]);
+
+  // Note: postAddToNotes should be called with actual message uuid when user clicks "Add to Notes"
+  // Example usage:
+  const handleAddToNotes = (messageUuid) => {
+    const payload = {
+      method: "POST",
+      url: `/messages/${messageUuid}/add-to-notes`,
+      name: "postAddToNotes",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  // Helper function to close sidebar
+  const closeSidebar = () => {
+    Animated.timing(translateX, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    dispatch(setToggleChatHistorySidebar(false));
+  };
+
+  // Helper function to open sidebar
+  const openSidebar = () => {
+    Animated.timing(translateX, {
+      toValue: SCREEN_WIDTH * 0.75,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    dispatch(setToggleChatHistorySidebar(true));
+  };
+
+  // Navigation Basics Tour Handlers
+  const handleNavigationBasicsNext = (currentStep) => {
+    if (currentStep === 1) {
+      dispatch(setNavigationBasicsGuideTourSteps(2));
+      // Sidebar will auto-open via useEffect
+    } else if (currentStep === 2) {
+      dispatch(setNavigationBasicsGuideTourSteps(3));
+    } else if (currentStep === 3) {
+      dispatch(setNavigationBasicsGuideTourSteps(4));
+      // Long press popup will auto-trigger via useEffect
+    } else if (currentStep === 4) {
+      // Finish tour
+      dispatch(setToggleChatActionsPopupOnLongPress(false));
+      closeSidebar();
+      dispatch(resetAllGuidedTourSteps());
+      dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
+      navigation.navigate("settingsInnerPages", { page: 5 });
+    }
+  };
+
+  const handleNavigationBasicsBack = (currentStep) => {
+    if (currentStep === 2) {
+      closeSidebar();
+      dispatch(setNavigationBasicsGuideTourSteps(1));
+    } else if (currentStep === 3) {
+      dispatch(setNavigationBasicsGuideTourSteps(2));
+    } else if (currentStep === 4) {
+      dispatch(setToggleChatActionsPopupOnLongPress(false));
+      dispatch(setNavigationBasicsGuideTourSteps(3));
+    }
+  };
+
+  // Chat Functions Tour Handlers
+  const handleChatFunctionsNext = (currentStep) => {
+    if (currentStep === 1) {
+      dispatch(setChatFunctionsGuideTourSteps(2));
+      // Mock messages will be injected via useEffect
+    } else if (currentStep === 2) {
+      // Clear mock messages
+      dispatch(setChatMessagesArray(originalChatMessages));
+      dispatch(setChatFunctionsGuideTourSteps(3));
+    } else if (currentStep === 3) {
+      dispatch(setChatFunctionsGuideTourSteps(4));
+    } else if (currentStep === 4) {
+      // Finish tour
+      dispatch(resetAllGuidedTourSteps());
+      dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
+      navigation.navigate("settingsInnerPages", { page: 5 });
+    }
+  };
+
+  const handleChatFunctionsBack = (currentStep) => {
+    if (currentStep === 2) {
+      // Clear mock messages
+      dispatch(setChatMessagesArray(originalChatMessages));
+      dispatch(setChatFunctionsGuideTourSteps(1));
+    } else if (currentStep === 3) {
+      // Re-inject mock messages
+      dispatch(setChatMessagesArray(mockChatMessages));
+      dispatch(setChatFunctionsGuideTourSteps(2));
+    } else if (currentStep === 4) {
+      dispatch(setChatFunctionsGuideTourSteps(3));
+    }
+  };
+
+  // Learning Labs Tour Handlers
+  const handleLearningLabsUnlock = () => {
+    closeSidebar();
+    dispatch(resetAllGuidedTourSteps());
+    navigation.navigate("paymentsAndBilling");
+  };
+
+  const handleLearningLabsBack = () => {
+    closeSidebar();
+    dispatch(resetAllGuidedTourSteps());
+    dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
+    navigation.navigate("settingsInnerPages", { page: 6 });
+  };
 
   // Show nothing (or a loader) while fonts are loading
   if (!fontsLoaded) {
@@ -804,11 +887,9 @@ const ChatScreen = () => {
             zIndex: 9999,
           }}
         ></View>
-        <ChatHeader translateX={translateX} />
+        <ChatHeader ref={chatHeaderRef} translateX={translateX} />
         <View style={styles.chatMainWrapper}>
-          {toggleStates.toggleChatMenuPopup && (
-            <ChatOptionsPopup chatUuid={chatUuid} />
-          )}
+          {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
           {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
           {toggleStates.toggleTopicsPopup && <TopicsCompo />}
           {toggleStates.toggleDeleteChatConfirmPopup && <DeleteConfirmPopup />}
@@ -846,6 +927,7 @@ const ChatScreen = () => {
           {toggleStates.toggleElunaraProWelcomePopup && (
             <ElunaraProWelcomePopup />
           )}
+
           {/* Original new user guided tour tooltips */}
           {toggleStates.toggleChatScreenGuideStart &&
             globalDataStates.guidedTourStepsCount == 1 &&
@@ -1154,15 +1236,8 @@ const ChatScreen = () => {
           {/* middle section */}
 
           {/* chatInput section */}
-
-          {createdChatDetails?.is_archived || createdChatDetails?.archived ? (
-            <View
-              style={{
-                width: "100%",
-                paddingHorizontal: 20,
-                paddingVertical: 30,
-              }}
-            >
+          {(createdChatDetails?.is_archived || createdChatDetails?.archived) ? (
+            <View style={{ width: "100%", paddingHorizontal: 20, paddingVertical: 30 }}>
               <Text
                 style={{
                   fontSize: 14,
@@ -1170,11 +1245,10 @@ const ChatScreen = () => {
                   fontFamily: "Mukta-Regular",
                   textAlign: "center",
                   marginBottom: 12,
-                  marginTop: 10,
+                  marginTop:10,
                 }}
               >
-                Archived chats are read-only. Unarchive to continue the
-                conversation.
+                Archived chats are read-only. Unarchive to continue the conversation.
               </Text>
               <TouchableOpacity
                 onPress={() => {
@@ -1183,7 +1257,7 @@ const ChatScreen = () => {
                     const payload = {
                       method: "POST",
                       url: `/chats/${chatId}/unarchive`,
-                      name: "archiveOrUnarchiveChat",
+                      name: "archiveOrUnarchiveChat"
                     };
                     dispatch(commonFunctionForAPICalls(payload));
                   }
@@ -1192,7 +1266,7 @@ const ChatScreen = () => {
                   width: "100%",
                   backgroundColor: appColors.navyBlueShade,
                   paddingVertical: 10,
-                  marginTop: 10,
+                  marginTop:10,
                   borderRadius: 50,
                   alignItems: "center",
                   justifyContent: "center",
@@ -1249,7 +1323,6 @@ const ChatScreen = () => {
               <ChatInputMain ref={chatInputRef} />
             </View>
           )}
-
           {/* chatInput section */}
         </View>
       </Animated.View>

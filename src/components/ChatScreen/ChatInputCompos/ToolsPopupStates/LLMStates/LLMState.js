@@ -7,8 +7,9 @@ import {
   ScrollView,
   Dimensions,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import {
   moderateScale,
@@ -19,43 +20,88 @@ import { ArrowLeft } from "lucide-react-native";
 import DropDowns from "../DropDowns";
 import { LLMOptionsAvailable } from "../../../../../data/datas";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
 } from "../../../../../redux/slices/toggleSlice";
-import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
 import LLMSavedState from "./LLMSavedState";
 import IntegrateAIAccState from "./IntegrateAIAccState";
 
 const screenHeight = Dimensions.get("window").height;
 
 const LLMState = () => {
-  const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
-
-  // Initialize with current selection if available
-  const initialSelection = roomsStates.tempRoomSettings?.llm_id
-    ? [roomsStates.tempRoomSettings.llm_id.toString()]
-    : [];
-
-  const [selectedCountsArray, setSelectedCountsArray] =
-    useState(initialSelection);
+  const [selectedCountsArray, setSelectedCountsArray] = useState([]);
   const [isLLMSaved, setIsLLMSaved] = useState(false);
   const [toggleIntegrateAi, setToggleIntegrateAi] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { settingsStates, loading } = useSelector((state) => state.API);
 
-  const handleSave = () => {
-    if (selectedCountsArray.length > 0) {
-      dispatch(
-        setTempRoomProperty({ key: "llm_id", value: selectedCountsArray[0] }),
-      );
+  useEffect(() => {
+    // Check if LLM preferences already exist
+    const llmPreferences = settingsStates?.allGeneralSettings?.preferredLLMs;
+    if (llmPreferences && (llmPreferences.preferred_llm_1 || llmPreferences.preferred_llm_2 || llmPreferences.preferred_llm_3)) {
+      setIsLLMSaved(true);
     }
-    setIsLLMSaved(true);
+  }, [settingsStates?.allGeneralSettings?.preferredLLMs]);
+
+  const updateLLM1 = (id) => {
+    const data = {
+      preferred_llm_1_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
   };
 
-  const updateSelection = (index, itemId) => {
-    const newCounts = [...selectedCountsArray];
-    newCounts[index] = itemId;
-    setSelectedCountsArray(newCounts);
+  const updateLLM2 = (id) => {
+    const data = {
+      preferred_llm_2_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const updateLLM3 = (id) => {
+    const data = {
+      preferred_llm_3_id: id,
+    };
+    const payload = {
+      method: "PUT",
+      url: "/settings/general",
+      data,
+      name: "updateGeneralSettings",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  };
+
+  const handleSaveLLMPreferences = async () => {
+    setIsSaving(true);
+
+    // The LLM preferences have already been saved individually via updateLLM1/2/3
+    // This button just confirms and transitions to the saved state
+    // We could optionally refetch to ensure sync
+    const payload = {
+      method: "GET",
+      url: "/settings/general",
+      name: "getAllGeneralSettings",
+    };
+
+    await dispatch(commonFunctionForAPICalls(payload));
+    setIsSaving(false);
+    setIsLLMSaved(true);
   };
 
   return (
@@ -130,8 +176,13 @@ const LLMState = () => {
               LLM 1
             </Text>
             <DropDowns
-              selectedId={selectedCountsArray[0]}
-              onSelect={(item) => updateSelection(0, item.id)}
+              initialSetValue={
+                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_1
+              }
+              triggerAPICall={updateLLM1}
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
             />
             <Text
               style={{
@@ -144,8 +195,13 @@ const LLMState = () => {
               LLM 2
             </Text>
             <DropDowns
-              selectedId={selectedCountsArray[1]}
-              onSelect={(item) => updateSelection(1, item.id)}
+              initialSetValue={
+                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_2
+              }
+              triggerAPICall={updateLLM2}
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
             />
             {/* <Text
               style={{
@@ -158,9 +214,14 @@ const LLMState = () => {
               LLM 3
             </Text>
             <DropDowns
-              selectedId={selectedCountsArray[2]}
-              onSelect={(item) => updateSelection(2, item.id)}
-            />
+              initialSetValue={
+                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_3
+              }
+              triggerAPICall={updateLLM3}
+              selectedCounts={selectedCountsArray}
+              setSelectedCounts={setSelectedCountsArray}
+              selectOptionsArray={LLMOptionsAvailable}
+            /> */}
 
             {/* Button */}
             <TouchableOpacity
@@ -168,26 +229,24 @@ const LLMState = () => {
                 styles.button,
                 {
                   backgroundColor:
-                    selectedCountsArray?.length >= 1 ? "#081A35" : "#CDD5DC",
+                    selectedCountsArray?.length >= 3 && !isSaving ? "#081A35" : "#CDD5DC",
                 },
               ]}
-              onPress={handleSave}
+              onPress={handleSaveLLMPreferences}
               activeOpacity={0.8}
+              disabled={selectedCountsArray?.length < 3 || isSaving}
             >
-              <Text
-                style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
-              >
-                Save LLM Preferences
-              </Text>
+              {isSaving ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text
+                  style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
+                >
+                  Save LLM Preferences
+                </Text>
+              )}
             </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: "row",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
               <Text
                 style={{
                   fontSize: moderateScale(13),
@@ -198,18 +257,20 @@ const LLMState = () => {
               >
                 More LLMS? Update your list in{" "}
               </Text>
-              <Pressable style={{ borderBottomWidth: 2 }}>
-                <Text
-                  style={{
-                    fontSize: moderateScale(13),
-                    lineHeight: 15,
-                    fontWeight: 600,
-                    textAlign: "center",
-                    fontFamily: "Mukta-Bold",
-                  }}
-                >
-                  Settings
-                </Text>
+              <Pressable
+                style={{borderBottomWidth:2}}
+                onPress={() => {
+                  dispatch(setToggleToolsPopup(false));
+                  navigation.navigate("settingsInnerPages", { page: 0 });
+                }}
+              >
+                <Text style={{
+                  fontSize: moderateScale(13),
+                  lineHeight:15,
+                  fontWeight: 600,
+                  textAlign: "center",
+                  fontFamily: "Mukta-Bold",
+                }}>Settings</Text>
               </Pressable>
             </View>
           </ScrollView>

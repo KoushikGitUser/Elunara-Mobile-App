@@ -20,6 +20,6 @@ export const chatCustomisationStates = {
   // Citation Format
   selectedCitationFormat: {
     id: null, // null for default (Harvard)
-    name: "Harvard",
+    name: "APA",
   },
 };

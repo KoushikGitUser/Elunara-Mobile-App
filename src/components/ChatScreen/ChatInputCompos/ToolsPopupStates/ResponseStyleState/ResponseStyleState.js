@@ -18,25 +18,56 @@ import {
   setToggleTopicsPopup,
   setSelectedResponseStyle,
 } from "../../../../../redux/slices/toggleSlice";
-import { setTempRoomProperty } from "../../../../../redux/slices/apiCommonSlice";
-import { responseStyles } from "../../../../../data/datas";
-import chakraLogo from "../../../../../assets/images/chakraFull.png";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
+import ChakraIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import ConversationalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
+import DetailedIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+
 const screenHeight = Dimensions.get("window").height;
+
+// Helper function to get response style icon based on name
+const getResponseStyleIcon = (name) => {
+  const key = name?.toLowerCase();
+  if (key?.includes("auto") || key?.includes("chakra")) {
+    return <ChakraIcon />;
+  } else if (key?.includes("concise")) {
+    return <ConciseIcon />;
+  } else if (key?.includes("formal")) {
+    return <FormalIcon />;
+  } else if (key?.includes("conversational")) {
+    return <ConversationalIcon />;
+  } else if (key?.includes("detailed")) {
+    return <DetailedIcon />;
+  } else if (key?.includes("creative")) {
+    return <CreativeIcon />;
+  }
+  return <ChakraIcon />; // Default to Chakra/Auto
+};
 
 const ResponseStyleState = () => {
   const dispatch = useDispatch();
-  const { roomsStates, settingsStates } = useSelector((state) => state.API);
+  const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
   const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
-  const initialSelection =
-    roomsStates.tempRoomSettings?.response_style_id !== null &&
-    roomsStates.tempRoomSettings?.response_style_id !== undefined
-      ? roomsStates.tempRoomSettings.response_style_id - 1
-      : 0;
+  useEffect(() => {
+    console.log("🎨 RESPONSE STYLE: Fetching response styles from API...");
+    const payload = {
+      method: "GET",
+      url: "/master/response-styles",
+      name: "fetchResponseStylesAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
   // Initialize selected style from Redux state
-  const allResponseStyles =
-    settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+  const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
+
+  console.log("🎨 RESPONSE STYLE: allResponseStyles from Redux:", allResponseStyles);
+  console.log("🎨 RESPONSE STYLE: settingsMasterDatas:", settingsStates?.settingsMasterDatas);
 
   useEffect(() => {
     if (chatCustomisationStates?.selectedResponseStyle?.id) {
@@ -50,17 +81,12 @@ const ResponseStyleState = () => {
         setSelectedStyle(0);
       }
     }
-  }, [
-    chatCustomisationStates?.selectedResponseStyle,
-    allResponseStyles.length,
-  ]);
+  }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
 
   // Handle response style selection
   const handleStyleSelection = (styleOption) => {
     const selectedData = {
-      id: styleOption.name?.toLowerCase().includes("auto")
-        ? null
-        : styleOption.id,
+      id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
       name: styleOption.name,
     };
 
@@ -92,9 +118,7 @@ const ResponseStyleState = () => {
           />
         </View>
         {/* Title */}
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-          Response Style
-        </Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>
 
         {/* Description */}
         <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
@@ -106,10 +130,13 @@ const ResponseStyleState = () => {
           showsVerticalScrollIndicator={false}
           style={styles.optionsContainer}
         >
-          <View style={{ flexDirection: "column" }}>
-            {responseStyles.map((styleOptions, optionsIndex) => {
+          <View style={{ flexDirection: "column",}}>
+            {(settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [])?.map((styleOptions, optionsIndex) => {
+              const icon = getResponseStyleIcon(styleOptions.name);
+              const isAuto = styleOptions.name?.toLowerCase().includes("auto") || styleOptions.id === 0;
+
               return (
-                <React.Fragment key={optionsIndex}>
+                <React.Fragment key={styleOptions.id || optionsIndex}>
                   <TouchableOpacity
                     style={[
                       styles.card,
@@ -124,28 +151,22 @@ const ResponseStyleState = () => {
                             : "#D3DAE5",
                       },
                     ]}
-                    onPress={() => {
-                      handleStyleSelection(styleOptions);
-                    }}
+                    onPress={() => handleStyleSelection(styleOptions)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.contentMain}>
                       <View style={styles.iconContainer}>
-                        {styleOptions.icon}
+                        {icon}
                       </View>
 
                       <View style={styles.textContainer}>
                         <Text
                           style={[
                             styles.optionTitle,
-                            {
-                              fontSize: scaleFont(18),
-                              fontWeight: 600,
-                              fontFamily: "Mukta-Bold",
-                            },
+                            { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
                           ]}
                         >
-                          {styleOptions.title}
+                          {styleOptions.name}
                         </Text>
                         <Text
                           style={[
@@ -154,7 +175,7 @@ const ResponseStyleState = () => {
                               fontSize: scaleFont(14),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily: "Mukta-Regular",
+                              fontFamily: "Mukta-Regular"
                             },
                           ]}
                         >
@@ -165,14 +186,14 @@ const ResponseStyleState = () => {
 
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
-                  {styleOptions.id == 0 && (
+                  {isAuto && (
                     <View style={{ width: "100%", marginBottom: 20 }}>
                       <Text
                         style={{
                           textAlign: "center",
                           color: "#757575",
                           fontSize: scaleFont(15),
-                          fontFamily: "Mukta-Regular",
+                          fontFamily: "Mukta-Regular"
                         }}
                       >
                         Or Select Manually
@@ -270,7 +291,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 18,
     backgroundColor: "white",
-    marginBottom: 20,
+    marginBottom:20
   },
   contentMain: {
     flexDirection: "row",

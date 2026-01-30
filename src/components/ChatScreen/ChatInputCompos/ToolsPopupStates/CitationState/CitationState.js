@@ -12,16 +12,15 @@ import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setToggleToolsPopup,
+    setToggleToolsPopup,
   setToggleToolsPopupStates,
+  setToggleTopicsPopup,
   setSelectedCitationFormat,
 } from "../../../../../redux/slices/toggleSlice";
-import {
-  commonFunctionForAPICalls,
-  setTempRoomProperty,
-} from "../../../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
 import APAIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/APAIcon";
 import HavardIcon from "../../../../../../assets/SvgIconsComponent/CitationFormatIcons/HavardIcon";
+
 
 // Helper function to get citation icon based on name
 const getCitationIcon = (name, isSelected) => {
@@ -37,22 +36,25 @@ const getCitationIcon = (name, isSelected) => {
 
 const CitationState = () => {
   const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
-  const { settingsStates, chatCustomisationStates } = useSelector(
-    (state) => state.API,
-  );
+  const [selectedStyle, setSelectedStyle] = useState(0);
+  const { settingsStates } = useSelector((state) => state.API);
+  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
-  const initialSelection =
-    roomsStates.tempRoomSettings?.citation_format_id !== null &&
-    roomsStates.tempRoomSettings?.citation_format_id !== undefined
-      ? roomsStates.tempRoomSettings.citation_format_id
-      : 0; // Use the ID directly, not index-1
-
-  const [selectedStyle, setSelectedStyle] = useState(initialSelection);
+  useEffect(() => {
+    console.log("📚 CITATION: Fetching citation formats from API...");
+    const payload = {
+      method: "GET",
+      url: "/master/citation-formats",
+      name: "fetchCitationFormatsAvailable",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
 
   // Initialize selected citation from Redux state
-  const allCitationFormats =
-    settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [];
+  const allCitationFormats = settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [];
+
+  console.log("📚 CITATION: allCitationFormats from Redux:", allCitationFormats);
+  console.log("📚 CITATION: settingsMasterDatas:", settingsStates?.settingsMasterDatas);
 
   useEffect(() => {
     if (chatCustomisationStates?.selectedCitationFormat?.id) {
@@ -72,10 +74,7 @@ const CitationState = () => {
         setSelectedStyle(0);
       }
     }
-  }, [
-    chatCustomisationStates?.selectedCitationFormat,
-    allCitationFormats.length,
-  ]);
+  }, [chatCustomisationStates?.selectedCitationFormat, allCitationFormats.length]);
 
   // Handle citation selection
   const handleCitationSelection = (citationOption) => {
@@ -86,14 +85,6 @@ const CitationState = () => {
 
     dispatch(setSelectedCitationFormat(selectedData));
     setSelectedStyle(citationOption.id);
-
-    // Also update temp room property for backward compatibility if needed
-    dispatch(
-      setTempRoomProperty({
-        key: "citation_format_id",
-        value: citationOption.id,
-      }),
-    );
   };
 
   const RadioButton = ({ selected }) => (
@@ -119,9 +110,7 @@ const CitationState = () => {
             color="black"
           />
         </View>
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-          Citation Format
-        </Text>
+        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Citation Format</Text>
 
         {/* Description */}
         <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
@@ -129,10 +118,7 @@ const CitationState = () => {
           submissions.
         </Text>
         <View style={{ flexDirection: "column", gap: 25 }}>
-          {(
-            settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable ||
-            []
-          )?.map((styleOptions, optionsIndex) => {
+          {(settingsStates?.settingsMasterDatas?.allCitationFormatsAvailable || [])?.map((styleOptions, optionsIndex) => {
             const isSelected = selectedStyle === styleOptions.id;
             const icon = getCitationIcon(styleOptions.name, isSelected);
 
@@ -152,16 +138,14 @@ const CitationState = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.contentMain}>
-                  <View style={styles.iconContainer}>{icon}</View>
+                  <View style={styles.iconContainer}>
+                    {icon}
+                  </View>
                   <View style={styles.textContainer}>
                     <Text
                       style={[
                         styles.optionTitle,
-                        {
-                          fontSize: scaleFont(18),
-                          fontWeight: 600,
-                          fontFamily: "Mukta-Bold",
-                        },
+                        { fontSize: scaleFont(18), fontWeight: 600, fontFamily: "Mukta-Bold" },
                       ]}
                     >
                       {styleOptions.name}
@@ -173,7 +157,7 @@ const CitationState = () => {
                           fontSize: scaleFont(14),
                           fontWeight: 400,
                           color: "#8F8F8F",
-                          fontFamily: "Mukta-Regular",
+                          fontFamily: "Mukta-Regular"
                         },
                       ]}
                     >
@@ -186,29 +170,11 @@ const CitationState = () => {
             );
           })}
         </View>
-        <Text
-          style={{
-            fontSize: moderateScale(12),
-            fontWeight: 400,
-            color: "#3A3A3A",
-            textAlign: "center",
-            marginTop: 40,
-            marginBottom: 20,
-            fontFamily: "Mukta-Regular",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: moderateScale(12),
-              fontWeight: 600,
-              color: "black",
-              fontFamily: "Mukta-Bold",
-            }}
-          >
+        <Text style={{ fontSize: moderateScale(12), fontWeight: 400,color:"#3A3A3A",textAlign:"center",marginTop:40,marginBottom:20,fontFamily:"Mukta-Regular" }}>
+          <Text style={{ fontSize: moderateScale(12), fontWeight: 600,color:"black",fontFamily:"Mukta-Bold" }}>
             Note:
           </Text>{" "}
-          Citations appear only in academic chats. Creative or general chats may
-          not include resources.
+          Citations appear only in academic chats. Creative or general chats may not include resources.
         </Text>
       </View>
     </View>

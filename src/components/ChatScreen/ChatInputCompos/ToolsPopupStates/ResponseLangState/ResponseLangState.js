@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Platform } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
@@ -13,14 +13,16 @@ import FirstLanguageSetState from "./FirstLanguageSetState";
 
 const ResponseLangState = () => {
   const dispatch = useDispatch();
-  const { roomsStates } = useSelector((state) => state.API);
+  const [isLanguageSaved, setIsLanguageSaved] = useState(false);
+  const { settingsStates } = useSelector((state) => state.API);
 
-  // Initialize based on whether a language ID is already set in tempRoomSettings
-  const hasSavedLanguage =
-    roomsStates.tempRoomSettings?.response_language_id !== null &&
-    roomsStates.tempRoomSettings?.response_language_id !== undefined;
-
-  const [isLanguageSaved, setIsLanguageSaved] = useState(hasSavedLanguage);
+  useEffect(() => {
+    // Check if language preferences already exist
+    const languagePreferences = settingsStates?.allGeneralSettings?.responseLanguageSettings;
+    if (languagePreferences && (languagePreferences.response_language_1 || languagePreferences.response_language_2 || languagePreferences.response_language_3)) {
+      setIsLanguageSaved(true);
+    }
+  }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
   return (
     <View style={styles.modalSheet}>
       {/* Content */}
@@ -38,11 +40,7 @@ const ResponseLangState = () => {
             color="black"
           />
         </View>
-        {isLanguageSaved ? (
-          <SavedLanguageState />
-        ) : (
-          <FirstLanguageSetState setIsLanguageSaved={setIsLanguageSaved} />
-        )}
+        {isLanguageSaved? <SavedLanguageState/>:<FirstLanguageSetState setIsLanguageSaved={setIsLanguageSaved} />}
       </View>
     </View>
   );

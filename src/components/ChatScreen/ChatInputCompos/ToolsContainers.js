@@ -8,23 +8,16 @@ import {
   Languages,
 } from "lucide-react-native";
 import { moderateScale } from "../../../utils/responsive";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopup,
   setToggleToolsPopupStates,
 } from "../../../redux/slices/toggleSlice";
-import {
-  toolsArrayOptions,
-  LLMOptionsAvailable,
-  responseStyles,
-  setLanguages,
-  citationStyles,
-} from "../../../data/datas";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { toolsArrayOptions } from "../../../data/datas";
 
 const ToolsContainers = () => {
   const dispatch = useDispatch();
-  const { roomsStates, settingsStates } = useSelector((state) => state.API);
   const { chatCustomisationStates } = useSelector((state) => state.Toggle);
 
   useEffect(() => {
@@ -43,82 +36,23 @@ const ToolsContainers = () => {
     dispatch(commonFunctionForAPICalls(citationFormatsPayload));
   }, []);
 
-  const getToolSelection = (tool, index) => {
-    const { tempRoomSettings } = roomsStates;
-    if (!tempRoomSettings) return tool.selection;
-
-    switch (index) {
-      case 0: // LLM
-        if (tempRoomSettings.llm_id) {
-          const llm = LLMOptionsAvailable.find(
-            (item) => item.id == tempRoomSettings.llm_id,
-          );
-          return llm ? llm.title : tool.selection;
-        } else if (roomsStates.currentRoom?.llm_id) {
-          const llm = LLMOptionsAvailable.find(
-            (item) => item.id == roomsStates.currentRoom.llm_id,
-          );
-          return llm ? llm.title : tool.selection;
-        } else if (roomsStates.currentRoom?.llm?.id) {
-          const llm = LLMOptionsAvailable.find(
-            (item) => item.id == roomsStates.currentRoom.llm.id,
-          );
-          return llm ? llm.title : tool.selection;
-        }
-        break;
+  // Get the selected value based on tool index
+  const getSelectedValue = (toolIndex) => {
+    switch (toolIndex) {
+      case 0: // LLM Preference
+        return chatCustomisationStates?.selectedLLM?.name || "Auto";
       case 1: // Response Style
-        if (
-          tempRoomSettings.response_style_id !== null &&
-          tempRoomSettings.response_style_id !== undefined
-        ) {
-          const style = responseStyles.find(
-            (item) => item.id == tempRoomSettings.response_style_id - 1,
-          );
-          return style ? style.title : tool.selection;
-        } else if (roomsStates.currentRoom?.response_style_id) {
-          const style = responseStyles.find(
-            (item) => item.id == roomsStates.currentRoom.response_style_id - 1,
-          );
-          return style ? style.title : tool.selection;
-        } else if (roomsStates.currentRoom?.response_style?.id) {
-          const style = responseStyles.find(
-            (item) => item.id == roomsStates.currentRoom.response_style.id - 1,
-          );
-          return style ? style.title : tool.selection;
-        }
-        break;
+        return chatCustomisationStates?.selectedResponseStyle?.name || "Auto";
       case 2: // Response Language
-        if (
-          tempRoomSettings.response_language_id !== null &&
-          tempRoomSettings.response_language_id !== undefined
-        ) {
-          const lang = setLanguages.find(
-            (item) => item.id == tempRoomSettings.response_language_id - 1,
-          );
-          return lang ? lang.lang?.split("—")[0].trim() : tool.selection;
-        } else if (roomsStates.currentRoom?.response_language_id) {
-          const lang = setLanguages.find(
-            (item) =>
-              item.id == roomsStates.currentRoom.response_language_id - 1,
-          );
-          return lang ? lang.lang?.split("—")[0].trim() : tool.selection;
-        } else if (roomsStates.currentRoom?.response_language?.id) {
-          const lang = setLanguages.find(
-            (item) =>
-              item.id == roomsStates.currentRoom.response_language.id - 1,
-          );
-          return lang ? lang.lang?.split("—")[0].trim() : tool.selection;
-        }
-        break;
+        return chatCustomisationStates?.selectedLanguage?.name || "English";
       case 3: // Citation Format
         return chatCustomisationStates?.selectedCitationFormat?.name || "APA";
       default:
         return "";
     }
-    return tool.selection;
   };
   return (
-    <View style={{ width: "100%" }}>
+    <View>
       {toolsArrayOptions?.map((tools, toolIndex) => {
         return (
           <TouchableOpacity
@@ -139,12 +73,7 @@ const ToolsContainers = () => {
             >
               {tools.icon}
 
-              <Text
-                style={{
-                  fontSize: moderateScale(16),
-                  fontFamily: "Mukta-Regular",
-                }}
-              >
+              <Text style={{ fontSize: moderateScale(16),fontFamily:"Mukta-Regular" }}>
                 {tools.title}{" "}
               </Text>
             </View>
@@ -157,13 +86,8 @@ const ToolsContainers = () => {
               }}
             >
               <View style={styles.selectedOption}>
-                <Text
-                  style={{
-                    fontSize: moderateScale(12),
-                    fontFamily: "Mukta-Regular",
-                  }}
-                >
-                  {getToolSelection(tools, toolIndex)}{" "}
+                <Text style={{ fontSize: moderateScale(12),fontFamily:"Mukta-Regular" }}>
+                  {getSelectedValue(toolIndex)}{" "}
                 </Text>
               </View>
               <ChevronRight size={30} strokeWidth={1.5} />

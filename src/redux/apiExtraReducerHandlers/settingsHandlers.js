@@ -181,6 +181,30 @@ export const handleGetAllSpecializationsAvailable = {
   rejected: (state, action) => {},
 };
 
+export const handleFetchResponseStylesAvailable = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    console.log("🎨 HANDLER: Response styles received:", action.payload.data.data);
+    state.settingsStates.settingsMasterDatas.allResponseStylesAvailable =
+      action.payload.data.data;
+  },
+  rejected: (state, action) => {
+    console.log("🎨 HANDLER: Response styles fetch FAILED:", action.payload);
+  },
+};
+
+export const handleFetchCitationFormatsAvailable = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    console.log("📚 HANDLER: Citation formats received:", action.payload.data.data);
+    state.settingsStates.settingsMasterDatas.allCitationFormatsAvailable =
+      action.payload.data.data;
+  },
+  rejected: (state, action) => {
+    console.log("📚 HANDLER: Citation formats fetch FAILED:", action.payload);
+  },
+};
+
 export const handleGetAllProfileInfos = {
   pending: (state) => {
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
