@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Check, MessageCircle, MoreVertical } from "lucide-react-native";
 import { scaleFont, verticalScale } from "../../utils/responsive";
 import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
@@ -33,6 +33,8 @@ const ChatsScrollForAllRoomsPage = ({
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const dispatch = useDispatch();
   const [optionsIndex, setOptionsIndex] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, right: 20 });
+  const menuButtonRef = useRef(null);
 
   const handleRoomPress = () => {
     if (isSelecting) {
@@ -94,7 +96,10 @@ const ChatsScrollForAllRoomsPage = ({
         ]}
       >
         {toggleStates.toggleAllChatsOptionsPopup && optionsIndex == index && (
-          <RoomsOptionsPopup setRoomOptionsPopup={setOptionsIndex} />
+          <RoomsOptionsPopup
+            setRoomOptionsPopup={setOptionsIndex}
+            popupPosition={popupPosition}
+          />
         )}
 
         {isSelecting && <CheckBox selected={selectedArray.includes(index)} />}
@@ -114,16 +119,20 @@ const ChatsScrollForAllRoomsPage = ({
 
         {/* Menu Icon */}
         <Pressable
+          ref={menuButtonRef}
           style={({ pressed }) => [
             styles.menuButton,
             pressed && styles.menuPressed,
           ]}
           onPress={() => {
-            dispatch(setToggleAllChatsOptionsPopup(true));
-            setOptionsIndex(index);
-            if (room) {
-              dispatch(setCurrentRoom(room));
-            }
+            menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
+              setPopupPosition({ top: pageY, right: 20 });
+              dispatch(setToggleAllChatsOptionsPopup(true));
+              setOptionsIndex(index);
+              if (room) {
+                dispatch(setCurrentRoom(room));
+              }
+            });
           }}
         >
           <MoreVertical size={24} color="#000000ff" strokeWidth={2} />

@@ -42,14 +42,18 @@ const SubTopicsCompo = () => {
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates } = useSelector((state) => state.API);
-  const isTopicsLoading = chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === "pending";
+  const isTopicsLoading =
+    chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === "pending" ||
+    chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === null;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [expandTextInput, setExpandTextInput] = useState(false);
-  const [filteredTopics, setFilteredTopics] = useState([]);
+  const [filteredTopics, setFilteredTopics] = useState(
+    chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || []
+  );
 
   // Filter topics based on search text
   useEffect(() => {

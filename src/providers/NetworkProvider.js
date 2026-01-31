@@ -7,7 +7,7 @@ const NetworkContext = createContext({
 });
 
 export const useNetwork = () => useContext(NetworkContext);
-
+ 
 const NetworkProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(true);
 

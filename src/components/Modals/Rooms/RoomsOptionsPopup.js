@@ -24,7 +24,7 @@ import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"
 
 const { width, height } = Dimensions.get("window");
 
-const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible }) => {
+const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible, popupPosition }) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { roomsStates } = useSelector((state) => state.API);
@@ -42,7 +42,7 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible }) => {
         onPress={() => setRoomOptionsPopup(false)}
         style={styles.overlay}
       >
-        <View style={styles.notesPopup}>
+        <View style={[styles.notesPopup, popupPosition && { top: popupPosition.top, right: popupPosition.right }]}>
           <Pressable
             onPress={() => {
               setRoomOptionsPopup(false);
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     padding: 7,
     width: "auto",
-    top: 60,
+    top: 0,
     right: 20,
     flexDirection: "column",
     alignItems: "flex-start",

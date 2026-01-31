@@ -210,7 +210,7 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       method: "POST",
       url: "/chats",
       data: {
-        name: "Chatting with AI",
+        name: "Chat with Elunara",
       },
       name: "createChatWithAI",
     };

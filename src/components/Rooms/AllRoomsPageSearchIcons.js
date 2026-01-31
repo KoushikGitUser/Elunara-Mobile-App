@@ -77,7 +77,7 @@ const AllRoomsPageSearchIcons = ({
             <ArrowUpDownIcon />
           </TouchableOpacity>
           {toggleSortingPopup && (
-            <RoomsSortingPopup close={setToggleSortingPopup} />
+            <RoomsSortingPopup right={0} close={setToggleSortingPopup} />
           )}
         </View>
         <View style={[styles.iconWrapper, toggleFilterPopup && { zIndex: 1000 }]}>
@@ -85,7 +85,7 @@ const AllRoomsPageSearchIcons = ({
             <FilterIcon />
           </TouchableOpacity>
           {toggleFilterPopup && (
-            <RoomsFilterPopup close={setToggleFilterPopup} />
+            <RoomsFilterPopup right={0} close={setToggleFilterPopup} />
           )}
         </View>
         <TouchableOpacity

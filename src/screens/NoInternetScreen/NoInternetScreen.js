@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import GradientText from "../../components/common/GradientText";
+import AuthGradientText from "../../components/common/AuthGradientText";
+
 import { appColors } from "../../themes/appColors";
 import BigGrayChakra from "../../assets/images/BigGrayChakra.png";
 
@@ -11,9 +12,9 @@ const NoInternetScreen = ({ onRetry }) => {
       <Image source={BigGrayChakra} style={styles.chakraLogo} />
       <View style={styles.contentContainer}>
         <Feather style={{borderWidth:2,borderRadius:50,padding:10,borderColor:"#888888"}} name="wifi-off" size={35} color="#888888" />
-        <GradientText marginTop={40} marginBottom={10} fontSize={25} fullWidth={true} style={styles.title}>
+        <AuthGradientText marginTop={40} marginBottom={10} fontSize={25} fullWidth={true} textAlign="left" style={styles.title}>
           No Internet Connection
-        </GradientText>
+        </AuthGradientText>
         <Text style={styles.description}>
           Make Sure WiFi or Mobile Data is turned on and then Try Again
         </Text>

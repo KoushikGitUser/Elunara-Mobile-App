@@ -24,6 +24,7 @@ import { setCurrentAIMessageIndexForRegeneration, setChatMessagesArray } from ".
 import { setToggleIsWaitingForResponse } from "../../../redux/slices/toggleSlice";
 import Markdown from 'react-native-markdown-display';
 import SuggestionsSection from "./SuggestionsSection";
+import { useNavigation } from "@react-navigation/native";
 
 const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestions, showSuggestions = false }) => {
   const dispatch = useDispatch();
@@ -60,6 +61,8 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
       language: null
     };
   });
+
+  const navigation = useNavigation();
 
   // Local state for switched version message content
   const [switchedVersionMessageContent, setSwitchedVersionMessageContent] = useState(null);
@@ -294,14 +297,16 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
   };
 
   // Watch for add to notes success - only update if this message was the one acted upon
+  const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
+
   useEffect(() => {
     if (isAddingToNotes && isAddToNotesPending === true && lastNotesActionMessageUuid === messageUuid) {
       setSavedToNotes(true);
       updateMessageNotesStatus(true);
-      triggerToastWithAction("Response saved in note", "Response saved in note", "success", 5000, "View", () => console.log("View"));
+      triggerToastWithAction("Response saved in note", "Response saved in note", "success", 5000, "View", () => navigation.navigate("notes", { chatUuid }));
       setIsAddingToNotes(false);
     }
-  }, [isAddToNotesPending, isAddingToNotes, lastNotesActionMessageUuid, messageUuid]);
+  }, [isAddToNotesPending, isAddingToNotes, lastNotesActionMessageUuid, messageUuid, chatUuid]);
 
   // Watch for remove from notes success - only update if this message was the one acted upon
   useEffect(() => {
@@ -388,10 +393,38 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
   const isPrevDisabled = currentVersion <= 1;
   const isNextDisabled = currentVersion >= totalVersions;
 
+  // Custom styles for Markdown
+  const markdownStyles = {
+    body: {
+      fontFamily: "Mukta-Regular",
+      fontSize: moderateScale(15),
+      color: "#5E5E5E",
+      lineHeight: 26,
+    },
+    strong: {
+      fontFamily: "Mukta-Bold",
+    },
+    heading1: {
+      fontFamily: "Mukta-Bold",
+      lineHeight: 36,
+    },
+    heading2: {
+      fontFamily: "Mukta-Bold",
+      lineHeight: 32,
+    },
+    heading3: {
+      fontFamily: "Mukta-Bold",
+      lineHeight: 28,
+    },
+    paragraph: {
+      marginVertical: 4,
+    },
+  };
+
   return (
     <View style={styles.mainBox}>
       <View style={styles.messageBox}>
-         <Markdown>
+         <Markdown style={markdownStyles}>
            {currentMessage?.message || message}
           </Markdown>
 

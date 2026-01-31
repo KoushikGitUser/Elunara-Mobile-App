@@ -181,12 +181,6 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
                   </View>
                 ) : (
                   <>
-                    <View style={styles.closeModalMain}>
-                      <TouchableOpacity>
-                        <BackArrowLeftIcon />
-                      </TouchableOpacity>
-                    </View>
-
                     <Text style={styles.title}>Enter the 6-digit code</Text>
                     {/* Description */}
                     <Text style={styles.description}>

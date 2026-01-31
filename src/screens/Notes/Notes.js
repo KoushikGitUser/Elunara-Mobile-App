@@ -64,9 +64,10 @@ import TextSizeMediumIcon from "../../../assets/SvgIconsComponent/NotesSectionIc
 import TextSizeLargeIcon from "../../../assets/SvgIconsComponent/NotesSectionIcons/TextSizeLargeIcon";
 import NotesOptions from "../../components/Modals/Notes/NotesOptions";
 import DeleteNoteConfirmPopup from "../../components/Notes/DeleteNoteConfirmPopup";
-import { scaleFont } from "../../utils/responsive";
+import { scaleFont, moderateScale } from "../../utils/responsive";
 import { Octicons } from "@expo/vector-icons";
 import { appColors } from "../../themes/appColors";
+import Markdown from "react-native-markdown-display";
 
 const Notes = () => {
   const insets = useSafeAreaInsets();
@@ -530,7 +531,7 @@ const Notes = () => {
                     fontFamily: "Mukta-Bold",
                   }}
                 >
-                  Bookmarked Messages
+                  Saved Messages
                 </Text>
                 <View
                   style={{ flex: 1, height: 1, backgroundColor: "#E5E7EB" }}
@@ -561,16 +562,36 @@ const Notes = () => {
                     >
                       YOU
                     </Text>
-                    <Text
+                    <Markdown
                       style={{
-                        fontSize: 15,
-                        color: "#1F2937",
-                        fontFamily: "Mukta-Regular",
-                        lineHeight: 22,
+                        body: {
+                          fontFamily: "Mukta-Regular",
+                          fontSize: moderateScale(15),
+                          color: "#1F2937",
+                          lineHeight: 26,
+                        },
+                        strong: {
+                          fontFamily: "Mukta-Bold",
+                        },
+                        heading1: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 36,
+                        },
+                        heading2: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 32,
+                        },
+                        heading3: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 28,
+                        },
+                        paragraph: {
+                          marginVertical: 4,
+                        },
                       }}
                     >
                       {pair.user_message.content}
-                    </Text>
+                    </Markdown>
                   </View>
 
                   {/* Assistant Message */}
@@ -585,23 +606,43 @@ const Notes = () => {
                     >
                       AI RESPONSE
                     </Text>
-                    <Text
+                    <Markdown
                       style={{
-                        fontSize: 15,
-                        color: "#374151",
-                        fontFamily: "Mukta-Regular",
-                        lineHeight: 22,
+                        body: {
+                          fontFamily: "Mukta-Regular",
+                          fontSize: moderateScale(15),
+                          color: "#5E5E5E",
+                          lineHeight: 26,
+                        },
+                        strong: {
+                          fontFamily: "Mukta-Bold",
+                        },
+                        heading1: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 36,
+                        },
+                        heading2: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 32,
+                        },
+                        heading3: {
+                          fontFamily: "Mukta-Bold",
+                          lineHeight: 28,
+                        },
+                        paragraph: {
+                          marginVertical: 4,
+                        },
                       }}
                     >
                       {pair.assistant_message.content}
-                    </Text>
+                    </Markdown>
                   </View>
                 </View>
               ))}
             </View>
           )}
 
-        <View style={{ height: keyboardVisible ? screenHeight : 100 }} />
+        <View style={{ height: keyboardVisible ? screenHeight : 250 }} />
       </ScrollView>
 
       {/* middle */}

@@ -62,7 +62,7 @@ const  ChatMiddleWrapper = () => {
                 width: 80,
                 position: "absolute",
                 right: -20,
-                top: 60,
+                top: 120,
                 zIndex: 1,
               }
         }

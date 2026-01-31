@@ -31,6 +31,7 @@ import folder from "../../../assets/images/FolderSimple.png";
 import pencil from "../../../assets/images/PencilSimple.png";
 import { useEffect } from "react";
 import bookmarkIcon from "../../../assets/images/BookmarkSimple.png";
+import { appColors } from "../../../themes/appColors";
 
 const ChatOptionsPopup = ({ chatUuid }) => {
   const styleProps = {};
@@ -234,6 +235,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
                 width: 20,
                 resizeMode: "contain",
                 marginRight: 12,
+                tintColor: appColors.navyBlueShade,
               }}
               source={folder}
             />
@@ -278,7 +280,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
               key={actionIndex}
             >
               <Image
-                style={{ height: 20, width: 20, resizeMode: "contain" }}
+                style={{ height: 20, width: 20, resizeMode: "contain", tintColor: appColors.navyBlueShade }}
                 source={actionItem.icon}
               />
               <Text
