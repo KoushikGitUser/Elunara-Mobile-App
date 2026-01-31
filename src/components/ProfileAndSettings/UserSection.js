@@ -112,7 +112,10 @@ const UserSection = () => {
                 : profileImage
               : userImg
           }
-          style={styles.userImg}
+          style={[
+            styles.userImg,
+            { objectFit: typeof profileImage === "string" ? "cover" : "contain" }
+          ]}
         />
         <View>
           <Text
@@ -168,7 +171,7 @@ const UserSection = () => {
               fontFamily: "Mukta-Bold",
             }}
           >
-            Verify mobile no. — 8 days left
+            Verify mobile no. — few days left
           </Text>
         </TouchableOpacity>
       )}
@@ -198,8 +201,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     marginRight: 20,
-    borderRadius:10,
-    objectFit:"contain"
+    borderRadius: 10,
   },
   mobileVerifyButton: {
     width: "100%",

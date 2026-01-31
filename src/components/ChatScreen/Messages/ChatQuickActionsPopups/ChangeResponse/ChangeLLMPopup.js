@@ -232,12 +232,16 @@ const ChangeLLMPopup = () => {
           <View style={styles.modalSheet}>
             <View style={styles.content}>
               <View style={styles.closeModalMain}>
-                <AntDesign
+                <TouchableOpacity
                   onPress={() => dispatch(setToggleChangeResponseLLMWhileChatPopup(false))}
-                  name="close"
-                  size={24}
-                  color="black"
-                />
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <AntDesign
+                    name="close"
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
               </View>
 
               {/* Current LLM Banner */}

@@ -116,17 +116,25 @@ const LLMState = () => {
       ) : (
         <View style={styles.content}>
           <View style={styles.closeModalMain}>
-            <ArrowLeft
+            <TouchableOpacity
               onPress={() => dispatch(setToggleToolsPopupStates(0))}
-              size={30}
-              strokeWidth={2}
-            />
-            <AntDesign
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <ArrowLeft
+                size={30}
+                strokeWidth={2}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => dispatch(setToggleToolsPopup(false))}
-              name="close"
-              size={24}
-              color="black"
-            />
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <AntDesign
+                name="close"
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
           </View>
           {/* Title */}
           <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>

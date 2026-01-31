@@ -57,7 +57,7 @@ import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
 
-const ChatInputMain = forwardRef((props, ref) => {
+const ChatInputMain = forwardRef(({ roomId, ...props }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -206,14 +206,29 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
   };
 
   const createChatWithAIFunction = () => {
+    const data = {
+      name: "Chat with Elunara",
+    };
+
+    // Add room_id if creating chat from within a room
+    if (roomId) {
+      data.room_id = roomId;
+    }
+
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🟢 CREATE CHAT WITH AI - START");
+    console.log("🟢 roomId prop:", roomId);
+    console.log("🟢 data.room_id:", data.room_id);
+    console.log("🟢 Full data payload:", JSON.stringify(data, null, 2));
+
     const payload = {
       method: "POST",
       url: "/chats",
-      data: {
-        name: "Chat with Elunara",
-      },
+      data,
       name: "createChatWithAI",
     };
+    console.log("🟢 Full API payload:", JSON.stringify(payload, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
     dispatch(commonFunctionForAPICalls(payload));
   };
 

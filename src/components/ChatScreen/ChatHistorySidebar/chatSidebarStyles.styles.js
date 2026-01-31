@@ -205,8 +205,7 @@ export const createStyles = ({}) =>
     profilePic: {
       height: verticalScale(24),
       width: verticalScale(24),
-      borderRadius:7,
-      objectFit:"contain"
+      borderRadius: 7,
     },
     profileText: {
       fontSize: moderateScale(17),

@@ -15,7 +15,15 @@ import { useDispatch } from "react-redux";
 import {
   setToggleAddExistingChatToRoomPopup,
   setToggleIsRoomEmpty,
+  setToggleIsChattingWithAI,
 } from "../../../redux/slices/toggleSlice";
+import {
+  setChatMessagesArray,
+  setMessageIDsArray,
+  setCurrentAIMessageIndexForRegeneration,
+  setUserMessagePrompt,
+  setSelecetdFiles,
+} from "../../../redux/slices/globalDataSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,6 +47,13 @@ const PlusButtonPopup = ({ setAddOptionsPopup, visible }) => {
           <Pressable
             onPress={() => {
               setAddOptionsPopup(false);
+              // Reset chat state for new chat
+              dispatch(setChatMessagesArray([]));
+              dispatch(setMessageIDsArray([]));
+              dispatch(setCurrentAIMessageIndexForRegeneration(null));
+              dispatch(setToggleIsChattingWithAI(false));
+              dispatch(setUserMessagePrompt(""));
+              dispatch(setSelecetdFiles([]));
               dispatch(setToggleIsRoomEmpty(false));
             }}
             style={({ pressed }) => [

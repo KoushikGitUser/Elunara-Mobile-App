@@ -54,12 +54,16 @@ const ToolsOptionsPopup = () => {
           {/* Content */}
           <View style={styles.content}>
             <View style={styles.closeModalMain}>
-              <AntDesign
+              <TouchableOpacity
                 onPress={() => dispatch(setToggleToolsPopup(false))}
-                name="close"
-                size={24}
-                color="black"
-              />
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <AntDesign
+                  name="close"
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
             </View>
             {/* Title */}
             <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>Choose Tools</Text>

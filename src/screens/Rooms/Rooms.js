@@ -5,22 +5,28 @@ import {
   Animated,
   StatusBar,
 } from "react-native";
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createStyles } from "./Rooms.styles";
-import { useNavigation } from "@react-navigation/native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { EllipsisVertical, Plus } from "lucide-react-native";
 import RoomsHeader from "../../components/Rooms/RoomsHeader";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import RoomsMiddle from "../../components/Rooms/RoomsMiddle";
+import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/ChatMiddleWrapper";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AddChatToRoomPopup from "../../components/Rooms/AddChatToRoomPopup";
 import { useFonts } from "expo-font";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import {
+  setSelecetdFiles,
+  clearUploadedAttachmentIds,
+  setChatMessagesArray,
+  setMessageIDsArray,
+  setCurrentAIMessageIndexForRegeneration,
+} from "../../redux/slices/globalDataSlice";
+import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 
 const Rooms = ({ route }) => {
   const { roomName, roomUuid } = route.params || {};
@@ -28,9 +34,15 @@ const Rooms = ({ route }) => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates } = useSelector((state) => state.Toggle);
-  const { roomsStates } = useSelector((state) => state.API);
-  const translateX = React.useRef(new Animated.Value(0)).current;
+  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { roomsStates, chatsStates } = useSelector((state) => state.API);
+  const { globalDataStates } = useSelector((state) => state.Global);
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  // Track chat creation for sending first message
+  const previousChatUuidRef = useRef(null);
+  const isChatCreatedWithAI = chatsStates?.loaderStates?.isChatCreatedWithAI;
+  const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
   const [fontsLoaded] = useFonts({ 
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
@@ -48,6 +60,114 @@ const Rooms = ({ route }) => {
       );
     }
   }, [roomUuid]);
+
+  // Track if we've already sent the first message for this chat
+  const hasSentFirstMessageRef = useRef(false);
+
+  // Clear chat state when entering Rooms screen (like ChatScreen does)
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(setChatMessagesArray([]));
+      dispatch(setMessageIDsArray([]));
+      dispatch(setCurrentAIMessageIndexForRegeneration(null));
+      dispatch(setToggleIsChattingWithAI(false));
+
+      // Reset the refs for fresh chat tracking
+      previousChatUuidRef.current = null;
+      hasSentFirstMessageRef.current = false;
+    }, [])
+  );
+
+  // When chat is created, send first message to get AI response (only when Rooms is focused)
+  // IMPORTANT: Only handle chats that were created WITH a room (to avoid conflict with ChatScreen)
+  useFocusEffect(
+    useCallback(() => {
+      if (isChatCreatedWithAI === true && createdChatDetails?.id) {
+        // Only proceed if this chat was created from a room (has room info in response)
+        // This prevents conflict with ChatScreen which handles non-room chats
+        const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
+
+        if (!isRoomChat) {
+          console.log("🟣 ROOMS: Chat has no room info, skipping (ChatScreen will handle)");
+          return;
+        }
+
+        // Only proceed if this is a new chat (different ID) and we haven't sent already
+        if (previousChatUuidRef.current !== createdChatDetails.id && !hasSentFirstMessageRef.current) {
+          previousChatUuidRef.current = createdChatDetails.id;
+          hasSentFirstMessageRef.current = true;
+          const chatId = createdChatDetails.id;
+
+          console.log("═══════════════════════════════════════════════════════");
+          console.log("🟣 ROOMS: Chat created WITH ROOM, sending first message");
+          console.log("🟣 Chat ID:", chatId);
+          console.log("🟣 Room info:", JSON.stringify(createdChatDetails?.room));
+          console.log("🟣 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+          console.log("🟣 chatMessagesArray:", JSON.stringify(globalDataStates.chatMessagesArray));
+
+          const messageData = {
+            content:
+              globalDataStates.chatMessagesArray[
+                globalDataStates.chatMessagesArray.length - 1
+              ]?.message || "Hello",
+            content_type: "text",
+            attachment_ids: globalDataStates.uploadedAttachmentIds || [],
+          };
+
+          // Add LLM ID if not null
+          if (chatCustomisationStates?.selectedLLM?.id !== null) {
+            messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+              ? chatCustomisationStates.selectedLLM.id
+              : parseInt(chatCustomisationStates.selectedLLM.id);
+          }
+
+          // Add Response Style ID if not null
+          if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+            messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+              ? chatCustomisationStates.selectedResponseStyle.id
+              : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+          }
+
+          // Add Language ID if not null
+          if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+            messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+              ? chatCustomisationStates.selectedLanguage.id
+              : parseInt(chatCustomisationStates.selectedLanguage.id);
+          }
+
+          // Add Citation Format ID if not null
+          if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+            messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+              ? chatCustomisationStates.selectedCitationFormat.id
+              : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+          }
+
+          const payload = {
+            method: "POST",
+            url: `/chats/${chatId}/messages`,
+            data: messageData,
+            name: "sendPromptAndGetMessageFromAI",
+          };
+
+          console.log("🟣 ROOMS: Full API payload:", JSON.stringify(payload, null, 2));
+          console.log("═══════════════════════════════════════════════════════");
+
+          dispatch(commonFunctionForAPICalls(payload));
+
+          // Clear attachments after sending
+          dispatch(setSelecetdFiles([]));
+          dispatch(clearUploadedAttachmentIds());
+        }
+      }
+
+      // Cleanup: reset the flag when chat changes or on unmount
+      return () => {
+        if (createdChatDetails?.id !== previousChatUuidRef.current) {
+          hasSentFirstMessageRef.current = false;
+        }
+      };
+    }, [isChatCreatedWithAI, createdChatDetails])
+  );
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -96,9 +216,13 @@ const Rooms = ({ route }) => {
           }}
         ></View>
         <RoomsHeader translateX={translateX} />
-        <RoomsMiddle roomName={roomName} />
+        {toggleStates.toggleIsChattingWithAI ? (
+          <ChatMiddleWrapper isFromRooms={true} />
+        ) : (
+          <RoomsMiddle roomName={roomName} />
+        )}
         <View style={{ width: "100%", paddingHorizontal: 20 }}>
-          <ChatInputMain />
+          <ChatInputMain roomId={roomsStates.currentRoom?.uuid} />
         </View>
       </Animated.View>
     </SafeAreaView>

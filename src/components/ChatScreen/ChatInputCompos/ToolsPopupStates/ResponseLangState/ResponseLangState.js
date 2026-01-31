@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
-  setToggleTopicsPopup,
+  setToggleToolsPopup,
 } from "../../../../../redux/slices/toggleSlice";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -28,17 +28,25 @@ const ResponseLangState = () => {
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.closeModalMain}>
-          <ArrowLeft
+          <TouchableOpacity
             onPress={() => dispatch(setToggleToolsPopupStates(0))}
-            size={30}
-            strokeWidth={2}
-          />
-          <AntDesign
-            onPress={() => dispatch(setToggleTopicsPopup(false))}
-            name="close"
-            size={24}
-            color="black"
-          />
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <ArrowLeft
+              size={30}
+              strokeWidth={2}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => dispatch(setToggleToolsPopup(false))}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AntDesign
+              name="close"
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
         </View>
         {isLanguageSaved? <SavedLanguageState/>:<FirstLanguageSetState setIsLanguageSaved={setIsLanguageSaved} />}
       </View>

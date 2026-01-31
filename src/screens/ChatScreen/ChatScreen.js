@@ -251,8 +251,18 @@ const ChatScreen = () => {
   const previousChatUuidRef = useRef(null);
 
   // When chat is created, send message to get AI response
+  // IMPORTANT: Only handle chats that were created WITHOUT a room (to avoid conflict with Rooms screen)
   useEffect(() => {
     if (isChatCreatedWithAI === true && createdChatDetails?.id) {
+      // Skip if this chat was created from a room (has room info in response)
+      // Rooms screen will handle room chats
+      const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
+
+      if (isRoomChat) {
+        console.log("🟢 CHAT SCREEN: Chat has room info, skipping (Rooms will handle)");
+        return;
+      }
+
       // Only proceed if this is a new chat (different ID)
       if (previousChatUuidRef.current !== createdChatDetails.id) {
         previousChatUuidRef.current = createdChatDetails.id;
@@ -260,7 +270,7 @@ const ChatScreen = () => {
         const chatId = createdChatDetails.id;
 
         console.log("═══════════════════════════════════════════════════════");
-        console.log("🟢 CHAT SCREEN: Chat created, sending first message");
+        console.log("🟢 CHAT SCREEN: Chat created WITHOUT ROOM, sending first message");
         console.log("🟢 Chat ID:", chatId);
         console.log("🟢 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
         console.log("🟢 selectedFiles from Redux:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));

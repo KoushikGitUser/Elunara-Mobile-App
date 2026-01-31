@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
   textDesc: {
     color: "#757575",
     fontSize: 15,
+    maxWidth: "80%",
   },
 });
 

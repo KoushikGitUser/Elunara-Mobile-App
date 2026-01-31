@@ -62,8 +62,9 @@ const UniversalTooltip = ({
       return;
     }
     // Original behavior for new user tour
-    dispatch(setGuidedTourStepsCount(globalDataStates.guidedTourStepsCount + 1));
-    if (globalDataStates.guidedTourStepsCount == 2) {
+    const nextStep = globalDataStates.guidedTourStepsCount + 1;
+    dispatch(setGuidedTourStepsCount(nextStep));
+    if (nextStep > 2) {
       dispatch(setToggleChatScreenGuideStart(false));
       await AsyncStorage.setItem("isNewUser", "false");
     }
@@ -107,7 +108,7 @@ const UniversalTooltip = ({
         {!isManualTour && (
           <AntDesign
             style={{ marginRight: 17 }}
-            onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
+            onPress={handleBackdropPress}
             name="close"
             size={16}
             color="white"
@@ -173,7 +174,7 @@ const UniversalTooltip = ({
           <View style={styles.btnsMain}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => dispatch(setToggleChatScreenGuideStart(false))}
+              onPress={handleBackdropPress}
               activeOpacity={0.8}
             >
               <Text style={styles.buttonText}>Start Exploring</Text>

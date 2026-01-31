@@ -169,11 +169,19 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
-                  <AntDesign
-                    name="close"
-                    size={24}
-                    color={appColors.navyBlueShade}
-                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      close(false);
+                      Keyboard.dismiss();
+                    }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <AntDesign
+                      name="close"
+                      size={24}
+                      color={appColors.navyBlueShade}
+                    />
+                  </TouchableOpacity>
                 </View>
                 {/* Title */}
                 <Text style={styles.title}>Forgot Your Password?</Text>

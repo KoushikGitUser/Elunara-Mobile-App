@@ -186,15 +186,19 @@ const ChangeResponseStylePopup = () => {
           <View style={styles.modalSheet}>
             {/* Handle Bar */}
             <View style={styles.closeModalMain}>
-              <AntDesign
-                style={{ marginRight: 20 }}
+              <TouchableOpacity
                 onPress={() =>
                   dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
                 }
-                name="close"
-                size={20}
-                color="black"
-              />
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                style={{ marginRight: 20 }}
+              >
+                <AntDesign
+                  name="close"
+                  size={20}
+                  color="black"
+                />
+              </TouchableOpacity>
             </View>
 
             {/* Content */}

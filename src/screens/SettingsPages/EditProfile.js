@@ -223,7 +223,7 @@ const EditProfile = () => {
                   : selectedImage
                 : profilePic
             }
-            style={{ height: "100%", width: "100%", borderRadius: 20,objectFit:"contain" }}
+            style={{ height: "100%", width: "100%", borderRadius: 20, objectFit: typeof selectedImage === "string" ? "cover" : "contain" }}
           />
           <TouchableOpacity
             onPress={() => dispatch(setToggleUpdateProfilePicPopup(true))}
@@ -277,6 +277,7 @@ const EditProfile = () => {
         <Text style={styles.inputLabel}>Email</Text>
         <View style={styles.input}>
           <TextInput
+            editable={false}
             ref={emailInputRef}
             style={styles.inputText}
             placeholder="Your email"
@@ -367,7 +368,7 @@ const EditProfile = () => {
               <TouchableOpacity>
                 <InfoIcon />
               </TouchableOpacity>
-              <Text style={styles.title}>Verify Mobile no. in 10 Days</Text>
+              <Text style={styles.title}>Verify Mobile number</Text>
             </View>
             <Text style={styles.subtitle}>
               Verifying your mobile no. helps protect your account and enables

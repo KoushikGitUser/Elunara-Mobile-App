@@ -15,7 +15,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopupStates,
-  setToggleTopicsPopup,
+  setToggleToolsPopup,
   setSelectedResponseStyle,
 } from "../../../../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
@@ -105,17 +105,25 @@ const ResponseStyleState = () => {
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.closeModalMain}>
-          <ArrowLeft
+          <TouchableOpacity
             onPress={() => dispatch(setToggleToolsPopupStates(0))}
-            size={30}
-            strokeWidth={2}
-          />
-          <AntDesign
-            onPress={() => dispatch(setToggleTopicsPopup(false))}
-            name="close"
-            size={24}
-            color="black"
-          />
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <ArrowLeft
+              size={30}
+              strokeWidth={2}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => dispatch(setToggleToolsPopup(false))}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AntDesign
+              name="close"
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
         </View>
         {/* Title */}
         <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>

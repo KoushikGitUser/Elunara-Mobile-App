@@ -105,7 +105,10 @@ const SidebarFooter = ({ translateX }) => {
                 : profileImage
               : profilePic
           }
-          style={styles.profilePic}
+          style={[
+            styles.profilePic,
+            { objectFit: typeof profileImage === "string" ? "cover" : "contain" }
+          ]}
         />
         <Text style={[styles.profileText, { fontFamily: "Mukta-Bold" }]}>
           Profile

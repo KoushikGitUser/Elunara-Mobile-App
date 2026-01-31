@@ -11,7 +11,7 @@ import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import chatLoader from "../../../assets/images/Loading chat mob.gif";
 
-const  ChatMiddleWrapper = () => { 
+const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -75,6 +75,7 @@ const  ChatMiddleWrapper = () => {
             justifyContent: "flex-end",
             gap: 25,
             alignItems: "center",
+            paddingHorizontal: isFromRooms ? 20 : 0,
           }}
           style={[styles.messagesContainer,]}
         >

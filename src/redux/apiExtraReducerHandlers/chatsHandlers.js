@@ -100,24 +100,36 @@ export const handleGetAllTopicsOfSelectedSubjects = {
 
 export const handleCreateChatWithAI = {
   pending: (state) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🔵 CREATE CHAT WITH AI - PENDING");
+    console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.loaderStates.isChatCreatedWithAI = "pending";
   },
   fulfilled: (state, action) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🔵 CREATE CHAT WITH AI - FULFILLED");
     console.log(
-      "createChatWithAI - REQUEST PAYLOAD:",
+      "🔵 REQUEST PAYLOAD:",
       JSON.stringify(action?.meta?.arg, null, 2),
     );
     console.log(
-      "createChatWithAI - FULL RESPONSE:",
+      "🔵 FULL RESPONSE:",
       JSON.stringify(action?.payload, null, 2),
     );
+    console.log(
+      "🔵 Chat ID:",
+      action?.payload?.data?.data?.id,
+    );
+    console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.allChatsDatas.createdChatDetails =
       action?.payload.data.data;
-    console.log(action?.payload.data.data, "data");
     state.chatsStates.loaderStates.isChatCreatedWithAI = true;
   },
   rejected: (state, { payload }) => {
-    console.log(payload.message);
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🔴 CREATE CHAT WITH AI - REJECTED");
+    console.log("🔴 Error:", payload?.message || "Unknown error");
+    console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.loaderStates.isChatCreatedWithAI = false;
   },
 };
@@ -312,6 +324,9 @@ export const handleFetchAllUserRoomsAvailable = {
 
 export const handleSendPromptAndGetMessageFromAI = {
   pending: (state) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🟡 SEND MESSAGE - PENDING");
+    console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.loaderStates.isMessagesFetched = "pending";
     state.chatsStates.allChatsDatas.aiMessageContent = null;
     state.chatsStates.allChatsDatas.latestUserMessageData = null;
@@ -320,6 +335,10 @@ export const handleSendPromptAndGetMessageFromAI = {
     state.chatsStates.loaderStates.isChatCreatedWithAI = null;
   },
   fulfilled: (state, action) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🟡 SEND MESSAGE - FULFILLED");
+    console.log("🟡 FULL RESPONSE:", JSON.stringify(action?.payload, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
     const responseData = action?.payload.data.data;
     state.chatsStates.allChatsDatas.chatMessages = responseData;
 
@@ -364,6 +383,10 @@ export const handleSendPromptAndGetMessageFromAI = {
     state.chatsStates.loaderStates.isMessagesFetched = true;
   },
   rejected: (state, { payload }) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🔴 SEND MESSAGE - REJECTED");
+    console.log("🔴 Error:", JSON.stringify(payload, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.loaderStates.isMessagesFetched = false;
     state.chatsStates.allChatsDatas.aiMessageContent = null;
     state.chatsStates.allChatsDatas.latestUserMessageData = null;
