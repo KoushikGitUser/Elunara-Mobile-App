@@ -31,6 +31,7 @@ import ArchiveConfirmPopup from "../../components/AllChatsPage/ArchiveConfirmPop
 import DeleteChatPopup from "../../components/AllChatsPage/DeleteChatPopup";
 import ArchiveChatPopup from "../../components/AllChatsPage/ArchiveChatPopup";
 import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
+import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import { triggerToast } from "../../services/toast";
 
 const AllChatsPage = () => {
@@ -230,6 +231,9 @@ const AllChatsPage = () => {
       )}
       {toggleStates.toggleRenameChatPopup && (
         <RenameChatPopup />
+      )}
+      {toggleStates.toggleAddChatToLearningLabPopup && (
+        <AddChatToLearningLabPopup />
       )}
       <ChatHistorySidebar translateX={translateX} />
       <StatusBar

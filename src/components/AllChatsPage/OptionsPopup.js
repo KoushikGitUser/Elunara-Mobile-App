@@ -15,6 +15,7 @@ import {
   setToggleDeleteChatPopup,
   setToggleArchiveChatPopup,
   setToggleRenameChatPopup,
+  setToggleAddChatToLearningLabPopup,
 } from "../../redux/slices/toggleSlice";
 import FolderIconDark from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
 import RenameIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
@@ -82,7 +83,8 @@ const OptionsPopup = ({ popupPosition }) => {
     const chatId = currentChat?.id;
 
     if (action === "addToRoom") {
-      // Handle add to room
+      // Open AddChatToLearningLabPopup to select a room
+      dispatch(setToggleAddChatToLearningLabPopup(true));
       closePopup();
     } else if (action === "rename") {
       dispatch(setToggleRenameChatPopup(true));

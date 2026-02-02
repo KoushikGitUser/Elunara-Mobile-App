@@ -107,6 +107,9 @@ const apiCommonSlice = createSlice({
     resetChatTitleUpdated: (state) => {
       state.chatsStates.loaderStates.isChatTitleUpdated = null;
     },
+    resetChatPinUnpinUpdated: (state) => {
+      state.chatsStates.loaderStates.isChatPinUnpinUpdated = null;
+    },
     setCurrentActionChatDetails: (state, action) => {
       state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     },

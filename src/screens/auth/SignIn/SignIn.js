@@ -58,6 +58,7 @@ const SignIn = () => {
 
   const { authStates } = useSelector((state) => state.Auth);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
 
   useEffect(() => {
@@ -153,8 +154,6 @@ const SignIn = () => {
     // Example: headingColor: '#000000',
     // Add any dynamic values here
   };
-
-  const navigation = useNavigation();
 
   const styles = useMemo(() => createStyles(styleProps), []);
   const subtitle =

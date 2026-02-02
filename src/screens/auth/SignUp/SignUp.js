@@ -74,6 +74,8 @@ const SignUp = () => {
   const confirmPasswordRef = useRef(null);
 
   const { authStates } = useSelector((state) => state.Auth);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (authStates.isSignedUp == true) {
@@ -178,8 +180,6 @@ const SignUp = () => {
     return "";
   };
 
-  const dispatch = useDispatch();
-
   const hasErrors = Object.values(errors).some((error) => error !== "");
 
   const handleUserSignUp = () => {
@@ -194,8 +194,6 @@ const SignUp = () => {
     dispatch(setUserMailIDOnSignup(email.trim()));
     dispatch(userSignUp(formData));
   };
-
-  const navigation = useNavigation();
 
   const styles = useMemo(() => createStyles(styleProps), []);
   const subtitle =

@@ -672,21 +672,17 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
         />
         <View style={styles.inputActionIconsMainWrapper}>
           <View style={styles.inputLeftActionIcons}>
-            <View
-              style={[
-                styles.parentContainer,
-                {
-                  backgroundColor: toggleStates.toggleAddItemsToInputPopup
-                    ? "#EEF4FF"
-                    : "",
-                  padding: 4,
-                  borderRadius: 8,
-                  borderRadius: 8,
-                },
-              ]}
-            >
+            <View style={styles.parentContainer}>
               <TouchableOpacity
                 onPress={() => dispatch(setToggleAddItemsToInputPopup(true))}
+                style={{
+                  backgroundColor: toggleStates.toggleAddItemsToInputPopup
+                    ? "#EEF4FF"
+                    : "transparent",
+                  padding: 4,
+                  borderRadius: 8,
+                  overflow: "hidden",
+                }}
               >
                 <ClipIcon />
               </TouchableOpacity>

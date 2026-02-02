@@ -104,6 +104,8 @@ export const handleCreateChatWithAI = {
     console.log("🔵 CREATE CHAT WITH AI - PENDING");
     console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.loaderStates.isChatCreatedWithAI = "pending";
+    // Clear stale data from previous chat to prevent incorrect popup states
+    state.chatsStates.allChatsDatas.currentActionChatDetails = null;
   },
   fulfilled: (state, action) => {
     console.log("═══════════════════════════════════════════════════════");
@@ -122,6 +124,9 @@ export const handleCreateChatWithAI = {
     );
     console.log("═══════════════════════════════════════════════════════");
     state.chatsStates.allChatsDatas.createdChatDetails =
+      action?.payload.data.data;
+    // Also set currentActionChatDetails to the new chat so popup uses fresh data
+    state.chatsStates.allChatsDatas.currentActionChatDetails =
       action?.payload.data.data;
     state.chatsStates.loaderStates.isChatCreatedWithAI = true;
   },

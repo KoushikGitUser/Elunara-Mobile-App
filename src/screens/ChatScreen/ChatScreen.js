@@ -259,90 +259,96 @@ const ChatScreen = () => {
     }
   }, [settingsStates?.allGeneralSettings, settingsStates?.settingsMasterDatas?.allLLMsAvailable]);
 
-  // Track previous chat UUID to detect new chat creation
-  const previousChatUuidRef = useRef(null);
+  // Track which chat ID we've already sent first message for
+  const sentFirstMessageForChatIdRef = useRef(null);
 
   // When chat is created, send message to get AI response
   // IMPORTANT: Only handle chats that were created WITHOUT a room (to avoid conflict with Rooms screen)
   useEffect(() => {
-    if (isChatCreatedWithAI === true && createdChatDetails?.id) {
-      // Skip if this chat was created from a room (has room info in response)
-      // Rooms screen will handle room chats
-      const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
-
-      if (isRoomChat) {
-        console.log("🟢 CHAT SCREEN: Chat has room info, skipping (Rooms will handle)");
-        return;
-      }
-
-      // Only proceed if this is a new chat (different ID)
-      if (previousChatUuidRef.current !== createdChatDetails.id) {
-        previousChatUuidRef.current = createdChatDetails.id;
-        setIsWaitingForMessages(true);
-        const chatId = createdChatDetails.id;
-
-        console.log("═══════════════════════════════════════════════════════");
-        console.log("🟢 CHAT SCREEN: Chat created WITHOUT ROOM, sending first message");
-        console.log("🟢 Chat ID:", chatId);
-        console.log("🟢 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
-        console.log("🟢 selectedFiles from Redux:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));
-
-        const messageData = {
-          content:
-            globalDataStates.chatMessagesArray[
-              globalDataStates.chatMessagesArray.length - 1
-            ]?.message || "Hello",
-          content_type: "text",
-          attachment_ids: globalDataStates.uploadedAttachmentIds || [],
-        };
-
-        // Add LLM ID if not null
-        if (chatCustomisationStates?.selectedLLM?.id !== null) {
-          messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
-            ? chatCustomisationStates.selectedLLM.id
-            : parseInt(chatCustomisationStates.selectedLLM.id);
-        }
-
-        // Add Response Style ID if not null
-        if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
-          messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
-            ? chatCustomisationStates.selectedResponseStyle.id
-            : parseInt(chatCustomisationStates.selectedResponseStyle.id);
-        }
-
-        // Add Language ID if not null
-        if (chatCustomisationStates?.selectedLanguage?.id !== null) {
-          messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
-            ? chatCustomisationStates.selectedLanguage.id
-            : parseInt(chatCustomisationStates.selectedLanguage.id);
-        }
-
-        // Add Citation Format ID if not null
-        if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
-          messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
-            ? chatCustomisationStates.selectedCitationFormat.id
-            : parseInt(chatCustomisationStates.selectedCitationFormat.id);
-        }
-
-        const payload = {
-          method: "POST",
-          url: `/chats/${chatId}/messages`,
-          data: messageData,
-          name: "sendPromptAndGetMessageFromAI",
-        };
-
-        console.log("🟢 CHAT SCREEN: Full API payload:", JSON.stringify(payload, null, 2));
-        console.log("🟢 CHAT SCREEN: attachment_ids specifically:", JSON.stringify(messageData.attachment_ids));
-        console.log("═══════════════════════════════════════════════════════");
-
-        dispatch(commonFunctionForAPICalls(payload));
-
-        // Clear attachments after sending (for new chat flow)
-        dispatch(setSelecetdFiles([]));
-        dispatch(clearUploadedAttachmentIds());
-      }
+    // Only proceed if chat was just created
+    if (isChatCreatedWithAI !== true || !createdChatDetails?.id) {
+      return;
     }
-  }, [isChatCreatedWithAI, createdChatDetails]);
+
+    // Skip if this chat was created from a room (has room info in response)
+    // Rooms screen will handle room chats
+    const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
+    if (isRoomChat) {
+      console.log("🟢 CHAT SCREEN: Chat has room info, skipping (Rooms will handle)");
+      return;
+    }
+
+    // Skip if we've already sent for this exact chat ID
+    if (sentFirstMessageForChatIdRef.current === createdChatDetails.id) {
+      console.log("🟢 CHAT SCREEN: Already sent for this chat ID, skipping");
+      return;
+    }
+
+    // Mark as sent for this chat ID BEFORE dispatching
+    sentFirstMessageForChatIdRef.current = createdChatDetails.id;
+    setIsWaitingForMessages(true);
+    const chatId = createdChatDetails.id;
+
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🟢 CHAT SCREEN: Chat created WITHOUT ROOM, sending first message");
+    console.log("🟢 Chat ID:", chatId);
+    console.log("🟢 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+    console.log("🟢 selectedFiles from Redux:", JSON.stringify(globalDataStates.selectedFiles?.map(f => ({ name: f.name, attachmentId: f.attachmentId }))));
+
+    const messageData = {
+      content:
+        globalDataStates.chatMessagesArray[
+          globalDataStates.chatMessagesArray.length - 1
+        ]?.message || "Hello",
+      content_type: "text",
+      attachment_ids: globalDataStates.uploadedAttachmentIds || [],
+    };
+
+    // Add LLM ID if not null
+    if (chatCustomisationStates?.selectedLLM?.id !== null) {
+      messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+        ? chatCustomisationStates.selectedLLM.id
+        : parseInt(chatCustomisationStates.selectedLLM.id);
+    }
+
+    // Add Response Style ID if not null
+    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+      messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+        ? chatCustomisationStates.selectedResponseStyle.id
+        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    }
+
+    // Add Language ID if not null
+    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+      messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+        ? chatCustomisationStates.selectedLanguage.id
+        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    }
+
+    // Add Citation Format ID if not null
+    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+      messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+        ? chatCustomisationStates.selectedCitationFormat.id
+        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    }
+
+    const payload = {
+      method: "POST",
+      url: `/chats/${chatId}/messages`,
+      data: messageData,
+      name: "sendPromptAndGetMessageFromAI",
+    };
+
+    console.log("🟢 CHAT SCREEN: Full API payload:", JSON.stringify(payload, null, 2));
+    console.log("🟢 CHAT SCREEN: attachment_ids specifically:", JSON.stringify(messageData.attachment_ids));
+    console.log("═══════════════════════════════════════════════════════");
+
+    dispatch(commonFunctionForAPICalls(payload));
+
+    // Clear attachments after sending (for new chat flow)
+    dispatch(setSelecetdFiles([]));
+    dispatch(clearUploadedAttachmentIds());
+  }, [isChatCreatedWithAI, createdChatDetails?.id]);
 
   // When messages are fetched, show alert
   useEffect(() => {
@@ -1285,7 +1291,7 @@ const ChatScreen = () => {
           {/* middle section */}
 
           {/* chatInput section */}
-          {(createdChatDetails?.is_archived || createdChatDetails?.archived) ? (
+          {(toggleStates.toggleIsChattingWithAI && (createdChatDetails?.is_archived || createdChatDetails?.archived)) ? (
             <View style={{ width: "100%", paddingHorizontal: 20, paddingVertical: 30 }}>
               <Text
                 style={{

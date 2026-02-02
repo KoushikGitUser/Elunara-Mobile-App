@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { setToggleAddChatToLearningLabPopup, setToggleRoomCreationPopup } from "../../../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
-import Toaster from "../../../UniversalToaster/Toaster";
 
 const AddChatToLearningLabPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -89,7 +88,6 @@ const AddChatToLearningLabPopup = () => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleAddChatToLearningLabPopup(false))}
     >
-      <Toaster/>
       <View style={styles.container}>
         {/* Blur Background */}
 

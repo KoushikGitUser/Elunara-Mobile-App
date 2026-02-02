@@ -40,6 +40,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const animatedValue = useState(new Animated.Value(0))[0];
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
@@ -79,7 +80,6 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   };
 
   const isEmailValid = email && !emailError;
-  const navigation = useNavigation();
 
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {

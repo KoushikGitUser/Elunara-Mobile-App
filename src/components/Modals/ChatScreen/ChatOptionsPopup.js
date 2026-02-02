@@ -5,7 +5,6 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Pressable,
-  Image,
 } from "react-native";
 import React, { useMemo, useRef } from "react";
 import { createStyles } from "./chatModals.styles";
@@ -22,16 +21,13 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import { triggerToast } from "../../../services/toast";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
-import archiveBox from "../../../assets/images/ArchiveBox.png";
-import deleteBin from "../../../assets/images/deleteBin.png";
-import pin from "../../../assets/images/PushPin.png";
-import pinGrey from "../../../assets/images/pinGrey.png";
-import archive from "../../../assets/images/Archive.png";
-import folder from "../../../assets/images/FolderSimple.png";
-import pencil from "../../../assets/images/PencilSimple.png";
 import { useEffect } from "react";
-import bookmarkIcon from "../../../assets/images/BookmarkSimple.png";
-import { appColors } from "../../../themes/appColors";
+import ArchiveIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
+import TrashIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon";
+import PinIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon";
+import FolderPlusIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon";
+import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
+import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon";
 
 const ChatOptionsPopup = ({ chatUuid }) => {
   const styleProps = {};
@@ -48,6 +44,23 @@ const ChatOptionsPopup = ({ chatUuid }) => {
   const createdChatDetails = chatsStates.allChatsDatas.createdChatDetails;
   const chatId = createdChatDetails?.id;
 
+  // Get the correct chat details - only use data that matches the current chat ID
+  // This prevents showing stale data from a previous chat
+  const getRelevantChatDetails = () => {
+    // Prefer currentActionChatDetails if it matches the current chat ID
+    if (currentChatDetails?.id === chatId) {
+      return currentChatDetails;
+    }
+    // Fall back to createdChatDetails if it matches
+    if (createdChatDetails?.id === chatId) {
+      return createdChatDetails;
+    }
+    // If neither match (shouldn't happen), return createdChatDetails
+    return createdChatDetails;
+  };
+
+  const relevantChatDetails = getRelevantChatDetails();
+
   // Ref to track if we've already fetched for this popup session
   const hasFetchedRef = useRef(false);
 
@@ -58,74 +71,65 @@ const ChatOptionsPopup = ({ chatUuid }) => {
     }
   }, [toggleStates.toggleChatMenuPopup]);
 
-  // Fetch chat details when popup opens - only if not already available
+  // Fetch chat details when popup opens - always fetch to ensure fresh data
   useEffect(() => {
     if (toggleStates.toggleChatMenuPopup && chatId && !hasFetchedRef.current) {
-      // Check if we already have the chat details for this specific chat
-      const hasCurrentDetails = currentChatDetails?.id === chatId || createdChatDetails?.id === chatId;
-
-      if (!hasCurrentDetails) {
-        hasFetchedRef.current = true;
-        const payload = {
-          method: "GET",
-          url: `/chats/${chatId}`,
-          name: "getAllDetailsOfChatByID",
-        };
-        dispatch(commonFunctionForAPICalls(payload));
-      }
+      hasFetchedRef.current = true;
+      const payload = {
+        method: "GET",
+        url: `/chats/${chatId}`,
+        name: "getAllDetailsOfChatByID",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
     }
   }, [toggleStates.toggleChatMenuPopup, chatId]);
-  const isPinned =
-    currentChatDetails?.is_pinned || createdChatDetails?.is_pinned;
+
+  // Use only the relevant chat details for the current chat ID
+  const isPinned = relevantChatDetails?.is_pinned || false;
+
   // Check both possible field names from API
   const isArchived =
-    currentChatDetails?.is_archived ||
-    currentChatDetails?.archived ||
-    createdChatDetails?.is_archived ||
-    createdChatDetails?.archived;
+    relevantChatDetails?.is_archived ||
+    relevantChatDetails?.archived ||
+    false;
 
-  // Check if chat already belongs to a room
-  const hasRoom =
-    currentChatDetails?.room ||
-    currentChatDetails?.room_id ||
-    createdChatDetails?.room ||
-    createdChatDetails?.room_id;
+  // Check if chat already belongs to a room - only from relevant chat details
+  const hasRoom = relevantChatDetails?.room || relevantChatDetails?.room_id || false;
 
   // Get room name for header
-  const roomName =
-    currentChatDetails?.room?.name || createdChatDetails?.room?.name || "Room";
+  const roomName = relevantChatDetails?.room?.name || "Room";
 
   // Show limited options when chat is archived
   const actions = isArchived
     ? [
-        { title: "Unarchive", icon: archiveBox, action: "unarchive" },
-        { title: "Delete", icon: deleteBin, action: "delete" },
+        { title: "Unarchive", icon: <ArchiveIcon />, action: "unarchive" },
+        { title: "Delete", icon: <TrashIcon />, action: "delete" },
       ]
     : [
-        { title: "Open Notes", icon: bookmarkIcon, action: "openNotes" },
+        { title: "Open Notes", icon: <NotesIcon />, action: "openNotes" },
         ...(hasRoom
           ? [
               {
                 title: "Remove from Room",
-                icon: folder,
+                icon: <FolderPlusIcon />,
                 action: "removeFromRoom",
               },
             ]
           : [
               {
                 title: "Add to Learning Lab",
-                icon: folder,
+                icon: <FolderPlusIcon />,
                 action: "addToLearningLab",
               },
             ]),
-        { title: "Rename", icon: pencil, action: "rename" },
+        { title: "Rename", icon: <RenameIcon />, action: "rename" },
         {
           title: isPinned ? "Unpin" : "Pin",
-          icon: isPinned ? pinGrey : pin,
+          icon: <PinIcon />,
           action: "pinUnpin",
         },
-        { title: "Archive", icon: archive, action: "archive" },
-        { title: "Delete", icon: deleteBin, action: "delete" },
+        { title: "Archive", icon: <ArchiveIcon />, action: "archive" },
+        { title: "Delete", icon: <TrashIcon />, action: "delete" },
       ];
 
   const commonFunctions = (actionType) => {
@@ -274,16 +278,9 @@ const ChatOptionsPopup = ({ chatUuid }) => {
               width: "100%",
             }}
           >
-            <Image
-              style={{
-                height: 20,
-                width: 20,
-                resizeMode: "contain",
-                marginRight: 12,
-                tintColor: appColors.navyBlueShade,
-              }}
-              source={folder}
-            />
+            <View style={{ marginRight: 12 }}>
+              <FolderPlusIcon />
+            </View>
             <View style={{ alignItems: "flex-start", flex: 1 }}>
               <Text
                 style={{
@@ -324,10 +321,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
               }}
               key={actionIndex}
             >
-              <Image
-                style={{ height: 20, width: 20, resizeMode: "contain", tintColor: appColors.navyBlueShade }}
-                source={actionItem.icon}
-              />
+              {actionItem.icon}
               <Text
                 numberOfLines={1}
                 style={{

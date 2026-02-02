@@ -92,6 +92,10 @@ export const handleGetRoom = {
     state.roomsStates.fetchingRoom = true;
   },
   fulfilled: (state, action) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("🏠 GET ROOM - FULFILLED");
+    console.log("🏠 Full response:", JSON.stringify(action?.payload?.data, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
     const room = action?.payload?.data?.data;
     state.roomsStates.currentRoom = room
       ? { ...room, uuid: room.id || room.uuid }
@@ -99,6 +103,7 @@ export const handleGetRoom = {
     state.roomsStates.fetchingRoom = false;
   },
   rejected: (state, action) => {
+    console.log("🏠 GET ROOM - REJECTED:", action?.payload?.message || "Unknown error");
     state.roomsStates.fetchingRoom = false;
   },
 };

@@ -106,13 +106,18 @@ const UniversalTooltip = ({
           <Text style={styles.title}>{title}</Text>
         </View>
         {!isManualTour && (
-          <AntDesign
-            style={{ marginRight: 17 }}
+          <TouchableOpacity
             onPress={handleBackdropPress}
-            name="close"
-            size={16}
-            color="white"
-          />
+            style={styles.closeButton}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AntDesign
+              name="close"
+              size={16}
+              color="white"
+            />
+          </TouchableOpacity>
         )}
       </View>
 
@@ -304,6 +309,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
     alignItems: "center",
+  },
+  closeButton: {
+    marginRight: 12,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   // New styles for manual tour
   stepCounter: {

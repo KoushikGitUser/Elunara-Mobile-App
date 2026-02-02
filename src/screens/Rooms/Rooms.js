@@ -39,11 +39,11 @@ const Rooms = ({ route }) => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const translateX = useRef(new Animated.Value(0)).current;
 
-  // Track chat creation for sending first message
-  const previousChatUuidRef = useRef(null);
+  // Track which chat ID we've already sent first message for (simple single-ref approach)
+  const sentFirstMessageForChatIdRef = useRef(null);
   const isChatCreatedWithAI = chatsStates?.loaderStates?.isChatCreatedWithAI;
   const createdChatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
-  const [fontsLoaded] = useFonts({ 
+  const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../assets/fonts/Mukta-Regular.ttf"),
   });
@@ -61,9 +61,6 @@ const Rooms = ({ route }) => {
     }
   }, [roomUuid]);
 
-  // Track if we've already sent the first message for this chat
-  const hasSentFirstMessageRef = useRef(false);
-
   // Clear chat state when entering Rooms screen (like ChatScreen does)
   useFocusEffect(
     useCallback(() => {
@@ -71,10 +68,8 @@ const Rooms = ({ route }) => {
       dispatch(setMessageIDsArray([]));
       dispatch(setCurrentAIMessageIndexForRegeneration(null));
       dispatch(setToggleIsChattingWithAI(false));
-
-      // Reset the refs for fresh chat tracking
-      previousChatUuidRef.current = null;
-      hasSentFirstMessageRef.current = false;
+      // Note: DO NOT reset sentFirstMessageForChatIdRef here - it tracks which chat ID
+      // was already processed globally, resetting would cause duplicate sends
     }, [])
   );
 
@@ -82,91 +77,89 @@ const Rooms = ({ route }) => {
   // IMPORTANT: Only handle chats that were created WITH a room (to avoid conflict with ChatScreen)
   useFocusEffect(
     useCallback(() => {
-      if (isChatCreatedWithAI === true && createdChatDetails?.id) {
-        // Only proceed if this chat was created from a room (has room info in response)
-        // This prevents conflict with ChatScreen which handles non-room chats
-        const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
-
-        if (!isRoomChat) {
-          console.log("🟣 ROOMS: Chat has no room info, skipping (ChatScreen will handle)");
-          return;
-        }
-
-        // Only proceed if this is a new chat (different ID) and we haven't sent already
-        if (previousChatUuidRef.current !== createdChatDetails.id && !hasSentFirstMessageRef.current) {
-          previousChatUuidRef.current = createdChatDetails.id;
-          hasSentFirstMessageRef.current = true;
-          const chatId = createdChatDetails.id;
-
-          console.log("═══════════════════════════════════════════════════════");
-          console.log("🟣 ROOMS: Chat created WITH ROOM, sending first message");
-          console.log("🟣 Chat ID:", chatId);
-          console.log("🟣 Room info:", JSON.stringify(createdChatDetails?.room));
-          console.log("🟣 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
-          console.log("🟣 chatMessagesArray:", JSON.stringify(globalDataStates.chatMessagesArray));
-
-          const messageData = {
-            content:
-              globalDataStates.chatMessagesArray[
-                globalDataStates.chatMessagesArray.length - 1
-              ]?.message || "Hello",
-            content_type: "text",
-            attachment_ids: globalDataStates.uploadedAttachmentIds || [],
-          };
-
-          // Add LLM ID if not null
-          if (chatCustomisationStates?.selectedLLM?.id !== null) {
-            messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
-              ? chatCustomisationStates.selectedLLM.id
-              : parseInt(chatCustomisationStates.selectedLLM.id);
-          }
-
-          // Add Response Style ID if not null
-          if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
-            messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
-              ? chatCustomisationStates.selectedResponseStyle.id
-              : parseInt(chatCustomisationStates.selectedResponseStyle.id);
-          }
-
-          // Add Language ID if not null
-          if (chatCustomisationStates?.selectedLanguage?.id !== null) {
-            messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
-              ? chatCustomisationStates.selectedLanguage.id
-              : parseInt(chatCustomisationStates.selectedLanguage.id);
-          }
-
-          // Add Citation Format ID if not null
-          if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
-            messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
-              ? chatCustomisationStates.selectedCitationFormat.id
-              : parseInt(chatCustomisationStates.selectedCitationFormat.id);
-          }
-
-          const payload = {
-            method: "POST",
-            url: `/chats/${chatId}/messages`,
-            data: messageData,
-            name: "sendPromptAndGetMessageFromAI",
-          };
-
-          console.log("🟣 ROOMS: Full API payload:", JSON.stringify(payload, null, 2));
-          console.log("═══════════════════════════════════════════════════════");
-
-          dispatch(commonFunctionForAPICalls(payload));
-
-          // Clear attachments after sending
-          dispatch(setSelecetdFiles([]));
-          dispatch(clearUploadedAttachmentIds());
-        }
+      // Only proceed if chat was just created
+      if (isChatCreatedWithAI !== true || !createdChatDetails?.id) {
+        return;
       }
 
-      // Cleanup: reset the flag when chat changes or on unmount
-      return () => {
-        if (createdChatDetails?.id !== previousChatUuidRef.current) {
-          hasSentFirstMessageRef.current = false;
-        }
+      // Only proceed if this chat was created from a room (has room info in response)
+      // This prevents conflict with ChatScreen which handles non-room chats
+      const isRoomChat = createdChatDetails?.room || createdChatDetails?.room_id;
+      if (!isRoomChat) {
+        console.log("🟣 ROOMS: Chat has no room info, skipping (ChatScreen will handle)");
+        return;
+      }
+
+      // Skip if we've already sent for this exact chat ID
+      if (sentFirstMessageForChatIdRef.current === createdChatDetails.id) {
+        console.log("🟣 ROOMS: Already sent for this chat ID, skipping");
+        return;
+      }
+
+      // Mark as sent for this chat ID BEFORE dispatching
+      sentFirstMessageForChatIdRef.current = createdChatDetails.id;
+      const chatId = createdChatDetails.id;
+
+      console.log("═══════════════════════════════════════════════════════");
+      console.log("🟣 ROOMS: Chat created WITH ROOM, sending first message");
+      console.log("🟣 Chat ID:", chatId);
+      console.log("🟣 Room info:", JSON.stringify(createdChatDetails?.room));
+      console.log("🟣 uploadedAttachmentIds from Redux:", JSON.stringify(globalDataStates.uploadedAttachmentIds));
+      console.log("🟣 chatMessagesArray:", JSON.stringify(globalDataStates.chatMessagesArray));
+
+      const messageData = {
+        content:
+          globalDataStates.chatMessagesArray[
+            globalDataStates.chatMessagesArray.length - 1
+          ]?.message || "Hello",
+        content_type: "text",
+        attachment_ids: globalDataStates.uploadedAttachmentIds || [],
       };
-    }, [isChatCreatedWithAI, createdChatDetails])
+
+      // Add LLM ID if not null
+      if (chatCustomisationStates?.selectedLLM?.id !== null) {
+        messageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
+          ? chatCustomisationStates.selectedLLM.id
+          : parseInt(chatCustomisationStates.selectedLLM.id);
+      }
+
+      // Add Response Style ID if not null
+      if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
+        messageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
+          ? chatCustomisationStates.selectedResponseStyle.id
+          : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+      }
+
+      // Add Language ID if not null
+      if (chatCustomisationStates?.selectedLanguage?.id !== null) {
+        messageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
+          ? chatCustomisationStates.selectedLanguage.id
+          : parseInt(chatCustomisationStates.selectedLanguage.id);
+      }
+
+      // Add Citation Format ID if not null
+      if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
+        messageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
+          ? chatCustomisationStates.selectedCitationFormat.id
+          : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+      }
+
+      const payload = {
+        method: "POST",
+        url: `/chats/${chatId}/messages`,
+        data: messageData,
+        name: "sendPromptAndGetMessageFromAI",
+      };
+
+      console.log("🟣 ROOMS: Full API payload:", JSON.stringify(payload, null, 2));
+      console.log("═══════════════════════════════════════════════════════");
+
+      dispatch(commonFunctionForAPICalls(payload));
+
+      // Clear attachments after sending
+      dispatch(setSelecetdFiles([]));
+      dispatch(clearUploadedAttachmentIds());
+    }, [isChatCreatedWithAI, createdChatDetails?.id])
   );
 
   useEffect(() => {

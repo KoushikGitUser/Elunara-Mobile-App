@@ -67,36 +67,24 @@ const ExistingRoomsCards = ({ roomId, roomName, chats, chatUuid }) => {
         })
       );
 
+      // Refetch all user chats to update room info in AllChatsPage
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: "/chats?page=1&per_page=20",
+          name: "fetchAllUserChatsAvailable",
+        })
+      );
+
+      // Show toast before closing popup so Toaster is still mounted
+      triggerToast(
+        "Added to Room",
+        `Chat added to ${roomName}`,
+        "success",
+        3000
+      );
+
       dispatch(setToggleAddChatToLearningLabPopup(false));
-
-      setTimeout(() => {
-        triggerToastWithAction(
-          "Successfully added!",
-          `Your chat has been added to ${roomName}`,
-          "success",
-          5000,
-          "Undo",
-          async () => {
-            // Undo action - remove from room
-            await dispatch(
-              commonFunctionForAPICalls({
-                method: "DELETE",
-                url: `/chats/${chatUuid}/room`,
-                name: "remove-chat-from-room",
-              })
-            ).unwrap();
-
-            // Refetch chat details to remove room name from chat title
-            dispatch(
-              commonFunctionForAPICalls({
-                method: "GET",
-                url: `/chats/${chatUuid}`,
-                name: "getAllDetailsOfChatByID",
-              })
-            );
-          }
-        );
-      }, 500);
     } catch (error) {
       console.error("🏠 ADD TO ROOM: Failed", error);
       triggerToast("Error", "Failed to add chat to room", "error", 3000);

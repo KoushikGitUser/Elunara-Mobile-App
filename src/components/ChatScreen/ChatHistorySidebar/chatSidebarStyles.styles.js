@@ -296,7 +296,6 @@ export const createStyles = ({}) =>
       position: "relative", // important: makes children absolute to this view
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: 7,
     },
     gettingResponseIndicator: {
       width: 35,
