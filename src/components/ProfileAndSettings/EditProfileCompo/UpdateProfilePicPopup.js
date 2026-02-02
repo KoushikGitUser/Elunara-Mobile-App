@@ -9,6 +9,7 @@ import {
   Platform,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import { scaleFont } from "../../../utils/responsive";
@@ -36,6 +37,7 @@ import femaleStudentAvatar from '../../../assets/images/Student Female2.png';
 const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
+  const { settingsStates } = useSelector((state) => state.API);
 
   const dispatch = useDispatch();
 
@@ -179,23 +181,35 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
             </Text>
 
             <TouchableOpacity onPress={()=>{
+                if (settingsStates.uploadingProfileImage) return;
                 dispatch(setToggleUpdateProfilePicPopup(false));
                 setTimeout(() => {
                   triggerImagePicker();
                 }, 300);
             }} activeOpacity={0.7} style={styles.uploadBoxMain}>
               <View style={styles.innerContent}>
-                <ProfilePicUploadIcon />
+                {settingsStates.uploadingProfileImage ? (
+                  <>
+                    <ActivityIndicator size="large" color="#081A35" />
+                    <Text style={[styles.titleUpload, { borderBottomWidth: 0 }]}>
+                      Uploading...
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <ProfilePicUploadIcon />
 
-                {/* Title */}
-                <Text style={styles.titleUpload}>
-                  Click to upload from Gallery
-                </Text>
+                    {/* Title */}
+                    <Text style={styles.titleUpload}>
+                      Click to upload from Gallery
+                    </Text>
 
-                {/* Subtitle */}
-                <Text style={styles.subtitle}>
-                  SVG, PNG, JPG or GIF (max. 800×400px)
-                </Text>
+                    {/* Subtitle */}
+                    <Text style={styles.subtitle}>
+                      SVG, PNG, JPG or GIF (max. 800×400px)
+                    </Text>
+                  </>
+                )}
               </View>
             </TouchableOpacity>
 

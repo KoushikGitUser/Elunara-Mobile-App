@@ -363,6 +363,7 @@ export const handleSendPromptAndGetMessageFromAI = {
           uuid: aiMessage.uuid || aiMessage.id,
           is_saved_to_notes: aiMessage.is_saved_to_notes || false,
           suggestions: aiMessage.suggestions || [],
+          sources: aiMessage.sources || [],
           generation: aiMessage.generation || null,
         }
       : null;
@@ -517,6 +518,7 @@ export const handleGetAllMessagesOfParticularChat = {
       uuid: msg.id, // Use 'id' from API response
       is_saved_to_notes: msg.added_to_notes || false, // Use 'added_to_notes' from API response
       suggestions: msg.suggestions || [], // Store suggestions from API
+      sources: msg.sources || [], // Store sources from API for APA citations
       version: msg.version || 1,
       total_versions: msg.total_versions || 1,
       versions: [

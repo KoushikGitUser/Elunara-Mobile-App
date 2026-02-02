@@ -273,145 +273,10 @@ const AddRoomDetails = () => {
             <ToolsContainers />
           </View>
         </View>
-        <View style={[styles.card, { marginTop: 10 }]}>
-          <View style={styles.contentWrapper}>
-            {sourcesPopup && <SourcesPopup setSourcesPopup={setSourcesPopup} />}
-            {/* Left Content */}
-            <View style={styles.leftContent}>
-              {/* Header with Icon and Title */}
-              <View style={[styles.titleSection, { marginBottom: 15 }]}>
-                <Paperclip size={26} color="#888888" strokeWidth={1.5} />
-                <Text style={styles.title}>Sources (Files or Links)</Text>
-              </View>
+        <View style={[styles.card, ]}>
+       
 
-              {/* Description */}
-              {(!roomsStates.currentRoom?.attachments ||
-                roomsStates.currentRoom.attachments.length === 0) && (
-                <Text style={[styles.description, { width: "100%" }]}>
-                  Share references you want the AI to use
-                </Text>
-              )}
-            </View>
 
-            {/* Plus Button - Centered to left content */}
-            <TouchableOpacity
-              onPress={() => setSourcesPopup(true)}
-              style={styles.addButton}
-            >
-              <Plus size={28} color="#1F2937" strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Dynamic File List - Merging Attachments and Links from Instructions */}
-          {(() => {
-            // 1. Get real attachments
-            const realAttachments = roomsStates.currentRoom?.attachments || [];
-
-            // 2. Parse links from instructions
-            const linkRegex =
-              /Reference:\s*(https?:\/\/[^\s]+)(?:\s*\((.*?)\))?/g;
-            const instructionLinks = [];
-            let match;
-            // Use locally managed instructions state to be instant
-            if (instructions) {
-              while ((match = linkRegex.exec(instructions)) !== null) {
-                instructionLinks.push({
-                  type: "link_instruction",
-                  url: match[1],
-                  name: match[2] || match[1],
-                  filename: match[2] || match[1],
-                  originalString: match[0], // to help with deletion
-                });
-              }
-            }
-
-            const allSources = [...realAttachments, ...instructionLinks];
-
-            return allSources.map((file, index) => (
-              <TouchableOpacity key={index} style={styles.linksMain}>
-                {/* Link Icon based on type */}
-                <View style={styles.pdfLogoContainer}>
-                  {file.type === "link_instruction" ? (
-                    <Feather name="link" size={24} color="#1F2937" />
-                  ) : (
-                    <Image
-                      source={pdfLogo}
-                      style={{ height: 25, width: 25, objectFit: "contain" }}
-                    />
-                  )}
-                </View>
-
-                {/* Link Details */}
-                <View style={styles.linkDetails}>
-                  <Text style={styles.url} numberOfLines={1}>
-                    {file.filename || file.name}{" "}
-                  </Text>
-                  <Text style={styles.description}>
-                    {file.type === "document"
-                      ? "PDF"
-                      : file.type === "link_instruction"
-                        ? "Link"
-                        : "File"}{" "}
-                  </Text>
-                </View>
-
-                {/* More Options Button acting as Delete */}
-                <TouchableOpacity
-                  style={styles.moreButton}
-                  onPress={() => {
-                    Alert.alert(
-                      "Delete Source",
-                      "Are you sure you want to delete this source?",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => {
-                            if (file.type === "link_instruction") {
-                              // Delete Link: Remove text string from instructions
-                              const newInstructions = instructions
-                                .replace(file.originalString, "")
-                                .trim();
-                              setInstructions(newInstructions);
-                              handleSaveDetails(); // Save immediately
-                              triggerToast(
-                                "Success",
-                                "Link removed",
-                                "success",
-                                3000,
-                              );
-                            } else {
-                              // Delete Attachment: API Call
-                              const payload = {
-                                method: "DELETE",
-                                url: `/attachments/${file.id || file.uuid}`,
-                                name: "delete-attachment",
-                              };
-                              dispatch(commonFunctionForAPICalls(payload)).then(
-                                () => {
-                                  // Refresh room
-                                  dispatch(
-                                    commonFunctionForAPICalls({
-                                      method: "GET",
-                                      url: `/rooms/${roomUuid}`,
-                                      name: "get-room",
-                                    }),
-                                  );
-                                },
-                              );
-                            }
-                          },
-                        },
-                      ],
-                    );
-                  }}
-                >
-                  <Trash2 size={20} color="#EF4444" strokeWidth={2} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ));
-          })()}
           <TouchableOpacity
             style={[styles.verifyButton, { marginBottom: 25 }]}
             onPress={handleSaveDetails}
@@ -699,7 +564,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 70,
+    marginTop: 20,
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",

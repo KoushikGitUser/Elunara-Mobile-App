@@ -123,6 +123,12 @@ const ChatScreen = () => {
   const chatInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
+  // Ref to track if chat customisation settings have been initialized from API
+  const hasInitializedCustomisationSettings = useRef(false);
+
+  // Ref to track the last processed messages to prevent duplicate processing
+  const lastProcessedMessagesRef = useRef(null);
+
   // State for measured spotlight rectangles
   const [spotlightRects, setSpotlightRects] = useState({});
 
@@ -189,8 +195,11 @@ const ChatScreen = () => {
     }
   }, [chatsStates.loaderStates.isChatArchiveUnarchiveUpdated]);
 
-  // Populate chatCustomisationStates when general settings are loaded
+  // Populate chatCustomisationStates when general settings are loaded (only once per session)
   useEffect(() => {
+    // Only initialize once to prevent resetting user's in-session selections
+    if (hasInitializedCustomisationSettings.current) return;
+
     if (settingsStates?.allGeneralSettings) {
       const { preferredLLMs, responseLanguageSettings, adSettings } =
         settingsStates.allGeneralSettings;
@@ -244,6 +253,9 @@ const ChatScreen = () => {
           }),
         );
       }
+
+      // Mark as initialized so we don't reset user's selections
+      hasInitializedCustomisationSettings.current = true;
     }
   }, [settingsStates?.allGeneralSettings, settingsStates?.settingsMasterDatas?.allLLMsAvailable]);
 
@@ -353,6 +365,13 @@ const ChatScreen = () => {
     const fetchedMessages = chatsStates.allChatsDatas.fetchedMessages;
 
     if (isAllMessagesOfChatFetched === true && fetchedMessages) {
+      // Prevent duplicate processing by checking if we've already processed these messages
+      const messagesKey = JSON.stringify(fetchedMessages.messageIDsArray);
+      if (lastProcessedMessagesRef.current === messagesKey) {
+        return;
+      }
+      lastProcessedMessagesRef.current = messagesKey;
+
       // Update Global slice with fetched messages and IDs
       dispatch(setChatMessagesArray(fetchedMessages.chatMessagesArray));
       dispatch(setMessageIDsArray(fetchedMessages.messageIDsArray));

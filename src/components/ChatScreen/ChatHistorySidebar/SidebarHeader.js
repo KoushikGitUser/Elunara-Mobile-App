@@ -20,7 +20,15 @@ import {
   setToggleLearningLabUnlockPopup,
   setToggleRoomCreationPopup,
   setToggleUnlockNewChatPopup,
+  setToggleIsChattingWithAI,
 } from "../../../redux/slices/toggleSlice";
+import {
+  setChatMessagesArray,
+  setMessageIDsArray,
+  setCurrentAIMessageIndexForRegeneration,
+  setUserMessagePrompt,
+  setSelecetdFiles,
+} from "../../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../../utils/responsive";
 
 const SidebarHeader = forwardRef(({ translateX }, ref) => {
@@ -51,9 +59,32 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
 
   return (
     <View style={styles.chatHistorySidebarHeader}>
-      <View style={styles.sidebarTopImageMain}>
+      <TouchableOpacity
+        onPress={() => {
+          // Reset chat state for new chat
+          dispatch(setChatMessagesArray([]));
+          dispatch(setMessageIDsArray([]));
+          dispatch(setCurrentAIMessageIndexForRegeneration(null));
+          dispatch(setToggleIsChattingWithAI(false));
+          dispatch(setUserMessagePrompt(""));
+          dispatch(setSelecetdFiles([]));
+
+          Animated.timing(translateX, {
+            toValue: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : SCREEN_WIDTH * 0.75,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+          dispatch(
+            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar),
+          );
+          navigation.navigate("chat");
+        }}
+        style={styles.sidebarTopImageMain}
+      >
         <Image style={styles.elunaraLogoSidebar} source={elunaraLogo} />
-      </View>
+      </TouchableOpacity>
       <View style={styles.searchInputMain}>
         <Search
           size={25}
@@ -73,6 +104,14 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
       <View style={styles.newButtonsMain}>
         <TouchableOpacity
           onPress={() => {
+            // Reset chat state for new chat
+            dispatch(setChatMessagesArray([]));
+            dispatch(setMessageIDsArray([]));
+            dispatch(setCurrentAIMessageIndexForRegeneration(null));
+            dispatch(setToggleIsChattingWithAI(false));
+            dispatch(setUserMessagePrompt(""));
+            dispatch(setSelecetdFiles([]));
+
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
                 ? 0
@@ -82,11 +121,10 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
             }).start();
             dispatch(
               setToggleChatHistorySidebar(
-                !toggleStates.toggleChatHistorySidebar
-              )
+                !toggleStates.toggleChatHistorySidebar,
+              ),
             );
             navigation.navigate("chat");
-            // dispatch(setToggleUnlockNewChatPopup(true));
           }}
           style={styles.newChatBtn}
         >
@@ -107,10 +145,10 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
             }).start();
             dispatch(
               setToggleChatHistorySidebar(
-                !toggleStates.toggleChatHistorySidebar
-              )
+                !toggleStates.toggleChatHistorySidebar,
+              ),
             );
-              dispatch(setToggleLearningLabUnlockPopup(true));
+            dispatch(setToggleLearningLabUnlockPopup(true));
           }}
           style={styles.newLearningTabBtn}
         >

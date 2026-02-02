@@ -135,9 +135,11 @@ const ToasterWithAction = () => {
         <CircleX style={{ marginTop: 5 }} color="#D00B0B" strokeWidth={1.25} />
       )}
 
-      <Animated.View style={{flex:1}}>
+      <Animated.View style={styles.textContainer}>
         <Text style={[styles.textTitle,{fontFamily:'Mukta-Bold'}]}>{toast.title}</Text>
-        <Text style={[styles.textDesc,{fontFamily:'Mukta-Regular'}]}>{toast.description}</Text>
+        {toast.description !== "" && (
+          <Text style={[styles.textDesc,{fontFamily:'Mukta-Regular'}]}>{toast.description}</Text>
+        )}
       </Animated.View>
 
       <TouchableOpacity style={styles.actionBtn} onPress={toast.action}>
@@ -169,6 +171,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "flex-start",
     gap: 10,
+  },
+  textContainer: {
+    flex: 1,
+    flexShrink: 1,
   },
   textTitle: {
     fontWeight: 600,

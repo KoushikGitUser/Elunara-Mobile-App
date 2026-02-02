@@ -6,7 +6,7 @@ import {
   Dimensions,
   Keyboard,
 } from "react-native";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { createStyles } from "../../screens/Rooms/Rooms.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +32,10 @@ const RoomsHeader = ({ translateX }) => {
   const [addOptionsPopup, setAddOptionsPopup] = useState(false);
   const [roomOptionsPopup, setRoomOptionsPopup] = useState(false);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ top: 60, right: 20 });
+  const [plusPopupPosition, setPlusPopupPosition] = useState({ top: 60, right: 20 });
+  const menuButtonRef = useRef(null);
+  const plusButtonRef = useRef(null);
 
   // Get chat details for header when chatting
   const chatDetails = chatsStates?.allChatsDatas?.createdChatDetails;
@@ -72,10 +76,12 @@ const RoomsHeader = ({ translateX }) => {
       <PlusButtonPopup
         visible={addOptionsPopup}
         setAddOptionsPopup={setAddOptionsPopup}
+        popupPosition={plusPopupPosition}
       />
       <RoomsOptionsPopup
         visible={roomOptionsPopup}
         setRoomOptionsPopup={setRoomOptionsPopup}
+        popupPosition={popupPosition}
       />
       {toggleStates.toggleChatMenuPopup && <ChatOptionsPopup />}
 
@@ -147,7 +153,15 @@ const RoomsHeader = ({ translateX }) => {
       )}
 
       <View style={styles.rightHeaderIcons}>
-        <TouchableOpacity onPress={() => setAddOptionsPopup(true)}>
+        <TouchableOpacity
+          ref={plusButtonRef}
+          onPress={() => {
+            plusButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
+              setPlusPopupPosition({ top: pageY + height + 5, right: 20 });
+              setAddOptionsPopup(true);
+            });
+          }}
+        >
           <Plus size={35} strokeWidth={1.5} />
         </TouchableOpacity>
         {toggleStates.toggleIsChattingWithAI ? (
@@ -161,7 +175,15 @@ const RoomsHeader = ({ translateX }) => {
             <EllipsisVertical strokeWidth={1.25} size={30} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={() => setRoomOptionsPopup(true)}>
+          <TouchableOpacity
+            ref={menuButtonRef}
+            onPress={() => {
+              menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                setPopupPosition({ top: pageY + height + 5, right: 20 });
+                setRoomOptionsPopup(true);
+              });
+            }}
+          >
             <EllipsisVertical strokeWidth={2} size={30} color="black" />
           </TouchableOpacity>
         )}

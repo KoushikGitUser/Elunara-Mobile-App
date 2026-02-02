@@ -52,13 +52,15 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
       return {
         llm: currentMessage.generation.llm || null,
         style: currentMessage.generation.style || null,
-        language: currentMessage.generation.language || null
+        language: currentMessage.generation.language || null,
+        citation_format: currentMessage.generation.citation_format || null
       };
     }
     return {
       llm: null,
       style: null,
-      language: null
+      language: null,
+      citation_format: null
     };
   });
 
@@ -160,7 +162,8 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         setGenerationData({
           llm: currentMessage.generation.llm || null,
           style: currentMessage.generation.style || null,
-          language: currentMessage.generation.language || null
+          language: currentMessage.generation.language || null,
+          citation_format: currentMessage.generation.citation_format || null
         });
       }
     }
@@ -189,7 +192,8 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         setGenerationData({
           llm: regeneratedResponse.generation.llm || { name: "Auto" },
           style: regeneratedResponse.generation.style || { name: "Auto" },
-          language: regeneratedResponse.generation.language || { name: "Auto" }
+          language: regeneratedResponse.generation.language || { name: "Auto" },
+          citation_format: regeneratedResponse.generation.citation_format || null
         });
       }
     }
@@ -218,7 +222,8 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         setGenerationData({
           llm: regeneratedResponse.generation.llm || { name: "Auto" },
           style: regeneratedResponse.generation.style || { name: "Auto" },
-          language: regeneratedResponse.generation.language || { name: "Auto" }
+          language: regeneratedResponse.generation.language || { name: "Auto" },
+          citation_format: regeneratedResponse.generation.citation_format || null
         });
       }
 
@@ -252,7 +257,8 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         setGenerationData({
           llm: switchedVersionData.generation.llm || { name: "Auto" },
           style: switchedVersionData.generation.style || { name: "Auto" },
-          language: switchedVersionData.generation.language || { name: "Auto" }
+          language: switchedVersionData.generation.language || { name: "Auto" },
+          citation_format: switchedVersionData.generation.citation_format || null
         });
       }
 
@@ -439,7 +445,7 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
               >
                 <View style={styles.resourcesLeftSection}>
                   <View style={styles.apaBadge}>
-                    <Text style={styles.apaText}>APA</Text>
+                    <Text style={styles.apaText}>{generationData?.citation_format?.name || "APA"}</Text>
                     <SwitchIcon width={14} height={14} />
                   </View>
                   <Text style={styles.resourcesTitle}>Resources</Text>
@@ -454,7 +460,9 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
 
               {isResourcesOpen && (
                 <View style={styles.resourcesDropdown}>
-                  <Text style={styles.noResourcesText}>There is no resources available</Text>
+                  {sources.map((source, index) => (
+                    <Text key={index} style={styles.sourceText}>{source}</Text>
+                  ))}
                 </View>
               )}
             </View>
@@ -590,7 +598,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderTopLeftRadius: 0,
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 40,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "stretch",
@@ -709,6 +718,13 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontFamily: "Mukta-Regular",
     textAlign: "center",
+  },
+  sourceText: {
+    fontSize: moderateScale(15),
+    color: "#5E5E5E",
+    fontFamily: "Mukta-Regular",
+    lineHeight: 26,
+    marginBottom: 32,
   },
 });
 

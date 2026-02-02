@@ -32,7 +32,7 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
   const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [isCodeSent, setIsCodeSent] = useState(true);
+  const [isCodeSent, setIsCodeSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const { globalDataStates } = useSelector((state) => state.Global);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -59,6 +59,8 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
     if (authStates.isOTPReceivedForMobileVerification == true) {
       setIsCodeSent(true);
       setResendTimer(20);
+      // Reset the state to prevent re-triggering
+      dispatch(setIsOTPReceivedForMobileVerification(null));
     }
     if (authStates.isMobileOTPVerified == true) {
       dispatch(setIsMobileOTPVerified(null));

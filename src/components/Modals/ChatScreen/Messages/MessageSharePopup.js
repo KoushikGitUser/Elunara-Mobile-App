@@ -10,12 +10,46 @@ import { triggerToast } from '../../../../services/toast';
  
 
 const MessageSharePopup = ({setSharePopup,messageContent}) => {
-
-  const openWhatsApp = () => {
+ 
+  const openWhatsApp = async () => {
     const url = `whatsapp://send?text=${encodeURIComponent(messageContent)}`;
-    Linking.openURL(url).catch(() => {
-      alert("Make sure WhatsApp is installed on your device");
-    });
+    const canOpen = await Linking.canOpenURL(url);
+    if (canOpen) {
+      Linking.openURL(url);
+    } else {
+      triggerToast("WhatsApp not installed", "Please install WhatsApp to share", "error", 3000);
+    }
+  };
+
+  const openLinkedIn = async () => {
+    // LinkedIn app scheme
+    const linkedInAppUrl = Platform.OS === 'ios' ? 'linkedin://' : 'linkedin://';
+    const canOpenApp = await Linking.canOpenURL(linkedInAppUrl);
+
+    if (canOpenApp) {
+      // LinkedIn doesn't support direct text sharing via deep link
+      // Open LinkedIn app and user can create a post manually
+      // We'll use the share URL which opens in the app if installed
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://elunara.com')}&summary=${encodeURIComponent(messageContent)}`;
+      Linking.openURL(shareUrl);
+    } else {
+      triggerToast("LinkedIn not installed", "Please install LinkedIn to share", "error", 3000);
+    }
+  };
+
+  const openZoom = async () => {
+    // Zoom app scheme
+    const zoomAppUrl = Platform.OS === 'ios' ? 'zoomus://' : 'zoomus://';
+    const canOpenApp = await Linking.canOpenURL(zoomAppUrl);
+
+    if (canOpenApp) {
+      // Zoom doesn't support direct text sharing
+      // Open the Zoom app - user can share in chat manually
+      Linking.openURL(zoomAppUrl);
+      triggerToast("Zoom opened", "You can paste the content in Zoom chat", "success", 3000);
+    } else {
+      triggerToast("Zoom not installed", "Please install Zoom to share", "error", 3000);
+    }
   };
 
   const handleDownload = async () => {
@@ -138,6 +172,7 @@ const MessageSharePopup = ({setSharePopup,messageContent}) => {
         <Pressable
           onPress={() => {
             setSharePopup(false);
+            openLinkedIn();
           }}
           style={({ pressed }) => [
             {
@@ -152,6 +187,7 @@ const MessageSharePopup = ({setSharePopup,messageContent}) => {
                 <Pressable
           onPress={() => {
             setSharePopup(false);
+            openZoom();
           }}
           style={({ pressed }) => [
             {

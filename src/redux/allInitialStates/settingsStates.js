@@ -32,6 +32,9 @@ export const settingsStates = {
   },
   allProfileInfos: {},
 
+  // Profile Image Upload
+  uploadingProfileImage: false,
+
   // Help Center Feedback
   isSubmittingFeedback: false,
   feedbackSubmitted: false,

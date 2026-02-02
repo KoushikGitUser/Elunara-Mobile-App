@@ -6,8 +6,10 @@ import {
   ScrollView,
   Dimensions,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { scaleFont } from "../../utils/responsive";
 import Personal from "../../components/ProfileAndSettings/PersonalitionCompo/Personal";
 import Education from "../../components/ProfileAndSettings/PersonalitionCompo/Education";
@@ -23,6 +25,7 @@ const Personalisation = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -69,7 +72,11 @@ const Personalisation = () => {
   ]);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 0}
+    >
       <Text style={{ fontSize: scaleFont(12), fontFamily: "Mukta-Regular" }}>
         Share about yourself for tailored responses!
       </Text>
@@ -141,24 +148,26 @@ const Personalisation = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, maxHeight: keyboardVisible ? screen_height - keyboardHeight - 180 : undefined }}>
         <ScrollView
+          ref={scrollViewRef}
           showsVerticalScrollIndicator={false}
           style={{ paddingTop: 30, flex: 1 }}
+          keyboardShouldPersistTaps="handled"
         >
           {selectedCategory == 1 ? (
-            <Personal />
+            <Personal scrollViewRef={scrollViewRef} />
           ) : selectedCategory == 2 ? (
-            <Education />
+            <Education scrollViewRef={scrollViewRef} />
           ) : (
             <Learning />
           )}
           {keyboardVisible && (
-            <View style={{ height: screen_height * 0.4 }}></View>
+            <View style={{ height: 100 }}></View>
           )}
         </ScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

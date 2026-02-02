@@ -77,6 +77,7 @@ const RegionSettings = () => {
           color: "#5E5E5E",
           marginTop: 20,
           fontFamily: "Mukta-Regular",
+          opacity: settingsStates.allGeneralSettings.regionSettings.country ? 1 : 0.5,
         }}
       >
         City
@@ -87,6 +88,7 @@ const RegionSettings = () => {
         country={false}
         selectedCounts={selectedCounts}
         setSelectedCounts={setSelectedCounts}
+        disabled={!settingsStates.allGeneralSettings.regionSettings.country}
       />
     </View>
   );

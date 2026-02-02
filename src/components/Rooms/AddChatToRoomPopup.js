@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleAddExistingChatToRoomPopup } from "../../redux/slices/toggleSlice";
+import { setToggleAddExistingChatToRoomPopup, setToggleRoomCreationPopup } from "../../redux/slices/toggleSlice";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { scaleFont, verticalScale } from "../../utils/responsive";
@@ -106,6 +106,12 @@ const AddChatToRoomPopup = () => {
                 Add to Learning Lab
               </Text>
               <TouchableOpacity
+                onPress={() => {
+                  dispatch(setToggleAddExistingChatToRoomPopup(false));
+                  setTimeout(() => {
+                    dispatch(setToggleRoomCreationPopup(true));
+                  }, 300);
+                }}
                 style={{
                   marginTop: 10,
                   marginBottom: 20,

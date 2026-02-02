@@ -16,7 +16,7 @@ import { getToken } from "../../utils/Secure/secureStore";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation }) => { 
   const dispatch = useDispatch();
   const hasNavigated = useRef(false); // Track if we've already navigated
   const isInitialMount = useRef(true); // Track if this is the initial mount

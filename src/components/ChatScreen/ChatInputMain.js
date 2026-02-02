@@ -403,6 +403,8 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
         uuid: aiMessageId || null,
         is_saved_to_notes: false,
         suggestions: latestAiMessageData?.suggestions || [],
+        sources: latestAiMessageData?.sources || [],
+        generation: latestAiMessageData?.generation || null,
         version: 1,
         total_versions: 1,
         versions: [{

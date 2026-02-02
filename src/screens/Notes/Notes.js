@@ -15,10 +15,8 @@ import {
 } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./Notes.styles";
-import * as ImagePicker from "expo-image-picker";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
-import Feather from "@expo/vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { useRoute } from "@react-navigation/native";
@@ -88,8 +86,12 @@ const Notes = () => {
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeStyles, setActiveStyles] = useState([]);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   const richTextRef = useRef();
+  const initialContentRef = useRef("");
+  const fetchedChatUuidRef = useRef(null);
 
   // Default style for formatting buttons (consistent padding)
   const defaultButtonStyle = {
@@ -126,9 +128,10 @@ const Notes = () => {
     };
   }, []);
 
-  // Fetch notes on mount
+  // Fetch notes on mount - only if not already fetched for this chat
   useEffect(() => {
-    if (chatUuid) {
+    if (chatUuid && fetchedChatUuidRef.current !== chatUuid) {
+      fetchedChatUuidRef.current = chatUuid;
       const payload = {
         method: "GET",
         url: `/chats/${chatUuid}/notes`,
@@ -141,20 +144,40 @@ const Notes = () => {
   // Update local state when notes are fetched
   useEffect(() => {
     if (notesStates.currentChatNotes) {
-      setNoteContent(notesStates.currentChatNotes.content || "");
-      richTextRef.current?.setContentHTML(
-        notesStates.currentChatNotes.content || "",
-      );
+      console.log("Notes fetched for chat:", chatUuid);
+      console.log("Full notes response:", JSON.stringify(notesStates.currentChatNotes, null, 2));
+      const content = notesStates.currentChatNotes.content || "";
+      setNoteContent(content);
+      initialContentRef.current = content;
+      richTextRef.current?.setContentHTML(content);
+      setCanUndo(false);
+      setCanRedo(false);
     }
   }, [notesStates.currentChatNotes]);
 
+  // Strip images and attachments from HTML content
+  const stripAttachments = (html) => {
+    if (!html) return html;
+    // Remove img tags
+    let cleanHtml = html.replace(/<img[^>]*>/gi, '');
+    // Remove object/embed/iframe tags (for other attachments)
+    cleanHtml = cleanHtml.replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '');
+    cleanHtml = cleanHtml.replace(/<embed[^>]*>/gi, '');
+    cleanHtml = cleanHtml.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '');
+    // Remove base64 data URIs that might be inline
+    cleanHtml = cleanHtml.replace(/data:image\/[^;]+;base64,[^"'\s]*/gi, '');
+    return cleanHtml;
+  };
+
   const handleSaveNotes = () => {
     if (chatUuid) {
+      // Strip any attachments before saving
+      const cleanContent = stripAttachments(noteContent);
       const payload = {
         method: "PUT",
         url: `/chats/${chatUuid}/notes`,
         name: "update-notes",
-        data: { content: noteContent },
+        data: { content: cleanContent },
       };
       dispatch(commonFunctionForAPICalls(payload)).then(() => {
         navigation.goBack();
@@ -173,41 +196,6 @@ const Notes = () => {
       setNoteContent("");
       richTextRef.current?.setContentHTML("");
     }
-  };
-
-  // Insert an image into the RichEditor using Expo Image Picker
-  const insertImage = async () => {
-    // Ask for permission
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permission.status !== "granted") {
-      alert("Permission to access gallery is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: false,
-      quality: 0.8,
-      allowsMultipleSelection: false,
-      base64: true,
-    });
-
-    if (result.canceled) return;
-
-    const asset = result.assets[0];
-    const base64 = asset.base64;
-
-    // Determine the image type from mimeType or URI
-    const mimeType =
-      asset.mimeType ||
-      (asset.uri.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg");
-    const dataUri = `data:${mimeType};base64,${base64}`;
-
-    // Insert image into rich editor
-    richTextRef.current?.insertImage(
-      dataUri,
-      "width: 90%; height: 200px; border-radius: 8px; object-fit: cover; margin-bottom: 10px;",
-    );
   };
 
   // Search and highlight functionality
@@ -406,6 +394,9 @@ const Notes = () => {
 
   const screenHeight = Dimensions.get("window").height;
 
+  // Check if note content is empty (strip HTML tags to detect actual text content)
+  const isNotesEmpty = !noteContent || noteContent.replace(/<[^>]*>/g, '').trim() === "";
+
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
 
@@ -434,30 +425,44 @@ const Notes = () => {
         </TouchableOpacity>
         <View style={styles.rightOptionsMain}>
           <TouchableOpacity
-            onPress={() =>
-              richTextRef.current?.sendAction(actions.undo, "result")
-            }
+            onPress={() => {
+              richTextRef.current?.sendAction(actions.undo, "result");
+              setCanRedo(true);
+            }}
+            disabled={!canUndo}
+            style={{ opacity: canUndo ? 1 : 0.3 }}
           >
             <Undo size={25} strokeWidth={1.5} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              richTextRef.current?.sendAction(actions.redo, "result")
-            }
+            onPress={() => {
+              richTextRef.current?.sendAction(actions.redo, "result");
+            }}
+            disabled={!canRedo}
+            style={{ opacity: canRedo ? 1 : 0.3 }}
           >
             <Redo size={25} strokeWidth={1.5} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={downloadAsPdf}>
+          <TouchableOpacity
+            onPress={downloadAsPdf}
+            disabled={isNotesEmpty}
+            style={{ opacity: isNotesEmpty ? 0.3 : 1 }}
+          >
             <Download size={25} strokeWidth={1.5} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setToggleOptionsPopup(true)}
-            style={styles.menuDots}
+            style={[styles.menuDots, { opacity: isNotesEmpty ? 0.3 : 1 }]}
+            disabled={isNotesEmpty}
           >
             <EllipsisVertical size={25} strokeWidth={1.5} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.doneBtn} onPress={handleSaveNotes}>
+          <TouchableOpacity
+            style={[styles.doneBtn, { opacity: isNotesEmpty ? 0.3 : 1 }]}
+            onPress={handleSaveNotes}
+            disabled={isNotesEmpty}
+          >
             <Text style={{ fontWeight: 600 }}>Done</Text>
           </TouchableOpacity>
         </View>
@@ -475,11 +480,37 @@ const Notes = () => {
           ref={richTextRef}
           placeholder="Type your notes here..."
           initialContentHTML={noteContent}
-          onChange={(html) => setNoteContent(html)}
+          onChange={(html) => {
+            // Strip any images/attachments that might have been pasted
+            const cleanHtml = stripAttachments(html);
+            if (cleanHtml !== html) {
+              // If content was modified, update the editor
+              richTextRef.current?.setContentHTML(cleanHtml);
+            }
+            setNoteContent(cleanHtml);
+            // Enable undo if content has changed from initial
+            if (cleanHtml !== initialContentRef.current) {
+              setCanUndo(true);
+            }
+          }}
+          pasteAsPlainText={true}
           editorInitializedCallback={() => {
             richTextRef.current?.registerToolbar((items) => {
               setActiveStyles(items);
             });
+            // Inject script to block image paste at DOM level
+            const blockImagePasteScript = `
+              document.addEventListener('paste', function(e) {
+                var items = e.clipboardData.items;
+                for (var i = 0; i < items.length; i++) {
+                  if (items[i].type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    return false;
+                  }
+                }
+              });
+            `;
+            richTextRef.current?.injectJavascript(blockImagePasteScript);
           }}
           onMessage={(message) => {
             try {
@@ -511,7 +542,7 @@ const Notes = () => {
         {/* Display Bookmarked Q&A Pairs */}
         {notesStates.currentChatNotes?.qa_pairs &&
           notesStates.currentChatNotes.qa_pairs.length > 0 && (
-            <View style={{ paddingHorizontal: 20, paddingBottom: 100 }}>
+            <View style={{ paddingHorizontal: 16, paddingBottom: 100 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -537,7 +568,7 @@ const Notes = () => {
                   style={{ flex: 1, height: 1, backgroundColor: "#E5E7EB" }}
                 />
               </View>
-
+ 
               {notesStates.currentChatNotes.qa_pairs.map((pair, index) => (
                 <View
                   key={index}
@@ -655,7 +686,7 @@ const Notes = () => {
             styles.collapsedButton,
             {
               bottom: keyboardVisible
-                ? keyboardHeight - insets.bottom + 70
+                ? keyboardHeight + 10
                 : 60,
             },
           ]}
@@ -806,7 +837,6 @@ const Notes = () => {
           >
             <TextEndIcon />
           </TouchableOpacity>
-          <Feather onPress={insertImage} name="image" size={24} color="black" />
           <TouchableOpacity
             onPress={() => setToggleTextActionTab(false)}
             style={styles.crossIcon}

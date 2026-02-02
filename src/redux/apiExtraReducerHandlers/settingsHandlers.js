@@ -237,14 +237,16 @@ export const handleUpdateProfileName = {
 
 export const handleUpdateProfileImage = {
   pending: (state) => {
-    console.log("pro pic update pendinding");
-    
+    state.settingsStates.uploadingProfileImage = true;
   },
   fulfilled: (state, action) => {
+    state.settingsStates.uploadingProfileImage = false;
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
   },
-  rejected: (state, action) => {},
+  rejected: (state, action) => {
+    state.settingsStates.uploadingProfileImage = false;
+  },
 };
 
 export const handleUpdateProfileAvatarImage = {

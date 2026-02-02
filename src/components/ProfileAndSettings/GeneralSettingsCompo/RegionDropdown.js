@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
 import { commonFunctionForAPICalls, setIsCountrySelectionChanged, setSelectedCountryCode } from "../../../redux/slices/apiCommonSlice";
 
-const RegionDropdown = ({ setSelectedCounts, selectedCounts, country, triggerAPICall, initialSetValue }) => {
+const RegionDropdown = ({ setSelectedCounts, selectedCounts, country, triggerAPICall, initialSetValue, disabled = false }) => {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const selectorRef = useRef(null);
@@ -32,6 +32,7 @@ const RegionDropdown = ({ setSelectedCounts, selectedCounts, country, triggerAPI
     }, [initialSetValue]);
 
     const toggleDropdown = () => {
+      if (disabled) return;
       if (selectorRef.current) {
         selectorRef.current.measure((_x, _y, _width, height, _pageX, pageY) => {
           const spaceBelow = screenHeight - pageY - height;
@@ -67,9 +68,10 @@ const RegionDropdown = ({ setSelectedCounts, selectedCounts, country, triggerAPI
       <View style={{ width: "100%" }}>
         <TouchableOpacity
           ref={selectorRef}
-          style={styles.selector}
+          style={[styles.selector, disabled && styles.selectorDisabled]}
           onPress={toggleDropdown}
-          activeOpacity={0.7}
+          activeOpacity={disabled ? 1 : 0.7}
+          disabled={disabled}
         >
           <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <Text
@@ -153,6 +155,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     width: "100%",
+  },
+  selectorDisabled: {
+    backgroundColor: "#F3F4F6",
+    opacity: 0.6,
   },
   overlay: {
     flex: 1,

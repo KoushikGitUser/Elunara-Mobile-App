@@ -144,7 +144,7 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
             justifyContent: "flex-end",
             paddingTop: 100, // Space for absolute ChatHeader (top:30 + header height)
           }}
-          style={{ flex: 1, width: "100%" }}
+          style={{ flex: 1, width: "100%",zIndex:2 }}
         >
           <GreetingsHeader />
           <ChatTopicsMain />

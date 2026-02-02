@@ -144,8 +144,8 @@ const Education = () => {
 
   
 
-  return ( 
-    <View style={{ flex: 1,paddingBottom:100}}>
+  return (
+    <View style={{ flex: 1, paddingBottom: 100 }}>
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
           <BriefCaseIcon />

@@ -108,11 +108,15 @@ export const createStyles = ({}) =>
       paddingVertical: moderateScale(25),
       flexDirection: "row",
       justifyContent: "space-between",
+      position: "relative",
+
     },
     grid:{
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    position: "relative",
+    zIndex: 2,
     },
     topicsContainerHalf: {
       width: "47%",
@@ -140,6 +144,9 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       justifyContent: "flex-start",
       alignItems: "flex-start",
+      backgroundColor: "#FFFFFF",
+      position: "relative",
+      zIndex: 2,
     },
     topicIcon: {
       height: 24,

@@ -7,7 +7,7 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { createStyles } from "./chatModals.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,23 +43,38 @@ const ChatOptionsPopup = ({ chatUuid }) => {
   const { chatsStates } = useSelector((state) => state.API);
   const { width, height } = Dimensions.get("window");
 
-  const chatId = chatsStates.allChatsDatas.createdChatDetails?.id;
-
-  // Fetch chat details when popup opens
-  useEffect(() => {
-    if (toggleStates.toggleChatMenuPopup && chatId) {
-      const payload = {
-        method: "GET",
-        url: `/chats/${chatId}`,
-        name: "getAllDetailsOfChatByID",
-      };
-      dispatch(commonFunctionForAPICalls(payload));
-    }
-  }, [toggleStates.toggleChatMenuPopup, chatId]);
-
   // Dynamic actions based on is_pinned and is_archived states
   const currentChatDetails = chatsStates.allChatsDatas.currentActionChatDetails;
   const createdChatDetails = chatsStates.allChatsDatas.createdChatDetails;
+  const chatId = createdChatDetails?.id;
+
+  // Ref to track if we've already fetched for this popup session
+  const hasFetchedRef = useRef(false);
+
+  // Reset fetch flag when popup closes
+  useEffect(() => {
+    if (!toggleStates.toggleChatMenuPopup) {
+      hasFetchedRef.current = false;
+    }
+  }, [toggleStates.toggleChatMenuPopup]);
+
+  // Fetch chat details when popup opens - only if not already available
+  useEffect(() => {
+    if (toggleStates.toggleChatMenuPopup && chatId && !hasFetchedRef.current) {
+      // Check if we already have the chat details for this specific chat
+      const hasCurrentDetails = currentChatDetails?.id === chatId || createdChatDetails?.id === chatId;
+
+      if (!hasCurrentDetails) {
+        hasFetchedRef.current = true;
+        const payload = {
+          method: "GET",
+          url: `/chats/${chatId}`,
+          name: "getAllDetailsOfChatByID",
+        };
+        dispatch(commonFunctionForAPICalls(payload));
+      }
+    }
+  }, [toggleStates.toggleChatMenuPopup, chatId]);
   const isPinned =
     currentChatDetails?.is_pinned || createdChatDetails?.is_pinned;
   // Check both possible field names from API
@@ -136,7 +151,37 @@ const ChatOptionsPopup = ({ chatUuid }) => {
         name: "pinOrUnpinChat",
       };
 
-      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(commonFunctionForAPICalls(payload))
+        .unwrap()
+        .then(() => {
+          // Refetch recent chats
+          dispatch(
+            commonFunctionForAPICalls({
+              method: "GET",
+              url: "/chats/recent?limit=10",
+              name: "getAllRecentChats",
+            })
+          );
+          // Refetch all user chats to update pinned chats in sidebar
+          dispatch(
+            commonFunctionForAPICalls({
+              method: "GET",
+              url: "/chats",
+              name: "fetchAllUserChatsAvailable",
+            })
+          );
+          // Refetch current chat details to update the pin state
+          dispatch(
+            commonFunctionForAPICalls({
+              method: "GET",
+              url: `/chats/${chatId}`,
+              name: "getAllDetailsOfChatByID",
+            })
+          );
+        })
+        .catch((error) => {
+          console.error("Failed to pin/unpin chat:", error);
+        });
       dispatch(setToggleChatMenuPopup(false));
     } else if (actionType === "archive" || actionType === "unarchive") {
       if (!chatId) {

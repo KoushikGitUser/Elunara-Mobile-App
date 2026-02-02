@@ -27,7 +27,7 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
-const PlusButtonPopup = ({ setAddOptionsPopup, visible }) => {
+const PlusButtonPopup = ({ setAddOptionsPopup, visible, popupPosition }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -43,7 +43,7 @@ const PlusButtonPopup = ({ setAddOptionsPopup, visible }) => {
         onPress={() => setAddOptionsPopup(false)}
         style={styles.overlay}
       >
-        <View style={styles.notesPopup}>
+        <View style={[styles.notesPopup, popupPosition && { top: popupPosition.top, right: popupPosition.right }]}>
           <Pressable
             onPress={() => {
               setAddOptionsPopup(false);

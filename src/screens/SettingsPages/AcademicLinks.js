@@ -5,6 +5,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Pressable,
+  ActivityIndicator,
+  Linking,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import SwayamIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/SwayamIcon";
@@ -104,7 +106,10 @@ const AcademicLinks = () => {
             <Text style={styles.title}>Swayam Central</Text>
           </View>
 
-          <TouchableOpacity style={styles.visitButton}>
+          <TouchableOpacity
+            style={styles.visitButton}
+            onPress={() => Linking.openURL("https://swayam.gov.in/")}
+          >
             <Text style={styles.visitText}>Visit Site</Text>
             <ArrowUpRightIcon />
           </TouchableOpacity>
@@ -142,7 +147,14 @@ const AcademicLinks = () => {
 
       <View style={styles.divider} />
 
-      {(settingsStates.academicLinks?.userLinks || []).map(
+      {/* Loader while fetching links */}
+      {settingsStates.fetchingAcademicLinks && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="small" color="#081A35" />
+        </View>
+      )}
+
+      {!settingsStates.fetchingAcademicLinks && (settingsStates.academicLinks?.userLinks || []).map(
         (links, linkIndex) => {
           return (
             <View key={linkIndex} style={styles.linksMain}>
@@ -172,11 +184,8 @@ const AcademicLinks = () => {
                     <TouchableOpacity
                       style={styles.popupOverlay}
                       onPress={() => {
+                        // Only close the popup when tapping outside
                         setActivePopupIndex(null);
-                        // backend uses 0-based index
-                        handleDelete(
-                          links.index !== undefined ? links.index : linkIndex,
-                        );
                       }}
                     ></TouchableOpacity>
                     <Pressable style={styles.popup}>
@@ -208,6 +217,11 @@ const AcademicLinks = () => {
 };
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    paddingVertical: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#FAFAFA",

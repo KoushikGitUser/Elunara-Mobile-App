@@ -3,8 +3,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity, 
-  Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Calendar, ChevronDown, UserRound } from "lucide-react-native";
@@ -15,34 +14,15 @@ import { appColors } from "../../../themes/appColors";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const Personal = () => {
+const Personal = ({ scrollViewRef }) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [hobbiesFocused, setHobbiesFocused] = useState(false);
   const [aboutFocused, setAboutFocused] = useState(false);
   const [hobbiesText, setHobbiesText] = useState("");
   const [aboutText, setAboutText] = useState("");
   const dispatch = useDispatch();
   const { settingsStates } = useSelector((state) => state.API);
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
-      setKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height); // <-- set height
-    });
-
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardVisible(false);
-      setKeyboardHeight(0);
-    });
-
-    return () => { 
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   useEffect(() => {
     setHobbiesText(
@@ -134,6 +114,7 @@ const Personal = () => {
   // Debounce timer refs
   const hobbiesDebounceRef = useRef(null);
   const aboutDebounceRef = useRef(null);
+  const bottomRef = useRef(null);
 
   // Debounced hobbies update
   useEffect(() => {
@@ -182,6 +163,12 @@ const Personal = () => {
       }
     };
   }, [aboutText, updateUserAbout, settingsStates.allPersonalisationsSettings.personalInfos.about]);
+
+  const scrollToAbout = () => {
+    setTimeout(() => {
+      scrollViewRef?.current?.scrollToEnd({ animated: true });
+    }, 150);
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -271,11 +258,16 @@ const Personal = () => {
             returnKeyType="done"
             multiline
             textAlignVertical="top"
-            onFocus={() => setAboutFocused(true)}
+            onFocus={() => {
+              setAboutFocused(true);
+              scrollToAbout();
+            }}
             onBlur={() => setAboutFocused(false)}
           />
         </View>
       </View>
+      {/* Empty view for spacing when About is focused */}
+      <View ref={bottomRef} style={{ height: 50 }} />
     </View>
   );
 };
