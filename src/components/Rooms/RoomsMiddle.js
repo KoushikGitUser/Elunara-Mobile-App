@@ -6,7 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../../screens/Rooms/Rooms.styles";
@@ -15,20 +15,21 @@ import { moderateScale, scaleFont } from "../../utils/responsive";
 import { Brain, Link } from "lucide-react-native";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
 import AuthGradientText from "../common/AuthGradientText";
-import { setToggleAddedRoomDetails } from "../../redux/slices/toggleSlice";
 import ChatsComponent from "../AllChatsPage/ChatsComponent";
 import SearchIconsHeader from "./SearchIconsHeader";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import RoomChatsOptionsPopup from "./RoomChatsOptionsPopup";
+import RemoveFromRoomConfirmPopup from "./RemoveFromRoomConfirmPopup";
 
 const RoomsMiddle = ({ roomName }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
-  const { toggleStates } = useSelector((state) => state.Toggle);
   const { roomsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
-  // Fetch room chats when room is loaded
+  // Fetch chats that are IN the room when room is loaded
   useEffect(() => {
     if (roomsStates.currentRoom?.uuid) {
       const payload = {
@@ -39,6 +40,19 @@ const RoomsMiddle = ({ roomName }) => {
       dispatch(commonFunctionForAPICalls(payload));
     }
   }, [roomsStates.currentRoom?.uuid]);
+
+  // Determine what to show based on room chats and description
+  const roomChats = roomsStates.roomChats || [];
+  const hasRoomChats = roomChats.length > 0;
+  const hasDescription = !!roomsStates.currentRoom?.description;
+
+  // Debug logging for room chats
+  console.log("═══════════════════════════════════════════════════════");
+  console.log("🏠 ROOM CHATS DEBUG");
+  console.log("🏠 Current Room UUID:", roomsStates.currentRoom?.uuid);
+  console.log("🏠 Room Chats Count:", roomChats.length);
+  console.log("🏠 Room Chats Data:", JSON.stringify(roomChats, null, 2));
+  console.log("═══════════════════════════════════════════════════════");
 
   return (
     <View style={styles.roomMiddleMain}>
@@ -66,7 +80,8 @@ const RoomsMiddle = ({ roomName }) => {
           </Text>
         </View>
       </View>
-      {toggleStates.toggleAddedRoomDetails && (
+      {/* Show sources/edit section when there are chats or description */}
+      {hasRoomChats && (
         <View style={styles.sources}>
           <View style={styles.sourcesInn}>
             <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
@@ -118,77 +133,67 @@ const RoomsMiddle = ({ roomName }) => {
           </TouchableOpacity>
         </View>
       )}
-      {toggleStates.toggleAddedRoomDetails &&
-        !toggleStates.toggleIsRoomEmpty && <SearchIconsHeader />}
-      {toggleStates.toggleAddedRoomDetails ? (
-        !toggleStates.toggleIsRoomEmpty ? (
-          <ScrollView style={[styles.chatsScrollRooms, { zIndex: 9 }]}>
-            {roomsStates.fetchingRoomChats ? (
-              <ActivityIndicator
-                size="large"
-                color="#081A35"
-                style={{ marginTop: 20 }}
+      {/* Show search header when there are chats */}
+      {hasRoomChats && <SearchIconsHeader />}
+
+      {/* Main content area */}
+      {roomsStates.fetchingRoomChats ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 40 }}>
+          <ActivityIndicator size="large" color="#081A35" />
+        </View>
+      ) : hasRoomChats ? (
+        // Show available chats
+        <ScrollView style={[styles.chatsScrollRooms, { zIndex: 9 }]}>
+          {roomChats.map((chat, chatsIndex) => {
+            return (
+              <ChatsComponent
+                key={chat.uuid || chat.id || chatsIndex}
+                index={chat.uuid || chat.id}
+                title={chat.name || chat.title}
+                subject={chat.description || ""}
+                roomName={roomName}
+                chatData={chat}
+                setPopupPosition={setPopupPosition}
+                isRoomContext={true}
               />
-            ) : roomsStates.roomChats?.length > 0 ? (
-              roomsStates.roomChats.map((chat, chatsIndex) => {
-                return (
-                  <ChatsComponent
-                    key={chat.uuid || chatsIndex}
-                    index={chat.uuid}
-                    title={chat.name || chat.title}
-                    subject={chat.description || ""}
-                    roomName={roomName}
-                  />
-                );
-              })
-            ) : (
-              <View style={{ marginTop: 20, alignItems: "center" }}>
-                <Text
-                  style={{
-                    fontSize: scaleFont(14),
-                    color: "#6B7280",
-                    fontFamily: "Mukta-Regular",
-                  }}
-                >
-                  No chats in this room yet
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        ) : (
-          <View
-            style={[
-              styles.middleBelowAddSection,
-              { borderWidth: 0, backgroundColor: "#FAFAFA" },
-            ]}
-          >
-            <View style={styles.noResultMain}>
-              <BigSearchIcon />
-              <AuthGradientText
-                marginBottom={0}
-                marginTop={15}
-                fullWidth={false}
-                widthMultiplier={0.55}
-                fontSize={scaleFont(20)}
-              >
-                Start Something Great Today!
-              </AuthGradientText>
-              <Text
-                style={{
-                  fontSize: scaleFont(14),
-                  fontFamily: "Mukta-Regular",
-                  textAlign: "center",
-                  width: "100%",
-                  color: "#757575",
-                }}
-              >
-                Create your first chat to dive into personalised AI help. Chats
-                created in this Learning Lab will appear here.
-              </Text>
-            </View>
+            );
+          })}
+        </ScrollView>
+      ) : hasDescription ? (
+        // No chats but has description - show "Start Something Great Today"
+        <View
+          style={[
+            styles.middleBelowAddSection,
+            { borderWidth: 0, backgroundColor: "#FAFAFA" },
+          ]}
+        >
+          <View style={styles.noResultMain}>
+            <BigSearchIcon />
+            <AuthGradientText
+              marginBottom={0}
+              marginTop={15}
+              fullWidth={false}
+              widthMultiplier={0.55}
+              fontSize={scaleFont(20)}
+            >
+              Start Something Great Today!
+            </AuthGradientText>
+            <Text
+              style={{
+                fontSize: scaleFont(14),
+                fontFamily: "Mukta-Regular",
+                textAlign: "center",
+                width: "100%",
+                color: "#757575",
+              }}
+            >
+              Create your first chat to dive into personalised AI help. Chats
+              created in this Learning Lab will appear here.
+            </Text>
           </View>
-        )
+        </View>
       ) : (
+        // No chats and no description - show add instructions component
         <View style={styles.middleBelowAddSection}>
           <View style={styles.addDetailsOptions}>
             <Brain strokeWidth={1.5} size={25} style={{ marginTop: 5 }} />
@@ -256,6 +261,10 @@ const RoomsMiddle = ({ roomName }) => {
           </TouchableOpacity>
         </View>
       )}
+      {/* Room Chats Options Popup */}
+      <RoomChatsOptionsPopup popupPosition={popupPosition} />
+      {/* Remove from Room Confirmation Popup */}
+      <RemoveFromRoomConfirmPopup />
     </View>
   );
 };

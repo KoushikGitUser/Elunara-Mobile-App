@@ -8,6 +8,7 @@ import { notesStates } from "./allInitialStates/notesStates";
 import { attachmentsStates } from "./allInitialStates/attachmentsStates";
 import { searchStates } from "./allInitialStates/searchStates";
 import { chatCustomisationStates } from "./allInitialStates/chatCustomisationStates";
+import { roomCustomisationStates } from "./allInitialStates/roomCustomisationStates";
 
 export const allInitialStates = {
   toggleStates,
@@ -20,4 +21,5 @@ export const allInitialStates = {
   attachmentsStates,
   searchStates,
   chatCustomisationStates,
+  roomCustomisationStates,
 };

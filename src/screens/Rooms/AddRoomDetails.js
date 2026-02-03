@@ -20,16 +20,18 @@ import ScrollListIcon from "../../../assets/SvgIconsComponent/RoomsIcons/ScrollL
 import { scaleFont } from "../../utils/responsive";
 import BrainMindIcon from "../../../assets/SvgIconsComponent/RoomsIcons/BrainMindIcon";
 import SlidersToolsIcon from "../../../assets/SvgIconsComponent/RoomsIcons/SlidersToolsIcon";
-import ToolsContainers from "../../components/ChatScreen/ChatInputCompos/ToolsContainers";
+import RoomToolsContainer from "../../components/Rooms/RoomToolsContainer";
 import { MoreVertical, Paperclip, Plus, Trash2 } from "lucide-react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import ToolsOptionsPopup from "../../components/ChatScreen/ChatInputCompos/ToolsOptionsPopup";
+import RoomToolsOptionsPopup from "../../components/Rooms/RoomToolsPopup/RoomToolsOptionsPopup";
 import { Feather } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
 import {
   setToggleAddedRoomDetails,
   setToggleAddLinkPopup,
+  initializeRoomCustomisation,
+  resetRoomCustomisation,
 } from "../../redux/slices/toggleSlice";
 import pdfLogo from "../../assets/images/pdf.png";
 import deleteBin from "../../assets/images/deleteBin.png";
@@ -37,10 +39,6 @@ import AddLinkPopup from "../../components/common/AddLinkPopup";
 import { BlurView } from "@react-native-community/blur";
 import { triggerToast } from "../../services/toast";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
-import {
-  setTempRoomProperty,
-  resetTempRoomSettings,
-} from "../../redux/slices/apiCommonSlice";
 const { width } = Dimensions.get("window");
 
 const AddRoomDetails = () => {
@@ -57,7 +55,7 @@ const AddRoomDetails = () => {
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: false },
   );
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, roomCustomisationStates } = useSelector((state) => state.Toggle);
   const { roomsStates } = useSelector((state) => state.API);
   const navigation = useNavigation();
   const route = useRoute();
@@ -79,50 +77,34 @@ const AddRoomDetails = () => {
   }, [roomUuid]);
 
   // Load existing room data when it's fetched
+  // Track if initial load has happened
+  const hasInitialized = React.useRef(false);
+
   useEffect(() => {
     if (roomsStates.currentRoom) {
       setDescription(roomsStates.currentRoom.description || "");
       setInstructions(roomsStates.currentRoom.instructions || "");
 
-      // Initialize temp settings
-      dispatch(
-        setTempRoomProperty({
-          key: "llm_id",
-          value:
-            roomsStates.currentRoom.llm_id || roomsStates.currentRoom.llm?.id,
-        }),
-      );
-      dispatch(
-        setTempRoomProperty({
-          key: "response_style_id",
-          value:
-            roomsStates.currentRoom.response_style_id ||
-            roomsStates.currentRoom.response_style?.id,
-        }),
-      );
-      dispatch(
-        setTempRoomProperty({
-          key: "response_language_id",
-          value:
-            roomsStates.currentRoom.response_language_id ||
-            roomsStates.currentRoom.response_language?.id,
-        }),
-      );
-      dispatch(
-        setTempRoomProperty({
-          key: "citation_format_id",
-          value:
-            roomsStates.currentRoom.citation_format_id ||
-            roomsStates.currentRoom.citation_format?.id,
-        }),
-      );
+      // Only initialize room customisation states on first load, not on every room update
+      // This prevents overwriting user selections when the room is updated
+      if (!hasInitialized.current) {
+        hasInitialized.current = true;
+        dispatch(
+          initializeRoomCustomisation({
+            llm: roomsStates.currentRoom.llm || { id: null, name: "Auto" },
+            response_style: roomsStates.currentRoom.response_style || { id: null, name: "Auto" },
+            response_language: roomsStates.currentRoom.response_language || { id: null, name: "English" },
+            citation_format: roomsStates.currentRoom.citation_format || { id: null, name: "Harvard" },
+          }),
+        );
+      }
     }
   }, [roomsStates.currentRoom]);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      dispatch(resetTempRoomSettings());
+      dispatch(resetRoomCustomisation());
     };
   }, []);
 
@@ -143,10 +125,6 @@ const AddRoomDetails = () => {
       data: {
         description: description,
         instructions: instructions,
-        llm_id: roomsStates.tempRoomSettings.llm_id,
-        response_style_id: roomsStates.tempRoomSettings.response_style_id,
-        response_language_id: roomsStates.tempRoomSettings.response_language_id,
-        citation_format_id: roomsStates.tempRoomSettings.citation_format_id,
       },
     };
 
@@ -175,10 +153,10 @@ const AddRoomDetails = () => {
       data: {
         description: description,
         instructions: newInstructions,
-        llm_id: roomsStates.tempRoomSettings.llm_id,
-        response_style_id: roomsStates.tempRoomSettings.response_style_id,
-        response_language_id: roomsStates.tempRoomSettings.response_language_id,
-        citation_format_id: roomsStates.tempRoomSettings.citation_format_id,
+        llm_id: roomCustomisationStates.selectedRoomLLM?.id,
+        response_style_id: roomCustomisationStates.selectedRoomResponseStyle?.id,
+        response_language_id: roomCustomisationStates.selectedRoomLanguage?.id,
+        citation_format_id: roomCustomisationStates.selectedRoomCitationFormat?.id,
         attachments:
           roomsStates.currentRoom?.attachments?.map((a) => a.id || a.uuid) ||
           [],
@@ -211,7 +189,7 @@ const AddRoomDetails = () => {
       {toggleStates.toggleAddLinkPopup && (
         <AddLinkPopup onLinkAdded={handleAddLink} />
       )}
-      {toggleStates.toggleToolsPopup && <ToolsOptionsPopup />}
+      {toggleStates.toggleRoomToolsPopup && <RoomToolsOptionsPopup />}
       <AddRoomDetailsHeader scrollY={scrollY} />
       <ScrollView
         onScroll={handleScroll}
@@ -270,7 +248,7 @@ const AddRoomDetails = () => {
         </View>
         <View style={styles.mainOptionsContainer}>
           <View style={styles.toolsContainer}>
-            <ToolsContainers />
+            <RoomToolsContainer />
           </View>
         </View>
         <View style={[styles.card, ]}>
@@ -371,13 +349,13 @@ const AddRoomDetails = () => {
                         data: {
                           description: description,
                           instructions: newInstructions, // USE THE NEW VALUE
-                          llm_id: roomsStates.tempRoomSettings.llm_id,
+                          llm_id: roomCustomisationStates.selectedRoomLLM?.id,
                           response_style_id:
-                            roomsStates.tempRoomSettings.response_style_id,
+                            roomCustomisationStates.selectedRoomResponseStyle?.id,
                           response_language_id:
-                            roomsStates.tempRoomSettings.response_language_id,
+                            roomCustomisationStates.selectedRoomLanguage?.id,
                           citation_format_id:
-                            roomsStates.tempRoomSettings.citation_format_id,
+                            roomCustomisationStates.selectedRoomCitationFormat?.id,
                           attachments:
                             roomsStates.currentRoom?.attachments?.map(
                               (a) => a.id || a.uuid,

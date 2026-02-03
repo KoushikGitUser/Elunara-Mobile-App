@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useDispatch } from "react-redux";
 import { MessageCircle, MoreVertical, Check } from "lucide-react-native";
-import { setToggleAllChatsOptionsPopup, setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
+import { setToggleAllChatsOptionsPopup, setToggleIsChattingWithAI, setToggleRoomChatsOptionsPopup } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
 import { appColors } from "../../themes/appColors";
@@ -15,12 +15,13 @@ const ChatsComponent = ({
   roomName,
   index,
   isPinned,
-  isSelecting,
-  setIsSelecting,
-  selectedArray,
-  setSelectedArray,
-  setPopupPosition,
-  chatData
+  isSelecting = false,
+  setIsSelecting = () => {},
+  selectedArray = [],
+  setSelectedArray = () => {},
+  setPopupPosition = () => {},
+  chatData,
+  isRoomContext = false
 }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
@@ -32,7 +33,12 @@ const ChatsComponent = ({
     menuButtonRef.current?.measureInWindow((x, y, width, height) => {
       setPopupPosition({ x: x + width, y: y + height });
       dispatch(setCurrentActionChatDetails(chatData));
-      dispatch(setToggleAllChatsOptionsPopup(true));
+      // Use appropriate toggle based on context
+      if (isRoomContext) {
+        dispatch(setToggleRoomChatsOptionsPopup(true));
+      } else {
+        dispatch(setToggleAllChatsOptionsPopup(true));
+      }
     });
   };
 

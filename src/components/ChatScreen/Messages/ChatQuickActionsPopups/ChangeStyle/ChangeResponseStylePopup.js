@@ -103,7 +103,7 @@ const ChangeResponseStylePopup = () => {
   const handleStyleSelection = (styleOption, index) => {
     setSelectedStyle(index);
     const selectedData = {
-      id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
+      id: styleOption.name?.toLowerCase()?.includes("auto") ? null : styleOption.id,
       name: styleOption.name,
     };
 
@@ -118,7 +118,7 @@ const ChangeResponseStylePopup = () => {
       // Build customisations payload
       const customisationsPayload = {
         llm_id: chatCustomisationStates.selectedLLM?.id,
-        response_style_id: styleOption.name?.toLowerCase().includes("auto") ? null : styleOption.id,
+        response_style_id: styleOption.name?.toLowerCase()?.includes("auto") ? null : styleOption.id,
         language_id: chatCustomisationStates.selectedLanguage?.id,
         citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
       };
@@ -277,7 +277,7 @@ const ChangeResponseStylePopup = () => {
                 >
                   {allResponseStyles.map((styleOptions, optionsIndex) => {
                     const icon = getResponseStyleIcon(styleOptions.name);
-                    const isAuto = styleOptions.name?.toLowerCase().includes("auto") || styleOptions.id === 0;
+                    const isAuto = styleOptions.name?.toLowerCase()?.includes("auto") || styleOptions.id === 0;
 
                     return (
                       <React.Fragment key={styleOptions.id || optionsIndex}>
@@ -359,7 +359,7 @@ const ChangeResponseStylePopup = () => {
                   }}
                 >
                   {allResponseStyles
-                    ?.filter(style => !style.name?.toLowerCase().includes("auto"))
+                    ?.filter(style => !style.name?.toLowerCase()?.includes("auto"))
                     ?.map((styleOption, optionsIndex) => {
                       const icon = getResponseStyleIcon(styleOption.name);
                       return (

@@ -246,10 +246,15 @@ export const handleGetRoomChats = {
     state.roomsStates.fetchingRoomChats = true;
   },
   fulfilled: (state, action) => {
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("📋 GET ROOM CHATS - FULFILLED");
+    console.log("📋 Full response:", JSON.stringify(action?.payload?.data, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
     state.roomsStates.roomChats = action?.payload?.data?.data || [];
     state.roomsStates.fetchingRoomChats = false;
   },
   rejected: (state, action) => {
+    console.log("📋 GET ROOM CHATS - REJECTED:", action?.payload?.message || "Unknown error");
     state.roomsStates.fetchingRoomChats = false;
   },
 };

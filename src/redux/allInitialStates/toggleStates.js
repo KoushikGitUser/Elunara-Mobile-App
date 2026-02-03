@@ -44,4 +44,11 @@ export const toggleStates = {
       toggleAddLinkPopup:false,
       toggleUpdateProfilePicPopup:false,
       isEditingUserMessage:false,
+      // Room Tools Popup States
+      toggleRoomToolsPopup:false,
+      toggleRoomToolsPopupStates:0,
+      // Room Chats Options Popup
+      toggleRoomChatsOptionsPopup:false,
+      // Remove from Room Confirmation Popup
+      toggleRemoveFromRoomConfirmPopup:false,
 }

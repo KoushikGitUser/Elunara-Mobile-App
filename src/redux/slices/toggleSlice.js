@@ -155,6 +155,77 @@ const toggleSlice = createSlice({
     setSelectedCitationFormat: (state, action) => {
       state.chatCustomisationStates.selectedCitationFormat = action.payload;
     },
+    // Room Tools Popup Actions
+    setToggleRoomToolsPopup: (state, action) => {
+      state.toggleStates.toggleRoomToolsPopup = action.payload;
+    },
+    setToggleRoomToolsPopupStates: (state, action) => {
+      state.toggleStates.toggleRoomToolsPopupStates = action.payload;
+    },
+    // Room Customisation Actions
+    setSelectedRoomLLM: (state, action) => {
+      state.roomCustomisationStates.selectedRoomLLM = action.payload;
+    },
+    setSelectedRoomResponseStyle: (state, action) => {
+      state.roomCustomisationStates.selectedRoomResponseStyle = action.payload;
+    },
+    setSelectedRoomLanguage: (state, action) => {
+      state.roomCustomisationStates.selectedRoomLanguage = action.payload;
+    },
+    setSelectedRoomCitationFormat: (state, action) => {
+      state.roomCustomisationStates.selectedRoomCitationFormat = action.payload;
+    },
+    // Initialize room customisation from room details
+    initializeRoomCustomisation: (state, action) => {
+      const { llm, response_style, response_language, citation_format } = action.payload;
+      if (llm) {
+        state.roomCustomisationStates.selectedRoomLLM = {
+          id: llm.id,
+          name: llm.name || "Auto",
+        };
+      } else {
+        state.roomCustomisationStates.selectedRoomLLM = { id: null, name: "Auto" };
+      }
+      if (response_style) {
+        state.roomCustomisationStates.selectedRoomResponseStyle = {
+          id: response_style.id,
+          name: response_style.name || "Auto",
+        };
+      } else {
+        state.roomCustomisationStates.selectedRoomResponseStyle = { id: null, name: "Auto" };
+      }
+      if (response_language) {
+        state.roomCustomisationStates.selectedRoomLanguage = {
+          id: response_language.id,
+          name: response_language.name || "English",
+        };
+      } else {
+        state.roomCustomisationStates.selectedRoomLanguage = { id: null, name: "English" };
+      }
+      if (citation_format) {
+        state.roomCustomisationStates.selectedRoomCitationFormat = {
+          id: citation_format.id,
+          name: citation_format.name || "Harvard",
+        };
+      } else {
+        state.roomCustomisationStates.selectedRoomCitationFormat = { id: null, name: "Harvard" };
+      }
+    },
+    // Reset room customisation to defaults
+    resetRoomCustomisation: (state) => {
+      state.roomCustomisationStates.selectedRoomLLM = { id: null, name: "Auto" };
+      state.roomCustomisationStates.selectedRoomResponseStyle = { id: null, name: "Auto" };
+      state.roomCustomisationStates.selectedRoomLanguage = { id: null, name: "English" };
+      state.roomCustomisationStates.selectedRoomCitationFormat = { id: null, name: "Harvard" };
+    },
+    // Room Chats Options Popup
+    setToggleRoomChatsOptionsPopup: (state, action) => {
+      state.toggleStates.toggleRoomChatsOptionsPopup = action.payload;
+    },
+    // Remove from Room Confirmation Popup
+    setToggleRemoveFromRoomConfirmPopup: (state, action) => {
+      state.toggleStates.toggleRemoveFromRoomConfirmPopup = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(resetAllStates, () => {
@@ -212,7 +283,20 @@ export const {
   setSelectedLLM,
   setSelectedResponseStyle,
   setSelectedLanguage,
-  setSelectedCitationFormat
+  setSelectedCitationFormat,
+  // Room Tools Exports
+  setToggleRoomToolsPopup,
+  setToggleRoomToolsPopupStates,
+  setSelectedRoomLLM,
+  setSelectedRoomResponseStyle,
+  setSelectedRoomLanguage,
+  setSelectedRoomCitationFormat,
+  initializeRoomCustomisation,
+  resetRoomCustomisation,
+  // Room Chats Options Popup
+  setToggleRoomChatsOptionsPopup,
+  // Remove from Room Confirmation Popup
+  setToggleRemoveFromRoomConfirmPopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

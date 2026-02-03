@@ -20,6 +20,7 @@ export const settingsStates = {
     allSpecializationsAvailable: [],
     allResponseStylesAvailable: [],
     allCitationFormatsAvailable: [],
+    allResponseLanguagesAvailable: [],
     selectedCountryCode: null,
     isCountrySelectionChanged: false,
   },

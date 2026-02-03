@@ -69,7 +69,7 @@ const OtherStylesPopup = ({
           style={{ maxHeight: 250 }}
         >
           {availableStyles
-            ?.filter(style => !style.name?.toLowerCase().includes("auto"))
+            ?.filter(style => !style.name?.toLowerCase()?.includes("auto"))
             ?.map((style, index) => {
               const isCurrentStyle = style.name === currentStyleName;
               const isOtherSelected = style.name === otherSelectedStyleName;

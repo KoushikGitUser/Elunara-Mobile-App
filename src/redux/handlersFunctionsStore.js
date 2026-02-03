@@ -25,6 +25,7 @@ import {
   handleGetAnalyticsSubjects,
   handleFetchResponseStylesAvailable,
   handleFetchCitationFormatsAvailable,
+  handleFetchResponseLanguagesAvailable,
 } from "./apiExtraReducerHandlers/settingsHandlers";
 
 import {
@@ -112,6 +113,7 @@ export const settingsHandlersFunctions = {
   getAllSpecializationsAvailable: handleGetAllSpecializationsAvailable,
   fetchResponseStylesAvailable: handleFetchResponseStylesAvailable,
   fetchCitationFormatsAvailable: handleFetchCitationFormatsAvailable,
+  fetchResponseLanguagesAvailable: handleFetchResponseLanguagesAvailable,
 
   // update or change settings
   updateGeneralSettings: handleUpdateGeneralSettings,
@@ -165,6 +167,7 @@ export const chatsHandlersFunctions = {
   //  Room operations
   addToRoom: handleAddToRoom,
   removeFromRoom: handleRemoveFromRoom,
+  "remove-chat-from-room": handleRemoveFromRoom,
   // Comparison operations
   compareAIResponses: handleCompareAIResponses,
   storeCompareResponses: handleStoreCompareResponses,
@@ -190,6 +193,7 @@ export const roomsHandlersFunctions = {
   "get-room-chats": handleGetRoomChats,
   "add-chats-to-room": handleAddChatsToRoom,
   "get-available-chats": handleGetAvailableChats,
+  "getAvailableChatForRoom": handleGetAvailableChats,
   "undo-delete-room": handleUndoDeleteRoom,
 };
 

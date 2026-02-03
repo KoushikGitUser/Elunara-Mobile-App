@@ -59,7 +59,7 @@ const AddChatToLearningLabPopup = () => {
 
   // Filter rooms based on search
   const filteredRooms = rooms.filter((room) =>
-    room?.name?.toLowerCase().includes(searchText.toLowerCase())
+    room?.name?.toLowerCase()?.includes(searchText.toLowerCase())
   );
 
   // Fetch rooms when popup opens

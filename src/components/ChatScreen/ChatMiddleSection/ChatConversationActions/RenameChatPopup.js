@@ -211,7 +211,20 @@ const RenameChatPopup = () => {
                   {/* Verify Button */}
                   <TouchableOpacity
                     onPress={() => {
-                      if (roomsStates.currentRoom) {
+                      // Check if we have currentActionChatDetails - if so, rename the chat
+                      const chatUUID = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+                      if (chatUUID) {
+                        // Rename chat
+                        const payload = {
+                          method: "PUT",
+                          url: `/chats/${chatUUID}`,
+                          data: { name: chatName },
+                          name: "renameAndUpdateChatTitle",
+                        };
+                        dispatch(commonFunctionForAPICalls(payload));
+                      } else if (roomsStates.currentRoom) {
+                        // No chat selected, rename the room instead
                         const payload = {
                           method: "PUT",
                           url: `/rooms/${roomsStates.currentRoom.uuid || roomsStates.currentRoom.id}`,
@@ -221,23 +234,20 @@ const RenameChatPopup = () => {
                           },
                         };
                         dispatch(commonFunctionForAPICalls(payload));
-                        // Close popup immediately for room updates (old logic)
+                        // Close popup immediately for room updates
                         dispatch(setToggleRenameChatPopup(false));
                         setTimeout(() => {
                           triggerToast(
                             "Renamed!",
-                            "Your chat has been successfully renamed",
+                            "Your room has been successfully renamed",
                             "success",
                             3000,
                           );
                         }, 500);
                       } else {
-                        // New logic for chats
-                        const chatUUID =
-                          chatsStates.allChatsDatas.currentActionChatDetails
-                            ?.id ||
-                          chatsStates.allChatsDatas.createdChatDetails?.id;
-                        if (!chatUUID) {
+                        // Fallback to createdChatDetails
+                        const fallbackChatUUID = chatsStates.allChatsDatas.createdChatDetails?.id;
+                        if (!fallbackChatUUID) {
                           triggerToast(
                             "Error",
                             "Chat UUID not found",
@@ -249,7 +259,7 @@ const RenameChatPopup = () => {
 
                         const payload = {
                           method: "PUT",
-                          url: `/chats/${chatUUID}`,
+                          url: `/chats/${fallbackChatUUID}`,
                           data: { name: chatName },
                           name: "renameAndUpdateChatTitle",
                         };

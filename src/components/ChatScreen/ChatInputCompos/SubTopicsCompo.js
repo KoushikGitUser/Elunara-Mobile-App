@@ -62,7 +62,7 @@ const SubTopicsCompo = () => {
       setFilteredTopics(allTopics);
     } else {
       const filtered = allTopics.filter((topic) =>
-        topic.name.toLowerCase().includes(searchText.toLowerCase())
+        topic.name?.toLowerCase()?.includes(searchText.toLowerCase())
       );
       setFilteredTopics(filtered);
     }

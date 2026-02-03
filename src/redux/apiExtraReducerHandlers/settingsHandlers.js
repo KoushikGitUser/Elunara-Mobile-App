@@ -205,6 +205,15 @@ export const handleFetchCitationFormatsAvailable = {
   },
 };
 
+export const handleFetchResponseLanguagesAvailable = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    state.settingsStates.settingsMasterDatas.allResponseLanguagesAvailable =
+      action.payload.data.data;
+  },
+  rejected: (state, action) => {},
+};
+
 export const handleGetAllProfileInfos = {
   pending: (state) => {
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;

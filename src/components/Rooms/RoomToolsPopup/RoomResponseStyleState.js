@@ -6,25 +6,26 @@ import {
   Platform,
   Dimensions,
   TouchableOpacity,
-  Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { scaleFont, verticalScale } from "../../../../../utils/responsive";
+import { scaleFont, verticalScale } from "../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setToggleToolsPopupStates,
-  setToggleToolsPopup,
-  setSelectedResponseStyle,
-} from "../../../../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls } from "../../../../../redux/slices/apiCommonSlice";
-import ChakraIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
-import ConciseIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
-import FormalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
-import ConversationalIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
-import DetailedIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
-import CreativeIcon from "../../../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
+  setToggleRoomToolsPopupStates,
+  setToggleRoomToolsPopup,
+  setSelectedRoomResponseStyle,
+} from "../../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { triggerToast } from "../../../services/toast";
+import Toaster from "../../UniversalToaster/Toaster";
+import ChakraIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
+import ConciseIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConciseIcon";
+import FormalIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/FormalIcon";
+import ConversationalIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/ConversationalIcon";
+import DetailedIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/DetailedIcon";
+import CreativeIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/CreativeIcon";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -47,14 +48,13 @@ const getResponseStyleIcon = (name) => {
   return <ChakraIcon />; // Default to Chakra/Auto
 };
 
-const ResponseStyleState = () => {
+const RoomResponseStyleState = () => {
   const dispatch = useDispatch();
   const [selectedStyle, setSelectedStyle] = useState(0);
-  const { settingsStates } = useSelector((state) => state.API);
-  const { chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { settingsStates, roomsStates } = useSelector((state) => state.API);
+  const { roomCustomisationStates } = useSelector((state) => state.Toggle);
 
   useEffect(() => {
-    console.log("🎨 RESPONSE STYLE: Fetching response styles from API...");
     const payload = {
       method: "GET",
       url: "/master/response-styles",
@@ -66,32 +66,49 @@ const ResponseStyleState = () => {
   // Initialize selected style from Redux state
   const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
 
-  console.log("🎨 RESPONSE STYLE: allResponseStyles from Redux:", allResponseStyles);
-  console.log("🎨 RESPONSE STYLE: settingsMasterDatas:", settingsStates?.settingsMasterDatas);
-
   useEffect(() => {
-    if (chatCustomisationStates?.selectedResponseStyle?.id) {
-      // Set to the actual ID, not the index
-      setSelectedStyle(chatCustomisationStates.selectedResponseStyle.id);
+    if (roomCustomisationStates?.selectedRoomResponseStyle?.id) {
+      setSelectedStyle(roomCustomisationStates.selectedRoomResponseStyle.id);
     } else {
-      // If no selection or Auto is selected, set to the first item's ID (Auto)
       if (allResponseStyles.length > 0) {
         setSelectedStyle(allResponseStyles[0]?.id || 0);
       } else {
         setSelectedStyle(0);
       }
     }
-  }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
+  }, [roomCustomisationStates?.selectedRoomResponseStyle, allResponseStyles.length]);
 
-  // Handle response style selection
+  // Handle response style selection and update room
   const handleStyleSelection = (styleOption) => {
+    const isAuto = styleOption.name?.toLowerCase()?.includes("auto");
     const selectedData = {
-      id: styleOption.name?.toLowerCase()?.includes("auto") ? null : styleOption.id,
+      id: isAuto ? null : styleOption.id,
       name: styleOption.name,
     };
 
-    dispatch(setSelectedResponseStyle(selectedData));
+    dispatch(setSelectedRoomResponseStyle(selectedData));
     setSelectedStyle(styleOption.id);
+
+    // Update room with selected response style
+    const roomUuid = roomsStates.currentRoom?.uuid;
+    if (roomUuid) {
+      const payload = {
+        method: "PUT",
+        url: `/rooms/${roomUuid}`,
+        name: "update-room",
+        data: {
+          response_style_id: isAuto ? null : styleOption.id,
+        },
+      };
+      dispatch(commonFunctionForAPICalls(payload))
+        .unwrap()
+        .then(() => {
+          triggerToast("Success", `Response style set to ${styleOption.name}`, "success", 2000);
+        })
+        .catch(() => {
+          triggerToast("Error", "Failed to update response style", "error", 3000);
+        });
+    }
   };
 
   const RadioButton = ({ selected }) => (
@@ -102,35 +119,24 @@ const ResponseStyleState = () => {
 
   return (
     <View style={styles.modalSheet}>
-      {/* Content */}
       <View style={styles.content}>
         <View style={styles.closeModalMain}>
           <TouchableOpacity
-            onPress={() => dispatch(setToggleToolsPopupStates(0))}
+            onPress={() => dispatch(setToggleRoomToolsPopupStates(0))}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <ArrowLeft
-              size={30}
-              strokeWidth={2}
-            />
+            <ArrowLeft size={30} strokeWidth={2} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => dispatch(setToggleToolsPopup(false))}
+            onPress={() => dispatch(setToggleRoomToolsPopup(false))}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <AntDesign
-              name="close"
-              size={24}
-              color="black"
-            />
+            <AntDesign name="close" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        {/* Title */}
         <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>
-
-        {/* Description */}
         <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
-          Set the tone of your AI companion - whether you need a mentor,
+          Set the tone of your AI companion for this room - whether you need a mentor,
           explainer, or study buddy.
         </Text>
 
@@ -138,8 +144,8 @@ const ResponseStyleState = () => {
           showsVerticalScrollIndicator={false}
           style={styles.optionsContainer}
         >
-          <View style={{ flexDirection: "column",}}>
-            {(settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [])?.map((styleOptions, optionsIndex) => {
+          <View style={{ flexDirection: "column" }}>
+            {allResponseStyles?.map((styleOptions, optionsIndex) => {
               const icon = getResponseStyleIcon(styleOptions.name);
               const isAuto = styleOptions.name?.toLowerCase()?.includes("auto") || styleOptions.id === 0;
 
@@ -150,23 +156,16 @@ const ResponseStyleState = () => {
                       styles.card,
                       {
                         backgroundColor:
-                          selectedStyle == styleOptions.id
-                            ? "#EEF4FF"
-                            : "white",
+                          selectedStyle == styleOptions.id ? "#EEF4FF" : "white",
                         borderColor:
-                          selectedStyle == styleOptions.id
-                            ? "black"
-                            : "#D3DAE5",
+                          selectedStyle == styleOptions.id ? "black" : "#D3DAE5",
                       },
                     ]}
                     onPress={() => handleStyleSelection(styleOptions)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.contentMain}>
-                      <View style={styles.iconContainer}>
-                        {icon}
-                      </View>
-
+                      <View style={styles.iconContainer}>{icon}</View>
                       <View style={styles.textContainer}>
                         <Text
                           style={[
@@ -183,7 +182,7 @@ const ResponseStyleState = () => {
                               fontSize: scaleFont(14),
                               fontWeight: 400,
                               color: "#8F8F8F",
-                              fontFamily: "Mukta-Regular"
+                              fontFamily: "Mukta-Regular",
                             },
                           ]}
                         >
@@ -191,7 +190,6 @@ const ResponseStyleState = () => {
                         </Text>
                       </View>
                     </View>
-
                     <RadioButton selected={selectedStyle === styleOptions.id} />
                   </TouchableOpacity>
                   {isAuto && (
@@ -201,7 +199,7 @@ const ResponseStyleState = () => {
                           textAlign: "center",
                           color: "#757575",
                           fontSize: scaleFont(15),
-                          fontFamily: "Mukta-Regular"
+                          fontFamily: "Mukta-Regular",
                         }}
                       >
                         Or Select Manually
@@ -224,10 +222,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
-  },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
   },
   content: {
     paddingHorizontal: 24,
@@ -257,34 +251,6 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     letterSpacing: 0.2,
   },
-  noteSection: {
-    width: "100%",
-    minHeight: verticalScale(70),
-    borderWidth: 1,
-    borderColor: "#D3DAE5",
-    borderRadius: 16,
-    backgroundColor: "#F3F3F3",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#081A35",
-    paddingVertical: 13,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    marginTop: 30,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFont(11),
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
   optionsContainer: {
     maxHeight: screenHeight * 0.55,
     flexDirection: "column",
@@ -299,7 +265,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 18,
     backgroundColor: "white",
-    marginBottom:20
+    marginBottom: 20,
   },
   contentMain: {
     flexDirection: "row",
@@ -329,4 +295,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ResponseStyleState;
+export default RoomResponseStyleState;
