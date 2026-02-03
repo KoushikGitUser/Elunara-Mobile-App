@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import React, { useMemo, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../../screens/Rooms/Rooms.styles";
 import roomLogo from "../../assets/images/Group 40427.png";
 import { moderateScale, scaleFont } from "../../utils/responsive";
-import { Brain, Link } from "lucide-react-native";
+import { Brain, Link, Check, Trash2 } from "lucide-react-native";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
 import AuthGradientText from "../common/AuthGradientText";
 import ChatsComponent from "../AllChatsPage/ChatsComponent";
@@ -20,6 +21,8 @@ import SearchIconsHeader from "./SearchIconsHeader";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import RoomChatsOptionsPopup from "./RoomChatsOptionsPopup";
 import RemoveFromRoomConfirmPopup from "./RemoveFromRoomConfirmPopup";
+import BulkRemoveFromRoomConfirmPopup from "./BulkRemoveFromRoomConfirmPopup";
+import { setToggleBulkRemoveFromRoomConfirmPopup } from "../../redux/slices/toggleSlice";
 
 const RoomsMiddle = ({ roomName }) => {
   const styleProps = {};
@@ -28,6 +31,11 @@ const RoomsMiddle = ({ roomName }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+
+  // Multi-select state
+  const [selectedArray, setSelectedArray] = useState([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   // Fetch chats that are IN the room when room is loaded
   useEffect(() => {
@@ -53,6 +61,32 @@ const RoomsMiddle = ({ roomName }) => {
   console.log("🏠 Room Chats Count:", roomChats.length);
   console.log("🏠 Room Chats Data:", JSON.stringify(roomChats, null, 2));
   console.log("═══════════════════════════════════════════════════════");
+
+  // Handle select all for room chats
+  const handleSelectAll = () => {
+    setChecked(!checked);
+    if (!checked) {
+      const allIds = roomChats.map((chat) => chat.id);
+      setSelectedArray(allIds);
+    } else {
+      setSelectedArray([]);
+    }
+  };
+
+  // Handle bulk remove from room
+  const handleBulkRemoveFromRoom = () => {
+    if (!selectedArray || selectedArray.length === 0) {
+      return;
+    }
+    dispatch(setToggleBulkRemoveFromRoomConfirmPopup(true));
+  };
+
+  // Reset selection state after bulk operation completes
+  const handleBulkOperationComplete = () => {
+    setSelectedArray([]);
+    setIsSelecting(false);
+    setChecked(false);
+  };
 
   return (
     <View style={styles.roomMiddleMain}>
@@ -133,8 +167,47 @@ const RoomsMiddle = ({ roomName }) => {
           </TouchableOpacity>
         </View>
       )}
-      {/* Show search header when there are chats */}
-      {hasRoomChats && <SearchIconsHeader />}
+      {/* Show search header or bulk action bar when there are chats */}
+      {hasRoomChats && (
+        isSelecting ? (
+          <View style={bulkStyles.container}>
+            {/* Left side - Select All */}
+            <TouchableOpacity
+              style={bulkStyles.selectAllContainer}
+              onPress={handleSelectAll}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[bulkStyles.checkbox, checked && bulkStyles.checkboxChecked]}
+              >
+                {checked && (
+                  <Check strokeWidth={2} size={17} color="white" />
+                )}
+              </View>
+              <Text style={bulkStyles.selectAllText}>Select All</Text>
+            </TouchableOpacity>
+
+            {/* Right side - Selected count and Remove from Room */}
+            <View style={bulkStyles.rightContainer}>
+              <View style={bulkStyles.selectedBadge}>
+                <Text style={bulkStyles.selectedText}>
+                  {selectedArray.length} Selected
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={handleBulkRemoveFromRoom}
+                style={bulkStyles.actionButton}
+                activeOpacity={0.7}
+              >
+                <Trash2 size={24} color="#1a2233" strokeWidth={1.8} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <SearchIconsHeader />
+        )
+      )}
 
       {/* Main content area */}
       {roomsStates.fetchingRoomChats ? (
@@ -148,13 +221,17 @@ const RoomsMiddle = ({ roomName }) => {
             return (
               <ChatsComponent
                 key={chat.uuid || chat.id || chatsIndex}
-                index={chat.uuid || chat.id}
+                index={chat.id}
                 title={chat.name || chat.title}
-                subject={chat.description || ""}
+                subject={chat.subject?.name}
                 roomName={roomName}
                 chatData={chat}
                 setPopupPosition={setPopupPosition}
                 isRoomContext={true}
+                isSelecting={isSelecting}
+                selectedArray={selectedArray}
+                setIsSelecting={setIsSelecting}
+                setSelectedArray={setSelectedArray}
               />
             );
           })}
@@ -265,8 +342,71 @@ const RoomsMiddle = ({ roomName }) => {
       <RoomChatsOptionsPopup popupPosition={popupPosition} />
       {/* Remove from Room Confirmation Popup */}
       <RemoveFromRoomConfirmPopup />
+      {/* Bulk Remove from Room Confirmation Popup */}
+      <BulkRemoveFromRoomConfirmPopup
+        selectedChatIds={selectedArray}
+        onComplete={handleBulkOperationComplete}
+      />
     </View>
   );
 };
+
+const bulkStyles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    width: "100%",
+  },
+  selectAllContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  checkbox: {
+    width: 28,
+    height: 28,
+    borderRadius: 3,
+    borderWidth: 2,
+    borderColor: "#d1d5db",
+    backgroundColor: "#ffffff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#1a2233",
+    borderColor: "#1a2233",
+  },
+  selectAllText: {
+    fontSize: scaleFont(16),
+    fontWeight: "600",
+    color: "#1a2233",
+    letterSpacing: -0.3,
+  },
+  rightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  selectedBadge: {
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 50,
+    borderWidth: 1.5,
+    borderColor: "#D3DAE5",
+    backgroundColor: "transparent",
+  },
+  selectedText: {
+    fontSize: scaleFont(12),
+    fontWeight: "500",
+    color: "#1a2233",
+    letterSpacing: -0.2,
+  },
+  actionButton: {
+    padding: 4,
+  },
+});
 
 export default RoomsMiddle;

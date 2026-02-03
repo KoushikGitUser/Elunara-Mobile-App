@@ -51,4 +51,6 @@ export const toggleStates = {
       toggleRoomChatsOptionsPopup:false,
       // Remove from Room Confirmation Popup
       toggleRemoveFromRoomConfirmPopup:false,
+      // Bulk Remove from Room Confirmation Popup
+      toggleBulkRemoveFromRoomConfirmPopup:false,
 }

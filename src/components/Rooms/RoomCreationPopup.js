@@ -10,6 +10,7 @@ import {
   Keyboard,
   Platform,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { BlurView } from "@react-native-community/blur";
@@ -25,6 +26,7 @@ const RoomCreationPopup = () => {
   const [roomName, setRoomName] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
   const animatedValue = useState(new Animated.Value(0))[0];
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -153,10 +155,11 @@ const RoomCreationPopup = () => {
                 <TouchableOpacity
                   style={[
                     styles.verifyButton,
-                    !roomName && styles.verifyButtonDisabled,
+                    (!roomName || isLoading) && styles.verifyButtonDisabled,
                     { marginBottom: 85 },
                   ]}
                   onPress={async () => {
+                    setIsLoading(true);
                     // Call create-room API
                     const payload = {
                       method: "POST",
@@ -172,6 +175,7 @@ const RoomCreationPopup = () => {
                       ).unwrap();
                       const newRoom = result?.data?.data;
 
+                      setIsLoading(false);
                       dispatch(setToggleRoomCreationPopup(false));
 
                       if (newRoom?.id || newRoom?.uuid) {
@@ -184,13 +188,18 @@ const RoomCreationPopup = () => {
                         navigation.navigate("rooms", { roomName });
                       }
                     } catch (error) {
+                      setIsLoading(false);
                       console.error("Failed to create room:", error);
                     }
                   }}
                   activeOpacity={0.8}
-                  disabled={!roomName}
+                  disabled={!roomName || isLoading}
                 >
-                  <Text style={styles.verifyButtonText}>Create Room</Text>
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.verifyButtonText}>Create Room</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>

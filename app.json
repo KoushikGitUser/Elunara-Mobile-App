@@ -48,8 +48,10 @@
         "NSCameraUsageDescription": "This app requires camera access to take photos.",
         "NSPhotoLibraryUsageDescription": "This app requires photo library access to select images.",
         "NSMicrophoneUsageDescription": "This app requires microphone access for speech-to-text and audio features.",
-        "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text."
-      }
+        "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.smgdev.elunara"
     },
     "android": {
       "adaptiveIcon": {
