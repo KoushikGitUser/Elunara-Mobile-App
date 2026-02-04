@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AllRoomsPageHeader from "../../components/Rooms/AllRoomsPageHeader";
 import AllRoomsPageSearchIcons from "../../components/Rooms/AllRoomsPageSearchIcons";
@@ -19,7 +19,7 @@ import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
-import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetHighlightRoomId } from "../../redux/slices/apiCommonSlice";
 import SearchHistory from "../../components/Search/SearchHistory";
 import SearchResults from "../../components/Search/SearchResults";
 
@@ -31,9 +31,15 @@ const AllRoomsLandingPage = () => {
   const [checked, setChecked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { roomsStates, chatsStates } = useSelector((state) => state.API);
+  const { roomsStates, chatsStates, searchStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
   const allUserRooms = chatsStates.allChatsDatas.allUserRoomsAvailable || [];
+
+  // State and refs for scroll-to-highlight feature
+  const [highlightedRoomId, setHighlightedRoomId] = useState(null);
+  const scrollViewRef = useRef(null);
+  const roomPositionsRef = useRef({});
+  const highlightRoomId = searchStates?.highlightRoomId;
 
   // Search Debounce
   useEffect(() => {
@@ -62,6 +68,38 @@ const AllRoomsLandingPage = () => {
     };
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
+
+  // Handle scroll-to and highlight for search results
+  useEffect(() => {
+    if (highlightRoomId && roomsStates.rooms?.length > 0 && !roomsStates.fetchingRooms) {
+      // Find the index of the room to highlight
+      const roomIndex = roomsStates.rooms.findIndex(room => room.uuid === highlightRoomId);
+
+      if (roomIndex !== -1) {
+        // Set the highlighted room
+        setHighlightedRoomId(highlightRoomId);
+
+        // Calculate approximate scroll position (assuming each room item is ~80px height)
+        const scrollPosition = roomIndex * 80;
+
+        // Scroll to the room after a small delay to ensure layout is complete
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: scrollPosition, animated: true });
+          }
+        }, 300);
+
+        // Reset highlight after animation completes
+        setTimeout(() => {
+          setHighlightedRoomId(null);
+          dispatch(resetHighlightRoomId());
+        }, 2000);
+      } else {
+        // Room not found in current list, reset the highlight
+        dispatch(resetHighlightRoomId());
+      }
+    }
+  }, [highlightRoomId, roomsStates.rooms, roomsStates.fetchingRooms]);
 
   const handleSelectAll = () => {
     setChecked(!checked);
@@ -160,6 +198,7 @@ const AllRoomsLandingPage = () => {
           </View>
         ) : (
           <ScrollView
+            ref={scrollViewRef}
             contentContainerStyle={{
               justifyContent: "space-between",
               alignItems: "center",
@@ -185,6 +224,11 @@ const AllRoomsLandingPage = () => {
                     setIsSelecting={setIsSelecting}
                     setSelectedArray={setSelectedArray}
                     room={room}
+                    isHighlighted={highlightedRoomId === room.uuid}
+                    onLayout={(event) => {
+                      const { y } = event.nativeEvent.layout;
+                      roomPositionsRef.current[room.uuid] = y;
+                    }}
                   />
                 );
               })

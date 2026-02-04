@@ -24,7 +24,7 @@ const SearchHistory = ({ onHistoryItemPress }) => {
         name: "get-search-history",
       }),
     );
-  }, []);
+  }, []); 
 
   const handleClearHistory = () => {
     dispatch(

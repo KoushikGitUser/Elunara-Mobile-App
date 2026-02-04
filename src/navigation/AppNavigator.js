@@ -20,6 +20,7 @@ import VerifyEmailWhileSignup from "../screens/auth/redirectionsAuth/VerifyEmail
 import AuthenticateUserUsingProvider from "../screens/auth/redirectionsAuth/AuthenticateUserUsingProvider";
 import { navigationRef } from "../services/navigationService";
 import RedirectToChangePassForToken from "../screens/auth/redirectionsAuth/RedirectToChangePassForToken";
+import UniversalSearchPage from "../screens/UniversalSearch/UniversalSearchPage";
 
 // Screens
 
@@ -48,6 +49,7 @@ const linking = {
       "analyticsComplete": "analyticsComplete",
       "verify-email": "verify-email/:emailToken",
       "auth-using-provider":"oauth/callback",
+      "universalSearch": "search",
     },
   },
 };
@@ -195,6 +197,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="recover-account"
           component={RedirectToChangePassForToken}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="universalSearch"
+          component={UniversalSearchPage}
           options={{
             headerShown: false,
           }}

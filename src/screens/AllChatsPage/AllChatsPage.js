@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AllChatsHeader from "../../components/AllChatsPage/AllChatsHeader";
 import { useNavigation } from "@react-navigation/native";
@@ -21,7 +21,7 @@ import { allChatsData } from "../../data/datas";
 import ChatsComponent from "../../components/AllChatsPage/ChatsComponent";
 import OptionsPopup from "../../components/AllChatsPage/OptionsPopup";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
-import { commonFunctionForAPICalls, resetBulkOperationCompleted } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetBulkOperationCompleted, resetHighlightChatId } from "../../redux/slices/apiCommonSlice";
 import authLoader from "../../assets/images/authLoader.gif";
 import { Check, Trash2, Archive } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
@@ -40,7 +40,7 @@ const AllChatsPage = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, searchStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const translateX = React.useRef(new Animated.Value(0)).current;
 
@@ -52,9 +52,15 @@ const AllChatsPage = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [currentSort, setCurrentSort] = useState(null);
+  const [highlightedChatId, setHighlightedChatId] = useState(null);
+
+  // Refs for scroll-to-highlight feature
+  const scrollViewRef = useRef(null);
+  const chatPositionsRef = useRef({});
 
   const isLoading = chatsStates.loaderStates.isAllUserChatsFetched === "pending" && isInitialLoad;
   const allUserChats = chatsStates.allChatsDatas.allUserChatsAvailable;
+  const highlightChatId = searchStates?.highlightChatId;
 
   useEffect(() => {
     const payload = {
@@ -118,6 +124,38 @@ const AllChatsPage = () => {
       dispatch(resetBulkOperationCompleted());
     }
   }, [chatsStates.loaderStates.isBulkOperationCompleted]);
+
+  // Handle scroll-to and highlight for search results
+  useEffect(() => {
+    if (highlightChatId && allUserChats.length > 0 && !isLoading) {
+      // Find the index of the chat to highlight
+      const chatIndex = allUserChats.findIndex(chat => chat.id === highlightChatId);
+
+      if (chatIndex !== -1) {
+        // Set the highlighted chat
+        setHighlightedChatId(highlightChatId);
+
+        // Calculate approximate scroll position (assuming each chat item is ~80px height)
+        const scrollPosition = chatIndex * 80;
+
+        // Scroll to the chat after a small delay to ensure layout is complete
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: scrollPosition, animated: true });
+          }
+        }, 300);
+
+        // Reset highlight after animation completes
+        setTimeout(() => {
+          setHighlightedChatId(null);
+          dispatch(resetHighlightChatId());
+        }, 2000);
+      } else {
+        // Chat not found in current list, reset the highlight
+        dispatch(resetHighlightChatId());
+      }
+    }
+  }, [highlightChatId, allUserChats, isLoading]);
 
   const handleSelectAll = () => {
     setChecked(!checked);
@@ -312,6 +350,7 @@ const AllChatsPage = () => {
           />
         )}
         <ScrollView
+          ref={scrollViewRef}
           contentContainerStyle={{
             justifyContent: "space-between",
             alignItems: "center",
@@ -333,6 +372,11 @@ const AllChatsPage = () => {
                 setSelectedArray={setSelectedArray}
                 setPopupPosition={setPopupPosition}
                 chatData={chat}
+                isHighlighted={highlightedChatId === chat.id}
+                onLayout={(event) => {
+                  const { y } = event.nativeEvent.layout;
+                  chatPositionsRef.current[chat.id] = y;
+                }}
               />
             );
           })}

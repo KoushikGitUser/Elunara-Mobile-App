@@ -12,4 +12,8 @@ export const searchStates = {
   isSearching: false,
   fetchingHistory: false,
   clearingHistory: false,
+
+  // Highlight states for scroll-to feature
+  highlightChatId: null,
+  highlightRoomId: null,
 };

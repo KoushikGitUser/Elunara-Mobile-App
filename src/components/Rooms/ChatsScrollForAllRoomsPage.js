@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Animated,
 } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Check, MessageCircle, MoreVertical } from "lucide-react-native";
 import { scaleFont, verticalScale } from "../../utils/responsive";
 import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
@@ -27,6 +28,8 @@ const ChatsScrollForAllRoomsPage = ({
   selectedArray,
   setSelectedArray,
   room,
+  isHighlighted = false,
+  onLayout = null,
 }) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -35,6 +38,50 @@ const ChatsScrollForAllRoomsPage = ({
   const [optionsIndex, setOptionsIndex] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, right: 20 });
   const menuButtonRef = useRef(null);
+
+  // Blink animation for highlight
+  const blinkAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isHighlighted) {
+      // Reset animation value first
+      blinkAnim.setValue(0);
+
+      // Create a glow animation that blinks 3 times
+      const blinkAnimation = Animated.sequence([
+        // Blink 1
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+        // Blink 2
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+        // Blink 3
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+      ]);
+
+      blinkAnimation.start();
+
+      return () => {
+        blinkAnimation.stop();
+        blinkAnim.setValue(0);
+      };
+    } else {
+      // Reset to 0 when not highlighted
+      blinkAnim.setValue(0);
+    }
+  }, [isHighlighted]);
+
+  const highlightBackgroundColor = blinkAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['transparent', '#EBF1FB'],
+  });
+
+  // Determine background color
+  const getBackgroundColor = () => {
+    if (selectedArray.includes(index)) return "#EEF4FF";
+    return "transparent";
+  };
 
   const handleRoomPress = () => {
     if (isSelecting) {
@@ -74,21 +121,27 @@ const ChatsScrollForAllRoomsPage = ({
   };
 
   return (
-    <TouchableOpacity
+    <Animated.View
       style={[
-        styles.cardContainer,
-        {
-          backgroundColor: selectedArray.includes(index)
-            ? "#EEF4FF"
-            : "transparent",
-        },
+        { backgroundColor: highlightBackgroundColor },
       ]}
-      onLongPress={() => {
-        setIsSelecting(true);
-        setSelectedArray([...selectedArray, index]);
-      }}
-      onPress={handleRoomPress}
+      onLayout={onLayout}
     >
+      <TouchableOpacity
+        style={[
+          styles.cardContainer,
+          {
+            backgroundColor: selectedArray.includes(index)
+              ? "#EEF4FF"
+              : "transparent",
+          },
+        ]}
+        onLongPress={() => {
+          setIsSelecting(true);
+          setSelectedArray([...selectedArray, index]);
+        }}
+        onPress={handleRoomPress}
+      >
       <View
         style={[
           styles.cardContent,
@@ -139,6 +192,7 @@ const ChatsScrollForAllRoomsPage = ({
         </Pressable>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 };
 

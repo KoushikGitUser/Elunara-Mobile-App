@@ -22,7 +22,7 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import RoomChatsOptionsPopup from "./RoomChatsOptionsPopup";
 import RemoveFromRoomConfirmPopup from "./RemoveFromRoomConfirmPopup";
 import BulkRemoveFromRoomConfirmPopup from "./BulkRemoveFromRoomConfirmPopup";
-import { setToggleBulkRemoveFromRoomConfirmPopup } from "../../redux/slices/toggleSlice";
+import { setToggleBulkRemoveFromRoomConfirmPopup, setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 
 const RoomsMiddle = ({ roomName }) => {
   const styleProps = {};
@@ -86,6 +86,28 @@ const RoomsMiddle = ({ roomName }) => {
     setSelectedArray([]);
     setIsSelecting(false);
     setChecked(false);
+  };
+
+  // Handle chat press within room - load chat without navigating away
+  const handleRoomChatPress = (chatData) => {
+    // Fetch chat details
+    const chatDetailsPayload = {
+      method: "GET",
+      url: `/chats/${chatData?.id}`,
+      name: "getAllDetailsOfChatByID",
+    };
+    dispatch(commonFunctionForAPICalls(chatDetailsPayload));
+
+    // Fetch all messages of the chat
+    const messagesPayload = {
+      method: "GET",
+      url: `/chats/${chatData?.id}/messages`,
+      name: "getAllMessagesOfParticularChat",
+    };
+    dispatch(commonFunctionForAPICalls(messagesPayload));
+
+    // Set chatting state to show ChatMiddleWrapper
+    dispatch(setToggleIsChattingWithAI(true));
   };
 
   return (
@@ -232,6 +254,7 @@ const RoomsMiddle = ({ roomName }) => {
                 selectedArray={selectedArray}
                 setIsSelecting={setIsSelecting}
                 setSelectedArray={setSelectedArray}
+                onChatPress={handleRoomChatPress}
               />
             );
           })}

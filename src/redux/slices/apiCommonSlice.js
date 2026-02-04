@@ -113,6 +113,18 @@ const apiCommonSlice = createSlice({
     setCurrentActionChatDetails: (state, action) => {
       state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     },
+    setHighlightChatId: (state, action) => {
+      state.searchStates.highlightChatId = action.payload;
+    },
+    setHighlightRoomId: (state, action) => {
+      state.searchStates.highlightRoomId = action.payload;
+    },
+    resetHighlightChatId: (state) => {
+      state.searchStates.highlightChatId = null;
+    },
+    resetHighlightRoomId: (state) => {
+      state.searchStates.highlightRoomId = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -152,6 +164,10 @@ export const {
   resetVersionSwitched,
   resetCompareStates,
   resetAcademicLinkFlags,
+  setHighlightChatId,
+  setHighlightRoomId,
+  resetHighlightChatId,
+  resetHighlightRoomId,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

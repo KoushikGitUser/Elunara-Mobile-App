@@ -1,5 +1,5 @@
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import React, { useMemo } from "react";
+import { View, Text, Pressable, TouchableOpacity, Animated } from "react-native";
+import React, { useMemo, useEffect, useRef } from "react";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 import { useDispatch } from "react-redux";
 import { MessageCircle, MoreVertical, Check } from "lucide-react-native";
@@ -21,13 +21,54 @@ const ChatsComponent = ({
   setSelectedArray = () => {},
   setPopupPosition = () => {},
   chatData,
-  isRoomContext = false
+  isRoomContext = false,
+  onChatPress = null,
+  isHighlighted = false,
+  onLayout = null,
 }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const menuButtonRef = React.useRef(null);
+
+  // Blink animation for highlight
+  const blinkAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isHighlighted) {
+      // Reset animation value first
+      blinkAnim.setValue(0);
+
+      // Create a glow animation that blinks 3 times
+      const blinkAnimation = Animated.sequence([
+        // Blink 1
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+        // Blink 2
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+        // Blink 3
+        Animated.timing(blinkAnim, { toValue: 1, duration: 250, useNativeDriver: false }),
+        Animated.timing(blinkAnim, { toValue: 0, duration: 250, useNativeDriver: false }),
+      ]);
+
+      blinkAnimation.start();
+
+      return () => {
+        blinkAnimation.stop();
+        blinkAnim.setValue(0);
+      };
+    } else {
+      // Reset to 0 when not highlighted
+      blinkAnim.setValue(0);
+    }
+  }, [isHighlighted]);
+
+  const highlightBackgroundColor = blinkAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['transparent', '#EBF1FB'],
+  });
 
   const handleMenuPress = () => {
     menuButtonRef.current?.measureInWindow((x, y, width, height) => {
@@ -43,6 +84,12 @@ const ChatsComponent = ({
   };
 
   const handleChatPress = () => {
+    // If custom onChatPress handler is provided (for room context), use it
+    if (onChatPress && isRoomContext) {
+      onChatPress(chatData);
+      return;
+    }
+
     // Navigate first
     navigation.navigate("chat");
 
@@ -79,10 +126,22 @@ const ChatsComponent = ({
     );
   };
 
+  // Determine background color
+  const getBackgroundColor = () => {
+    if (selectedArray.includes(index)) return "#EEF4FF";
+    return "transparent";
+  };
+
   return (
-    <TouchableOpacity
-      style={[styles.cardContainer, { backgroundColor: selectedArray.includes(index) ? "#EEF4FF" : "transparent", paddingLeft: isSelecting ? 10 : 0 }]}
-      onLongPress={() => {
+    <Animated.View
+      style={[
+        { backgroundColor: highlightBackgroundColor },
+      ]}
+      onLayout={onLayout}
+    >
+      <TouchableOpacity
+        style={[styles.cardContainer, { backgroundColor: getBackgroundColor(), paddingLeft: isSelecting ? 10 : 0 }]}
+        onLongPress={() => {
         setIsSelecting(true);
         setSelectedArray([...selectedArray, index])
       }}
@@ -150,6 +209,7 @@ const ChatsComponent = ({
         </Pressable>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 };
 

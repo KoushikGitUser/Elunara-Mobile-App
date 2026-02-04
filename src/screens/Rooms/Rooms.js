@@ -215,7 +215,7 @@ const Rooms = ({ route }) => {
           <RoomsMiddle roomName={roomName} />
         )}
         <View style={{ width: "100%", paddingHorizontal: 20 }}>
-          <ChatInputMain roomId={roomsStates.currentRoom?.uuid} />
+          <ChatInputMain roomId={roomsStates.currentRoom?.uuid} isRoomContext={true} />
         </View>
       </Animated.View>
     </SafeAreaView>

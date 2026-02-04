@@ -57,12 +57,15 @@ import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
 
-const ChatInputMain = forwardRef(({ roomId, ...props }, ref) => {
+const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, chatCustomisationStates, roomCustomisationStates } = useSelector((state) => state.Toggle);
+
+  // Use room customisation states when in room context, otherwise use chat customisation states
+  const activeCustomisationStates = isRoomContext ? roomCustomisationStates : chatCustomisationStates;
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates } = useSelector((state) => state.API);
   const isMessagesFetched = chatsStates.loaderStates.isMessagesFetched;
@@ -165,34 +168,38 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
 
     console.log("📨 SEND: Message payload data:", JSON.stringify(data, null, 2));
 
-    // Add LLM ID if not null
-    if (chatCustomisationStates?.selectedLLM?.id !== null) {
-      data.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
-        ? chatCustomisationStates.selectedLLM.id
-        : parseInt(chatCustomisationStates.selectedLLM.id);
+    // Add LLM ID if not null (use room settings when in room context)
+    const selectedLLM = isRoomContext ? activeCustomisationStates?.selectedRoomLLM : activeCustomisationStates?.selectedLLM;
+    if (selectedLLM?.id !== null) {
+      data.llm_id = typeof selectedLLM.id === 'number'
+        ? selectedLLM.id
+        : parseInt(selectedLLM.id);
     }
 
     // Add Response Style ID if not null
-    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
-      data.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
-        ? chatCustomisationStates.selectedResponseStyle.id
-        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    const selectedResponseStyle = isRoomContext ? activeCustomisationStates?.selectedRoomResponseStyle : activeCustomisationStates?.selectedResponseStyle;
+    if (selectedResponseStyle?.id !== null) {
+      data.response_style_id = typeof selectedResponseStyle.id === 'number'
+        ? selectedResponseStyle.id
+        : parseInt(selectedResponseStyle.id);
     }
 
     // Add Language ID if not null
-    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
-      data.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
-        ? chatCustomisationStates.selectedLanguage.id
-        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    const selectedLanguage = isRoomContext ? activeCustomisationStates?.selectedRoomLanguage : activeCustomisationStates?.selectedLanguage;
+    if (selectedLanguage?.id !== null) {
+      data.language_id = typeof selectedLanguage.id === 'number'
+        ? selectedLanguage.id
+        : parseInt(selectedLanguage.id);
     }
 
     // Add Citation Format ID if not null
-    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
-      data.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
-        ? chatCustomisationStates.selectedCitationFormat.id
-        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    const selectedCitationFormat = isRoomContext ? activeCustomisationStates?.selectedRoomCitationFormat : activeCustomisationStates?.selectedCitationFormat;
+    if (selectedCitationFormat?.id !== null) {
+      data.citation_format_id = typeof selectedCitationFormat.id === 'number'
+        ? selectedCitationFormat.id
+        : parseInt(selectedCitationFormat.id);
     }
- 
+
     const payload = {
       method: "POST",
       url: `/chats/${chatUuid}/messages`,
@@ -286,32 +293,36 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
       attachment_ids: globalDataStates.uploadedAttachmentIds || [],
     };
 
-    // Add LLM ID if not null
-    if (chatCustomisationStates?.selectedLLM?.id !== null) {
-      sendMessageData.llm_id = typeof chatCustomisationStates.selectedLLM.id === 'number'
-        ? chatCustomisationStates.selectedLLM.id
-        : parseInt(chatCustomisationStates.selectedLLM.id);
+    // Add LLM ID if not null (use room settings when in room context)
+    const editSelectedLLM = isRoomContext ? activeCustomisationStates?.selectedRoomLLM : activeCustomisationStates?.selectedLLM;
+    if (editSelectedLLM?.id !== null) {
+      sendMessageData.llm_id = typeof editSelectedLLM.id === 'number'
+        ? editSelectedLLM.id
+        : parseInt(editSelectedLLM.id);
     }
 
     // Add Response Style ID if not null
-    if (chatCustomisationStates?.selectedResponseStyle?.id !== null) {
-      sendMessageData.response_style_id = typeof chatCustomisationStates.selectedResponseStyle.id === 'number'
-        ? chatCustomisationStates.selectedResponseStyle.id
-        : parseInt(chatCustomisationStates.selectedResponseStyle.id);
+    const editSelectedResponseStyle = isRoomContext ? activeCustomisationStates?.selectedRoomResponseStyle : activeCustomisationStates?.selectedResponseStyle;
+    if (editSelectedResponseStyle?.id !== null) {
+      sendMessageData.response_style_id = typeof editSelectedResponseStyle.id === 'number'
+        ? editSelectedResponseStyle.id
+        : parseInt(editSelectedResponseStyle.id);
     }
 
     // Add Language ID if not null
-    if (chatCustomisationStates?.selectedLanguage?.id !== null) {
-      sendMessageData.language_id = typeof chatCustomisationStates.selectedLanguage.id === 'number'
-        ? chatCustomisationStates.selectedLanguage.id
-        : parseInt(chatCustomisationStates.selectedLanguage.id);
+    const editSelectedLanguage = isRoomContext ? activeCustomisationStates?.selectedRoomLanguage : activeCustomisationStates?.selectedLanguage;
+    if (editSelectedLanguage?.id !== null) {
+      sendMessageData.language_id = typeof editSelectedLanguage.id === 'number'
+        ? editSelectedLanguage.id
+        : parseInt(editSelectedLanguage.id);
     }
 
     // Add Citation Format ID if not null
-    if (chatCustomisationStates?.selectedCitationFormat?.id !== null) {
-      sendMessageData.citation_format_id = typeof chatCustomisationStates.selectedCitationFormat.id === 'number'
-        ? chatCustomisationStates.selectedCitationFormat.id
-        : parseInt(chatCustomisationStates.selectedCitationFormat.id);
+    const editSelectedCitationFormat = isRoomContext ? activeCustomisationStates?.selectedRoomCitationFormat : activeCustomisationStates?.selectedCitationFormat;
+    if (editSelectedCitationFormat?.id !== null) {
+      sendMessageData.citation_format_id = typeof editSelectedCitationFormat.id === 'number'
+        ? editSelectedCitationFormat.id
+        : parseInt(editSelectedCitationFormat.id);
     }
 
     const sendMessagePayload = {

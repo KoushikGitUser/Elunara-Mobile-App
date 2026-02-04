@@ -294,3 +294,151 @@ const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * fact
                  "role": "user"
                  }
                  }
+
+
+                 {
+    "chats": [
+      {
+        "id": "1ab7b631-ca28-4587-a0f2-474d98fd11bc",
+        "name": "Marketing for Non-profit organizations",
+        "subject": {
+          "id": 2,
+          "name": "Marketing"
+        },
+        "room": null,
+        "is_archived": false,
+        "last_message_at": "2026-01-29T10:47:58.000000Z"
+      },
+      {
+        "id": "7c50be12-8504-4d4c-9aa3-374281c37e56",
+        "name": "Marketing for Non-profit organizations",
+        "subject": {
+          "id": 2,
+          "name": "Marketing"
+        },
+        "room": null,
+        "is_archived": false,
+        "last_message_at": null
+      },
+      {
+        "id": "5ea0a4d6-016a-4c54-bfdb-4bacb330e503",
+        "name": "International Marketing",
+        "subject": {
+          "id": 2,
+          "name": "Marketing"
+        },
+        "room": null,
+        "is_archived": false,
+        "last_message_at": null
+      },
+      {
+        "id": "8326a0a1-b53d-44be-a997-03e5676721a7",
+        "name": "Marketing for Non-profit organizations",
+        "subject": {
+          "id": 2,
+          "name": "Marketing"
+        },
+        "room": null,
+        "is_archived": false,
+        "last_message_at": null
+      },
+      {
+        "id": "d41914c9-2569-407f-acf7-938e71e7b454",
+        "name": "International Marketing",
+        "subject": {
+          "id": 2,
+          "name": "Marketing"
+        },
+        "room": null,
+        "is_archived": false,
+        "last_message_at": "2026-01-30T06:08:20.000000Z"
+      }
+    ],
+    "rooms": [],
+    "messages": [
+      {
+        "id": "7f0fa64c-7101-4f93-b107-986769f63a29",
+        "chat": {
+          "id": "15437b0a-446a-40a2-94b0-767237f136cb",
+          "name": "Chatting with AI"
+        },
+        "role": "assistant",
+        "snippet": "...es in other languages, I'm designed to respond primarily in English to help with learning and educational content. \n\nHow can I help you learn somethin...",
+        "created_at": "2026-01-29T06:01:56.000000Z"
+      },
+      {
+        "id": "5cdf5efc-fafb-4ef0-874a-fa4295f7bb98",
+        "chat": {
+          "id": "1ab7b631-ca28-4587-a0f2-474d98fd11bc",
+          "name": "Marketing for Non-profit organizations"
+        },
+        "role": "user",
+        "snippet": "Marketing for Non-profit organizations",
+        "created_at": "2026-01-29T10:47:45.000000Z"
+      },
+      {
+        "id": "e3e82f36-9c15-4289-a112-333426ee003c",
+        "chat": {
+          "id": "1ab7b631-ca28-4587-a0f2-474d98fd11bc",
+          "name": "Marketing for Non-profit organizations"
+        },
+        "role": "assistant",
+        "snippet": "# Marketing for Non-Profit Organizations\n\nMarketing for non-profits is fundamentally different from for-profit marketing, as it focuses on mission-dri...",
+        "created_at": "2026-01-29T10:47:58.000000Z"
+      },
+      {
+        "id": "4a1f52c5-65d1-4aab-98ec-63b98b14714f",
+        "chat": {
+          "id": "05e7798a-6c40-4a61-80a1-9bbde47c5803",
+          "name": "Chatting with AI"
+        },
+        "role": "assistant",
+        "snippet": "...of management, including Business Administration, Marketing, Finance, Human Resources, Operations, Strategy, and related disciplines.\n\nWhether you're ...",
+        "created_at": "2026-01-30T05:10:17.000000Z"
+      },
+      {
+        "id": "bfd91b6f-a6a8-4351-8416-9ece44ec111e",
+        "chat": {
+          "id": "d41914c9-2569-407f-acf7-938e71e7b454",
+          "name": "International Marketing"
+        },
+        "role": "user",
+        "snippet": "International Marketing",
+        "created_at": "2026-01-30T05:16:50.000000Z"
+      }
+    ]
+  },
+  "searchHistory": [],
+  "meta": {
+    "query": "mar",
+    "type": "all",
+    "page": 1,
+    "per_page": 5,
+    "total_chats": 10,
+    "total_rooms": 0,
+    "total_messages": 49,
+    "pagination": {
+      "chats": {
+        "current_page": 1,
+        "per_page": 5,
+        "total": 10,
+        "last_page": 2
+      },
+      "rooms": {
+        "current_page": 1,
+        "per_page": 5,
+        "total": 0,
+        "last_page": 1
+      },
+      "messages": {
+        "current_page": 1,
+        "per_page": 5,
+        "total": 49,
+        "last_page": 10
+      }
+    }
+  },
+  "isSearching": false,
+  "fetchingHistory": false,
+  "clearingHistory": false
+}

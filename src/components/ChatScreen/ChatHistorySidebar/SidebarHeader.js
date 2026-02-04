@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Image,
   Animated,
@@ -85,22 +84,40 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
       >
         <Image style={styles.elunaraLogoSidebar} source={elunaraLogo} />
       </TouchableOpacity>
-      <View style={styles.searchInputMain}>
+      <TouchableOpacity
+        style={styles.searchInputMain}
+        onPress={() => {
+          Animated.timing(translateX, {
+            toValue: toggleStates.toggleChatHistorySidebar
+              ? 0
+              : SCREEN_WIDTH * 0.75,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+          dispatch(
+            setToggleChatHistorySidebar(!toggleStates.toggleChatHistorySidebar),
+          );
+          navigation.navigate("universalSearch");
+        }}
+        activeOpacity={0.7}
+      >
         <Search
           size={25}
           strokeWidth={1.25}
           color="#B5BECE"
           style={styles.searchIcon}
         />
-        <TextInput
-          placeholder="Search"
-          placeholderTextColor="#B5BECE"
+        <View
           style={[
             styles.searchInput,
-            { fontFamily: "Mukta-Regular", fontSize: scaleFont(15) },
+            { fontFamily: "Mukta-Regular", fontSize: scaleFont(15), justifyContent: "center", paddingVertical: 10 },
           ]}
-        />
-      </View>
+        >
+          <Text style={{ color: "#B5BECE", fontFamily: "Mukta-Regular", fontSize: scaleFont(15) }}>
+            Search
+          </Text>
+        </View>
+      </TouchableOpacity>
       <View style={styles.newButtonsMain}>
         <TouchableOpacity
           onPress={() => {
