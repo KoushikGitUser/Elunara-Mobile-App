@@ -26,10 +26,15 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
   // Ref for ScrollView to enable auto-scroll
   const scrollViewRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages are added
+  // Auto-scroll to bottom only when user sends a message (not for AI messages)
   useEffect(() => {
     if (scrollViewRef.current && globalDataStates.chatMessagesArray.length > 0) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+      // Get the last message
+      const lastMessage = globalDataStates.chatMessagesArray[globalDataStates.chatMessagesArray.length - 1];
+      // Only auto-scroll if the last message is from the user
+      if (lastMessage?.role === "user") {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }
     }
   }, [globalDataStates.chatMessagesArray]);
 

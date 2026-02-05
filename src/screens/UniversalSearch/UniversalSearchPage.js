@@ -17,7 +17,10 @@ import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsI
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { appColors } from "../../themes/appColors";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Markdown from 'react-native-markdown-display';
 import { commonFunctionForAPICalls, setHighlightChatId, setHighlightRoomId } from "../../redux/slices/apiCommonSlice";
+import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration } from "../../redux/slices/globalDataSlice";
+import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import { triggerToast } from "../../services/toast";
 
@@ -34,14 +37,15 @@ const UniversalSearchPage = () => {
   const [isFocused, setIsFocused] = useState(false);
 
   // Get search results from Redux
-  const searchResults = searchStates?.searchResults || { chats: [], rooms: [] };
+  const searchResults = searchStates?.searchResults || { chats: [], rooms: [], messages: [] };
   const searchHistory = searchStates?.searchHistory || [];
   const isSearching = searchStates?.isSearching || false;
 
   // Check if we have any results
   const hasChats = searchResults.chats?.length > 0;
   const hasRooms = searchResults.rooms?.length > 0;
-  const hasResults = hasChats || hasRooms;
+  const hasMessages = searchResults.messages?.length > 0;
+  const hasResults = hasChats || hasRooms || hasMessages;
   const hasSearchHistory = searchHistory.length > 0;
 
   // Auto-focus the input when the page loads
@@ -135,6 +139,103 @@ const UniversalSearchPage = () => {
     navigation.goBack();
   };
 
+  // Handle chat press - redirect to AllChatsPage and blink the chat
+  const handleChatPress = (chat) => {
+    dispatch(setHighlightChatId(chat.id));
+    navigation.navigate("allchats");
+  };
+
+  // Handle room press - redirect to AllRoomsLandingPage and blink the room
+  const handleRoomPress = (room) => {
+    dispatch(setHighlightRoomId(room.id));
+    navigation.navigate("allRooms");
+  };
+
+  // Handle message press - redirect to ChatScreen and load messages
+  const handleMessagePress = (message) => {
+    // Clear existing messages and IDs before loading new chat
+    dispatch(setChatMessagesArray([]));
+    dispatch(setMessageIDsArray([]));
+    dispatch(setCurrentAIMessageIndexForRegeneration(null));
+
+    // Navigate to chat screen first
+    navigation.navigate("chat");
+
+    // Then fetch chat details and messages after a small delay to ensure ChatScreen has mounted
+    setTimeout(() => {
+      // Fetch chat details
+      const chatDetailsPayload = {
+        method: "GET",
+        url: `/chats/${message.chat.id}`,
+        name: "getAllDetailsOfChatByID",
+      };
+      dispatch(commonFunctionForAPICalls(chatDetailsPayload));
+
+      // Fetch all messages of the chat
+      const messagesPayload = {
+        method: "GET",
+        url: `/chats/${message.chat.id}/messages`,
+        name: "getAllMessagesOfParticularChat",
+      };
+      dispatch(commonFunctionForAPICalls(messagesPayload));
+
+      // Set chatting state after ChatScreen has mounted
+      dispatch(setToggleIsChattingWithAI(true));
+    }, 100);
+  };
+
+  // Markdown styles for snippets (similar to AIMessageBox but smaller)
+  const snippetMarkdownStyles = {
+    body: {
+      fontFamily: "Mukta-Regular",
+      fontSize: scaleFont(13),
+      color: "#6B7280",
+      lineHeight: 18,
+    },
+    strong: {
+      fontFamily: "Mukta-Bold",
+      color: "#3A3A3A",
+    },
+    code_inline: {
+      fontFamily: "Mukta-Bold",
+      fontSize: scaleFont(13),
+      color: "#081A35",
+      backgroundColor: "#EEF4FF",
+      paddingHorizontal: 2,
+      borderRadius: 2,
+    },
+    paragraph: {
+      marginVertical: 0,
+      marginTop: 0,
+      marginBottom: 0,
+    },
+  };
+
+  // Pre-process snippet to highlight search query with inline code markdown
+  const highlightSearchInSnippet = (snippet) => {
+    if (!snippet || !debouncedSearch.trim()) {
+      return snippet;
+    }
+
+    const searchQuery = debouncedSearch.trim();
+    // Escape special regex characters in search query
+    const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Create case-insensitive regex
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    // Replace matches with inline code markdown (backticks) for highlighting
+    return snippet.replace(regex, '`$1`');
+  };
+
+  // Render snippet with Markdown and highlighted search query
+  const renderHighlightedSnippet = (snippet) => {
+    const processedSnippet = highlightSearchInSnippet(snippet);
+    return (
+      <Markdown style={snippetMarkdownStyles}>
+        {processedSnippet}
+      </Markdown>
+    );
+  };
+
   // Render subtitle for chat items
   const renderChatSubtitle = (chat) => {
     const subjectName = chat.subject?.name || "";
@@ -207,6 +308,12 @@ const UniversalSearchPage = () => {
               key={item.id || index}
               style={styles.searchItem}
               activeOpacity={0.7}
+              onPress={() => {
+                const query = item.query || item.name;
+                setSearch(query);
+                setStartedSearching(true);
+                setDebouncedSearch(query);
+              }}
             >
               <View style={styles.iconContainer}>
                 <MessageCircle
@@ -230,10 +337,7 @@ const UniversalSearchPage = () => {
                   key={chat.id}
                   style={styles.searchItem}
                   activeOpacity={0.7}
-                  onPress={() => {
-                    dispatch(setHighlightChatId(chat.id));
-                    navigation.navigate("allchats");
-                  }}
+                  onPress={() => handleChatPress(chat)}
                 >
                   <View style={styles.iconContainer}>
                     <MessageCircle
@@ -260,10 +364,7 @@ const UniversalSearchPage = () => {
                   key={room.id}
                   style={styles.searchItem}
                   activeOpacity={0.7}
-                  onPress={() => {
-                    dispatch(setHighlightRoomId(room.id));
-                    navigation.navigate("allRooms");
-                  }}
+                  onPress={() => handleRoomPress(room)}
                 >
                   <View style={styles.iconContainer}>
                     <FolderIcon />
@@ -273,6 +374,33 @@ const UniversalSearchPage = () => {
                     {room.chats_count !== undefined && (
                       <Text style={styles.itemSubtitle}>{room.chats_count} chats</Text>
                     )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+
+          {/* Messages Section */}
+          {startedSearching && hasMessages && (
+            <>
+              <Text style={styles.sectionLabel}>Messages</Text>
+              {searchResults.messages.map((message) => (
+                <TouchableOpacity
+                  key={message.id}
+                  style={styles.searchItem}
+                  activeOpacity={0.7}
+                  onPress={() => handleMessagePress(message)}
+                >
+                  <View style={styles.iconContainer}>
+                    <MessageCircle
+                      size={24}
+                      strokeWidth={1.5}
+                      color="#9CA3AF"
+                    />
+                  </View>
+                  <View style={styles.itemContent}>
+                    <Text style={styles.itemTitle}>{message.chat?.name || "Chat"}</Text>
+                    {renderHighlightedSnippet(message.snippet)}
                   </View>
                 </TouchableOpacity>
               ))}
@@ -415,6 +543,6 @@ const styles = StyleSheet.create({
     color: "#757575",
     fontFamily: "Mukta-Regular",
   },
-});
+  });
 
 export default UniversalSearchPage;

@@ -54,7 +54,7 @@ const TopicsCompo = () => {
       popularTopics: topicsSheet[7]?.popularTopics,
     };
 
-    return [...topicsWithIcons, othersItem];
+    return [...topicsWithIcons];
   }, [chatsStates.allChatsDatas.allSubjectsAvailable]);
 
 
