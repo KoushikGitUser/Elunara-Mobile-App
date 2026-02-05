@@ -36,7 +36,6 @@ import {
   setSelectedResponseStyle,
   setSelectedLanguage,
   setSelectedCitationFormat,
-  setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
@@ -46,7 +45,6 @@ import {
   resetAllGuidedTourSteps,
   setChatMessagesArray,
   setMessageIDsArray,
-  setCurrentAIMessageIndexForRegeneration,
   setChatTitleOnLongPress,
   setSettingsInnerPageHeaderTitle,
   setSelecetdFiles,
@@ -591,13 +589,6 @@ const ChatScreen = () => {
     globalDataStates.manualGuidedTourRunning,
   ]);
 
-  useEffect(() => {
-    dispatch(setChatMessagesArray([]));
-    dispatch(setMessageIDsArray([]));
-    dispatch(setCurrentAIMessageIndexForRegeneration(null));
-    dispatch(setToggleIsChattingWithAI(false));
-  }, []);
- 
   useEffect(() => {
     const backAction = () => {
       setToggleExitAppConfirmPopup(true);

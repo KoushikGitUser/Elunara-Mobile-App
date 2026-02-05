@@ -53,4 +53,6 @@ export const toggleStates = {
       toggleRemoveFromRoomConfirmPopup:false,
       // Bulk Remove from Room Confirmation Popup
       toggleBulkRemoveFromRoomConfirmPopup:false,
+      // Unsaved Changes Confirmation Popup
+      toggleUnsavedChangesConfirmPopup:false,
 }

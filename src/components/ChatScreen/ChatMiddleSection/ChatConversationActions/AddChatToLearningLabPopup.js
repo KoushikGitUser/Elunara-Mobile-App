@@ -9,6 +9,7 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { scaleFont, verticalScale } from "../../../../utils/responsive";
@@ -30,6 +31,7 @@ const AddChatToLearningLabPopup = () => {
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const inputRef = useRef();
 
   // Get rooms from redux state
@@ -81,6 +83,23 @@ const AddChatToLearningLabPopup = () => {
     }
   }, [isSearching]);
 
+  // Listen for keyboard show/hide events
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setIsKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setIsKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <Modal
       visible={toggleStates.toggleAddChatToLearningLabPopup}
@@ -106,7 +125,7 @@ const AddChatToLearningLabPopup = () => {
         />
 
         {/* Modal Sheet */}
-        <View style={styles.modalSheet}>
+        <View style={[styles.modalSheet, isKeyboardVisible && { height: SCREEN_HEIGHT * 0.9 }]}>
           {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
@@ -185,7 +204,7 @@ const AddChatToLearningLabPopup = () => {
             </View>
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={[styles.chatsScroll, { maxHeight: SCREEN_HEIGHT * 0.5 }]}
+              style={[styles.chatsScroll, { maxHeight: isKeyboardVisible ? SCREEN_HEIGHT * 0.6 : SCREEN_HEIGHT * 0.5 }]}
             >
               {isLoading ? (
                 <View style={{ paddingVertical: 40, alignItems: "center" }}>

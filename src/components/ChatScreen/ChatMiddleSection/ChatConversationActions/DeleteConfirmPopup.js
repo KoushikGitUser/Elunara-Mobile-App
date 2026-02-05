@@ -16,7 +16,10 @@ import { scaleFont } from "../../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { commonFunctionForAPICalls } from "../../../../redux/slices/apiCommonSlice";
-import { setToggleDeleteChatConfirmPopup } from "../../../../redux/slices/toggleSlice";
+import {
+  setToggleDeleteChatConfirmPopup,
+  setToggleIsChattingWithAI
+} from "../../../../redux/slices/toggleSlice";
 import {
   triggerToast,
   triggerToastWithAction,
@@ -25,7 +28,13 @@ import {
   resetChatDeleted,
   resetChatDeleteUndone,
   resetBulkOperationCompleted,
+  setCurrentActionChatDetails,
+  setCreatedChatDetails,
 } from "../../../../redux/slices/apiCommonSlice";
+import {
+  setChatMessagesArray,
+  setMessageIDsArray,
+} from "../../../../redux/slices/globalDataSlice";
 import Toaster from "../../../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
@@ -49,9 +58,29 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
   // Handle delete success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatDeleted === true) {
-      dispatch(setToggleDeleteChatConfirmPopup(false));
-
       const chatId = chatsStates.allChatsDatas.currentActionChatDetails?.id;
+
+      // Check if the deleted chat was the currently active chat
+      const currentChatId = chatsStates.allChatsDatas.createdChatDetails?.id;
+      const wasActiveChat = chatId && currentChatId && chatId === currentChatId && toggleStates.toggleIsChattingWithAI;
+
+      // If the deleted chat was active, navigate to chat home and reset states
+      if (wasActiveChat) {
+        navigation.navigate("chat");
+
+        // Reset all chat-related states after navigation
+        dispatch(setToggleIsChattingWithAI(false));
+        dispatch(setChatMessagesArray([]));
+        dispatch(setMessageIDsArray([]));
+        dispatch(setCreatedChatDetails(null));
+        dispatch(setCurrentActionChatDetails(null));
+
+        console.log('=== RESET CHAT STATE AFTER DELETION ===');
+        console.log('Deleted chat was currently active, resetting all states');
+      }
+
+      // Close the modal after reset is complete
+      dispatch(setToggleDeleteChatConfirmPopup(false));
 
       // Refresh recent chats list
       dispatch(commonFunctionForAPICalls({
@@ -272,8 +301,6 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
 
                     dispatch(commonFunctionForAPICalls(payload));
                   }
-
-                  dispatch(setToggleDeleteChatConfirmPopup(false));
                 }}
                 activeOpacity={0.8}
                 disabled={isLoading}

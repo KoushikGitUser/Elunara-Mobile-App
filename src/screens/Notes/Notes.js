@@ -6,6 +6,7 @@ import {
   ScrollView,
   Keyboard,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { RichEditor, actions } from "react-native-pell-rich-editor";
@@ -19,6 +20,7 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { useDispatch, useSelector } from "react-redux";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { setToggleUnsavedChangesConfirmPopup } from "../../redux/slices/toggleSlice";
 import { useRoute } from "@react-navigation/native";
 import {
   ArrowLeft,
@@ -62,6 +64,7 @@ import TextSizeMediumIcon from "../../../assets/SvgIconsComponent/NotesSectionIc
 import TextSizeLargeIcon from "../../../assets/SvgIconsComponent/NotesSectionIcons/TextSizeLargeIcon";
 import NotesOptions from "../../components/Modals/Notes/NotesOptions";
 import DeleteNoteConfirmPopup from "../../components/Notes/DeleteNoteConfirmPopup";
+import UnsavedChangesConfirmPopup from "../../components/Rooms/UnsavedChangesConfirmPopup";
 import { scaleFont, moderateScale } from "../../utils/responsive";
 import { Octicons } from "@expo/vector-icons";
 import { appColors } from "../../themes/appColors";
@@ -88,10 +91,12 @@ const Notes = () => {
   const [activeStyles, setActiveStyles] = useState([]);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const richTextRef = useRef();
   const initialContentRef = useRef("");
   const fetchedChatUuidRef = useRef(null);
+  const isInitializedRef = useRef(false);
 
   // Default style for formatting buttons (consistent padding)
   const defaultButtonStyle = {
@@ -132,6 +137,7 @@ const Notes = () => {
   useEffect(() => {
     if (chatUuid && fetchedChatUuidRef.current !== chatUuid) {
       fetchedChatUuidRef.current = chatUuid;
+      isInitializedRef.current = false; // Reset initialization flag
       const payload = {
         method: "GET",
         url: `/chats/${chatUuid}/notes`,
@@ -152,8 +158,76 @@ const Notes = () => {
       richTextRef.current?.setContentHTML(content);
       setCanUndo(false);
       setCanRedo(false);
+      // Mark as initialized after a short delay to let the RichEditor finish setting up
+      setTimeout(() => {
+        isInitializedRef.current = true;
+        console.log("=== EDITOR INITIALIZED ===");
+      }, 500);
     }
   }, [notesStates.currentChatNotes]);
+
+  // Track changes to set unsaved changes flag
+  useEffect(() => {
+    // Only start tracking changes after the editor is initialized
+    if (!isInitializedRef.current) {
+      console.log('=== SKIPPING CHANGE TRACKING - NOT INITIALIZED YET ===');
+      return;
+    }
+
+    // Strip HTML tags and normalize whitespace for comparison
+    const stripHtml = (html) => {
+      if (!html) return '';
+      // Remove HTML tags
+      let text = html.replace(/<[^>]*>/g, '');
+      // Decode HTML entities
+      text = text.replace(/&nbsp;/g, ' ');
+      text = text.replace(/&lt;/g, '<');
+      text = text.replace(/&gt;/g, '>');
+      text = text.replace(/&amp;/g, '&');
+      // Normalize whitespace
+      text = text.trim();
+      return text;
+    };
+
+    const currentText = stripHtml(noteContent);
+    const initialText = stripHtml(initialContentRef.current);
+
+    const hasChanges = currentText !== initialText;
+
+    // Debug logging
+    console.log('=== NOTES CHANGE TRACKING ===');
+    console.log('Initialized:', isInitializedRef.current);
+    console.log('Current text:', currentText);
+    console.log('Initial text:', initialText);
+    console.log('Has changes:', hasChanges);
+    console.log('============================');
+
+    setHasUnsavedChanges(hasChanges);
+  }, [noteContent]);
+
+  // Handle hardware/software back button press with unsaved changes alert
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      console.log('=== BEFORE REMOVE TRIGGERED ===');
+      console.log('hasUnsavedChanges:', hasUnsavedChanges);
+      console.log('===============================');
+
+      if (!hasUnsavedChanges) {
+        // If we don't have unsaved changes, just let the action proceed
+        return;
+      }
+
+      // Prevent default behavior of leaving the screen
+      e.preventDefault();
+
+      console.log('=== SHOWING UNSAVED CHANGES MODAL ===');
+
+      // Show custom modal
+      dispatch(setToggleUnsavedChangesConfirmPopup(true));
+    });
+
+    return unsubscribe;
+  }, [navigation, hasUnsavedChanges]);
 
   // Strip images and attachments from HTML content
   const stripAttachments = (html) => {
@@ -169,6 +243,12 @@ const Notes = () => {
     return cleanHtml;
   };
 
+  const handleDiscardChanges = () => {
+    setHasUnsavedChanges(false);
+    dispatch(setToggleUnsavedChangesConfirmPopup(false));
+    navigation.goBack();
+  };
+
   const handleSaveNotes = () => {
     if (chatUuid) {
       // Strip any attachments before saving
@@ -180,7 +260,8 @@ const Notes = () => {
         data: { content: cleanContent },
       };
       dispatch(commonFunctionForAPICalls(payload)).then(() => {
-        navigation.goBack();
+        setHasUnsavedChanges(false);
+        initialContentRef.current = cleanContent;
       });
     }
   };
@@ -193,10 +274,20 @@ const Notes = () => {
         name: "delete-notes",
       };
       dispatch(commonFunctionForAPICalls(payload));
-      setNoteContent("");
-      richTextRef.current?.setContentHTML("");
     }
   };
+
+  // Close modal and reset local state after deletion completes
+  useEffect(() => {
+    if (notesStates.deletingNote === false && toggleDeleteNotePopup && !notesStates.currentChatNotes) {
+      // Deletion completed successfully (deletingNote changed from true to false and notes are null)
+      setToggleDeleteNotePopup(false);
+      setNoteContent("");
+      richTextRef.current?.setContentHTML("");
+      initialContentRef.current = "";
+      setHasUnsavedChanges(false);
+    }
+  }, [notesStates.deletingNote, notesStates.currentChatNotes]);
 
   // Search and highlight functionality
   const highlightSearchMatches = (query) => {
@@ -413,12 +504,19 @@ const Notes = () => {
         setToggleDeleteNotePopup={setToggleDeleteNotePopup}
         toggleDeleteNotePopup={toggleDeleteNotePopup}
         onDelete={handleDeleteNotes}
+        isDeleting={notesStates.deletingNote}
       />
 
       {/* header */}
       <View style={styles.notesHeader}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("chat")}
+          onPress={() => {
+            if (hasUnsavedChanges) {
+              dispatch(setToggleUnsavedChangesConfirmPopup(true));
+            } else {
+              navigation.goBack();
+            }
+          }}
           style={styles.backBtn}
         >
           <ArrowLeft size={25} strokeWidth={1.5} />
@@ -459,11 +557,15 @@ const Notes = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.doneBtn, { opacity: isNotesEmpty ? 0.3 : 1 }]}
+            style={[styles.doneBtn, { opacity: !hasUnsavedChanges || notesStates.savingNote ? 0.3 : 1 }]}
             onPress={handleSaveNotes}
-            disabled={isNotesEmpty}
+            disabled={!hasUnsavedChanges || notesStates.savingNote}
           >
-            <Text style={{ fontWeight: 600 }}>Done</Text>
+            {notesStates.savingNote ? (
+              <ActivityIndicator size="small" color="#000000" />
+            ) : (
+              <Text style={{ fontWeight: 600 }}>Done</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -917,6 +1019,9 @@ const Notes = () => {
       )}
 
       {/* Footer actions */}
+
+      {/* Unsaved Changes Confirmation Modal */}
+      <UnsavedChangesConfirmPopup onDiscard={handleDiscardChanges} />
     </SafeAreaView>
   );
 };

@@ -37,6 +37,9 @@ const RoomsMiddle = ({ roomName }) => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [checked, setChecked] = useState(false);
 
+  // Search state - filter chats by name
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Fetch chats that are IN the room when room is loaded
   useEffect(() => {
     if (roomsStates.currentRoom?.uuid) {
@@ -51,6 +54,14 @@ const RoomsMiddle = ({ roomName }) => {
 
   // Determine what to show based on room chats and description
   const roomChats = roomsStates.roomChats || [];
+
+  // Filter room chats by search query
+  const filteredRoomChats = searchQuery.trim()
+    ? roomChats.filter(chat =>
+        chat.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : roomChats;
+
   const hasRoomChats = roomChats.length > 0;
   const hasDescription = !!roomsStates.currentRoom?.description;
 
@@ -153,7 +164,7 @@ const RoomsMiddle = ({ roomName }) => {
                   : "No instructions"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
+            {/* <TouchableOpacity disabled style={styles.sourcesAndInstruction}>
               <Text
                 style={{
                   fontSize: scaleFont(12),
@@ -167,7 +178,7 @@ const RoomsMiddle = ({ roomName }) => {
                   : 0}
                 )
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <TouchableOpacity
             style={styles.editBtn}
@@ -227,7 +238,7 @@ const RoomsMiddle = ({ roomName }) => {
             </View>
           </View>
         ) : (
-          <SearchIconsHeader />
+          <SearchIconsHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         )
       )}
 
@@ -239,7 +250,7 @@ const RoomsMiddle = ({ roomName }) => {
       ) : hasRoomChats ? (
         // Show available chats
         <ScrollView style={[styles.chatsScrollRooms, { zIndex: 9 }]}>
-          {roomChats.map((chat, chatsIndex) => {
+          {filteredRoomChats.map((chat, chatsIndex) => {
             return (
               <ChatsComponent
                 key={chat.uuid || chat.id || chatsIndex}
@@ -318,7 +329,7 @@ const RoomsMiddle = ({ roomName }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.addDetailsOptions}>
+          {/* <View style={styles.addDetailsOptions}>
             <Link strokeWidth={1.5} size={25} style={{ marginTop: 5 }} />
             <View style={{ width: "85%" }}>
               <Text
@@ -340,7 +351,7 @@ const RoomsMiddle = ({ roomName }) => {
                 Share sources to set the quicker context
               </Text>
             </View>
-          </View>
+          </View> */}
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("roomDetails", {

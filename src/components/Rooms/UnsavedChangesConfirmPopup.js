@@ -1,32 +1,41 @@
+import React from "react";
 import {
   View,
   Text,
+  TouchableOpacity,
+  StyleSheet,
   Modal,
   Platform,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
-import React from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../utils/responsive";
+import { useDispatch, useSelector } from "react-redux";
+import { setToggleUnsavedChangesConfirmPopup } from "../../redux/slices/toggleSlice";
 
-const DeleteNoteConfirmPopup = ({
-  toggleDeleteNotePopup,
-  setToggleDeleteNotePopup,
-  onDelete,
-  isDeleting = false,
-}) => {
+const UnsavedChangesConfirmPopup = ({ onDiscard }) => {
+  const { toggleStates } = useSelector((state) => state.Toggle);
+  const dispatch = useDispatch();
+
+  const handleDiscard = () => {
+    dispatch(setToggleUnsavedChangesConfirmPopup(false));
+    if (onDiscard) {
+      onDiscard();
+    }
+  };
+
+  const handleCancel = () => {
+    dispatch(setToggleUnsavedChangesConfirmPopup(false));
+  };
+
   return (
     <Modal
-      visible={toggleDeleteNotePopup}
+      visible={toggleStates.toggleUnsavedChangesConfirmPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() => setToggleDeleteNotePopup(false)}
+      onRequestClose={handleCancel}
     >
       <View style={styles.container}>
         {/* Blur Background */}
-
         <BlurView
           style={styles.blurView}
           blurType="light"
@@ -38,7 +47,7 @@ const DeleteNoteConfirmPopup = ({
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() => setToggleDeleteNotePopup(false)}
+          onPress={handleCancel}
         />
 
         {/* Modal Sheet */}
@@ -51,12 +60,13 @@ const DeleteNoteConfirmPopup = ({
           {/* Content */}
           <View style={styles.content}>
             {/* Title */}
-            <Text style={styles.title}>Delete Note Content?</Text>
+            <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+              Discard Changes?
+            </Text>
 
             {/* Description */}
-            <Text style={styles.description}>
-              Please confirm you want to delete the content of this note. This
-              action cannot be undone.
+            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+              You have unsaved changes. Are you sure you want to discard them and leave?
             </Text>
 
             {/* Button */}
@@ -70,26 +80,28 @@ const DeleteNoteConfirmPopup = ({
                     borderColor: "black",
                   },
                 ]}
-                onPress={() => setToggleDeleteNotePopup(false)}
+                onPress={handleCancel}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.buttonText, { color: "black" }]}>
-                  Cancel
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: "black", fontFamily: "Mukta-Regular" },
+                  ]}
+                >
+                  Don't Leave
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => {
-                  onDelete?.();
-                }}
+                onPress={handleDiscard}
                 activeOpacity={0.8}
-                disabled={isDeleting}
               >
-                {isDeleting ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.buttonText}>Delete</Text>
-                )}
+                <Text
+                  style={[styles.buttonText, { fontFamily: "Mukta-Regular" }]}
+                >
+                  Discard
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -140,38 +152,39 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 20,
   },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D1D5DB",
+  },
   btnsMain: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
-  },
   content: {
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 32,
   },
-  iconContainer: {
-    marginBottom: 24,
-  },
   title: {
-    fontSize: scaleFont(23),
-    fontWeight: "700",
+    fontSize: scaleFont(26),
     color: "#1F2937",
-    marginBottom: 16,
+    marginBottom: 12,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(12),
-    lineHeight: 24,
+    fontSize: scaleFont(14),
     color: "#6B7280",
     marginBottom: 32,
-    letterSpacing: 0.2,
+    lineHeight: 22,
   },
   button: {
     width: "48%",
@@ -184,10 +197,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(11),
+    fontSize: scaleFont(13),
     fontWeight: "500",
     letterSpacing: 0.3,
   },
 });
 
-export default DeleteNoteConfirmPopup;
+export default UnsavedChangesConfirmPopup;

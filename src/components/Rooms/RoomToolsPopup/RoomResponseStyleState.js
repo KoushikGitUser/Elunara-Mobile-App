@@ -78,7 +78,7 @@ const RoomResponseStyleState = () => {
     }
   }, [roomCustomisationStates?.selectedRoomResponseStyle, allResponseStyles.length]);
 
-  // Handle response style selection and update room
+  // Handle response style selection (only update Redux state, no API call)
   const handleStyleSelection = (styleOption) => {
     const isAuto = styleOption.name?.toLowerCase()?.includes("auto");
     const selectedData = {
@@ -88,27 +88,6 @@ const RoomResponseStyleState = () => {
 
     dispatch(setSelectedRoomResponseStyle(selectedData));
     setSelectedStyle(styleOption.id);
-
-    // Update room with selected response style
-    const roomUuid = roomsStates.currentRoom?.uuid;
-    if (roomUuid) {
-      const payload = {
-        method: "PUT",
-        url: `/rooms/${roomUuid}`,
-        name: "update-room",
-        data: {
-          response_style_id: isAuto ? null : styleOption.id,
-        },
-      };
-      dispatch(commonFunctionForAPICalls(payload))
-        .unwrap()
-        .then(() => {
-          triggerToast("Success", `Response style set to ${styleOption.name}`, "success", 2000);
-        })
-        .catch(() => {
-          triggerToast("Error", "Failed to update response style", "error", 3000);
-        });
-    }
   };
 
   const RadioButton = ({ selected }) => (

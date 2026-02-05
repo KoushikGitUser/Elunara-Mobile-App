@@ -230,6 +230,10 @@ const toggleSlice = createSlice({
     setToggleBulkRemoveFromRoomConfirmPopup: (state, action) => {
       state.toggleStates.toggleBulkRemoveFromRoomConfirmPopup = action.payload;
     },
+    // Unsaved Changes Confirmation Popup
+    setToggleUnsavedChangesConfirmPopup: (state, action) => {
+      state.toggleStates.toggleUnsavedChangesConfirmPopup = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(resetAllStates, () => {
@@ -302,7 +306,9 @@ export const {
   // Remove from Room Confirmation Popup
   setToggleRemoveFromRoomConfirmPopup,
   // Bulk Remove from Room Confirmation Popup
-  setToggleBulkRemoveFromRoomConfirmPopup
+  setToggleBulkRemoveFromRoomConfirmPopup,
+  // Unsaved Changes Confirmation Popup
+  setToggleUnsavedChangesConfirmPopup
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

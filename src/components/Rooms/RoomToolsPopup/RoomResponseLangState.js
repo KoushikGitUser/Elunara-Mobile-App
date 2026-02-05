@@ -53,7 +53,7 @@ const RoomResponseLangState = () => {
     }
   }, [roomCustomisationStates?.selectedRoomLanguage, allLanguages.length]);
 
-  // Handle language selection and update room
+  // Handle language selection (only update Redux state, no API call)
   const handleLanguageSelection = (langOption) => {
     const selectedData = {
       id: langOption.id,
@@ -61,27 +61,6 @@ const RoomResponseLangState = () => {
     };
     dispatch(setSelectedRoomLanguage(selectedData));
     setSelectedLanguageLocal(langOption.id);
-
-    // Update room with selected language
-    const roomUuid = roomsStates.currentRoom?.uuid;
-    if (roomUuid) {
-      const payload = {
-        method: "PUT",
-        url: `/rooms/${roomUuid}`,
-        name: "update-room",
-        data: {
-          response_language_id: langOption.id,
-        },
-      };
-      dispatch(commonFunctionForAPICalls(payload))
-        .unwrap()
-        .then(() => {
-          triggerToast("Success", `Language set to ${langOption.name}`, "success", 2000);
-        })
-        .catch(() => {
-          triggerToast("Error", "Failed to update language", "error", 3000);
-        });
-    }
   };
 
   const RadioButton = ({ selected }) => (

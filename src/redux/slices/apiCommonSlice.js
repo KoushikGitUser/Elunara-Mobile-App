@@ -113,6 +113,9 @@ const apiCommonSlice = createSlice({
     setCurrentActionChatDetails: (state, action) => {
       state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     },
+    setCreatedChatDetails: (state, action) => {
+      state.chatsStates.allChatsDatas.createdChatDetails = action.payload;
+    },
     setHighlightChatId: (state, action) => {
       state.searchStates.highlightChatId = action.payload;
     },
@@ -160,6 +163,7 @@ export const {
   resetChatDeleteUndone,
   resetBulkOperationCompleted,
   setCurrentActionChatDetails,
+  setCreatedChatDetails,
   resetAIResponseRegenerated,
   resetVersionSwitched,
   resetCompareStates,

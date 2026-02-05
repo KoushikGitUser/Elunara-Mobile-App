@@ -7,7 +7,7 @@ import { verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 
-const SearchIconsHeader = ({ isSearching, setIsSearching }) => {
+const SearchIconsHeader = ({ searchQuery, setSearchQuery }) => {
   const navigation = useNavigation();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -19,7 +19,7 @@ const SearchIconsHeader = ({ isSearching, setIsSearching }) => {
       <View
         style={[
           styles.searchInputMain,
-          { width: isSearching ? "100%" : "auto" },
+          { width: searchQuery ? "100%" : "auto" },
         ]}
       >
         <Search
@@ -30,14 +30,15 @@ const SearchIconsHeader = ({ isSearching, setIsSearching }) => {
         />
         <TextInput
           ref={inputRef}
-          onFocus={() => setIsSearching(true)}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
           placeholder="Search"
           placeholderTextColor="#B5BECE"
-          style={[styles.searchInput, { outlineWidth: isSearching ? 1 : 0 }]}
+          style={[styles.searchInput, { outlineWidth: searchQuery ? 1 : 0 }]}
         />
       </View>
       <View
-        style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
+        style={[styles.iconsMain, { display: searchQuery ? "none" : "flex" }]}
       >
         <ArrowUpDownIcon />
         <FilterIcon />

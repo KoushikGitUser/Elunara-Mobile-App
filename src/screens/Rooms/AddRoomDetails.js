@@ -9,7 +9,6 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
-  Alert,
   Modal,
   Platform,
 } from "react-native";
@@ -24,6 +23,7 @@ import RoomToolsContainer from "../../components/Rooms/RoomToolsContainer";
 import { MoreVertical, Paperclip, Plus, Trash2 } from "lucide-react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import RoomToolsOptionsPopup from "../../components/Rooms/RoomToolsPopup/RoomToolsOptionsPopup";
+import UnsavedChangesConfirmPopup from "../../components/Rooms/UnsavedChangesConfirmPopup";
 import { Feather } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import SourcesPopup from "../../components/Modals/Rooms/SourcesPopup";
@@ -32,6 +32,7 @@ import {
   setToggleAddLinkPopup,
   initializeRoomCustomisation,
   resetRoomCustomisation,
+  setToggleUnsavedChangesConfirmPopup,
 } from "../../redux/slices/toggleSlice";
 import pdfLogo from "../../assets/images/pdf.png";
 import deleteBin from "../../assets/images/deleteBin.png";
@@ -46,6 +47,8 @@ const AddRoomDetails = () => {
   const [sourcesPopup, setSourcesPopup] = useState(false);
   const [description, setDescription] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pendingNavigationAction, setPendingNavigationAction] = useState(null);
 
   // Delete Popup States
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -79,16 +82,31 @@ const AddRoomDetails = () => {
   // Load existing room data when it's fetched
   // Track if initial load has happened
   const hasInitialized = React.useRef(false);
+  const initialValues = React.useRef({});
 
   useEffect(() => {
     if (roomsStates.currentRoom) {
-      setDescription(roomsStates.currentRoom.description || "");
-      setInstructions(roomsStates.currentRoom.instructions || "");
+      const desc = roomsStates.currentRoom.description || "";
+      const inst = roomsStates.currentRoom.instructions || "";
+
+      setDescription(desc);
+      setInstructions(inst);
 
       // Only initialize room customisation states on first load, not on every room update
       // This prevents overwriting user selections when the room is updated
       if (!hasInitialized.current) {
         hasInitialized.current = true;
+
+        // Store initial values for comparison
+        initialValues.current = {
+          description: desc,
+          instructions: inst,
+          llm_id: roomsStates.currentRoom.llm?.id,
+          response_style_id: roomsStates.currentRoom.response_style?.id,
+          response_language_id: roomsStates.currentRoom.response_language?.id,
+          citation_format_id: roomsStates.currentRoom.citation_format?.id,
+        };
+
         dispatch(
           initializeRoomCustomisation({
             llm: roomsStates.currentRoom.llm || { id: null, name: "Auto" },
@@ -101,6 +119,21 @@ const AddRoomDetails = () => {
     }
   }, [roomsStates.currentRoom]);
 
+  // Track changes to set unsaved changes flag
+  useEffect(() => {
+    if (!hasInitialized.current) return;
+
+    const hasChanges =
+      description !== initialValues.current.description ||
+      instructions !== initialValues.current.instructions ||
+      roomCustomisationStates.selectedRoomLLM?.id !== initialValues.current.llm_id ||
+      roomCustomisationStates.selectedRoomResponseStyle?.id !== initialValues.current.response_style_id ||
+      roomCustomisationStates.selectedRoomLanguage?.id !== initialValues.current.response_language_id ||
+      roomCustomisationStates.selectedRoomCitationFormat?.id !== initialValues.current.citation_format_id;
+
+    setHasUnsavedChanges(hasChanges);
+  }, [description, instructions, roomCustomisationStates.selectedRoomLLM, roomCustomisationStates.selectedRoomResponseStyle, roomCustomisationStates.selectedRoomLanguage, roomCustomisationStates.selectedRoomCitationFormat]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -108,7 +141,26 @@ const AddRoomDetails = () => {
     };
   }, []);
 
-  const handleSaveDetails = () => {
+  // Handle back button press with unsaved changes alert
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!hasUnsavedChanges) {
+        // If we don't have unsaved changes, just let the action proceed
+        return;
+      }
+
+      // Prevent default behavior of leaving the screen
+      e.preventDefault();
+
+      // Store the navigation action and show custom modal
+      setPendingNavigationAction(e.data.action);
+      dispatch(setToggleUnsavedChangesConfirmPopup(true));
+    });
+
+    return unsubscribe;
+  }, [navigation, hasUnsavedChanges]);
+
+  const  handleSaveDetails = () => {
     // Use roomUuid from route params or currentRoom as fallback
     const effectiveRoomUuid =
       route.params?.roomUuid || roomsStates.currentRoom?.uuid;
@@ -118,6 +170,7 @@ const AddRoomDetails = () => {
       return;
     }
 
+    // Include ALL keys in the update payload
     const payload = {
       method: "PUT",
       url: `/rooms/${effectiveRoomUuid}`,
@@ -125,15 +178,27 @@ const AddRoomDetails = () => {
       data: {
         description: description,
         instructions: instructions,
+        llm_id: roomCustomisationStates.selectedRoomLLM?.id,
+        response_style_id: roomCustomisationStates.selectedRoomResponseStyle?.id,
+        response_language_id: roomCustomisationStates.selectedRoomLanguage?.id,
+        citation_format_id: roomCustomisationStates.selectedRoomCitationFormat?.id,
       },
     };
 
     dispatch(commonFunctionForAPICalls(payload));
+    setHasUnsavedChanges(false);
     navigation.navigate("rooms", {
       roomName: roomsStates.currentRoom?.name || "Room",
       roomUuid: roomsStates.currentRoom?.uuid || roomsStates.currentRoom?.id,
     });
     dispatch(setToggleAddedRoomDetails(true));
+  };
+
+  const handleDiscardChanges = () => {
+    if (pendingNavigationAction) {
+      navigation.dispatch(pendingNavigationAction);
+      setPendingNavigationAction(null);
+    }
   };
 
   const handleAddLink = (linkData) => {
@@ -356,10 +421,6 @@ const AddRoomDetails = () => {
                             roomCustomisationStates.selectedRoomLanguage?.id,
                           citation_format_id:
                             roomCustomisationStates.selectedRoomCitationFormat?.id,
-                          attachments:
-                            roomsStates.currentRoom?.attachments?.map(
-                              (a) => a.id || a.uuid,
-                            ) || [],
                         },
                       };
 
@@ -420,6 +481,9 @@ const AddRoomDetails = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Unsaved Changes Confirmation Modal */}
+      <UnsavedChangesConfirmPopup onDiscard={handleDiscardChanges} />
     </SafeAreaView>
   );
 };

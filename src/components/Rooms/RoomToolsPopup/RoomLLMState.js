@@ -96,7 +96,7 @@ const RoomLLMState = () => {
     }
   }, [roomCustomisationStates?.selectedRoomLLM]);
 
-  // Handle LLM selection and update room
+  // Handle LLM selection (only update Redux state, no API call)
   const handleLLMSelection = (llmOption) => {
     const selectedData = {
       id: llmOption.id,
@@ -104,27 +104,6 @@ const RoomLLMState = () => {
     };
     dispatch(setSelectedRoomLLM(selectedData));
     setSelectedLLMLocal(llmOption.id);
-
-    // Update room with selected LLM
-    const roomUuid = roomsStates.currentRoom?.uuid;
-    if (roomUuid) {
-      const payload = {
-        method: "PUT",
-        url: `/rooms/${roomUuid}`,
-        name: "update-room",
-        data: {
-          llm_id: llmOption.id,
-        },
-      };
-      dispatch(commonFunctionForAPICalls(payload))
-        .unwrap()
-        .then(() => {
-          triggerToast("Success", `LLM set to ${llmOption.name}`, "success", 2000);
-        })
-        .catch(() => {
-          triggerToast("Error", "Failed to update LLM", "error", 3000);
-        });
-    }
   };
 
   const RadioButton = ({ selected }) => (

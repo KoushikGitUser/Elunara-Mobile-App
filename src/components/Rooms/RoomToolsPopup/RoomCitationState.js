@@ -69,7 +69,7 @@ const RoomCitationState = () => {
     }
   }, [roomCustomisationStates?.selectedRoomCitationFormat, allCitationFormats.length]);
 
-  // Handle citation selection and update room
+  // Handle citation selection (only update Redux state, no API call)
   const handleCitationSelection = (citationOption) => {
     const selectedData = {
       id: citationOption.id,
@@ -77,27 +77,6 @@ const RoomCitationState = () => {
     };
     dispatch(setSelectedRoomCitationFormat(selectedData));
     setSelectedCitationLocal(citationOption.id);
-
-    // Update room with selected citation format
-    const roomUuid = roomsStates.currentRoom?.uuid;
-    if (roomUuid) {
-      const payload = {
-        method: "PUT",
-        url: `/rooms/${roomUuid}`,
-        name: "update-room",
-        data: {
-          citation_format_id: citationOption.id,
-        },
-      };
-      dispatch(commonFunctionForAPICalls(payload))
-        .unwrap()
-        .then(() => {
-          triggerToast("Success", `Citation format set to ${citationOption.name}`, "success", 2000);
-        })
-        .catch(() => {
-          triggerToast("Error", "Failed to update citation format", "error", 3000);
-        });
-    }
   };
 
   const RadioButton = ({ selected }) => (
