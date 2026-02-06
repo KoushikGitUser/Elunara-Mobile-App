@@ -6,7 +6,7 @@ export const chatsStates = {
     allSubjectsAvailable: [],
     allTopicsOfSelectedSubjects: [],
     createdChatDetails: {},
-    allUserChatsAvailable: [],
+    allUserChatsAvailable: [],          
     allUserRoomsAvailable: [],
     lastBulkOperationInfo: null,
     chatMessages: {},

@@ -269,7 +269,7 @@ const AddRoomDetails = () => {
             Briefly describe what this Room is about
           </Text>
           <View style={styles.inputLarge}>
-            <TextInput
+            <TextInput       
               style={styles.inputText}
               placeholder='e.g. "Preparing for final exams in biology"...'
               placeholderTextColor="#9CA3AF"

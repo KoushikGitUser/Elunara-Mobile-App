@@ -15,7 +15,7 @@ import CitationIcon from "../../../assets/SvgIconsComponent/ToolsOptionsIcons/Ci
 
 const roomToolsArrayOptions = [
   {
-    icon: <LLMIcon color="#888888" />,
+    icon: <LLMIcon color="#888888" />,   
     title: "LLM",
     selection: "Auto",
   },

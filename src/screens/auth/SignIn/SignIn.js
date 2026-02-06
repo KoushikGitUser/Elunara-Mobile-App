@@ -12,7 +12,7 @@ import {
   BackHandler,
   Keyboard,
 } from "react-native"; 
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";   
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { createStyles } from "./SignIn.styles";

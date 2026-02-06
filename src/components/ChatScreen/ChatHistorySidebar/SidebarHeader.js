@@ -1,7 +1,7 @@
 import {
   View,
   Text,
-  TouchableOpacity,
+  TouchableOpacity,          
   Image,
   Animated,
   Dimensions,

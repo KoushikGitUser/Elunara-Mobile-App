@@ -200,7 +200,7 @@ const UniversalSearchPage = () => {
       fontFamily: "Mukta-Bold",
       fontSize: scaleFont(13),
       color: "#081A35",
-      backgroundColor: "#EEF4FF",
+      backgroundColor: "#EEF4FF",      
       paddingHorizontal: 2,
       borderRadius: 2,
     },

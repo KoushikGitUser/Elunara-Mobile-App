@@ -190,7 +190,7 @@ const Rooms = ({ route }) => {
       {toggleStates.toggleAddExistingChatToRoomPopup && <AddChatToRoomPopup />}
 
       <Animated.View
-        style={[
+        style={[       
           styles.mainWrapper,
           {
             flex: 1,

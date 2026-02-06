@@ -32,7 +32,7 @@ const TopicsCompo = () => {
 
   // Take first 7 items from API data and merge with icons from topicsSheet
   const dynamicTopics = useMemo(() => {
-    const apiTopics = chatsStates.allChatsDatas.allSubjectsAvailable.slice(0, 7);
+    const apiTopics = chatsStates.allChatsDatas.allSubjectsAvailable.slice(0, 7);          
 
     const topicsWithIcons = apiTopics.map((topic, index) => ({
       title: topic.name,

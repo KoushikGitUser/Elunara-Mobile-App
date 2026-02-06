@@ -6,7 +6,7 @@ export const globalDataStates = {
   selectedFiles: [],
   uploadedAttachmentIds: [], // Stores uploaded attachment IDs for sending with message
   isUploadingAttachment: false, // Tracks if attachment is currently uploading 
-  noteForIndividualChat: null,
+  noteForIndividualChat: null,            
   chatInputContentLinesNumber:0,
   currentSelectedTopic: null,
   chatTitleOnLongPress:null,

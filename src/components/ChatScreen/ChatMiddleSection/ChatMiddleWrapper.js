@@ -5,7 +5,7 @@ import { createStyles } from "../ChatScreenCompo.styles";
 import ChatTopicsMain from "./ChatTopicsMain";
 import GreetingsHeader from "./GreetingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { chatMessages } from "../../../data/datas";
+import { chatMessages } from "../../../data/datas";       
 import UserMessageBox from "../Messages/UserMessageBox";
 import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";

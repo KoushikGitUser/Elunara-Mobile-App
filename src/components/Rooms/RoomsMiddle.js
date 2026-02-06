@@ -322,7 +322,7 @@ const RoomsMiddle = ({ roomName }) => {
                 style={{
                   fontSize: moderateScale(14),
                   color: "#717680",
-                  fontFamily: "Mukta-Regular",
+                  fontFamily: "Mukta-Regular",    
                 }}
               >
                 Tailor the way Elunara AI responds in this Room

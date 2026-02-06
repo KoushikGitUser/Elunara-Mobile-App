@@ -512,7 +512,7 @@ const Notes = () => {
         <TouchableOpacity
           onPress={() => {
             if (hasUnsavedChanges) {
-              dispatch(setToggleUnsavedChangesConfirmPopup(true));
+              dispatch(setToggleUnsavedChangesConfirmPopup(true));   
             } else {
               navigation.goBack();
             }
