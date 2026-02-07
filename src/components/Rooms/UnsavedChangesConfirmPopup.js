@@ -17,10 +17,7 @@ const UnsavedChangesConfirmPopup = ({ onDiscard }) => {
   const dispatch = useDispatch();
 
   const handleDiscard = () => {
-    dispatch(setToggleUnsavedChangesConfirmPopup(false));
-    if (onDiscard) {
-      onDiscard();
-    }
+    onDiscard();
   };
 
   const handleCancel = () => {

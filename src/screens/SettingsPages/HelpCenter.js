@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     width: "100%",
-    height: verticalScale(40),
+    height: verticalScale(55),
     borderWidth: 1,
     borderRadius: 16,
     borderColor: "#ABB8CC",

@@ -223,7 +223,7 @@ const EditProfile = () => {
                   : selectedImage
                 : profilePic
             }
-            style={{ height: "100%", width: "100%", borderRadius: 20, objectFit: typeof selectedImage === "string" ? "cover" : "contain" }}
+            style={{ height: "100%", width: "100%", borderRadius: 20,borderWidth:1,borderColor:"#D3DAE5", objectFit: typeof selectedImage === "string" ? "cover" : "contain" }}
           />
           <TouchableOpacity
             onPress={() => dispatch(setToggleUpdateProfilePicPopup(true))}

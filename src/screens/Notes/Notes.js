@@ -246,7 +246,7 @@ const Notes = () => {
   const handleDiscardChanges = () => {
     setHasUnsavedChanges(false);
     dispatch(setToggleUnsavedChangesConfirmPopup(false));
-    navigation.goBack();
+    navigation.navigate("chat");
   };
 
   const handleSaveNotes = () => {
@@ -644,7 +644,7 @@ const Notes = () => {
         {/* Display Bookmarked Q&A Pairs */}
         {notesStates.currentChatNotes?.qa_pairs &&
           notesStates.currentChatNotes.qa_pairs.length > 0 && (
-            <View style={{ paddingHorizontal: 16, paddingBottom: 100 }}>
+            <View style={{ paddingHorizontal: 0, paddingBottom: 100 }}>
               <View
                 style={{
                   flexDirection: "row",

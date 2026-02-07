@@ -213,7 +213,7 @@ export const createStyles = ({}) =>
     },
     upgradeBtn: {
       width: "100%",
-      height: verticalScale(65),
+      minHeight: verticalScale(65),
       borderWidth: 1,
       borderColor: "#D3DAE5",
       borderRadius: 16,
