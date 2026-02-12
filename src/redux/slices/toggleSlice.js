@@ -234,6 +234,25 @@ const toggleSlice = createSlice({
     setToggleUnsavedChangesConfirmPopup: (state, action) => {
       state.toggleStates.toggleUnsavedChangesConfirmPopup = action.payload;
     },
+    // Wallet Actions
+    setWalletBalance: (state, action) => {
+      state.walletStates.walletBalance = action.payload;
+    },
+    setIsInitialRechargeCompleted: (state, action) => {
+      state.walletStates.isInitialRechargeCompleted = action.payload;
+    },
+    setIsPromotionalUser: (state, action) => {
+      state.walletStates.isPromotionalUser = action.payload;
+    },
+    setPromotionalDaysRemaining: (state, action) => {
+      state.walletStates.promotionalDaysRemaining = action.payload;
+    },
+    setWalletTransactions: (state, action) => {
+      state.walletStates.walletTransactions = action.payload;
+    },
+    addWalletTransaction: (state, action) => {
+      state.walletStates.walletTransactions.unshift(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(resetAllStates, () => {
@@ -308,7 +327,14 @@ export const {
   // Bulk Remove from Room Confirmation Popup
   setToggleBulkRemoveFromRoomConfirmPopup,
   // Unsaved Changes Confirmation Popup
-  setToggleUnsavedChangesConfirmPopup
+  setToggleUnsavedChangesConfirmPopup,
+  // Wallet Actions
+  setWalletBalance,
+  setIsInitialRechargeCompleted,
+  setIsPromotionalUser,
+  setPromotionalDaysRemaining,
+  setWalletTransactions,
+  addWalletTransaction,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

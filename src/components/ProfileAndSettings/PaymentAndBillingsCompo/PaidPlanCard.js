@@ -1,34 +1,54 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { Globe } from "lucide-react-native";
-import GradientText from "../../common/GradientText";
 import { scaleFont } from "../../../utils/responsive";
-import ChakraIcon from "../../../../assets/SvgIconsComponent/ResponseStyleIcons/ChakraIcon";
 import PaidPlanChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/PaidPlanChakraIcon";
-import { useDispatch } from "react-redux";
-import { setToggleIsPaidOrProUser } from "../../../redux/slices/toggleSlice";
+import GradientText from "../../common/GradientText";
+import { useSelector } from "react-redux";
 
-const PaidPlanCard = ({setIsPaidUser}) => {
-  const dispatch = useDispatch();
+const PaidPlanCard = () => {
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const balance = walletStates.walletBalance;
+  const isFileFeaturesEnabled = balance >= 799;
+
+  const getStatusColor = () => {
+    if (balance <= 0) return "#EF4444";
+    if (balance < 799) return "#F59E0B";
+    return "#10B981";
+  };
+
+  const getStatusText = () => {
+    if (balance <= 0) return "Inactive";
+    if (balance < 799) return "Limited";
+    return "Active";
+  };
+
   return (
     <View style={styles.content}>
-      <Text style={styles.header}>Current Plan:</Text>
+      <Text style={styles.header}>Wallet Balance:</Text>
       <View style={styles.planCard}>
         <View style={styles.planHeader}>
-          <PaidPlanChakraIcon/>
-          <GradientText fontSize={22} children="Elunara Pro" fullWidth={true} />
+          <PaidPlanChakraIcon />
+          <GradientText fontSize={22} children="Elunara Wallet" fullWidth={true} />
         </View>
 
-        <Text style={styles.price}>₹1,999 per month</Text>
+        <Text style={styles.price}>₹{balance.toLocaleString("en-IN")}</Text>
 
-        <Text style={styles.billingText}>
-          Your next billing date is{" "}
-          <Text style={styles.billingDate}>8 August 2025</Text>
+        <View style={styles.statusRow}>
+          <View style={[styles.statusDot, { backgroundColor: getStatusColor() }]} />
+          <Text style={[styles.statusText, { color: getStatusColor() }]}>
+            {getStatusText()}
+          </Text>
+        </View>
+
+        {!isFileFeaturesEnabled && balance > 0 && (
+          <Text style={styles.thresholdText}>
+            File uploads disabled below ₹799. Recharge to re-enable.
+          </Text>
+        )}
+
+        <Text style={styles.infoText}>
+          Usage-based deduction — no expiry on balance
         </Text>
-
-        <TouchableOpacity onPress={()=> dispatch(setToggleIsPaidOrProUser(false))} style={styles.cancelButton}>
-          <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -37,7 +57,7 @@ const PaidPlanCard = ({setIsPaidUser}) => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    width:"100%"
+    width: "100%",
   },
   header: {
     fontSize: scaleFont(14),
@@ -45,7 +65,7 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#64748b",
     marginBottom: 14,
-    marginTop:20
+    marginTop: 20,
   },
   planCard: {
     backgroundColor: "#ffffff",
@@ -58,53 +78,43 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    gap:10
-  },
-  planTitle: {
-    fontSize: 36,
-    fontWeight: "700",
-    fontFamily: "Mukta-Bold",
-    color: "#1e293b",
-    marginLeft: 12,
-  },
-  planTitlePro: {
-    color: "#94a3b8",
-    fontWeight: "400",
-    fontFamily: "Mukta-Regular",
+    gap: 10,
   },
   price: {
-    fontSize: scaleFont(24),
+    fontSize: scaleFont(32),
     fontWeight: "600",
     fontFamily: "Mukta-Bold",
     color: "#0f172a",
     marginBottom: 10,
   },
-  billingText: {
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  statusText: {
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Medium",
+    fontWeight: "600",
+  },
+  thresholdText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#F59E0B",
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  infoText: {
+    fontSize: scaleFont(12),
     fontFamily: "Mukta-Regular",
     color: "#64748b",
-    marginBottom: 25,
-    lineHeight: 26,
-  },
-  billingDate: {
-    fontWeight: "600",
-    fontFamily: "Mukta-Bold",
-    color: "#1e293b",
-  },
-  cancelButton: {
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#1e293b",
-    borderRadius: 50,
-    paddingVertical: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelButtonText: {
-    fontSize: scaleFont(14),
-    fontWeight: "600",
-    fontFamily: "Mukta-Bold",
-    color: "#1e293b",
+    lineHeight: 20,
   },
 });
 

@@ -1,31 +1,30 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import { Check, IndianRupee, RefreshCw } from 'lucide-react-native';
-import { freePlanFeature, proPlanFeature } from '../../../data/datas';
-import freePlanIcon from '../../../assets/images/freeplanIcon.jpg'
+import { Check } from 'lucide-react-native';
+import { platformFeatures } from '../../../data/datas';
 import { scaleFont } from '../../../utils/responsive';
+import BigChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/BigChakraIcon";
+import GradientText from '../../common/GradientText'
 
 const FreePlanFeatureCard = () => {
   return (
       <View style={styles.card}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.iconContainer}>
-           <Image style={{height:40,width:40}} source={freePlanIcon} />
-          </View>
-          <Text style={styles.title}>Free Plan</Text>
+          <BigChakraIcon />
+          <GradientText children="Platform Features" fontSize={24} fullWidth={true} />
         </View>
 
         {/* Subtitle */}
         <Text style={styles.subtitle}>
-          You are currently enjoying these features at no cost
+          All features included with your Elunara wallet
         </Text>
 
         {/* Features List */}
         <View style={styles.featuresList}>
-          {freePlanFeature.map((feature, index) => (
+          {platformFeatures.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Check size={24} color="#888888" strokeWidth={1.5} style={styles.checkIcon} />
+              <Check size={24} color="#10B981" strokeWidth={1.7} />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
@@ -50,23 +49,6 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 6,
   },
-  iconContainer: {
-    position: 'relative',
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  refreshIcon: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-  },
-  title: {
-    fontSize: scaleFont(25),
-    fontFamily: 'Mukta-Bold',
-    color: '#374151',
-  },
   subtitle: {
     fontSize: scaleFont(15),
     lineHeight: 24,
@@ -82,10 +64,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-  },
-  checkIcon: {
-    marginTop: 2,
-    flexShrink: 0,
   },
   featureText: {
     fontSize: scaleFont(14),

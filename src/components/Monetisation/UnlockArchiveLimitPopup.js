@@ -6,24 +6,29 @@ import {
   Modal,
   TouchableOpacity,
   Image,
-  ScrollView,
-  Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { scaleFont } from "../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
-import { Check } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUnlockArchiveLimitPopup } from "../../redux/slices/toggleSlice";
 import icon from "../../assets/images/archiveLimit.png";
-import { triggerToast } from "../../services/toast";
+import { useNavigation } from "@react-navigation/native";
+import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
 
 const UnlockArchiveLimitPopup = () => {
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
-  const [selectedPlan, setSelectedPlan] = useState("monthly");
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const navigation = useNavigation();
+  const balance = walletStates.walletBalance;
+
+  const handleRecharge = () => {
+    dispatch(setToggleUnlockArchiveLimitPopup(false));
+    navigation.navigate("settingsInnerPages", { page: 11 });
+    dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+    dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+  };
 
   return (
     <Modal
@@ -33,8 +38,6 @@ const UnlockArchiveLimitPopup = () => {
       onRequestClose={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
     >
       <View style={styles.container}>
-        {/* Blur Background */}
-
         <BlurView
           style={styles.blurView}
           blurType="light"
@@ -49,9 +52,7 @@ const UnlockArchiveLimitPopup = () => {
           onPress={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
         />
 
-        {/* Modal Sheet */}
         <View style={styles.modalSheet}>
-          {/* Handle Bar */}
           <View style={styles.closeModalMain}>
             <AntDesign
               style={{ marginRight: 20 }}
@@ -62,59 +63,37 @@ const UnlockArchiveLimitPopup = () => {
             />
           </View>
 
-          {/* Content */}
           <View style={styles.content}>
-            {/* Icon */}
             <View style={styles.iconContainer}>
-              {/* icon */}
               <Image style={{ height: 50, width: 50 }} source={icon} />
             </View>
-            {/* Title */}
-            <Text style={styles.title}>Archive limit reached</Text>
-            {/* Description */}
-            <Text style={[styles.description, { marginBottom: 20 }]}>
-              <Text style={{ fontWeight: 800, color: "black" }}>
-                Free plan limit reached: 100 archived chats.
-              </Text>{" "}
-              To archive this conversation, unarchive older chats or upgrade for
-              more archive capacity and advanced organisation.
+
+            <Text style={styles.title}>Insufficient Balance</Text>
+
+            <Text style={styles.description}>
+              Your wallet balance is ₹{balance.toLocaleString("en-IN")}. Recharge your wallet to continue archiving chats and accessing all features.
             </Text>
-            <Text style={[styles.description]}>
-              Tip: Pin important chats so they're easy to find without
-              archiving. or upgrade to Pro for unlimited chats.
+
+            <Text style={styles.tipText}>
+              Tip: Pin important chats so they're easy to find without archiving.
             </Text>
-            {/* Button */}
+
             <View style={styles.btnsMain}>
               <TouchableOpacity
-                style={[
-                  styles.button,
-                  { backgroundColor: "white", borderWidth: 1 },
-                ]}
-                onPress={() =>
-                  dispatch(setToggleUnlockArchiveLimitPopup(false))
-                }
+                style={[styles.button, { backgroundColor: "white", borderWidth: 1 }]}
+                onPress={() => dispatch(setToggleUnlockArchiveLimitPopup(false))}
                 activeOpacity={0.8}
               >
                 <Text style={[styles.buttonText, { color: "black" }]}>
-                  Manage archived chats
+                  Manage Archived Chats
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
-                onPress={() => {
-                  dispatch(setToggleUnlockArchiveLimitPopup(false));
-                  setTimeout(() => {
-                    triggerToast(
-                      "Chat Archived",
-                      "Your chat has been successfully archived",
-                      "success",
-                      3000
-                    );
-                  }, 500);
-                }}
+                onPress={handleRecharge}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Upgrade more archives</Text>
+                <Text style={styles.buttonText}>Recharge Wallet</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -157,10 +136,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
+    shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 20,
@@ -171,11 +147,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     gap: 15,
-  },
-  verifiedIcon: {
-    height: 55,
-    width: 50,
-    objectFit: "contain",
   },
   content: {
     paddingHorizontal: 24,
@@ -188,16 +159,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(23),
     fontWeight: "700",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
+    fontSize: scaleFont(14),
+    lineHeight: 24,
+    color: "#6B7280",
+    marginBottom: 16,
+    fontFamily: "Mukta-Regular",
+  },
+  tipText: {
     fontSize: scaleFont(12),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
-    letterSpacing: 0.2,
+    marginBottom: 24,
+    fontFamily: "Mukta-Regular",
   },
   button: {
     width: "100%",
@@ -211,88 +190,8 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: scaleFont(13),
     fontWeight: "500",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
-  },
-  featuresList: {
-    gap: 10,
-    marginBottom: 30,
-  },
-  featureItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  featureText: {
-    fontSize: scaleFont(13),
-    lineHeight: 24,
-    color: "#1F2937",
-    fontWeight: "500",
-    flex: 1,
-    paddingTop: 1,
-  },
-  cardsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    width: "100%",
-    marginBottom: 15,
-    marginTop: 20,
-  },
-  priceCard: {
-    flex: 1,
-    backgroundColor: "#F9FAFB",
-    borderRadius: 20,
-    padding: 13,
-    borderWidth: 2,
-    borderColor: "#D3DAE5",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectedCard: {
-    backgroundColor: "#EEF4FF",
-    borderColor: "#081A35",
-  },
-  checkBadge: {
-    position: "absolute",
-    top: -17,
-    right: 20,
-    transform: [{ translateX: 12 }],
-    width: 27,
-    height: 27,
-    borderRadius: 16,
-    backgroundColor: "#081A35",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#ffffff",
-  },
-  saveBadge: {
-    position: "absolute",
-    top: -15,
-    right: 15,
-    backgroundColor: "#F3ECFF",
-    borderWidth: 1,
-    borderColor: "#7D1DE4",
-    paddingHorizontal: 14,
-    paddingVertical: 2,
-    borderRadius: 20,
-  },
-  saveText: {
-    color: "#7D1DE4",
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  priceText: {
-    fontSize: scaleFont(12.5),
-    fontWeight: "600",
-    color: "#1F2937",
-    textAlign: "center",
-  },
-  periodText: {
-    fontSize: scaleFont(12.5),
-    fontWeight: "600",
-    color: "#1F2937",
-    textAlign: "center",
   },
   closeModalMain: {
     width: "100%",

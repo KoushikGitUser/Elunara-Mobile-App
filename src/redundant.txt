@@ -442,3 +442,41 @@ const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * fact
   "fetchingHistory": false,
   "clearingHistory": false
 }
+
+
+      {!toggleStates.toggleIsPaidOrProUser && (
+        <View style={styles.categorySections}>
+          <TouchableOpacity
+            onPress={() => setSelectedCategory(1)}
+            style={[
+              styles.sections,
+              { borderColor: selectedCategory == 1 ? "black" : "#E2E2E2" },
+            ]}
+          >
+            <Text
+              style={[
+                styles.sectionText,
+                { color: selectedCategory == 1 ? "black" : "#757575" },
+              ]}
+            >
+              Upgrade Plan
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSelectedCategory(2)}
+            style={[
+              styles.sections,
+              { borderColor: selectedCategory == 2 ? "black" : "#E2E2E2" },
+            ]}
+          >
+            <Text
+              style={[
+                styles.sectionText,
+                { color: selectedCategory == 2 ? "black" : "#757575" },
+              ]}
+            >
+              Current free plan
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}

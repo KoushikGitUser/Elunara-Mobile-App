@@ -128,6 +128,13 @@ const apiCommonSlice = createSlice({
     resetHighlightRoomId: (state) => {
       state.searchStates.highlightRoomId = null;
     },
+    // Payment States
+    setHasBalance: (state, action) => {
+      state.paymentStates.hasBalance = action.payload;
+    },
+    setHasEnoughBalanceForFiles: (state, action) => {
+      state.paymentStates.hasEnoughBalanceForFiles = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -172,6 +179,9 @@ export const {
   setHighlightRoomId,
   resetHighlightChatId,
   resetHighlightRoomId,
+  // Payment States
+  setHasBalance,
+  setHasEnoughBalanceForFiles,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

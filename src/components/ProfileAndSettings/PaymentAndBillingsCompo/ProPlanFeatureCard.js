@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { proPlanFeature } from "../../../data/datas";
+import { platformFeatures } from "../../../data/datas";
 import { Check } from "lucide-react-native";
 import BigChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/BigChakraIcon";
 import { scaleFont } from "../../../utils/responsive";
@@ -22,16 +22,16 @@ const ProPlanFeatureCard = () => {
         {/* Header */}
         <View style={styles.header}>
           <BigChakraIcon />
-          <GradientText children="Pro Plan" fontSize={24} fullWidth={true}  />
+          <GradientText children="Platform Features" fontSize={24} fullWidth={true}  />
         </View>
         {/* Subtitle */}
         <Text style={styles.subtitle}>
-          Unlock smarter learning — go Pro and power up your progress
+          All features included with your Elunara wallet
         </Text>
 
         {/* Features List */}
         <View style={styles.featuresList}>
-          {proPlanFeature.map((feature, index) => (
+          {platformFeatures.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
               <Check size={24} color="#10B981" strokeWidth={1.7} />
               <Text style={styles.featureText}>{feature}</Text>

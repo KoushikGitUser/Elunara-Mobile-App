@@ -1,82 +1,63 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Upload, Palette, Languages } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
+import { useSelector } from "react-redux";
+import { Wallet, FileText, CheckCircle } from "lucide-react-native";
 
 const FreePlanUsageCard = () => {
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const balance = walletStates.walletBalance;
+  const isFileFeaturesEnabled = balance >= 799;
+
   const items = [
     {
-      title: "Attachment's Upload",
-      Icon: Upload,
-      value: 2,
-      max: 5,
-      colors: ["#1B365D", "#A5C0E7"],
+      title: "Wallet Balance",
+      Icon: Wallet,
+      value: `₹${balance.toLocaleString("en-IN")}`,
+      color: balance > 0 ? "#10B981" : "#EF4444",
     },
     {
-      title: "Change Response style",
-      Icon: Palette,
-      value: 3,
-      max: 5,
-      colors: ["#1B365D", "#A5C0E7"],
+      title: "File Features",
+      Icon: FileText,
+      value: isFileFeaturesEnabled ? "Enabled" : "Disabled",
+      color: isFileFeaturesEnabled ? "#10B981" : "#F59E0B",
     },
     {
-      title: "Change Response language",
-      Icon: Languages,
-      value: 1,
-      max: 5,
-      colors: ["#1B365D", "#A5C0E7"],
+      title: "Platform Access",
+      Icon: CheckCircle,
+      value: balance > 0 ? "Active" : "Inactive",
+      color: balance > 0 ? "#10B981" : "#EF4444",
     },
   ];
 
   return (
     <View style={styles.card}>
-      <Text style={styles.heading}>Today’s Usage</Text>
+      <Text style={styles.heading}>Wallet Status</Text>
 
-      {items.map((item, i) => {
-        const widthPercent = (item.value / item.max) * 100;
-
-        return (
-          <View key={i} style={styles.row}>
-            <View style={{width:"90%"}}>
-            <View style={styles.labelRow}>
-              <Text style={styles.title}>{item.title}</Text>
-            </View>
-
-            {/* Background Bar */}
-            <View style={styles.progressBg}>
-              <LinearGradient
-                colors={item.colors}
-                start={[0, 0]}
-                end={[1, 0]}
-                style={[styles.progressFill, { width: `${widthPercent}%` }]}
-              />
-            </View>
-            </View>
-
-
-            <Text style={styles.count}>
-             <Text style={{ fontFamily:"Mukta-Bold",fontSize:16}}> {item.value}
-                </Text>/{item.max}
-            </Text>
+      {items.map((item, i) => (
+        <View key={i} style={styles.row}>
+          <View style={styles.labelRow}>
+            <item.Icon size={20} color="#555" strokeWidth={1.5} />
+            <Text style={styles.title}>{item.title}</Text>
           </View>
-        );
-      })}
+          <Text style={[styles.value, { color: item.color }]}>{item.value}</Text>
+        </View>
+      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#ffffff",
     borderRadius: 20,
-    paddingHorizontal:13,
-    paddingVertical:15,
+    paddingHorizontal: 13,
+    paddingVertical: 15,
     marginTop: 20,
-    borderWidth:1,
-    borderColor:"#D3DAE5",
-    marginBottom:30,
-    width:"100%",
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    marginBottom: 30,
+    width: "100%",
   },
   heading: {
     fontSize: 22,
@@ -85,17 +66,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   row: {
-    marginBottom: 26,
-    flexDirection:"row",
-    alignItems:"flex-end",
-    justifyContent:"space-between",
-    width:"100%"
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   labelRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
+    gap: 10,
   },
   title: {
     fontSize: 15,
@@ -103,23 +83,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontFamily: "Mukta-Medium",
   },
-  progressBg: {
-    width:"100%",
-    height: 8,
-    backgroundColor: "#EEE",
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 10,
-  },
-  count: {
-    textAlign: "right",
-    marginTop: 6,
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
-    color: "#555",
+  value: {
+    fontSize: scaleFont(15),
+    fontFamily: "Mukta-Bold",
+    fontWeight: "600",
   },
 });
 

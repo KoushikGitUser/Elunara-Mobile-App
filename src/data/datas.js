@@ -1061,32 +1061,22 @@ export const academicLinks = [
   },
 ];
 
-export const proPlanFeature = [
-  "Everything in free",
-  "Unlimited file and photo uploads",
+export const platformFeatures = [
+  "Unlimited AI chat interactions",
+  "Unlimited file and photo uploads (requires balance \u2265 \u20B9799)",
   "Room-based learning: create and manage focused Rooms",
-  "Unlimited Custom AI interaction: pick model, style, language, and citations.",
-  "Increased limits: more chats and longer conversations.",
-  "Opportunities to test new features",
-];
-
-export const adFreeProPlan = [
-  "Ad-free chat sessions for seamless focus",
-  "Everything in free",
-  "Unlimited file and photo uploads",
-  "Room-based learning: create and manage focused Rooms",
-  "Unlimited Custom AI interaction: pick model, style, language, and citations.",
-  "Increased limits: more chats and longer conversations.",
-  "Opportunities to test new features",
-];
-
-export const freePlanFeature = [
-  "Basic AI chat interactions",
+  "Unlimited Custom AI interaction: pick model, style, language, and citations",
+  "Analytics dashboard to track your learning progress",
+  "Ad-free experience across the platform",
   "Access to curated subject library",
-  "Limited daily attachment uploads\n(up to <x> files per day)",
-  "Limited number of changes to AI response style and language (up to <x> changes per day)",
-  "Limited number of changes to resources citations (up to <x> changes per day)",
+  "Opportunities to test new features",
 ];
+
+export const proPlanFeature = platformFeatures;
+
+export const adFreeProPlan = platformFeatures;
+
+export const freePlanFeature = platformFeatures;
 
 export const analyticsFeatures = [
   "Track your learning streaks",
@@ -1099,124 +1089,61 @@ export const newChatLimit = [
   "Full personalization - choose AI model, tone, language & citation style",
   "Rooms - organize multiple topics in dedicated workspaces",
 ];
-export const elunaraProWelcome = [
-  "Ad-free chats",
-  "Advanced AI tools",
-  "Unlimited follow-ups and more!",
+export const elunaraWalletWelcome = [
+  "Unlimited AI chats and tools",
+  "File uploads, Learning Labs, Analytics",
+  "Usage-based balance — no expiry!",
+];
+export const elunaraProWelcome = elunaraWalletWelcome;
+
+export const rechargePresets = [
+  { id: 1, amount: 99, label: "₹99" },
+  { id: 2, amount: 499, label: "₹499" },
+  { id: 3, amount: 999, label: "₹999", recommended: true },
+  { id: 4, amount: 1999, label: "₹1,999" },
 ];
 
-export const creditPacks = [
-  {
-    id: 1,
-    credits: "500 Credits",
-    title: "Starter Credit Pack",
-    badge: "Ideal for light users",
-    price: "₹10",
-    validity: "Valid for 30 days",
-    selected: false,
-  },
-  {
-    id: 2,
-    credits: "1500 Credits",
-    title: "Basic Credit Pack",
-    badge: "Good for regular users",
-    price: "₹25",
-    validity: "Valid for 45 days",
-    selected: false,
-  },
-  {
-    id: 3,
-    credits: "3000 Credits",
-    title: "Premium Credit Pack",
-    badge: "Best value pack",
-    price: "₹45",
-    validity: "Valid for 60 days",
-    selected: false,
-  },
-  {
-    id: 4,
-    credits: "5000 Credits",
-    title: "Elite Credit Pack",
-    badge: "For power users",
-    price: "₹70",
-    validity: "Valid for 90 days",
-    selected: false,
-  },
-];
+// Kept for backwards compatibility
+export const creditPacks = [];
 
 
-export const billingData = [
+export const sampleWalletTransactions = [
   {
     id: 1,
     date: "09/06/2025",
-    amount: "₹1,999",
+    amount: "+₹999",
+    type: "recharge",
     paymentMethod: "gpay",
     paymentInfo: "a****@oksbi",
   },
   {
     id: 2,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "mastercard",
-    paymentInfo: "**** **** **** 4356",
+    date: "10/06/2025",
+    amount: "-₹15",
+    type: "usage",
+    paymentMethod: null,
+    paymentInfo: "File upload usage",
   },
   {
     id: 3,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
+    date: "12/06/2025",
+    amount: "-₹8",
+    type: "usage",
+    paymentMethod: null,
+    paymentInfo: "AI chat usage",
   },
   {
     id: 4,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
-  {
-    id: 5,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
-  {
-    id: 6,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
-  {
-    id: 7,
-    date: "09/06/2025",
-    amount: "₹1,999",
+    date: "15/06/2025",
+    amount: "+₹499",
+    type: "recharge",
     paymentMethod: "mastercard",
     paymentInfo: "**** **** **** 4356",
   },
-  {
-    id: 8,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
-  {
-    id: 9,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
-  {
-    id: 10,
-    date: "09/06/2025",
-    amount: "₹1,999",
-    paymentMethod: "gpay",
-    paymentInfo: "a****@oksbi",
-  },
 ];
+
+// Kept for backwards compatibility
+export const billingData = sampleWalletTransactions;
 
 export const topicsCoveredAnalytics = [
   {

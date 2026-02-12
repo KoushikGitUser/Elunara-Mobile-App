@@ -9,6 +9,8 @@ import { attachmentsStates } from "./allInitialStates/attachmentsStates";
 import { searchStates } from "./allInitialStates/searchStates";
 import { chatCustomisationStates } from "./allInitialStates/chatCustomisationStates";
 import { roomCustomisationStates } from "./allInitialStates/roomCustomisationStates";
+import { walletStates } from "./allInitialStates/walletStates";
+import { paymentStates } from "./allInitialStates/paymentStates";
 
 export const allInitialStates = {
   toggleStates,
@@ -22,4 +24,6 @@ export const allInitialStates = {
   searchStates,
   chatCustomisationStates,
   roomCustomisationStates,
+  walletStates,
+  paymentStates,
 };

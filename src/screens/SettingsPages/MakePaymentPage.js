@@ -13,13 +13,18 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
-import GradientText from "../../components/common/GradientText";
 import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
 import paymentSuccessText from "../../assets/images/Title.png";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
-import { setToggleIsPaidOrProUser } from "../../redux/slices/toggleSlice";
+import {
+  setToggleIsPaidOrProUser,
+  setWalletBalance,
+  setIsInitialRechargeCompleted,
+  addWalletTransaction,
+} from "../../redux/slices/toggleSlice";
+import { rechargePresets } from "../../data/datas";
 
 const MakePaymentPage = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -33,18 +38,23 @@ const MakePaymentPage = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [rechargeAmount, setRechargeAmount] = useState("");
+  const [selectedPreset, setSelectedPreset] = useState(null);
+  const [amountError, setAmountError] = useState("");
+
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
+  const currentBalance = walletStates.walletBalance;
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
       setKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height); // <-- set height
+      setKeyboardHeight(e.endCoordinates.height);
     });
-
     const hideSub = Keyboard.addListener("keyboardDidHide", () => {
       setKeyboardVisible(false);
       setKeyboardHeight(0);
     });
-
     return () => {
       showSub.remove();
       hideSub.remove();
@@ -60,6 +70,71 @@ const MakePaymentPage = () => {
 
   const selectPaymentMethod = (method) => {
     setSelectedPayment(method);
+  };
+
+  const handlePresetSelect = (preset) => {
+    setSelectedPreset(preset.id);
+    setRechargeAmount(String(preset.amount));
+    setAmountError("");
+  };
+
+  const handleAmountChange = (text) => {
+    // Only allow numbers
+    const numericText = text.replace(/[^0-9]/g, "");
+    setRechargeAmount(numericText);
+    setSelectedPreset(null);
+    setAmountError("");
+  };
+
+  const validateAmount = () => {
+    const amount = parseInt(rechargeAmount);
+    if (!amount || isNaN(amount)) {
+      setAmountError("Please enter a valid amount");
+      return false;
+    }
+    if (isFirstRecharge && amount < 999) {
+      setAmountError("Initial recharge must be at least ₹999");
+      return false;
+    }
+    if (!isFirstRecharge && amount < 99) {
+      setAmountError("Minimum recharge amount is ₹99");
+      return false;
+    }
+    if (amount > 9999) {
+      setAmountError("Maximum recharge amount is ₹9,999");
+      return false;
+    }
+    // Check if recharging to re-enable file features
+    if (currentBalance < 799 && currentBalance + amount < 799) {
+      // Just a note, not blocking — user can still recharge any valid amount
+    }
+    return true;
+  };
+
+  const handleMakePayment = () => {
+    if (!validateAmount()) return;
+
+    const amount = parseInt(rechargeAmount);
+    const newBalance = currentBalance + amount;
+
+    // Update wallet balance
+    dispatch(setWalletBalance(newBalance));
+    dispatch(setIsInitialRechargeCompleted(true));
+    dispatch(setToggleIsPaidOrProUser(true));
+
+    // Add transaction record
+    const today = new Date();
+    const dateStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+    dispatch(addWalletTransaction({
+      id: Date.now(),
+      date: dateStr,
+      amount: `+₹${amount.toLocaleString("en-IN")}`,
+      type: "recharge",
+      paymentMethod: selectedPayment || "gpay",
+      paymentInfo: selectedPayment === "upiid" ? userUPIID : "Wallet Recharge",
+    }));
+
+    setPaymentSuccess(true);
   };
 
   const PaymentOption = ({ id, label, logo, logoType }) => (
@@ -110,10 +185,9 @@ const MakePaymentPage = () => {
   useEffect(() => {
     setTimeout(() => {
       if (paymentSuccess) {
-        navigation.navigate("settingsInnerPages", { page: 2,});
+        navigation.navigate("settingsInnerPages", { page: 2 });
         dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
-        dispatch(setToggleIsPaidOrProUser(true));
-        setPaymentSuccess(false)
+        setPaymentSuccess(false);
       }
     }, 4000);
   }, [paymentSuccess]);
@@ -154,8 +228,78 @@ const MakePaymentPage = () => {
           showsVerticalScrollIndicator={false}
           style={[styles.containerScroll]}
         >
-          <Text style={styles.headerText}>Choose your payment method</Text>
+          {/* Recharge Amount Section */}
+          <Text style={styles.headerText}>
+            {isFirstRecharge
+              ? "Initial recharge of ₹999 required to activate the platform"
+              : "Enter recharge amount (₹99 - ₹9,999)"}
+          </Text>
 
+          {/* Current Balance */}
+          <View style={styles.currentBalanceRow}>
+            <Text style={styles.currentBalanceLabel}>Current Balance:</Text>
+            <Text style={styles.currentBalanceValue}>₹{currentBalance.toLocaleString("en-IN")}</Text>
+          </View>
+
+          {/* Amount Input */}
+          <View style={styles.amountInputContainer}>
+            <Text style={styles.rupeeSymbol}>₹</Text>
+            <TextInput
+              style={styles.amountInput}
+              placeholder={isFirstRecharge ? "999" : "Enter amount"}
+              placeholderTextColor="#B5BECE"
+              value={rechargeAmount}
+              onChangeText={handleAmountChange}
+              keyboardType="number-pad"
+              maxLength={5}
+            />
+          </View>
+          {amountError ? (
+            <Text style={styles.errorText}>{amountError}</Text>
+          ) : null}
+
+          {/* Quick Recharge Presets */}
+          <View style={styles.presetsContainer}>
+            {rechargePresets.map((preset) => (
+              <TouchableOpacity
+                key={preset.id}
+                style={[
+                  styles.presetChip,
+                  selectedPreset === preset.id && styles.presetChipSelected,
+                ]}
+                onPress={() => handlePresetSelect(preset)}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.presetChipText,
+                    selectedPreset === preset.id && styles.presetChipTextSelected,
+                  ]}
+                >
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Balance after recharge preview */}
+          {rechargeAmount ? (
+            <View style={styles.balancePreview}>
+              <Text style={styles.balancePreviewText}>
+                Balance after recharge:{" "}
+                <Text style={{ fontFamily: "Mukta-Bold", color: "#10B981" }}>
+                  ₹{(currentBalance + (parseInt(rechargeAmount) || 0)).toLocaleString("en-IN")}
+                </Text>
+              </Text>
+              {currentBalance < 799 && (currentBalance + (parseInt(rechargeAmount) || 0)) >= 799 && (
+                <Text style={styles.fileFeatureNote}>
+                  File uploads will be re-enabled
+                </Text>
+              )}
+            </View>
+          ) : null}
+
+          {/* Debit/Credit Card */}
           <View style={styles.accordionCard}>
             <TouchableOpacity
               style={styles.accordionHeader}
@@ -284,10 +428,18 @@ const MakePaymentPage = () => {
       {!paymentSuccess && (
         <View style={styles.primaryButtonMain}>
           <TouchableOpacity
-            onPress={() => setPaymentSuccess(true)}
-            style={styles.primaryButton}
+            onPress={handleMakePayment}
+            style={[
+              styles.primaryButton,
+              { opacity: !rechargeAmount ? 0.5 : 1 },
+            ]}
+            disabled={!rechargeAmount}
           >
-            <Text style={styles.primaryButtonText}>Make Payment</Text>
+            <Text style={styles.primaryButtonText}>
+              {rechargeAmount
+                ? `Recharge ₹${parseInt(rechargeAmount).toLocaleString("en-IN")}`
+                : "Enter Amount"}
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -308,6 +460,95 @@ const styles = StyleSheet.create({
     color: "#64748b",
     marginBottom: 20,
     marginTop: 20,
+  },
+  currentBalanceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  currentBalanceLabel: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+  },
+  currentBalanceValue: {
+    fontSize: scaleFont(20),
+    fontFamily: "Mukta-Bold",
+    color: "#1e293b",
+  },
+  amountInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ABB8CC",
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    marginBottom: 8,
+  },
+  rupeeSymbol: {
+    fontSize: scaleFont(24),
+    fontFamily: "Mukta-Bold",
+    color: "#1e293b",
+    marginRight: 8,
+  },
+  amountInput: {
+    flex: 1,
+    fontSize: scaleFont(24),
+    fontFamily: "Mukta-Bold",
+    color: "#1e293b",
+    paddingVertical: 14,
+  },
+  errorText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#EF4444",
+    marginBottom: 8,
+  },
+  presetsContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 20,
+    marginTop: 8,
+  },
+  presetChip: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+  },
+  presetChipSelected: {
+    backgroundColor: "#081A35",
+    borderColor: "#081A35",
+  },
+  presetChipText: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Medium",
+    color: "#1e293b",
+  },
+  presetChipTextSelected: {
+    color: "#FFFFFF",
+  },
+  balancePreview: {
+    backgroundColor: "#F0FDF4",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+  },
+  balancePreviewText: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#1e293b",
+  },
+  fileFeatureNote: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Medium",
+    color: "#10B981",
+    marginTop: 4,
   },
   accordionCard: {
     backgroundColor: "#ffffff",
@@ -407,7 +648,6 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Medium",
     color: "#1e293b",
   },
-  // PhonePe Logo
   phonePeLogo: {
     width: 38,
     height: 38,
@@ -423,7 +663,6 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Bold",
     color: "#ffffff",
   },
-  // Google Pay Logo
   gpayLogoContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -452,7 +691,6 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Medium",
     color: "#5f6368",
   },
-  // Paytm Logo
   paytmLogo: {
     fontSize: 18,
     fontWeight: "700",
@@ -460,7 +698,6 @@ const styles = StyleSheet.create({
     color: "#00baf2",
     marginRight: 16,
   },
-  // Apple Pay Logo
   applePayLogo: {
     flexDirection: "row",
     alignItems: "center",
@@ -479,7 +716,6 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Medium",
     color: "#1e293b",
   },
-  // UPI Logo
   upiLogo: {
     fontSize: 16,
     fontWeight: "700",
