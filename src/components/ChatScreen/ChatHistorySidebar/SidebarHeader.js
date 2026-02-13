@@ -20,6 +20,7 @@ import {
   setToggleRoomCreationPopup,
   setToggleUnlockNewChatPopup,
   setToggleIsChattingWithAI,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
 import {
   setChatMessagesArray,
@@ -35,7 +36,8 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
+  const isZeroBalance = walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
   // Ref for Learning Lab button
@@ -153,6 +155,16 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
         <TouchableOpacity
           ref={learningLabBtnRef}
           onPress={() => {
+            if (isZeroBalance) {
+              Animated.timing(translateX, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
+              dispatch(setToggleChatHistorySidebar(false));
+              dispatch(setToggleNoBalanceModal(true));
+              return;
+            }
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
                 ? 0

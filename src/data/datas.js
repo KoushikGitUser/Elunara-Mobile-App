@@ -1098,9 +1098,14 @@ export const elunaraProWelcome = elunaraWalletWelcome;
 
 export const rechargePresets = [
   { id: 1, amount: 99, label: "₹99" },
-  { id: 2, amount: 499, label: "₹499" },
-  { id: 3, amount: 999, label: "₹999", recommended: true },
-  { id: 4, amount: 1999, label: "₹1,999" },
+  { id: 2, amount: 299, label: "₹299" },
+  { id: 3, amount: 499, label: "₹499" },
+  { id: 4, amount: 799, label: "₹799" },
+  { id: 5, amount: 999, label: "₹999" },
+  { id: 6, amount: 1299, label: "₹1,299" },
+  { id: 7, amount: 1499, label: "₹1,499" },
+  { id: 8, amount: 1799, label: "₹1,799" },
+  { id: 9, amount: 9999, label: "₹9,999" },
 ];
 
 // Kept for backwards compatibility

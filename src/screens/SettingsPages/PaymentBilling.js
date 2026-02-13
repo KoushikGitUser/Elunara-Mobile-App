@@ -7,21 +7,16 @@ import {
 } from "react-native";
 import React from "react";
 import { scaleFont } from "../../utils/responsive";
-import { Download } from "lucide-react-native";
+import { Download, Gift } from "lucide-react-native";
 import GpayIcon from "../../../assets/SvgIconsComponent/PaymentBillingIcons/GpayIcon";
 import MasterCardIcon from "../../../assets/SvgIconsComponent/PaymentBillingIcons/MasterCardIcon";
 import PaymentUpdationAlertCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/PaymentUpdationAlertCard";
 import ShiftedToFreePlanCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/ShiftedToFreePlanCard";
 import PaidPlanCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/PaidPlanCard";
-import ProPlanFeatureCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/ProPlanFeatureCard";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { useSelector } from "react-redux";
 import { sampleWalletTransactions } from "../../data/datas";
 
 const PaymentBilling = ({ handleScroll }) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
   const { walletStates } = useSelector((state) => state.Toggle);
   const balance = walletStates.walletBalance;
   const isActive = balance > 0 || walletStates.isPromotionalUser;
@@ -29,12 +24,6 @@ const PaymentBilling = ({ handleScroll }) => {
   const transactions = walletStates.walletTransactions?.length > 0
     ? walletStates.walletTransactions
     : sampleWalletTransactions;
-
-  const navigateToRecharge = () => {
-    navigation.navigate("settingsInnerPages", { page: 11 });
-    dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
-    dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
-  };
 
   const PaymentIcon = ({ method }) => {
     if (method === "gpay") return <GpayIcon />;
@@ -81,18 +70,23 @@ const PaymentBilling = ({ handleScroll }) => {
         )}
 
         {/* Low balance warning for file features */}
-        {isActive && !isFileFeaturesEnabled && (
+        {isActive && !isFileFeaturesEnabled && !(walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0) && (
           <PaymentUpdationAlertCard />
         )}
 
         {/* Promotional Banner */}
         {walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0 && (
           <View style={styles.promoBanner}>
-            <Text style={styles.promoText}>
-              Free trial: {walletStates.promotionalDaysRemaining} days remaining
-            </Text>
+            <View style={styles.promoHeader}>
+              <Gift size={25} color="#10B981" strokeWidth={1.5} />
+              <Text style={styles.promoText}>
+                Promotional Free Trial is Active
+              </Text>
+            </View>
             <Text style={styles.promoSubText}>
-              Recharge ₹999 before your trial ends to continue using the platform
+              {walletStates.isInitialRechargeCompleted
+                ? "Enjoy full access to all platform features. Your ₹999 initial recharge will be active after the free trial ends."
+                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}
             </Text>
           </View>
         )}
@@ -100,29 +94,21 @@ const PaymentBilling = ({ handleScroll }) => {
         {/* Wallet Balance Card */}
         <PaidPlanCard />
 
-        {/* Recharge Button */}
-        <TouchableOpacity
-          onPress={navigateToRecharge}
-          style={styles.rechargeButton}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
-        </TouchableOpacity>
-
-        {/* Platform Features */}
-        <ProPlanFeatureCard />
-
-        {/* Transaction History */}
-        <Text style={styles.header}>Transaction History</Text>
-        <View style={{ marginBottom: 40 }}>
-          {transactions.length > 0 ? (
-            transactions.map((item) => (
-              <TransactionItem key={item.id} item={item} />
-            ))
-          ) : (
-            <Text style={styles.noTransactions}>No transactions yet</Text>
-          )}
-        </View>
+        {/* Transaction History — hide for promo users who haven't activated */}
+        {!(walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0 && !walletStates.isInitialRechargeCompleted) && (
+          <>
+            <Text style={styles.header}>Transaction History</Text>
+            <View style={{ marginBottom: 40 }}>
+              {transactions.length > 0 ? (
+                transactions.map((item) => (
+                  <TransactionItem key={item.id} item={item} />
+                ))
+              ) : (
+                <Text style={styles.noTransactions}>No transactions yet</Text>
+              )}
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -143,38 +129,28 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#081A35",
+    borderColor: "#406DD8",
     marginBottom: 20,
     marginTop: 20,
+  },
+  promoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 10,
   },
   promoText: {
     fontSize: scaleFont(16),
     fontWeight: "600",
     fontFamily: "Mukta-Bold",
-    color: "#081A35",
-    marginBottom: 4,
+    color: "#1e293b",
+    flex: 1,
   },
   promoSubText: {
     fontSize: scaleFont(12),
     fontFamily: "Mukta-Regular",
     color: "#535862",
     lineHeight: 20,
-  },
-  rechargeButton: {
-    backgroundColor: "#081A35",
-    paddingVertical: 14,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    width: "100%",
-  },
-  rechargeButtonText: {
-    color: "#FFFFFF",
-    fontSize: scaleFont(14),
-    fontWeight: "500",
-    fontFamily: "Mukta-Medium",
-    letterSpacing: 0.3,
   },
   header: {
     fontSize: scaleFont(20),

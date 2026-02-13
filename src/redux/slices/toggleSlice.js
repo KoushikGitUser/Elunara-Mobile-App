@@ -234,6 +234,14 @@ const toggleSlice = createSlice({
     setToggleUnsavedChangesConfirmPopup: (state, action) => {
       state.toggleStates.toggleUnsavedChangesConfirmPopup = action.payload;
     },
+    // No Balance Modal
+    setToggleNoBalanceModal: (state, action) => {
+      state.toggleStates.toggleNoBalanceModal = action.payload;
+    },
+    // Low Balance Modal
+    setToggleLowBalanceModal: (state, action) => {
+      state.toggleStates.toggleLowBalanceModal = action.payload;
+    },
     // Wallet Actions
     setWalletBalance: (state, action) => {
       state.walletStates.walletBalance = action.payload;
@@ -328,6 +336,10 @@ export const {
   setToggleBulkRemoveFromRoomConfirmPopup,
   // Unsaved Changes Confirmation Popup
   setToggleUnsavedChangesConfirmPopup,
+  // No Balance Modal
+  setToggleNoBalanceModal,
+  // Low Balance Modal
+  setToggleLowBalanceModal,
   // Wallet Actions
   setWalletBalance,
   setIsInitialRechargeCompleted,

@@ -32,6 +32,8 @@ import {
   setToggleTopicsPopup,
   setToggleUnlockPersonalisationLimitPopup,
   setIsEditingUserMessage,
+  setToggleNoBalanceModal,
+  setToggleLowBalanceModal,
 } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls, resetAIResponseRegenerated } from "../../redux/slices/apiCommonSlice";
 import AddItemsToInputPopup from "../Modals/ChatScreen/AddItemsToInputPopup";
@@ -56,13 +58,15 @@ import ToolsIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/ToolsIco
 import MicIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
+import NoBalanceModal from "../Monetisation/NoBalanceModal";
+import LowBalanceModal from "../Monetisation/LowBalanceModal";
 
 const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates, chatCustomisationStates, roomCustomisationStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, chatCustomisationStates, roomCustomisationStates, walletStates } = useSelector((state) => state.Toggle);
 
   // Use room customisation states when in room context, otherwise use chat customisation states
   const activeCustomisationStates = isRoomContext ? roomCustomisationStates : chatCustomisationStates;
@@ -71,6 +75,8 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
   const isMessagesFetched = chatsStates.loaderStates.isMessagesFetched;
   const aiMessageContent = chatsStates.allChatsDatas.aiMessageContent;
   const isWaitingForResponse = toggleStates.toggleIsWaitingForResponse;
+  const isZeroBalance = walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
+  const isLowBalance = walletStates.walletBalance > 0 && walletStates.walletBalance < 799 && !walletStates.isPromotionalUser;
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const LINE_HEIGHT = 20;
   const PADDING_VERTICAL = 16; // 8 top + 8 bottom
@@ -685,7 +691,13 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
           <View style={styles.inputLeftActionIcons}>
             <View style={styles.parentContainer}>
               <TouchableOpacity
-                onPress={() => dispatch(setToggleAddItemsToInputPopup(true))}
+                onPress={() => {
+                  if (isLowBalance) {
+                    dispatch(setToggleLowBalanceModal(true));
+                  } else {
+                    dispatch(setToggleAddItemsToInputPopup(true));
+                  }
+                }}
                 style={{
                   backgroundColor: toggleStates.toggleAddItemsToInputPopup
                     ? "#EEF4FF"
@@ -803,7 +815,30 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
             )}
           </View>
         </View>
+
+        {/* Zero balance overlay */}
+        {isZeroBalance && (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => dispatch(setToggleNoBalanceModal(true))}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.6)",
+              borderRadius: 20,
+              zIndex: 10,
+            }}
+          />
+        )}
       </View>
+
+      {/* No Balance Modal */}
+      <NoBalanceModal />
+      {/* Low Balance Modal */}
+      <LowBalanceModal />
     </View>
   );
 });

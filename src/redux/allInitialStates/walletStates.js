@@ -1,6 +1,6 @@
 export const walletStates = {
   walletBalance: 0,
-  isInitialRechargeCompleted: false,
+  isInitialRechargeCompleted: true,
   isPromotionalUser: false,
   promotionalDaysRemaining: 0,
   walletTransactions: [],

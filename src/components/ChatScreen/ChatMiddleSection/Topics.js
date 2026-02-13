@@ -13,10 +13,11 @@ import {
   scaleFont,
   verticalScale,
 } from "../../../utils/responsive";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleSubTopics,
   setToggleTopicsPopup,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
 import { setCurrentSelectedTopic, setSelectedSubjectID } from "../../../redux/slices/globalDataSlice";
 import { useFonts } from "expo-font";
@@ -26,6 +27,8 @@ const Topics = ({ item, index }) => {
 
 
   const dispatch = useDispatch();
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const isZeroBalance = walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
 
     const fetchAllTopicsOfSelectedSubjects = ()=>{
       const subjectId = parseInt(item?.id, 10);
@@ -42,6 +45,10 @@ const Topics = ({ item, index }) => {
   return (
     <TouchableOpacity
       onPress={() => {
+        if (isZeroBalance) {
+          dispatch(setToggleNoBalanceModal(true));
+          return;
+        }
         if (index == 5) {
           dispatch(setToggleTopicsPopup(true));
           dispatch(setToggleSubTopics(false));

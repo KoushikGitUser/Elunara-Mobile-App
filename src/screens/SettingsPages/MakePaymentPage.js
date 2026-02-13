@@ -10,7 +10,6 @@ import {
   Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react-native";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
@@ -25,16 +24,10 @@ import {
   addWalletTransaction,
 } from "../../redux/slices/toggleSlice";
 import { rechargePresets } from "../../data/datas";
+import AuthGradientText from "../../components/common/AuthGradientText";
+import { Gift } from "lucide-react-native";
 
 const MakePaymentPage = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [cardNumber, setCardNumber] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [nameOnCard, setNameOnCard] = useState("");
-  const [expandedSection, setExpandedSection] = useState("upi");
-  const [selectedPayment, setSelectedPayment] = useState("");
-  const [userUPIID, setUserUPIID] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -45,6 +38,13 @@ const MakePaymentPage = () => {
   const { walletStates } = useSelector((state) => state.Toggle);
   const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
   const currentBalance = walletStates.walletBalance;
+  const isPromoActive = walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0;
+
+  const getBalanceColor = () => { 
+    if (currentBalance <= 0) return "#EF4444";
+    if (currentBalance < 799) return "#F59E0B";
+    return "#10B981";
+  };
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -64,13 +64,6 @@ const MakePaymentPage = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const toggleSection = (section) => {
-    setExpandedSection(expandedSection === section ? "" : section);
-  };
-
-  const selectPaymentMethod = (method) => {
-    setSelectedPayment(method);
-  };
 
   const handlePresetSelect = (preset) => {
     setSelectedPreset(preset.id);
@@ -92,11 +85,7 @@ const MakePaymentPage = () => {
       setAmountError("Please enter a valid amount");
       return false;
     }
-    if (isFirstRecharge && amount < 999) {
-      setAmountError("Initial recharge must be at least ₹999");
-      return false;
-    }
-    if (!isFirstRecharge && amount < 99) {
+    if (amount < 99) {
       setAmountError("Minimum recharge amount is ₹99");
       return false;
     }
@@ -109,6 +98,28 @@ const MakePaymentPage = () => {
       // Just a note, not blocking — user can still recharge any valid amount
     }
     return true;
+  };
+
+  const handleInitialRecharge = () => {
+    const amount = 999;
+    const newBalance = currentBalance + amount;
+
+    dispatch(setWalletBalance(newBalance));
+    dispatch(setIsInitialRechargeCompleted(true));
+    dispatch(setToggleIsPaidOrProUser(true));
+
+    const today = new Date();
+    const dateStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+    dispatch(addWalletTransaction({
+      id: Date.now(),
+      date: dateStr,
+      amount: `+₹${amount.toLocaleString("en-IN")}`,
+      type: "recharge",
+      paymentMethod: "gpay",
+      paymentInfo: "Initial Wallet Activation",
+    }));
+
+    setPaymentSuccess(true);
   };
 
   const handleMakePayment = () => {
@@ -130,57 +141,12 @@ const MakePaymentPage = () => {
       date: dateStr,
       amount: `+₹${amount.toLocaleString("en-IN")}`,
       type: "recharge",
-      paymentMethod: selectedPayment || "gpay",
-      paymentInfo: selectedPayment === "upiid" ? userUPIID : "Wallet Recharge",
+      paymentMethod: "gpay",
+      paymentInfo: "Wallet Recharge",
     }));
 
     setPaymentSuccess(true);
   };
-
-  const PaymentOption = ({ id, label, logo, logoType }) => (
-    <TouchableOpacity
-      style={styles.paymentOption}
-      onPress={() => selectPaymentMethod(id)}
-      activeOpacity={0.7}
-    >
-      <View
-        style={[
-          styles.radioOuter,
-          { borderColor: selectedPayment == id ? "black" : "#D3DAE5" },
-        ]}
-      >
-        {selectedPayment === id && <View style={styles.radioInner} />}
-      </View>
-
-      {logoType === "phonepe" && (
-        <View style={styles.phonePeLogo}>
-          <Text style={styles.phonePeText}>₹</Text>
-        </View>
-      )}
-
-      {logoType === "gpay" && (
-        <View style={styles.gpayLogoContainer}>
-          <View style={styles.gpayG}>
-            <Text style={styles.gpayGText}>G</Text>
-          </View>
-          <Text style={styles.gpayPayText}>Pay</Text>
-        </View>
-      )}
-
-      {logoType === "paytm" && <Text style={styles.paytmLogo}>paytm</Text>}
-
-      {logoType === "applepay" && (
-        <View style={styles.applePayLogo}>
-          <Text style={styles.appleIcon}></Text>
-          <Text style={styles.applePayText}>Pay</Text>
-        </View>
-      )}
-
-      {logoType === "upi" && <Text style={styles.upiLogo}>UPI</Text>}
-
-      <Text style={styles.paymentLabel}>{label}</Text>
-    </TouchableOpacity>
-  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -191,10 +157,6 @@ const MakePaymentPage = () => {
       }
     }, 4000);
   }, [paymentSuccess]);
-
-  const toggleAccordion = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   const screenHeight = Dimensions.get("window").height;
 
@@ -223,35 +185,94 @@ const MakePaymentPage = () => {
             />
           </View>
         </View>
+      ) : isFirstRecharge ? (
+        <View style={{ flex: 1, width: "100%" }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={[styles.containerScroll]}
+          >
+            {/* Promotional Banner (only if promo active) */}
+            {isPromoActive && (
+              <View style={styles.promoBanner}>
+                <View style={styles.promoHeader}>
+                  <Gift size={25} color="#10B981" strokeWidth={1.5} />
+                  <Text style={styles.promoText}>
+                    Promotional Free Trial is Active
+                  </Text>
+                </View>
+                <Text style={styles.promoSubText}>
+                  Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted.
+                </Text>
+              </View>
+            )}
+
+            {/* Initial Recharge Card */}
+            <View style={styles.initialRechargeCard}>
+              {/* Free Trial Badge (only if promo active) */}
+              {isPromoActive && (
+                <View style={styles.freeTrialBadge}>
+                  <Gift size={16} color="#10B981" strokeWidth={2} />
+                  <Text style={styles.freeTrialBadgeText}>
+                    Free Trial — {walletStates.promotionalDaysRemaining} days remaining
+                  </Text>
+                </View>
+              )}
+
+              <AuthGradientText fontSize={25} textAlign="left">Activate Wallet</AuthGradientText>
+
+              <Text style={styles.initialRechargeNotice}>
+                An initial recharge of ₹999 is mandatory to activate the platform. Once activated, you can recharge with any custom amount starting from ₹99 to ₹9,999.
+              </Text>
+
+              <View style={styles.initialRechargeInfoRow}>
+                <Text style={styles.initialRechargeInfoLabel}>Activation Amount</Text>
+                <Text style={styles.initialRechargeInfoValue}>₹999</Text>
+              </View>
+
+              <View style={styles.initialRechargeInfoRow}>
+                <Text style={styles.initialRechargeInfoLabel}>After Activation</Text>
+                <Text style={styles.initialRechargeInfoValue}>₹99 - ₹9,999</Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={handleInitialRecharge}
+                style={styles.initialRechargeButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.primaryButtonText}>Recharge for ₹999</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginBottom: 40 }} />
+          </ScrollView>
+        </View>
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={[styles.containerScroll]}
         >
-          {/* Recharge Amount Section */}
-          <Text style={styles.headerText}>
-            {isFirstRecharge
-              ? "Initial recharge of ₹999 required to activate the platform"
-              : "Enter recharge amount (₹99 - ₹9,999)"}
-          </Text>
-
           {/* Current Balance */}
           <View style={styles.currentBalanceRow}>
             <Text style={styles.currentBalanceLabel}>Current Balance:</Text>
-            <Text style={styles.currentBalanceValue}>₹{currentBalance.toLocaleString("en-IN")}</Text>
+            <Text style={[styles.currentBalanceValue, { color: getBalanceColor() }]}>₹{currentBalance.toLocaleString("en-IN")}</Text>
           </View>
+
+          {/* Recharge Amount Section */}
+          <Text style={styles.headerText}>
+            Enter recharge amount (₹99 - ₹9,999)
+          </Text>
 
           {/* Amount Input */}
           <View style={styles.amountInputContainer}>
             <Text style={styles.rupeeSymbol}>₹</Text>
             <TextInput
               style={styles.amountInput}
-              placeholder={isFirstRecharge ? "999" : "Enter amount"}
+              placeholder="Enter amount"
               placeholderTextColor="#B5BECE"
               value={rechargeAmount}
               onChangeText={handleAmountChange}
               keyboardType="number-pad"
-              maxLength={5}
+              maxLength={4}
             />
           </View>
           {amountError ? (
@@ -299,133 +320,14 @@ const MakePaymentPage = () => {
             </View>
           ) : null}
 
-          {/* Debit/Credit Card */}
-          <View style={styles.accordionCard}>
-            <TouchableOpacity
-              style={styles.accordionHeader}
-              onPress={toggleAccordion}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.accordionTitle}>Debit/Credit Card</Text>
-              {isExpanded ? (
-                <ChevronUp size={28} color="#1e293b" strokeWidth={1.5} />
-              ) : (
-                <ChevronDown size={28} color="#1e293b" strokeWidth={1.5} />
-              )}
-            </TouchableOpacity>
-
-            {isExpanded && (
-              <View style={styles.accordionContent}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Card number"
-                  placeholderTextColor="#B5BECE"
-                  value={cardNumber}
-                  onChangeText={setCardNumber}
-                  keyboardType="number-pad"
-                  maxLength={19}
-                />
-
-                <View style={styles.rowContainer}>
-                  <TextInput
-                    style={[styles.input, styles.halfInput]}
-                    placeholder="Expiration date"
-                    placeholderTextColor="#B5BECE"
-                    value={expirationDate}
-                    onChangeText={setExpirationDate}
-                    keyboardType="number-pad"
-                    maxLength={5}
-                  />
-
-                  <View
-                    style={[
-                      styles.input,
-                      styles.halfInput,
-                      styles.cvvContainer,
-                    ]}
-                  >
-                    <TextInput
-                      style={styles.cvvInput}
-                      placeholder="CVV"
-                      placeholderTextColor="#B5BECE"
-                      value={cvv}
-                      onChangeText={setCvv}
-                      keyboardType="number-pad"
-                      maxLength={4}
-                      secureTextEntry
-                    />
-                    <TouchableOpacity style={styles.helpIcon}>
-                      <HelpCircle size={22} color="#1e293b" strokeWidth={2} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <TextInput
-                  style={[styles.input, { marginBottom: 5 }]}
-                  placeholder="Name on card"
-                  placeholderTextColor="#B5BECE"
-                  value={nameOnCard}
-                  onChangeText={setNameOnCard}
-                  autoCapitalize="words"
-                />
-              </View>
-            )}
-          </View>
-
-          {/* UPI Section */}
-          <View style={[styles.accordionCard, { marginBottom: 100 }]}>
-            <TouchableOpacity
-              style={styles.accordionHeader}
-              onPress={() => toggleSection("upi")}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.accordionTitle}>UPI</Text>
-              {expandedSection === "upi" ? (
-                <ChevronUp size={28} color="#1e293b" strokeWidth={1.5} />
-              ) : (
-                <ChevronDown size={28} color="#1e293b" strokeWidth={1.5} />
-              )}
-            </TouchableOpacity>
-
-            {expandedSection === "upi" && (
-              <View style={[styles.accordionContent]}>
-                <PaymentOption
-                  id="phonepe"
-                  label="PhonePe"
-                  logoType="phonepe"
-                />
-                <PaymentOption
-                  id="googlepay"
-                  label="Google Pay"
-                  logoType="gpay"
-                />
-                <PaymentOption id="paytm" label="Paytm" logoType="paytm" />
-                <PaymentOption
-                  id="applepay"
-                  label="Apple Pay"
-                  logoType="applepay"
-                />
-                <PaymentOption id="upiid" label="UPI ID" logoType="upi" />
-                {selectedPayment == "upiid" && (
-                  <TextInput
-                    style={[styles.input, { marginBottom: 5 }]}
-                    placeholder="Enter UPI ID here"
-                    placeholderTextColor="#B5BECE"
-                    value={userUPIID}
-                    onChangeText={setUserUPIID}
-                    autoCapitalize="words"
-                  />
-                )}
-              </View>
-            )}
-          </View>
+          <View style={{ marginBottom: 100 }} />
           {keyboardVisible && (
             <View style={{ height: screenHeight * 0.4 }}></View>
           )}
         </ScrollView>
       )}
 
-      {!paymentSuccess && (
+      {!paymentSuccess && !isFirstRecharge && (
         <View style={styles.primaryButtonMain}>
           <TouchableOpacity
             onPress={handleMakePayment}
@@ -463,9 +365,9 @@ const styles = StyleSheet.create({
   },
   currentBalanceRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+    gap: 8,
   },
   currentBalanceLabel: {
     fontSize: scaleFont(14),
@@ -483,7 +385,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#ABB8CC",
-    borderRadius: 14,
+    borderRadius: 25,
     paddingHorizontal: 20,
     marginBottom: 8,
   },
@@ -496,9 +398,9 @@ const styles = StyleSheet.create({
   amountInput: {
     flex: 1,
     fontSize: scaleFont(24),
-    fontFamily: "Mukta-Bold",
+    fontFamily: "Mukta-Regular",
     color: "#1e293b",
-    paddingVertical: 14,
+    paddingVertical: 8,
   },
   errorText: {
     fontSize: scaleFont(12),
@@ -508,13 +410,14 @@ const styles = StyleSheet.create({
   },
   presetsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
     marginBottom: 20,
     marginTop: 8,
   },
   presetChip: {
-    flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 24,
     borderRadius: 50,
     borderWidth: 1,
     borderColor: "#D3DAE5",
@@ -550,19 +453,92 @@ const styles = StyleSheet.create({
     color: "#10B981",
     marginTop: 4,
   },
-  accordionCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 18,
+  promoBanner: {
+    backgroundColor: "#EEF4FF",
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    borderColor: "#ABB8CC",
-    overflow: "hidden",
-    marginBottom: 30,
+    borderColor: "#406DD8",
+    marginBottom: 20,
+    marginTop: 10,
   },
-  accordionHeader: {
+  promoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 10,
+  },
+  promoText: {
+    fontSize: scaleFont(16),
+    fontWeight: "600",
+    fontFamily: "Mukta-Bold",
+    color: "#1e293b",
+    flex: 1,
+  },
+  promoSubText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#535862",
+    lineHeight: 20,
+  },
+  initialRechargeCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 24,
+    padding: 20,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#D3DAE5",
+  },
+  freeTrialBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#F0FDF4",
+    borderRadius: 50,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    alignSelf: "flex-start",
+    marginBottom: 16,
+  },
+  freeTrialBadgeText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Medium",
+    color: "#10B981",
+  },
+  initialRechargeNotice: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+    lineHeight: 22,
+    marginTop: 12,
+    marginBottom: 20,
+  },
+  initialRechargeInfoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F1F5F9",
+  },
+  initialRechargeInfoLabel: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+  },
+  initialRechargeInfoValue: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
+    color: "#1e293b",
+  },
+  initialRechargeButton: {
+    backgroundColor: "#0f172a",
+    width: "100%",
+    borderRadius: 50,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
   },
   chakraLogo: {
     position: "absolute",
@@ -574,155 +550,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     gap: 10,
-  },
-  accordionTitle: {
-    fontSize: scaleFont(17),
-    fontWeight: "600",
-    fontFamily: "Mukta-Bold",
-    color: "#1e293b",
-  },
-  accordionContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  input: {
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#ABB8CC",
-    borderRadius: 14,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
-    color: "#1e293b",
-    marginBottom: 15,
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  halfInput: {
-    flex: 1,
-  },
-  cvvContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingRight: 16,
-  },
-  cvvInput: {
-    flex: 1,
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
-    color: "#1e293b",
-    padding: 0,
-  },
-  helpIcon: {
-    marginLeft: 8,
-  },
-  paymentOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-  },
-  radioOuter: {
-    width: 23,
-    height: 23,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: "#D3DAE5",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ffffff",
-    marginRight: 15,
-  },
-  radioInner: {
-    width: "80%",
-    height: "80%",
-    borderRadius: 50,
-    backgroundColor: "#000000ff",
-  },
-  paymentLabel: {
-    fontSize: scaleFont(16),
-    fontWeight: "600",
-    fontFamily: "Mukta-Medium",
-    color: "#1e293b",
-  },
-  phonePeLogo: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#5f259f",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  phonePeText: {
-    fontSize: 22,
-    fontWeight: "700",
-    fontFamily: "Mukta-Bold",
-    color: "#ffffff",
-  },
-  gpayLogoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  gpayG: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#ffffff",
-    borderWidth: 1.5,
-    borderColor: "#4285f4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 2,
-  },
-  gpayGText: {
-    fontSize: 11,
-    fontWeight: "700",
-    fontFamily: "Mukta-Bold",
-    color: "#4285f4",
-  },
-  gpayPayText: {
-    fontSize: 14,
-    fontWeight: "500",
-    fontFamily: "Mukta-Medium",
-    color: "#5f6368",
-  },
-  paytmLogo: {
-    fontSize: 18,
-    fontWeight: "700",
-    fontFamily: "Mukta-Bold",
-    color: "#00baf2",
-    marginRight: 16,
-  },
-  applePayLogo: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  appleIcon: {
-    fontSize: 20,
-    fontWeight: "600",
-    fontFamily: "Mukta-Medium",
-    color: "#1e293b",
-    marginRight: 2,
-  },
-  applePayText: {
-    fontSize: 16,
-    fontWeight: "500",
-    fontFamily: "Mukta-Medium",
-    color: "#1e293b",
-  },
-  upiLogo: {
-    fontSize: 16,
-    fontWeight: "700",
-    fontFamily: "Mukta-Bold",
-    color: "#1e293b",
-    letterSpacing: 0.5,
-    marginRight: 16,
   },
   primaryButtonMain: {
     paddingVertical: 16,

@@ -55,4 +55,8 @@ export const toggleStates = {
       toggleBulkRemoveFromRoomConfirmPopup:false,
       // Unsaved Changes Confirmation Popup
       toggleUnsavedChangesConfirmPopup:false,
+      // No Balance Modal
+      toggleNoBalanceModal:false,
+      // Low Balance Modal
+      toggleLowBalanceModal:false,
 }
