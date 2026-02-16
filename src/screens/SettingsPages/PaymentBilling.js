@@ -86,8 +86,8 @@ const PaymentBilling = ({ handleScroll }) => {
             <Text style={styles.promoSubText}>
               {walletStates.isInitialRechargeCompleted
                 ? "Enjoy full access to all platform features. Your ₹999 initial recharge will be active after the free trial ends."
-                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}
-            </Text>
+                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}  
+            </Text> 
           </View>
         )}
 
