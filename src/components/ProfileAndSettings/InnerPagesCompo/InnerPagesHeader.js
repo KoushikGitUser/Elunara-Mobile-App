@@ -30,20 +30,22 @@ const InnerPagesHeader = ({ scrollY }) => {
   return (
     <View style={styles.headerWrapper}>
       <View style={[styles.chatHeader]}>
-        <TouchableOpacity
-          onPress={() => {
-            if (globalDataStates.settingsInnerPageHeaderTitle == "Search") {
-              navigation.navigate("settingsInnerPages", { page: 5 });
-              dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
-            }
-            else{
-            navigation.goBack();
-            }
+        {!globalDataStates.hideSettingsBackButton && (
+          <TouchableOpacity
+            onPress={() => {
+              if (globalDataStates.settingsInnerPageHeaderTitle == "Search") {
+                navigation.navigate("settingsInnerPages", { page: 5 });
+                dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
+              }
+              else{
+              navigation.goBack();
+              }
 
-          }}
-        >
-          <BackArrowLeftIcon />
-        </TouchableOpacity>
+            }}
+          >
+            <BackArrowLeftIcon />
+          </TouchableOpacity>
+        )}
         <Text
           style={{
             fontSize: scaleFont(20),

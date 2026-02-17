@@ -223,7 +223,7 @@ const AddChatToLearningLabPopup = () => {
               ) : (
                 <View style={{ paddingVertical: 40, alignItems: "center" }}>
                   <Text style={{ color: "#757575", fontFamily: "Mukta-Regular" }}>
-                    {searchText ? "No rooms found" : "No learning labs available"}
+                    {searchText ? "No learning labs found" : "No learning labs available"}
                   </Text>
                 </View>
               )}

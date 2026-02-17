@@ -254,7 +254,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
               ))
             ) : (
               <Text style={{ paddingLeft: 20, fontSize: 12, color: "#6B7280" }}>
-                No pinned rooms
+                No pinned learning labs
               </Text>
             )}
           </View>
@@ -384,7 +384,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
               fontFamily: "Mukta-Regular",
             }}
           >
-            Rooms
+            Learning Labs
           </Text>
           {roomsOpened ? (
             <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
@@ -407,7 +407,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
                 ))
             ) : (
               <Text style={{ paddingLeft: 20, fontSize: 12, color: "#6B7280" }}>
-                No rooms yet
+                No learning labs yet
               </Text>
             )}
             <TouchableOpacity
@@ -432,7 +432,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
                   fontFamily: "Mukta-Regular",
                 }}
               >
-                View all Rooms
+                View all Learning Labs
               </Text>
               <ChevronRight style={{ marginLeft: "auto" }} strokeWidth={1.25} />
             </TouchableOpacity>

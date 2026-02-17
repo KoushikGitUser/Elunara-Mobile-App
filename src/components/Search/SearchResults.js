@@ -26,7 +26,7 @@ const SearchResults = () => {
 
   const sections = [
     {
-      title: "Rooms",
+      title: "Learning Labs",
       data: searchStates.searchResults?.rooms || [],
       icon: <Home size={18} color="#4B5563" />,
       type: "room",

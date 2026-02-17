@@ -80,7 +80,7 @@ const DemoPopup = ({ popupState, setPopupState }) => {
             <Text style={styles.description}>
              Get the most out of your AI learning companion. Choose a
               walkthrough below to master navigation, harness chat tools, or
-              organize work with Rooms.
+              organize work with Learning Labs.
             </Text>
             <ScrollView
               showsVerticalScrollIndicator={false}

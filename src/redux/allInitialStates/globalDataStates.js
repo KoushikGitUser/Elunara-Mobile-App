@@ -32,6 +32,7 @@ export const globalDataStates = {
   selectedSubjectID:1,
   selectedTopicsID:1,
   currentAIMessageIndexForRegeneration: null, // Stores AI message index for regeneration (to get UUID from messageIDsArray)
+  hideSettingsBackButton: false, // Hides back button in settings inner pages (used during payment pending)
 };
 
 export const demoChatMessages = [

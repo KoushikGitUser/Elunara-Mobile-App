@@ -138,6 +138,9 @@ const globalDataSlice = createSlice({
         message.total_versions = newVersion.total_versions;
       }
     },
+    setHideSettingsBackButton: (state, action) => {
+      state.globalDataStates.hideSettingsBackButton = action.payload;
+    },
     resetAllGuidedTourSteps: (state) => {
       state.globalDataStates.manualGuidedTourRunning = false;
       state.globalDataStates.navigationBasicsGuideTourSteps = 0;
@@ -189,6 +192,7 @@ export const {
   setCurrentAIMessageIndexForRegeneration,
   navigateToNextVersion,
   navigateToPreviousVersion,
+  setHideSettingsBackButton,
 } = globalDataSlice.actions;
 
 export default globalDataSlice.reducer; 

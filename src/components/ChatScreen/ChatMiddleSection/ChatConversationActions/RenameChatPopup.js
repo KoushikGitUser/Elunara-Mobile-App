@@ -239,7 +239,7 @@ const RenameChatPopup = () => {
                         setTimeout(() => {
                           triggerToast(
                             "Renamed!",
-                            "Your room has been successfully renamed",
+                            "Your learning lab has been successfully renamed",
                             "success",
                             3000,
                           );

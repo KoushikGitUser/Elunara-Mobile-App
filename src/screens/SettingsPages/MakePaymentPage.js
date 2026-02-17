@@ -8,24 +8,41 @@ import {
   Dimensions,
   Image,
   Keyboard,
+  AppState,
+  BackHandler,
+  Linking,
+  Modal,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
 import paymentSuccessText from "../../assets/images/Title.png";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
 import {
-  setToggleIsPaidOrProUser,
-  setWalletBalance,
-  setIsInitialRechargeCompleted,
-  addWalletTransaction,
-} from "../../redux/slices/toggleSlice";
+  setSettingsInnerPageHeaderTitle,
+  setHideSettingsBackButton,
+} from "../../redux/slices/globalDataSlice";
+// Wallet actions — will be used when payment gateway confirms success
+// import {
+//   setToggleIsPaidOrProUser,
+//   setWalletBalance,
+//   setIsInitialRechargeCompleted,
+//   addWalletTransaction,
+// } from "../../redux/slices/toggleSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { Gift } from "lucide-react-native";
+import Svg, { Circle } from "react-native-svg";
+import { BlurView } from "@react-native-community/blur";
+import { appColors } from "../../themes/appColors";
+
+const COUNTDOWN_DURATION = 300; // 5 minutes in seconds
+const CIRCLE_SIZE = 180;
+const STROKE_WIDTH = 8;
+const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const MakePaymentPage = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -34,18 +51,31 @@ const MakePaymentPage = () => {
   const [rechargeAmount, setRechargeAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [amountError, setAmountError] = useState("");
+  const [isPaymentInitiated, setIsPaymentInitiated] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(COUNTDOWN_DURATION);
+  const [showBackPressPopup, setShowBackPressPopup] = useState(false);
+
+  const timerStartRef = useRef(null);
+  const timerIntervalRef = useRef(null);
+  const appStateRef = useRef(AppState.currentState);
 
   const { walletStates } = useSelector((state) => state.Toggle);
   const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
   const currentBalance = walletStates.walletBalance;
-  const isPromoActive = walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0;
+  const isPromoActive =
+    walletStates.isPromotionalUser &&
+    walletStates.promotionalDaysRemaining > 0;
 
-  const getBalanceColor = () => { 
+  const getBalanceColor = () => {
     if (currentBalance <= 0) return "#EF4444";
     if (currentBalance < 799) return "#F59E0B";
     return "#10B981";
   };
 
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  // Keyboard listeners
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
       setKeyboardVisible(true);
@@ -61,9 +91,108 @@ const MakePaymentPage = () => {
     };
   }, []);
 
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+      dispatch(setHideSettingsBackButton(false));
+    };
+  }, []);
 
+  // AppState listener - recalculate remaining time when coming back from background
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === "active" &&
+        isPaymentInitiated &&
+        timerStartRef.current
+      ) {
+        // Recalculate remaining time based on actual elapsed time
+        const elapsed = Math.floor(
+          (Date.now() - timerStartRef.current) / 1000
+        );
+        const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
+        setRemainingTime(newRemaining);
+
+        if (newRemaining <= 0) {
+          handleTimerExpired();
+        }
+      }
+      appStateRef.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isPaymentInitiated]);
+
+  // Countdown timer interval
+  useEffect(() => {
+    if (isPaymentInitiated && remainingTime > 0) {
+      timerIntervalRef.current = setInterval(() => {
+        if (!timerStartRef.current) return;
+
+        const elapsed = Math.floor(
+          (Date.now() - timerStartRef.current) / 1000
+        );
+        const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
+        setRemainingTime(newRemaining);
+
+        if (newRemaining <= 0) {
+          handleTimerExpired();
+        }
+      }, 1000);
+
+      return () => {
+        if (timerIntervalRef.current) {
+          clearInterval(timerIntervalRef.current);
+        }
+      };
+    }
+  }, [isPaymentInitiated, remainingTime > 0]);
+
+  // BackHandler - show popup when payment is pending
+  useEffect(() => {
+    if (!isPaymentInitiated) return;
+
+    const backAction = () => {
+      setShowBackPressPopup(true);
+      return true; // Prevent default back behavior
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [isPaymentInitiated]);
+
+  const handleTimerExpired = () => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+    timerStartRef.current = null;
+    setIsPaymentInitiated(false);
+    setRemainingTime(COUNTDOWN_DURATION);
+    dispatch(setHideSettingsBackButton(false));
+  };
+
+  const startPaymentFlow = () => {
+    // Set payment initiated state
+    setIsPaymentInitiated(true);
+    setRemainingTime(COUNTDOWN_DURATION);
+    timerStartRef.current = Date.now();
+
+    // Hide back button in header
+    dispatch(setHideSettingsBackButton(true));
+
+    // Redirect to payment gateway
+    Linking.openURL("https://www.google.com");
+  };
 
   const handlePresetSelect = (preset) => {
     setSelectedPreset(preset.id);
@@ -72,7 +201,6 @@ const MakePaymentPage = () => {
   };
 
   const handleAmountChange = (text) => {
-    // Only allow numbers
     const numericText = text.replace(/[^0-9]/g, "");
     setRechargeAmount(numericText);
     setSelectedPreset(null);
@@ -93,61 +221,19 @@ const MakePaymentPage = () => {
       setAmountError("Maximum recharge amount is ₹9,999");
       return false;
     }
-    // Check if recharging to re-enable file features
-    if (currentBalance < 799 && currentBalance + amount < 799) {
-      // Just a note, not blocking — user can still recharge any valid amount
-    }
     return true;
   };
 
   const handleInitialRecharge = () => {
-    const amount = 999;
-    const newBalance = currentBalance + amount;
-
-    dispatch(setWalletBalance(newBalance));
-    dispatch(setIsInitialRechargeCompleted(true));
-    dispatch(setToggleIsPaidOrProUser(true));
-
-    const today = new Date();
-    const dateStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
-    dispatch(addWalletTransaction({
-      id: Date.now(),
-      date: dateStr,
-      amount: `+₹${amount.toLocaleString("en-IN")}`,
-      type: "recharge",
-      paymentMethod: "gpay",
-      paymentInfo: "Initial Wallet Activation",
-    }));
-
-    setPaymentSuccess(true);
+    startPaymentFlow();
   };
 
   const handleMakePayment = () => {
     if (!validateAmount()) return;
-
-    const amount = parseInt(rechargeAmount);
-    const newBalance = currentBalance + amount;
-
-    // Update wallet balance
-    dispatch(setWalletBalance(newBalance));
-    dispatch(setIsInitialRechargeCompleted(true));
-    dispatch(setToggleIsPaidOrProUser(true));
-
-    // Add transaction record
-    const today = new Date();
-    const dateStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
-    dispatch(addWalletTransaction({
-      id: Date.now(),
-      date: dateStr,
-      amount: `+₹${amount.toLocaleString("en-IN")}`,
-      type: "recharge",
-      paymentMethod: "gpay",
-      paymentInfo: "Wallet Recharge",
-    }));
-
-    setPaymentSuccess(true);
+    startPaymentFlow();
   };
 
+  // Payment success redirect
   useEffect(() => {
     setTimeout(() => {
       if (paymentSuccess) {
@@ -160,9 +246,132 @@ const MakePaymentPage = () => {
 
   const screenHeight = Dimensions.get("window").height;
 
+  // Format remaining time as MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
+  // Calculate circle progress (strokeDashoffset)
+  const progress = remainingTime / COUNTDOWN_DURATION;
+  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+
+  // Payment Pending UI
+  const renderPaymentPending = () => (
+    <View style={styles.pendingContainer}>
+      <View style={styles.pendingContent}>
+        {/* Countdown Circle */}
+        <View style={styles.circleContainer}>
+          <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
+            {/* Background circle */}
+            <Circle
+              cx={CIRCLE_SIZE / 2}
+              cy={CIRCLE_SIZE / 2}
+              r={RADIUS}
+              stroke={remainingTime <= 60 ? "#FECACA" : "#E9F2FF"}
+              strokeWidth={STROKE_WIDTH}
+              fill="none"
+            />
+            {/* Progress circle */}
+            <Circle
+              cx={CIRCLE_SIZE / 2}
+              cy={CIRCLE_SIZE / 2}
+              r={RADIUS}
+              stroke={remainingTime <= 60 ? "#EF4444" : appColors.navyBlueShade}
+              strokeWidth={STROKE_WIDTH}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={strokeDashoffset}
+              transform={`rotate(-90, ${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2})`}
+            />
+          </Svg>
+          {/* Timer text in center */}
+          <View style={styles.timerTextContainer}>
+            <Text
+              style={[
+                styles.timerText,
+                remainingTime <= 60 && { color: "#EF4444" },
+              ]}
+            >
+              {formatTime(remainingTime)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Pending message */}
+        <Text style={styles.pendingTitle}>Payment Initiated</Text>
+        <Text style={styles.pendingDescription}>
+          Your payment is pending, complete the payment in the browser and come
+          back for successful payment.
+        </Text>
+
+        {remainingTime <= 0 && (
+          <Text style={styles.expiredText}>
+            Payment session expired. Please try again.
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+
+  // Back Press Popup
+  const renderBackPressPopup = () => (
+    <Modal
+      visible={showBackPressPopup}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={() => setShowBackPressPopup(false)}
+    >
+      <View style={styles.popupOverlay}>
+        <BlurView
+          style={styles.blurView}
+          blurType="light"
+          blurAmount={7}
+          reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.43)"
+        />
+        <View style={styles.androidBlur} />
+
+        <TouchableOpacity
+          style={styles.popupBackdrop}
+          activeOpacity={1}
+          onPress={() => setShowBackPressPopup(false)}
+        />
+
+        <View style={styles.popupSheet}>
+          <View style={styles.popupHandleContainer}>
+            <View style={styles.popupHandle} />
+          </View>
+
+          <View style={styles.popupContent}>
+            <Text style={styles.popupTitle}>Payment Pending</Text>
+            <Text style={styles.popupDescription}>
+              You cannot go back at this stage, your payment is pending, either
+              complete the payment or cancel the payment from browser if
+              initiated by mistake.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.popupButton}
+              onPress={() => setShowBackPressPopup(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.popupButtonText}>OK, Got it</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <View style={[styles.container]}>
-      {paymentSuccess ? (
+      {renderBackPressPopup()}
+
+      {isPaymentInitiated ? (
+        renderPaymentPending()
+      ) : paymentSuccess ? (
         <View
           style={{
             flex: 1,
@@ -201,7 +410,8 @@ const MakePaymentPage = () => {
                   </Text>
                 </View>
                 <Text style={styles.promoSubText}>
-                  Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted.
+                  Enjoy full access to all platform features. Recharge your
+                  wallet before the trial ends to continue uninterrupted.
                 </Text>
               </View>
             )}
@@ -213,25 +423,36 @@ const MakePaymentPage = () => {
                 <View style={styles.freeTrialBadge}>
                   <Gift size={16} color="#10B981" strokeWidth={2} />
                   <Text style={styles.freeTrialBadgeText}>
-                    Free Trial — {walletStates.promotionalDaysRemaining} days remaining
+                    Free Trial — {walletStates.promotionalDaysRemaining} days
+                    remaining
                   </Text>
                 </View>
               )}
 
-              <AuthGradientText fontSize={25} textAlign="left">Activate Wallet</AuthGradientText>
+              <AuthGradientText fontSize={25} textAlign="left">
+                Activate Wallet
+              </AuthGradientText>
 
               <Text style={styles.initialRechargeNotice}>
-                An initial recharge of ₹999 is mandatory to activate the platform. Once activated, you can recharge with any custom amount starting from ₹99 to ₹9,999.
+                An initial recharge of ₹999 is mandatory to activate the
+                platform. Once activated, you can recharge with any custom amount
+                starting from ₹99 to ₹9,999.
               </Text>
 
               <View style={styles.initialRechargeInfoRow}>
-                <Text style={styles.initialRechargeInfoLabel}>Activation Amount</Text>
+                <Text style={styles.initialRechargeInfoLabel}>
+                  Activation Amount
+                </Text>
                 <Text style={styles.initialRechargeInfoValue}>₹999</Text>
               </View>
 
               <View style={styles.initialRechargeInfoRow}>
-                <Text style={styles.initialRechargeInfoLabel}>After Activation</Text>
-                <Text style={styles.initialRechargeInfoValue}>₹99 - ₹9,999</Text>
+                <Text style={styles.initialRechargeInfoLabel}>
+                  After Activation
+                </Text>
+                <Text style={styles.initialRechargeInfoValue}>
+                  ₹99 - ₹9,999
+                </Text>
               </View>
 
               <TouchableOpacity
@@ -239,7 +460,9 @@ const MakePaymentPage = () => {
                 style={styles.initialRechargeButton}
                 activeOpacity={0.8}
               >
-                <Text style={styles.primaryButtonText}>Recharge for ₹999</Text>
+                <Text style={styles.primaryButtonText}>
+                  Recharge for ₹999
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -254,7 +477,11 @@ const MakePaymentPage = () => {
           {/* Current Balance */}
           <View style={styles.currentBalanceRow}>
             <Text style={styles.currentBalanceLabel}>Current Balance:</Text>
-            <Text style={[styles.currentBalanceValue, { color: getBalanceColor() }]}>₹{currentBalance.toLocaleString("en-IN")}</Text>
+            <Text
+              style={[styles.currentBalanceValue, { color: getBalanceColor() }]}
+            >
+              ₹{currentBalance.toLocaleString("en-IN")}
+            </Text>
           </View>
 
           {/* Recharge Amount Section */}
@@ -294,7 +521,8 @@ const MakePaymentPage = () => {
                 <Text
                   style={[
                     styles.presetChipText,
-                    selectedPreset === preset.id && styles.presetChipTextSelected,
+                    selectedPreset === preset.id &&
+                      styles.presetChipTextSelected,
                   ]}
                 >
                   {preset.label}
@@ -309,14 +537,18 @@ const MakePaymentPage = () => {
               <Text style={styles.balancePreviewText}>
                 Balance after recharge:{" "}
                 <Text style={{ fontFamily: "Mukta-Bold", color: "#10B981" }}>
-                  ₹{(currentBalance + (parseInt(rechargeAmount) || 0)).toLocaleString("en-IN")}
+                  ₹
+                  {(
+                    currentBalance + (parseInt(rechargeAmount) || 0)
+                  ).toLocaleString("en-IN")}
                 </Text>
               </Text>
-              {currentBalance < 799 && (currentBalance + (parseInt(rechargeAmount) || 0)) >= 799 && (
-                <Text style={styles.fileFeatureNote}>
-                  File uploads will be re-enabled
-                </Text>
-              )}
+              {currentBalance < 799 &&
+                currentBalance + (parseInt(rechargeAmount) || 0) >= 799 && (
+                  <Text style={styles.fileFeatureNote}>
+                    File uploads will be re-enabled
+                  </Text>
+                )}
             </View>
           ) : null}
 
@@ -327,7 +559,7 @@ const MakePaymentPage = () => {
         </ScrollView>
       )}
 
-      {!paymentSuccess && !isFirstRecharge && (
+      {!paymentSuccess && !isFirstRecharge && !isPaymentInitiated && (
         <View style={styles.primaryButtonMain}>
           <TouchableOpacity
             onPress={handleMakePayment}
@@ -575,6 +807,135 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "Mukta-Bold",
     color: "#ffffff",
+  },
+
+  // Payment Pending Styles
+  pendingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pendingContent: {
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  circleContainer: {
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  timerTextContainer: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  timerText: {
+    fontSize: scaleFont(32),
+    fontFamily: "Mukta-Bold",
+    color: "#081A35",
+  },
+  pendingTitle: {
+    fontSize: scaleFont(22),
+    fontFamily: "Mukta-Bold",
+    color: "#1F2937",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  pendingDescription: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#6B7280",
+    lineHeight: 22,
+    textAlign: "center",
+  },
+  expiredText: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Medium",
+    color: "#EF4444",
+    marginTop: 16,
+    textAlign: "center",
+  },
+
+  // Back Press Popup Styles
+  popupOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  blurView: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  androidBlur: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.18)",
+  },
+  popupBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  popupSheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 20,
+  },
+  popupHandleContainer: {
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  popupHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D1D5DB",
+  },
+  popupContent: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  popupTitle: {
+    fontSize: scaleFont(22),
+    fontFamily: "Mukta-Bold",
+    color: "#1F2937",
+    marginBottom: 12,
+  },
+  popupDescription: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#6B7280",
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  popupButton: {
+    backgroundColor: "#081A35",
+    paddingVertical: 14,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  popupButtonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
   },
 });
 

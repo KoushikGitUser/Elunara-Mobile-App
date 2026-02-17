@@ -78,7 +78,7 @@ const BulkRemoveFromRoomConfirmPopup = ({ selectedChatIds = [], onComplete }) =>
       }
     } catch (error) {
       setIsLoading(false);
-      triggerToast("Error", "Failed to remove chats from room", "error", 3000);
+      triggerToast("Error", "Failed to remove chats from learning lab", "error", 3000);
     }
   };
 

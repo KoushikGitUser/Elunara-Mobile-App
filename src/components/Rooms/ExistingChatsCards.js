@@ -43,7 +43,7 @@ const ExistingChatsCards = ({ chatName, projects, chat }) => {
         }),
       );
     } else {
-      triggerToast("Error", "Could not identify room or chat", "error", 3000);
+      triggerToast("Error", "Could not identify learning lab or chat", "error", 3000);
     }
   };
 

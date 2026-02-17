@@ -142,7 +142,7 @@ const RoomCreationPopup = () => {
                 <View style={styles.inputSection}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter Room Name"
+                    placeholder="Enter Learning Lab Name"
                     placeholderTextColor="#9CA3AF"
                     value={roomName}
                     onChangeText={setRoomName}
@@ -198,7 +198,7 @@ const RoomCreationPopup = () => {
                   {isLoading ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.verifyButtonText}>Create Room</Text>
+                    <Text style={styles.verifyButtonText}>Create Learning Lab</Text>
                   )}
                 </TouchableOpacity>
               </View>

@@ -63,7 +63,7 @@ const RemoveFromRoomConfirmPopup = () => {
       })
       .catch(() => {
         setIsLoading(false);
-        triggerToast("Error", "Failed to remove chat from room", "error", 3000);
+        triggerToast("Error", "Failed to remove chat from learning lab", "error", 3000);
       });
   };
 
@@ -107,12 +107,12 @@ const RemoveFromRoomConfirmPopup = () => {
 
             {/* Title */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-              Remove from Room?
+              Remove from Learning Lab?
             </Text>
 
             {/* Description */}
             <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
-              This chat will be removed from this room but will still be available in your chats.
+              This chat will be removed from this learning lab but will still be available in your chats.
             </Text>
 
             {/* Button */}

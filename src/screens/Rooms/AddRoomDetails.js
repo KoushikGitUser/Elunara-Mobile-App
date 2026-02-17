@@ -166,7 +166,7 @@ const AddRoomDetails = () => {
       route.params?.roomUuid || roomsStates.currentRoom?.uuid;
 
     if (!effectiveRoomUuid) {
-      triggerToast("Error", "Room not found", "error", 3000);
+      triggerToast("Error", "Learning Lab not found", "error", 3000);
       return;
     }
 

@@ -110,7 +110,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
         ...(hasRoom
           ? [
               {
-                title: "Remove from Room",
+                title: "Remove from Learning Lab",
                 icon: <FolderPlusIcon />,
                 action: "removeFromRoom",
               },
@@ -231,13 +231,13 @@ const ChatOptionsPopup = ({ chatUuid }) => {
               name: "getAllDetailsOfChatByID",
             }),
           );
-          triggerToast("Success", "Chat removed from room", "success", 3000);
+          triggerToast("Success", "Chat removed from learning lab", "success", 3000);
         })
         .catch((error) => {
-          console.error("Failed to remove chat from room:", error);
+          console.error("Failed to remove chat from learning lab:", error);
           triggerToast(
             "Error",
-            "Failed to remove chat from room",
+            "Failed to remove chat from learning lab",
             "error",
             3000,
           );

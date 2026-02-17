@@ -35,7 +35,7 @@ const ExistingRoomsCards = ({ roomId, roomName, chats, chatUuid }) => {
 
     if (!roomId) {
       console.log("🏠 ADD TO ROOM: roomId is missing");
-      triggerToast("Error", "Room ID is missing", "error", 3000);
+      triggerToast("Error", "Learning Lab ID is missing", "error", 3000);
       return;
     }
 
@@ -78,7 +78,7 @@ const ExistingRoomsCards = ({ roomId, roomName, chats, chatUuid }) => {
 
       // Show toast before closing popup so Toaster is still mounted
       triggerToast(
-        "Added to Room",
+        "Added to Learning Lab",
         `Chat added to ${roomName}`,
         "success",
         3000
@@ -87,7 +87,7 @@ const ExistingRoomsCards = ({ roomId, roomName, chats, chatUuid }) => {
       dispatch(setToggleAddChatToLearningLabPopup(false));
     } catch (error) {
       console.error("🏠 ADD TO ROOM: Failed", error);
-      triggerToast("Error", "Failed to add chat to room", "error", 3000);
+      triggerToast("Error", "Failed to add chat to learning lab", "error", 3000);
     } finally {
       setIsAdding(false);
     }

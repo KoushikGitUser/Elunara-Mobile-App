@@ -32,7 +32,7 @@ export const handleCreateRoom = {
       // Set as current room so room details screen can access it
       state.roomsStates.currentRoom = roomWithUuid;
     }
-    triggerToast("Success", "Room created successfully", "success", 3000);
+    triggerToast("Success", "Learning Lab created successfully", "success", 3000);
   },
   rejected: (state, action) => {
     state.roomsStates.creatingRoom = false;
@@ -40,7 +40,7 @@ export const handleCreateRoom = {
       action?.payload?.data?.message ||
       action?.payload?.message ||
       action?.error?.message ||
-      "Failed to create room";
+      "Failed to create learning lab";
     triggerToast("Error", errorMessage, "error", 3000);
   },
 };
@@ -128,13 +128,13 @@ export const handleUpdateRoom = {
         state.roomsStates.currentRoom = roomWithUuid;
       }
     }
-    triggerToast("Success", "Room updated successfully", "success", 3000);
+    triggerToast("Success", "Learning Lab updated successfully", "success", 3000);
   },
   rejected: (state, action) => {
     state.roomsStates.updatingRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to update room",
+      action?.payload?.message || "Failed to update learning lab",
       "error",
       3000
     );
@@ -154,13 +154,13 @@ export const handleDeleteRoom = {
         (room) => room.uuid !== deletedUuid
       );
     }
-    triggerToast("Success", "Room deleted successfully", "success", 3000);
+    triggerToast("Success", "Learning Lab deleted successfully", "success", 3000);
   },
   rejected: (state, action) => {
     state.roomsStates.deletingRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to delete room",
+      action?.payload?.message || "Failed to delete learning lab",
       "error",
       3000
     );
@@ -174,7 +174,7 @@ export const handlePinRoom = {
   },
   fulfilled: (state, action) => {
     state.roomsStates.pinningRoom = false;
-    triggerToast("Success", "Room pinned", "success", 3000);
+    triggerToast("Success", "Learning Lab pinned", "success", 3000);
     const pinnedUuid = action.meta.arg.url.split("/")[2];
     if (pinnedUuid) {
       // Find the room in the main list
@@ -200,7 +200,7 @@ export const handlePinRoom = {
     state.roomsStates.pinningRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to pin room",
+      action?.payload?.message || "Failed to pin learning lab",
       "error",
       3000
     );
@@ -214,7 +214,7 @@ export const handleUnpinRoom = {
   },
   fulfilled: (state, action) => {
     state.roomsStates.unpinningRoom = false;
-    triggerToast("Success", "Room unpinned", "success", 3000);
+    triggerToast("Success", "Learning Lab unpinned", "success", 3000);
 
     // Optimistic Update
     // Extract UUID from URL: /rooms/:uuid/unpin
@@ -233,7 +233,7 @@ export const handleUnpinRoom = {
     state.roomsStates.unpinningRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to unpin room",
+      action?.payload?.message || "Failed to unpin learning lab",
       "error",
       3000
     );
@@ -266,13 +266,13 @@ export const handleAddChatsToRoom = {
   },
   fulfilled: (state, action) => {
     state.roomsStates.addingChatsToRoom = false;
-    triggerToast("Success", "Chats added to room", "success", 3000);
+    triggerToast("Success", "Chats added to learning lab", "success", 3000);
   },
   rejected: (state, action) => {
     state.roomsStates.addingChatsToRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to add chats to room",
+      action?.payload?.message || "Failed to add chats to learning lab",
       "error",
       3000
     );
@@ -300,13 +300,13 @@ export const handleUndoDeleteRoom = {
   },
   fulfilled: (state, action) => {
     state.roomsStates.undoingDeleteRoom = false;
-    triggerToast("Success", "Room restored", "success", 3000);
+    triggerToast("Success", "Learning Lab restored", "success", 3000);
   },
   rejected: (state, action) => {
     state.roomsStates.undoingDeleteRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to restore room",
+      action?.payload?.message || "Failed to restore learning lab",
       "error",
       3000
     );

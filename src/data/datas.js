@@ -711,13 +711,13 @@ export const allChatsData = [
     id: 4,
     title: "Chat Name",
     subject: "Marketing",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 5,
     title: "Chat Name",
     subject: "Subject",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 6,
@@ -735,7 +735,7 @@ export const allChatsData = [
     id: 8,
     title: "Chat Name",
     subject: "Subject",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 9,
@@ -765,13 +765,13 @@ export const allChatsData = [
     id: 13,
     title: "Chat Name",
     subject: "Marketing",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 14,
     title: "Chat Name",
     subject: "Subject",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 15,
@@ -789,7 +789,7 @@ export const allChatsData = [
     id: 17,
     title: "Chat Name",
     subject: "Subject",
-    roomName: "Room Name",
+    roomName: "Learning Lab Name",
   },
   {
     id: 18,
@@ -801,7 +801,7 @@ export const allChatsData = [
 
 export const allChatsOptionsPopupData = [
   {
-    title: "Add to Room",
+    title: "Add to Learning Lab",
     icon: <FolderIconDark />,
   },
   {
@@ -974,7 +974,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 3,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 4,
@@ -982,7 +982,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 5,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 6,
@@ -990,7 +990,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 7,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 8,
@@ -1006,7 +1006,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 3,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 4,
@@ -1014,7 +1014,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 5,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 6,
@@ -1022,7 +1022,7 @@ export const previouslySearchedTopicsForHelp = [
   },
   {
     id: 7,
-    title: "Rooms",
+    title: "Learning Labs",
   },
   {
     id: 8,
@@ -1064,7 +1064,7 @@ export const academicLinks = [
 export const platformFeatures = [
   "Unlimited AI chat interactions",
   "Unlimited file and photo uploads (requires balance \u2265 \u20B9799)",
-  "Room-based learning: create and manage focused Rooms",
+  "Learning Lab-based learning: create and manage focused Learning Labs",
   "Unlimited Custom AI interaction: pick model, style, language, and citations",
   "Analytics dashboard to track your learning progress",
   "Ad-free experience across the platform",
@@ -1087,7 +1087,7 @@ export const analyticsFeatures = [
 export const newChatLimit = [
   "Unlimited new chats — never wait to start a fresh conversation",
   "Full personalization - choose AI model, tone, language & citation style",
-  "Rooms - organize multiple topics in dedicated workspaces",
+  "Learning Labs - organize multiple topics in dedicated workspaces",
 ];
 export const elunaraWalletWelcome = [
   "Unlimited AI chats and tools",

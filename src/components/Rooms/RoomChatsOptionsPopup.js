@@ -31,7 +31,7 @@ const RoomChatsOptionsPopup = ({ popupPosition }) => {
   // Options for room chats: Remove from Room, Rename, Delete
   const dynamicOptions = [
     {
-      title: "Remove from Room",
+      title: "Remove from Learning Lab",
       icon: <FolderIconDark />,
       action: "removeFromRoom"
     },
@@ -81,7 +81,7 @@ const RoomChatsOptionsPopup = ({ popupPosition }) => {
           }
         })
         .catch(() => {
-          triggerToast("Error", "Failed to remove chat from room", "error", 3000);
+          triggerToast("Error", "Failed to remove chat from learning lab", "error", 3000);
         });
     } else if (action === "rename") {
       dispatch(setToggleRenameChatPopup(true));

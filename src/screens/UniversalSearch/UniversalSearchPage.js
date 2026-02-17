@@ -358,7 +358,7 @@ const UniversalSearchPage = () => {
           {/* Rooms Section */}
           {startedSearching && hasRooms && (
             <>
-              <Text style={styles.sectionLabel}>Rooms</Text>
+              <Text style={styles.sectionLabel}>Learning Labs</Text>
               {searchResults.rooms.map((room) => (
                 <TouchableOpacity
                   key={room.id}

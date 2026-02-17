@@ -99,7 +99,7 @@ const ConfirmLogoutPopup = ({
             {/* Description */}
             <Text style={styles.description}>
               Are you sure you want to log out? You'll need to sign in again to
-              access your Rooms and chats.
+              access your Learning Labs and chats.
             </Text>
 
             {/* Button */}

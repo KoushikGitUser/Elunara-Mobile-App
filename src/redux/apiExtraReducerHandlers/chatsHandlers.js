@@ -7,13 +7,13 @@ export const handleAddToRoom = {
   },
   fulfilled: (state, action) => {
     state.chatsStates.addingToRoom = false;
-    triggerToast("Success", "Chat added to room", "success", 3000);
+    triggerToast("Success", "Chat added to learning lab", "success", 3000);
   },
   rejected: (state, action) => {
     state.chatsStates.addingToRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to add chat to room",
+      action?.payload?.message || "Failed to add chat to learning lab",
       "error",
       3000,
     );
@@ -27,13 +27,13 @@ export const handleRemoveFromRoom = {
   },
   fulfilled: (state, action) => {
     state.chatsStates.removingFromRoom = false;
-    triggerToast("Success", "Chat removed from room", "success", 3000);
+    triggerToast("Success", "Chat removed from learning lab", "success", 3000);
   },
   rejected: (state, action) => {
     state.chatsStates.removingFromRoom = false;
     triggerToast(
       "Error",
-      action?.payload?.message || "Failed to remove chat from room",
+      action?.payload?.message || "Failed to remove chat from learning lab",
       "error",
       3000,
     );

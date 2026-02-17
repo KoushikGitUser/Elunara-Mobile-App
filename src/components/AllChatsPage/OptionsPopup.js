@@ -53,7 +53,7 @@ const OptionsPopup = ({ popupPosition }) => {
       ]
     : [
         {
-          title: "Add to Room",
+          title: "Add to Learning Lab",
           icon: <FolderIconDark />,
           action: "addToRoom"
         },

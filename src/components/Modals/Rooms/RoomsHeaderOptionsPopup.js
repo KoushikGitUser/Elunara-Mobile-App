@@ -67,7 +67,7 @@ const RoomsHeaderOptionsPopup = ({ close }) => {
         <Pressable
           onPress={() => {
             closePopup();
-            triggerToast("Room pinned", "Room pinned successfully", "success", 3000);
+            triggerToast("Learning Lab pinned", "Learning Lab pinned successfully", "success", 3000);
           }}
           style={({ pressed }) => [
             {
