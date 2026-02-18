@@ -5,6 +5,7 @@ import {
   chatsHandlersFunctions,
   attachmentsHandlersFunctions,
   searchHandlersFunctions,
+  walletHandlersFunctions,
 } from "../handlersFunctionsStore";
 
 export const addCasePending = (state, action) => {
@@ -22,5 +23,7 @@ export const addCasePending = (state, action) => {
     attachmentsHandlersFunctions[name].pending(state, action);
   } else if (searchHandlersFunctions[name]?.pending) {
     searchHandlersFunctions[name].pending(state, action);
+  } else if (walletHandlersFunctions[name]?.pending) {
+    walletHandlersFunctions[name].pending(state, action);
   }
 };

@@ -18,6 +18,7 @@ import {
   setToggleDeleteChatConfirmPopup,
   setToggleRenameChatPopup,
   setToggleUnlockArchiveLimitPopup,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
 import { triggerToast } from "../../../services/toast";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
@@ -28,6 +29,7 @@ import PinIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/P
 import FolderPlusIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon";
 import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
 import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon";
+import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 
 const ChatOptionsPopup = ({ chatUuid }) => {
   const styleProps = {};
@@ -35,8 +37,10 @@ const ChatOptionsPopup = ({ chatUuid }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
   const { chatsStates } = useSelector((state) => state.API);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const { width, height } = Dimensions.get("window");
 
   // Dynamic actions based on is_pinned and is_archived states
@@ -120,6 +124,7 @@ const ChatOptionsPopup = ({ chatUuid }) => {
                 title: "Add to Learning Lab",
                 icon: <FolderPlusIcon />,
                 action: "addToLearningLab",
+                showLock: isZeroBalance,
               },
             ]),
         { title: "Rename", icon: <RenameIcon />, action: "rename" },
@@ -138,6 +143,10 @@ const ChatOptionsPopup = ({ chatUuid }) => {
       navigation.navigate("notes", { chatUuid: chatId });
     } else if (actionType === "addToLearningLab") {
       dispatch(setToggleChatMenuPopup(false));
+      if (isZeroBalance) {
+        dispatch(setToggleNoBalanceModal(true));
+        return;
+      }
       dispatch(setToggleAddChatToLearningLabPopup(true));
     } else if (actionType === "rename") {
       dispatch(setToggleChatMenuPopup(false));
@@ -327,11 +336,13 @@ const ChatOptionsPopup = ({ chatUuid }) => {
                 style={{
                   fontSize: moderateScale(16),
                   flexShrink: 1,
+                  flex: 1,
                   fontFamily: "Mukta-Regular",
                 }}
               >
                 {actionItem.title}
               </Text>
+              {actionItem.showLock && <LockIcon />}
             </Pressable>
           );
         })}

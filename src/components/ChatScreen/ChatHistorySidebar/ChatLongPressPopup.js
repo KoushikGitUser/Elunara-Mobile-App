@@ -23,7 +23,9 @@ import {
   setToggleChatActionsPopupOnLongPress,
   setToggleDeleteChatConfirmPopup,
   setToggleRenameChatPopup,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
+import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import { triggerToast } from "../../../services/toast";
 import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
@@ -31,9 +33,11 @@ import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"
 import { appColors } from "../../../themes/appColors";
 
 const ChatLongPressPopup = () => {
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates } = useSelector((state) => state.API);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const dispatch = useDispatch();
 
   // Dynamic actions based on is_pinned and is_archived states
@@ -70,6 +74,7 @@ const ChatLongPressPopup = () => {
                 title: "Add to Learning Lab",
                 icon: folder,
                 action: "addToLearningLab",
+                showLock: isZeroBalance,
               },
             ]),
         { title: "Rename", icon: pencil, action: "rename" },
@@ -91,6 +96,10 @@ const ChatLongPressPopup = () => {
   const commonFunction = (actionType) => {
     if (actionType === "addToLearningLab") {
       dispatch(setToggleChatActionsPopupOnLongPress(false));
+      if (isZeroBalance) {
+        dispatch(setToggleNoBalanceModal(true));
+        return;
+      }
       dispatch(setToggleAddChatToLearningLabPopup(true));
     } else if (actionType === "rename") {
       dispatch(setToggleChatActionsPopupOnLongPress(false));
@@ -241,6 +250,7 @@ const ChatLongPressPopup = () => {
                   style={({ pressed }) => [
                     styles.actionButton,
                     pressed && styles.actionButtonPressed,
+                    item.showLock && { paddingRight: 10 },
                   ]}
                   onPress={() => {
                     commonFunction(item.action);
@@ -252,7 +262,8 @@ const ChatLongPressPopup = () => {
                       source={item.icon}
                     />
                   </View>
-                  <Text style={styles.actionText}>{item.title}</Text>
+                  <Text style={[styles.actionText, { flex: 1 }]}>{item.title}</Text>
+                  {item.showLock && <View style={{ marginLeft: 8 }}><LockIcon /></View>}
                 </Pressable>
               ))}
             </View>
@@ -303,6 +314,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   modalSheet: {
     backgroundColor: "white",
@@ -342,6 +354,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
     fontWeight: "400",
+    fontFamily: "Mukta-Regular",
   },
   separator: {
     height: 1,

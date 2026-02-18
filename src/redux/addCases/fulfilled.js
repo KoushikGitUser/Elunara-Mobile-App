@@ -5,6 +5,7 @@ import {
   chatsHandlersFunctions,
   attachmentsHandlersFunctions,
   searchHandlersFunctions,
+  walletHandlersFunctions,
 } from "../handlersFunctionsStore";
 
 export const addCaseFulfilled = (state, action) => {
@@ -22,5 +23,7 @@ export const addCaseFulfilled = (state, action) => {
     attachmentsHandlersFunctions[name].fulfilled(state, action);
   } else if (searchHandlersFunctions[name]?.fulfilled) {
     searchHandlersFunctions[name].fulfilled(state, action);
+  } else if (walletHandlersFunctions[name]?.fulfilled) {
+    walletHandlersFunctions[name].fulfilled(state, action);
   }
 };

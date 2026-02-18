@@ -22,12 +22,16 @@ import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import RoomChatsOptionsPopup from "./RoomChatsOptionsPopup";
 import RemoveFromRoomConfirmPopup from "./RemoveFromRoomConfirmPopup";
 import BulkRemoveFromRoomConfirmPopup from "./BulkRemoveFromRoomConfirmPopup";
-import { setToggleBulkRemoveFromRoomConfirmPopup, setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
+import { setToggleBulkRemoveFromRoomConfirmPopup, setToggleIsChattingWithAI, setToggleNoBalanceModal } from "../../redux/slices/toggleSlice";
+import LockIcon from "../../../assets/SvgIconsComponent/LockIcon";
 
 const RoomsMiddle = ({ roomName }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const { roomsStates } = useSelector((state) => state.API);
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -181,12 +185,16 @@ const RoomsMiddle = ({ roomName }) => {
             </TouchableOpacity> */}
           </View>
           <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() =>
+            style={[styles.editBtn, { flexDirection: "row", alignItems: "center", gap: 5 }]}
+            onPress={() => {
+              if (isZeroBalance) {
+                dispatch(setToggleNoBalanceModal(true));
+                return;
+              }
               navigation.navigate("roomDetails", {
                 roomUuid: roomsStates.currentRoom?.uuid,
-              })
-            }
+              });
+            }}
           >
             <Text
               style={{
@@ -197,6 +205,7 @@ const RoomsMiddle = ({ roomName }) => {
             >
               Edit
             </Text>
+            {isZeroBalance && <LockIcon />}
           </TouchableOpacity>
         </View>
       )}

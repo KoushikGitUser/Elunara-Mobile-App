@@ -17,17 +17,21 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleDeleteChatConfirmPopup,
   setToggleRenameChatPopup,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
 import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
 import { triggerToast } from "../../../services/toast";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 
 const { width, height } = Dimensions.get("window");
 
 const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible, popupPosition }) => {
   const navigation = useNavigation();
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
   const { roomsStates } = useSelector((state) => state.API);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const dispatch = useDispatch();
 
   return (
@@ -61,6 +65,10 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible, popupPosition }) => {
           <Pressable
             onPress={() => {
               setRoomOptionsPopup(false);
+              if (isZeroBalance) {
+                dispatch(setToggleNoBalanceModal(true));
+                return;
+              }
               navigation.navigate("roomDetails", {
                 roomUuid: roomsStates.currentRoom?.uuid,
               });
@@ -70,10 +78,12 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible, popupPosition }) => {
                 backgroundColor: pressed ? "#EEF4FF" : "transparent",
               },
               styles.notesPopupOptions,
+              isZeroBalance && { paddingRight: 0 },
             ]}
           >
             <FilesIcon />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>Edit Details</Text>
+            <Text style={{ fontFamily: "Mukta-Regular", flex: 1 }}>Edit Details</Text>
+            {isZeroBalance && <LockIcon />}
           </Pressable>
           <Pressable
             onPress={() => {

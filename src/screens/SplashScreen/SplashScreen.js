@@ -15,6 +15,12 @@ import elunaraLogoSplash from "../../assets/images/ElunaraLogoSplash.png";
 import { getToken } from "../../utils/Secure/secureStore";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  setWalletBalance,
+  setIsInitialRechargeCompleted,
+  setIsPromotionalUser,
+  setPromotionalDaysRemaining,
+} from "../../redux/slices/toggleSlice";
 
 const SplashScreen = ({ navigation }) => { 
   const dispatch = useDispatch();
@@ -35,39 +41,45 @@ const SplashScreen = ({ navigation }) => {
         return;
       }
 
-      // If access token exists (with or without refresh token), fetch profile info
-      const payload = {
+      // If access token exists (with or without refresh token), fetch profile info and wallet info
+      dispatch(commonFunctionForAPICalls({
         method: "GET",
         url: "/settings/profile",
         name: "getAllProfileInfos",
-      };
+      }));
 
-      dispatch(commonFunctionForAPICalls(payload));
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/wallet",
+        name: "getUserWalletInfo",
+      }));
     };
     checkAuthAndNavigate();
   }, []);
 
-  const { settingsStates } = useSelector((state) => state.API);
+  const { settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
 
+  // Sync wallet data to Toggle slice whenever wallet API resolves
   useEffect(() => {
-    const handleProfileFetchResult = async () => {
-      // Only handle navigation on initial mount, ignore subsequent state changes
+    if (apiWalletStates.isWalletInfoFetched === true) {
+      dispatch(setWalletBalance(apiWalletStates.walletBalance));
+      dispatch(setIsInitialRechargeCompleted(apiWalletStates.isInitialRechargeCompleted));
+      dispatch(setIsPromotionalUser(apiWalletStates.isPromotionalUser));
+      dispatch(setPromotionalDaysRemaining(apiWalletStates.promotionalDaysRemaining));
+    }
+  }, [apiWalletStates.isWalletInfoFetched]);
+
+  // Navigate to chat when profile is fetched
+  useEffect(() => {
+    const handleFetchResults = async () => {
       if (!isInitialMount.current) return;
       if (hasNavigated.current) return;
 
       const accessToken = await getToken();
+      if (!accessToken) return;
 
-      // Only process if access token exists
-      if (!accessToken) {
-        return;
-      }
-
-      // Only navigate to chat when profile is successfully fetched (true)
-      // Ignore false states as they could be "loading" or "error"
-      // If there's an auth error, the axios interceptor will handle logout
       if (
-        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched ===
-        true
+        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true
       ) {
         hasNavigated.current = true;
         isInitialMount.current = false;
@@ -75,8 +87,10 @@ const SplashScreen = ({ navigation }) => {
       }
     };
 
-    handleProfileFetchResult();
-  }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched]);
+    handleFetchResults();
+  }, [
+    settingsStates.allPersonalisationsSettings.isPersonalInfosFetched,
+  ]);
 
   return (
     <View style={styles.container}>

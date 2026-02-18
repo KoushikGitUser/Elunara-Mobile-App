@@ -5,6 +5,7 @@ import {
   chatsHandlersFunctions,
   attachmentsHandlersFunctions,
   searchHandlersFunctions,
+  walletHandlersFunctions,
 } from "../handlersFunctionsStore";
 
 export const addCaseRejected = (state, action) => {
@@ -22,5 +23,7 @@ export const addCaseRejected = (state, action) => {
     attachmentsHandlersFunctions[name].rejected(state, action);
   } else if (searchHandlersFunctions[name]?.rejected) {
     searchHandlersFunctions[name].rejected(state, action);
+  } else if (walletHandlersFunctions[name]?.rejected) {
+    walletHandlersFunctions[name].rejected(state, action);
   }
 };

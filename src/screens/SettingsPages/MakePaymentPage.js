@@ -37,6 +37,7 @@ import { Gift } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
+import { triggerToast } from "../../services/toast";
 
 const COUNTDOWN_DURATION = 300; // 5 minutes in seconds
 const CIRCLE_SIZE = 180;
@@ -225,7 +226,7 @@ const MakePaymentPage = () => {
   };
 
   const handleInitialRecharge = () => {
-    startPaymentFlow();
+    triggerToast("Payment not done", "Payment functionalities not implemented yet.", "error", 5000);
   };
 
   const handleMakePayment = () => {
@@ -577,6 +578,24 @@ const MakePaymentPage = () => {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Demo Buttons */}
+      {/* <View style={styles.demoButtonsContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("paymentStatus", { status: "success" })}
+          style={[styles.demoButton, { backgroundColor: "#10B981" }]}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.demoButtonText}>Demo: Payment Success</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("paymentStatus", { status: "error" })}
+          style={[styles.demoButton, { backgroundColor: "#EF4444" }]}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.demoButtonText}>Demo: Payment Error</Text>
+        </TouchableOpacity>
+      </View> */}
     </View>
   );
 };
@@ -935,6 +954,23 @@ const styles = StyleSheet.create({
   popupButtonText: {
     color: "#FFFFFF",
     fontSize: scaleFont(14),
+    fontFamily: "Mukta-Bold",
+  },
+  demoButtonsContainer: {
+    flexDirection: "row",
+    gap: 10,
+    paddingVertical: 10,
+  },
+  demoButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  demoButtonText: {
+    color: "#FFFFFF",
+    fontSize: scaleFont(12),
     fontFamily: "Mukta-Bold",
   },
 });

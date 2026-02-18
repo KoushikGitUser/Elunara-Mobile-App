@@ -6,6 +6,8 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  ScrollView,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -36,6 +38,8 @@ const ChangePassword = ({ route }) => {
   const [hasStartedTypingPassword, setHasStartedTypingPassword] =
     useState(false);
   const inputRefs = useRef([]);
+  const scrollViewRef = useRef(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [hasStartedTypingConfirm, setHasStartedTypingConfirm] = useState(false);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
@@ -106,6 +110,24 @@ const ChangePassword = ({ route }) => {
       setCanResend(true);
     }
   }, [resendTimer, isForTokenOrOTP]);
+
+  // Keyboard listener for Android - push OTP input above keyboard
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+      // Scroll to bottom when keyboard opens so OTP input is visible
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    });
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(0);
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Handle password change
   const handlePasswordChange = (text) => {
@@ -199,6 +221,12 @@ const ChangePassword = ({ route }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: keyboardHeight }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
       <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -439,6 +467,7 @@ const ChangePassword = ({ route }) => {
           {/* Divider */}
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

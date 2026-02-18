@@ -20,7 +20,7 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { useDispatch, useSelector } from "react-redux";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
-import { setToggleUnsavedChangesConfirmPopup } from "../../redux/slices/toggleSlice";
+import { setToggleUnsavedChangesConfirmPopup, setToggleNoBalanceModal } from "../../redux/slices/toggleSlice";
 import { useRoute } from "@react-navigation/native";
 import {
   ArrowLeft,
@@ -111,6 +111,9 @@ const Notes = () => {
       : defaultButtonStyle;
 
   const { notesStates } = useSelector((state) => state.API);
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const dispatch = useDispatch();
   const route = useRoute();
   const navigation = useNavigation();
@@ -578,68 +581,84 @@ const Notes = () => {
         keyboardDismissMode="none"
         nestedScrollEnabled={true}
       >
-        <RichEditor
-          ref={richTextRef}
-          placeholder="Type your notes here..."
-          initialContentHTML={noteContent}
-          onChange={(html) => {
-            // Strip any images/attachments that might have been pasted
-            const cleanHtml = stripAttachments(html);
-            if (cleanHtml !== html) {
-              // If content was modified, update the editor
-              richTextRef.current?.setContentHTML(cleanHtml);
-            }
-            setNoteContent(cleanHtml);
-            // Enable undo if content has changed from initial
-            if (cleanHtml !== initialContentRef.current) {
-              setCanUndo(true);
-            }
-          }}
-          pasteAsPlainText={true}
-          editorInitializedCallback={() => {
-            richTextRef.current?.registerToolbar((items) => {
-              setActiveStyles(items);
-            });
-            // Inject script to block image paste at DOM level
-            const blockImagePasteScript = `
-              document.addEventListener('paste', function(e) {
-                var items = e.clipboardData.items;
-                for (var i = 0; i < items.length; i++) {
-                  if (items[i].type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    return false;
+        <View style={{ position: "relative" }}>
+          <RichEditor
+            ref={richTextRef}
+            placeholder="Type your notes here..."
+            disabled={isZeroBalance}
+            initialContentHTML={noteContent}
+            onChange={(html) => {
+              // Strip any images/attachments that might have been pasted
+              const cleanHtml = stripAttachments(html);
+              if (cleanHtml !== html) {
+                // If content was modified, update the editor
+                richTextRef.current?.setContentHTML(cleanHtml);
+              }
+              setNoteContent(cleanHtml);
+              // Enable undo if content has changed from initial
+              if (cleanHtml !== initialContentRef.current) {
+                setCanUndo(true);
+              }
+            }}
+            pasteAsPlainText={true}
+            editorInitializedCallback={() => {
+              richTextRef.current?.registerToolbar((items) => {
+                setActiveStyles(items);
+              });
+              // Inject script to block image paste at DOM level
+              const blockImagePasteScript = `
+                document.addEventListener('paste', function(e) {
+                  var items = e.clipboardData.items;
+                  for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                      e.preventDefault();
+                      return false;
+                    }
+                  }
+                });
+              `;
+              richTextRef.current?.injectJavascript(blockImagePasteScript);
+            }}
+            onMessage={(message) => {
+              try {
+                const data = JSON.parse(message.data);
+                if (data.type === "searchCount") {
+                  setMatchCount(data.count);
+                  if (data.count > 0) {
+                    navigateToMatch(0);
                   }
                 }
-              });
-            `;
-            richTextRef.current?.injectJavascript(blockImagePasteScript);
-          }}
-          onMessage={(message) => {
-            try {
-              const data = JSON.parse(message.data);
-              if (data.type === "searchCount") {
-                setMatchCount(data.count);
-                if (data.count > 0) {
-                  navigateToMatch(0);
-                }
+              } catch (e) {
+                // Ignore non-JSON messages
               }
-            } catch (e) {
-              // Ignore non-JSON messages
-            }
-          }}
-          editorStyle={{
-            backgroundColor: "transparent",
-            contentCSSText: `
-              font-family: 'Mukta-Regular';
-              font-size: ${scaleFont(16)}px;
-              line-height: 27px;
-              color: #3A3A3A;
-              padding: 10px 0;
-            `,
-            placeholderColor: "#B5BECE",
-          }}
-          style={{ minHeight: 300, flex: 1 }}
-        />
+            }}
+            editorStyle={{
+              backgroundColor: "transparent",
+              contentCSSText: `
+                font-family: 'Mukta-Regular';
+                font-size: ${scaleFont(16)}px;
+                line-height: 27px;
+                color: #3A3A3A;
+                padding: 10px 0;
+              `,
+              placeholderColor: "#B5BECE",
+            }}
+            style={{ minHeight: 300, flex: 1 }}
+          />
+          {isZeroBalance && (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => dispatch(setToggleNoBalanceModal(true))}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+            />
+          )}
+        </View>
 
         {/* Display Bookmarked Q&A Pairs */}
         {notesStates.currentChatNotes?.qa_pairs &&

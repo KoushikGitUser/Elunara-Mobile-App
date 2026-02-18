@@ -95,6 +95,11 @@ import {
   handleClearSearchHistory,
 } from "./apiExtraReducerHandlers/searchHandlers";
 
+import {
+  handleGetUserWalletInfo,
+  handleGetTransactions,
+} from "./apiExtraReducerHandlers/walletHandlers";
+
 // Settings Handlers
 export const settingsHandlersFunctions = {
   // get all settings of sections
@@ -216,4 +221,10 @@ export const searchHandlersFunctions = {
   "search-global": handleSearch,
   "get-search-history": handleGetSearchHistory,
   "clear-search-history": handleClearSearchHistory,
+};
+
+// Wallet Handlers
+export const walletHandlersFunctions = {
+  getUserWalletInfo: handleGetUserWalletInfo,
+  getTransactions: handleGetTransactions,
 };

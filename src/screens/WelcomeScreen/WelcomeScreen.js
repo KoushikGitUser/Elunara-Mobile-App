@@ -115,7 +115,14 @@ const WelcomeScreen = () => {
               </Text>
             </TouchableOpacity>
 
-
+            {/* Demo Button */}
+            {/* <TouchableOpacity
+              onPress={() => navigation.navigate("changepass", { isForTokenOrOTP: "OTP" })}
+              style={[styles.socialButton, { borderColor: "#EF4444", borderStyle: "dashed" }]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.socialButtonText, { color: "#EF4444" }]}>Demo: Change Password (OTP)</Text>
+            </TouchableOpacity> */}
 
             {/* Divider */}
             <Text style={styles.divider}>or</Text>

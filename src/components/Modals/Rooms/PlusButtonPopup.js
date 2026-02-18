@@ -11,12 +11,14 @@ import React from "react";
 import { MessageCirclePlus } from "lucide-react-native";
 import FilesIcon from "../../../../assets/SvgIconsComponent/RoomsIcons/FilesIcon";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleAddExistingChatToRoomPopup,
   setToggleIsRoomEmpty,
   setToggleIsChattingWithAI,
+  setToggleNoBalanceModal,
 } from "../../../redux/slices/toggleSlice";
+import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 import {
   setChatMessagesArray,
   setMessageIDsArray,
@@ -30,6 +32,9 @@ const { width, height } = Dimensions.get("window");
 const PlusButtonPopup = ({ setAddOptionsPopup, visible, popupPosition }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { walletStates } = useSelector((state) => state.Toggle);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
 
   return (
     <Modal
@@ -69,6 +74,10 @@ const PlusButtonPopup = ({ setAddOptionsPopup, visible, popupPosition }) => {
           <Pressable
             onPress={() => {
               setAddOptionsPopup(false);
+              if (isZeroBalance) {
+                dispatch(setToggleNoBalanceModal(true));
+                return;
+              }
               dispatch(setToggleAddExistingChatToRoomPopup(true));
             }}
             style={({ pressed }) => [
@@ -76,12 +85,14 @@ const PlusButtonPopup = ({ setAddOptionsPopup, visible, popupPosition }) => {
                 backgroundColor: pressed ? "#EEF4FF" : "transparent",
               },
               styles.notesPopupOptions,
+              isZeroBalance && { paddingRight: 0 },
             ]}
           >
             <FilesIcon />
-            <Text style={{ fontFamily: "Mukta-Regular" }}>
+            <Text style={{ fontFamily: "Mukta-Regular", flex: 1 }}>
               Add Chat to Learning Lab
             </Text>
+            {isZeroBalance && <LockIcon />}
           </Pressable>
         </View>
       </TouchableOpacity>

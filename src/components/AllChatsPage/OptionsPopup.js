@@ -16,8 +16,10 @@ import {
   setToggleArchiveChatPopup,
   setToggleRenameChatPopup,
   setToggleAddChatToLearningLabPopup,
+  setToggleNoBalanceModal,
 } from "../../redux/slices/toggleSlice";
 import FolderIconDark from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FolderIconDark";
+import LockIcon from "../../../assets/SvgIconsComponent/LockIcon";
 import RenameIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon";
 import PinIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon";
 import ArchiveIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon";
@@ -28,8 +30,10 @@ import { triggerToast } from "../../services/toast";
 const OptionsPopup = ({ popupPosition }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { toggleStates } = useSelector((state) => state.Toggle);
+  const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
   const { chatsStates } = useSelector((state) => state.API);
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const { width, height } = Dimensions.get("window");
 
   const currentChat = chatsStates.allChatsDatas.currentActionChatDetails;
@@ -55,7 +59,8 @@ const OptionsPopup = ({ popupPosition }) => {
         {
           title: "Add to Learning Lab",
           icon: <FolderIconDark />,
-          action: "addToRoom"
+          action: "addToRoom",
+          showLock: isZeroBalance,
         },
         {
           title: "Rename",
@@ -83,9 +88,13 @@ const OptionsPopup = ({ popupPosition }) => {
     const chatId = currentChat?.id;
 
     if (action === "addToRoom") {
+      closePopup();
+      if (isZeroBalance) {
+        dispatch(setToggleNoBalanceModal(true));
+        return;
+      }
       // Open AddChatToLearningLabPopup to select a room
       dispatch(setToggleAddChatToLearningLabPopup(true));
-      closePopup();
     } else if (action === "rename") {
       dispatch(setToggleRenameChatPopup(true));
       closePopup();
@@ -183,10 +192,12 @@ const OptionsPopup = ({ popupPosition }) => {
                     backgroundColor: pressed ? "#EEF4FF" : "transparent",
                   },
                   styles.notesPopupOptions,
+                  options.showLock && { paddingRight: 0 },
                 ]}
               >
                 {options?.icon}
-                <Text style={{ fontFamily: "Mukta-Regular", fontSize: 17 }}>{options.title} </Text>
+                <Text style={{ fontFamily: "Mukta-Regular", fontSize: 17, flex: 1 }}>{options.title} </Text>
+                {options.showLock && <LockIcon />}
               </Pressable>
             )
           })}

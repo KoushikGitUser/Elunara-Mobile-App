@@ -8,7 +8,7 @@ export const createStyles = ({}) =>
     menuModalMain: {
       position: "absolute",
       minHeight: verticalScale(250),
-      minWidth: 240,
+      minWidth: 260,
       paddingHorizontal: 8,
       paddingVertical: 10,
       backgroundColor: "white",

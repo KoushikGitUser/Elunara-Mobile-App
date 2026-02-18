@@ -1,13 +1,14 @@
 import {
   View,
   Text,
-  TouchableOpacity,          
+  TouchableOpacity,
   Image,
   Animated,
   Dimensions,
 } from "react-native";
 import React, { useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { FolderPlus, MessageCirclePlus, Search } from "lucide-react-native";
+import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import chakraLogo from "../../../assets/images/chakraFull.png";
@@ -16,7 +17,6 @@ import AddFolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySideb
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatHistorySidebar,
-  setToggleLearningLabUnlockPopup,
   setToggleRoomCreationPopup,
   setToggleUnlockNewChatPopup,
   setToggleIsChattingWithAI,
@@ -37,7 +37,8 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
-  const isZeroBalance = walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
+  const isZeroBalance =
+    walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
   // Ref for Learning Lab button
@@ -112,10 +113,21 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
         <View
           style={[
             styles.searchInput,
-            { fontFamily: "Mukta-Regular", fontSize: scaleFont(15), justifyContent: "center", paddingVertical: 10 },
+            {
+              fontFamily: "Mukta-Regular",
+              fontSize: scaleFont(15),
+              justifyContent: "center",
+              paddingVertical: 10,
+            },
           ]}
         >
-          <Text style={{ color: "#B5BECE", fontFamily: "Mukta-Regular", fontSize: scaleFont(15) }}>
+          <Text
+            style={{
+              color: "#B5BECE",
+              fontFamily: "Mukta-Regular",
+              fontSize: scaleFont(15),
+            }}
+          >
             Search
           </Text>
         </View>
@@ -177,7 +189,7 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
                 !toggleStates.toggleChatHistorySidebar,
               ),
             );
-            dispatch(setToggleLearningLabUnlockPopup(true));
+            dispatch(setToggleRoomCreationPopup(true));
           }}
           style={styles.newLearningTabBtn}
         >
@@ -190,6 +202,11 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
           >
             New Learning Lab
           </Text>
+          {isZeroBalance && (
+            <View style={{marginLeft:"auto"}}>
+              <LockIcon />
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>

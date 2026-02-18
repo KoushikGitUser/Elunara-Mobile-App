@@ -60,6 +60,7 @@ import SendIcon from "../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon"
 import UnlockMaxUploadLimitPopup from "../Monetisation/UnlockMaxUploadLimitPopup";
 import NoBalanceModal from "../Monetisation/NoBalanceModal";
 import LowBalanceModal from "../Monetisation/LowBalanceModal";
+import LockIcon from "../../../assets/SvgIconsComponent/LockIcon";
 
 const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, ref) => {
   const styleProps = {};
@@ -827,11 +828,16 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.6)",
+              backgroundColor: "transparent",
               borderRadius: 20,
               zIndex: 10,
+              alignItems: "flex-end",
+              paddingTop: 12,
+              paddingRight: 12,
             }}
-          />
+          >
+            <LockIcon />
+          </TouchableOpacity>
         )}
       </View>
 

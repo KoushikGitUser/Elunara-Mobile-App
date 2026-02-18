@@ -178,6 +178,17 @@ const ChatScreen = () => {
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
 
+  // Fetch pinned chats on mount (if not already fetched)
+  useEffect(() => {
+    if (chatsStates.loaderStates.isAllUserChatsFetched !== true) {
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats",
+        name: "fetchAllUserChatsAvailable",
+      }));
+    }
+  }, []);
+
   // Handle archive/unarchive success - refresh recent chats
   useEffect(() => {
     if (chatsStates.loaderStates.isChatArchiveUnarchiveUpdated === true) {

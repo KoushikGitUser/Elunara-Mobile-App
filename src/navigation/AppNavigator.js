@@ -21,6 +21,7 @@ import AuthenticateUserUsingProvider from "../screens/auth/redirectionsAuth/Auth
 import { navigationRef } from "../services/navigationService";
 import RedirectToChangePassForToken from "../screens/auth/redirectionsAuth/RedirectToChangePassForToken";
 import UniversalSearchPage from "../screens/UniversalSearch/UniversalSearchPage";
+import PaymentStatusPage from "../screens/PaymentPage/PaymentStatusPage";
 
 // Screens
 
@@ -50,6 +51,7 @@ const linking = {
       "verify-email": "verify-email/:emailToken",
       "auth-using-provider":"oauth/callback",
       "universalSearch": "search",
+      "paymentStatus":"payment-status/:status/:reason"
     },
   },
 };
@@ -209,6 +211,15 @@ const AppNavigator = () => {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="paymentStatus"
+          component={PaymentStatusPage}
+          options={{
+            headerShown: false,
+          }}
+        />
+
 
       </Stack.Navigator>
 
