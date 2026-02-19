@@ -261,6 +261,21 @@ const toggleSlice = createSlice({
     addWalletTransaction: (state, action) => {
       state.walletStates.walletTransactions.unshift(action.payload);
     },
+    // Payment Flow Actions
+    setIsPaymentInitiated: (state, action) => {
+      state.paymentStates.isPaymentInitiated = action.payload;
+    },
+    setRemainingTime: (state, action) => {
+      state.paymentStates.remainingTime = action.payload;
+    },
+    setPaymentSuccess: (state, action) => {
+      state.paymentStates.paymentSuccess = action.payload;
+    },
+    resetPaymentFlow: (state) => {
+      state.paymentStates.isPaymentInitiated = false;
+      state.paymentStates.remainingTime = 300;
+      state.paymentStates.paymentSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(resetAllStates, () => {
@@ -347,6 +362,11 @@ export const {
   setPromotionalDaysRemaining,
   setWalletTransactions,
   addWalletTransaction,
+  // Payment Flow Actions
+  setIsPaymentInitiated,
+  setRemainingTime,
+  setPaymentSuccess,
+  resetPaymentFlow,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

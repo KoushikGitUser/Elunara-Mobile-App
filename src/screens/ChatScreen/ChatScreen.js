@@ -36,6 +36,10 @@ import {
   setSelectedResponseStyle,
   setSelectedLanguage,
   setSelectedCitationFormat,
+  setWalletBalance,
+  setIsInitialRechargeCompleted,
+  setIsPromotionalUser,
+  setPromotionalDaysRemaining,
 } from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
@@ -95,7 +99,7 @@ const ChatScreen = () => {
   const dispatch = useDispatch();
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { chatsStates, settingsStates } = useSelector((state) => state.API);
+  const { chatsStates, settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -188,6 +192,25 @@ const ChatScreen = () => {
       }));
     }
   }, []);
+
+  // Fetch wallet info on mount
+  useEffect(() => {
+    dispatch(commonFunctionForAPICalls({
+      method: "GET",
+      url: "/wallet",
+      name: "getUserWalletInfo",
+    }));
+  }, []);
+
+  // Sync wallet data to Toggle slice when fetched
+  useEffect(() => {
+    if (apiWalletStates.isWalletInfoFetched === true) {
+      dispatch(setWalletBalance(apiWalletStates.walletBalance));
+      dispatch(setIsInitialRechargeCompleted(apiWalletStates.isInitialRechargeCompleted));
+      dispatch(setIsPromotionalUser(apiWalletStates.isPromotionalUser));
+      dispatch(setPromotionalDaysRemaining(apiWalletStates.promotionalDaysRemaining));
+    }
+  }, [apiWalletStates.isWalletInfoFetched]);
 
   // Handle archive/unarchive success - refresh recent chats
   useEffect(() => {

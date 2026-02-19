@@ -12,7 +12,13 @@ import ShiftedToFreePlanCard from "../../components/ProfileAndSettings/PaymentAn
 import PaidPlanCard from "../../components/ProfileAndSettings/PaymentAndBillingsCompo/PaidPlanCard";
 import { useSelector, useDispatch } from "react-redux";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
-import { setWalletTransactions } from "../../redux/slices/toggleSlice";
+import {
+  setWalletTransactions,
+  setWalletBalance,
+  setIsInitialRechargeCompleted,
+  setIsPromotionalUser,
+  setPromotionalDaysRemaining,
+} from "../../redux/slices/toggleSlice";
 
 const PaymentBilling = ({ handleScroll }) => {
   const dispatch = useDispatch();
@@ -26,11 +32,27 @@ const PaymentBilling = ({ handleScroll }) => {
   useEffect(() => {
     dispatch(commonFunctionForAPICalls({
       method: "GET",
+      url: "/wallet",
+      name: "getUserWalletInfo",
+    }));
+    dispatch(commonFunctionForAPICalls({
+      method: "GET",
       url: "/wallet/transactions?type=credit",
       name: "getTransactions",
     }));
   }, []);
 
+  // Sync wallet info to Toggle slice
+  useEffect(() => {
+    if (apiWalletStates.isWalletInfoFetched === true) {
+      dispatch(setWalletBalance(apiWalletStates.walletBalance));
+      dispatch(setIsInitialRechargeCompleted(apiWalletStates.isInitialRechargeCompleted));
+      dispatch(setIsPromotionalUser(apiWalletStates.isPromotionalUser));
+      dispatch(setPromotionalDaysRemaining(apiWalletStates.promotionalDaysRemaining));
+    }
+  }, [apiWalletStates.isWalletInfoFetched]);
+
+  // Sync transactions to Toggle slice
   useEffect(() => {
     if (apiWalletStates.isTransactionsFetched === true) {
       dispatch(setWalletTransactions(apiWalletStates.walletTransactions));
@@ -107,7 +129,7 @@ const PaymentBilling = ({ handleScroll }) => {
         )}
 
         {/* Wallet Balance Card */}
-        <PaidPlanCard />
+        <PaidPlanCard isLoading={apiWalletStates.isWalletInfoFetched !== true} />
 
         {/* Transaction History — hide for promo users who haven't activated */}
         {!(walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0 && !walletStates.isInitialRechargeCompleted) && (

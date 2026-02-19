@@ -163,6 +163,8 @@ const Education = () => {
           placeholder="Select current university"
           triggerAPICall={updateUniversity}
           initialValue={settingsStates.allPersonalisationsSettings.academicCareer.university}
+          searchable={true}
+          adjustForKeyboard={false}
         />
       </View>
       <View style={styles.fullnameInput}>
@@ -173,6 +175,8 @@ const Education = () => {
             placeholder="Select degree"
             triggerAPICall={updateDegreeProgram}
             initialValue={settingsStates.allPersonalisationsSettings.academicCareer.degree_program}
+            searchable={true}
+            maxDisplayLength={20}
           />
         </View>
         <View style={styles.inputSection}>
@@ -193,6 +197,7 @@ const Education = () => {
           triggerAPICall={updateSpecialization}
           initialValue={settingsStates.allPersonalisationsSettings.academicCareer.specialisation}
           maxHeightPercent={0.2}
+          searchable={true}
         />
       </View>
       <View style={{ marginTop: 10, marginBottom: 20 }}>

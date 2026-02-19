@@ -38,7 +38,7 @@ const InnerPagesHeader = ({ scrollY }) => {
                 dispatch(setSettingsInnerPageHeaderTitle("Help Center"));
               }
               else{
-              navigation.goBack();
+              navigation.navigate("profile");
               }
 
             }}

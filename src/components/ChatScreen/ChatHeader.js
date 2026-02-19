@@ -183,7 +183,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
             Upgrade Plan
           </Text>
         </TouchableOpacity>
-      )}
+      )}  
 
       <View style={styles.rightChatHeaderIcons}>
         <TouchableOpacity

@@ -16,6 +16,7 @@ const PaymentStatusPage = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   const status = route.params?.status;
+  const reason = route.params?.reason || null;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -81,10 +82,11 @@ const PaymentStatusPage = () => {
           <AuthGradientText fontSize={25}>
             Payment Failed
           </AuthGradientText>
-          <Text style={styles.errorDescription}>
-            Something went wrong with your payment. Please try again or contact
-            support if the issue persists.
-          </Text>
+          {reason && (
+            <Text style={styles.errorReason}>
+               {reason}
+            </Text>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -146,6 +148,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 2,
     borderColor: "#FAFAFA",
+  },
+  errorReason: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Medium",
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 8,
   },
   errorDescription: {
     fontSize: scaleFont(14),

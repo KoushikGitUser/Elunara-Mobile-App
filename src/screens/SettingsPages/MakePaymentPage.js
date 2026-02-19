@@ -24,13 +24,11 @@ import {
   setSettingsInnerPageHeaderTitle,
   setHideSettingsBackButton,
 } from "../../redux/slices/globalDataSlice";
-// Wallet actions — will be used when payment gateway confirms success
-// import {
-//   setToggleIsPaidOrProUser,
-//   setWalletBalance,
-//   setIsInitialRechargeCompleted,
-//   addWalletTransaction,
-// } from "../../redux/slices/toggleSlice";
+import {
+  setIsPaymentInitiated,
+  setRemainingTime,
+  setPaymentSuccess,
+} from "../../redux/slices/toggleSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { Gift } from "lucide-react-native";
@@ -46,21 +44,21 @@ const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const MakePaymentPage = () => {
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [rechargeAmount, setRechargeAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [amountError, setAmountError] = useState("");
-  const [isPaymentInitiated, setIsPaymentInitiated] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(COUNTDOWN_DURATION);
   const [showBackPressPopup, setShowBackPressPopup] = useState(false);
 
   const timerStartRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const appStateRef = useRef(AppState.currentState);
 
-  const { walletStates } = useSelector((state) => state.Toggle);
+  const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
+  const isPaymentInitiated = paymentStates.isPaymentInitiated;
+  const remainingTime = paymentStates.remainingTime;
+  const paymentSuccess = paymentStates.paymentSuccess;
   const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
   const currentBalance = walletStates.walletBalance;
   const isPromoActive =
@@ -116,7 +114,7 @@ const MakePaymentPage = () => {
           (Date.now() - timerStartRef.current) / 1000
         );
         const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
-        setRemainingTime(newRemaining);
+        dispatch(setRemainingTime(newRemaining));
 
         if (newRemaining <= 0) {
           handleTimerExpired();
@@ -140,7 +138,7 @@ const MakePaymentPage = () => {
           (Date.now() - timerStartRef.current) / 1000
         );
         const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
-        setRemainingTime(newRemaining);
+        dispatch(setRemainingTime(newRemaining));
 
         if (newRemaining <= 0) {
           handleTimerExpired();
@@ -177,15 +175,15 @@ const MakePaymentPage = () => {
       clearInterval(timerIntervalRef.current);
     }
     timerStartRef.current = null;
-    setIsPaymentInitiated(false);
-    setRemainingTime(COUNTDOWN_DURATION);
+    dispatch(setIsPaymentInitiated(false));
+    dispatch(setRemainingTime(COUNTDOWN_DURATION));
     dispatch(setHideSettingsBackButton(false));
   };
 
   const startPaymentFlow = () => {
     // Set payment initiated state
-    setIsPaymentInitiated(true);
-    setRemainingTime(COUNTDOWN_DURATION);
+    dispatch(setIsPaymentInitiated(true));
+    dispatch(setRemainingTime(COUNTDOWN_DURATION));
     timerStartRef.current = Date.now();
 
     // Hide back button in header
@@ -226,7 +224,7 @@ const MakePaymentPage = () => {
   };
 
   const handleInitialRecharge = () => {
-    triggerToast("Payment not done", "Payment functionalities not implemented yet.", "error", 5000);
+    startPaymentFlow()
   };
 
   const handleMakePayment = () => {
@@ -240,7 +238,7 @@ const MakePaymentPage = () => {
       if (paymentSuccess) {
         navigation.navigate("settingsInnerPages", { page: 2 });
         dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
-        setPaymentSuccess(false);
+        dispatch(setPaymentSuccess(false));
       }
     }, 4000);
   }, [paymentSuccess]);

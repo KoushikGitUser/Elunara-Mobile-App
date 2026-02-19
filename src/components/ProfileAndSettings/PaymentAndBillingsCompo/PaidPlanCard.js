@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import React from "react";
 import { scaleFont } from "../../../utils/responsive";
 import PaidPlanChakraIcon from "../../../../assets/SvgIconsComponent/PaymentBillingIcons/PaidPlanChakraIcon";
@@ -6,10 +6,11 @@ import AuthGradientText from "../../common/AuthGradientText";
 import { useSelector, useDispatch } from "react-redux";
 import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
-import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../../redux/slices/globalDataSlice";
+import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle, setHideSettingsBackButton } from "../../../redux/slices/globalDataSlice";
+import { resetPaymentFlow } from "../../../redux/slices/toggleSlice";
 import { appColors } from "../../../themes/appColors";
 
-const PaidPlanCard = () => {
+const PaidPlanCard = ({ isLoading = false }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { walletStates } = useSelector((state) => state.Toggle);
@@ -58,36 +59,47 @@ const PaidPlanCard = () => {
             <AuthGradientText fontSize={25} textAlign="left">Wallet Balance</AuthGradientText>
           </View>
 
-          {isPromoNotActivated ? (
-            <Text style={styles.freeTrialText}>Free Trial</Text>
+          {isLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color={appColors.navyBlueShade} />
+            </View>
           ) : (
-            <Text style={[styles.price, { color: getStatusColor() }]}>₹{balance.toLocaleString("en-IN")}</Text>
-          )}
+            <>
+              {isPromoNotActivated ? (
+                <Text style={styles.freeTrialText}>Free Trial</Text>
+              ) : (
+                <Text style={[styles.price, { color: getStatusColor() }]}>₹{balance.toLocaleString("en-IN")}</Text>
+              )}
 
-          <View style={styles.statusRow}>
-            <View style={[styles.statusDot, { backgroundColor: getStatusColor() }]} />
-            <Text style={[styles.statusText, { color: getStatusColor() }]}>
-              {getStatusText()}
-            </Text>
-            <Text style={[styles.statusDescription, { color: getStatusColor() }]}>
-              — {getStatusDescription()}
-            </Text>
-          </View>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusDot, { backgroundColor: getStatusColor() }]} />
+                <Text style={[styles.statusText, { color: getStatusColor() }]}>
+                  {getStatusText()}
+                </Text>
+                <Text style={[styles.statusDescription, { color: getStatusColor() }]}>
+                  — {getStatusDescription()}
+                </Text>
+              </View>
 
-          {!isPromoNotActivated && (
-            <Text style={styles.infoText}>
-              Usage-based deduction — no expiry on balance
-            </Text>
+              {!isPromoNotActivated && (
+                <Text style={styles.infoText}>
+                  Usage-based deduction — no expiry on balance
+                </Text>
+              )}
+            </>
           )}
 
           <TouchableOpacity
             onPress={() => {
+              dispatch(resetPaymentFlow());
+              dispatch(setHideSettingsBackButton(false));
               navigation.navigate("settingsInnerPages", { page: 11 });
               dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
               dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
             }}
-            style={styles.rechargeButton}
+            style={[styles.rechargeButton, isLoading && { opacity: 0.5 }]}
             activeOpacity={0.8}
+            disabled={isLoading}
           >
             <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
           </TouchableOpacity>
@@ -130,6 +142,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
+  },
+  loaderContainer: {
+    paddingVertical: 30,
+    alignItems: "center",
+    justifyContent: "center",
   },
   planHeader: {
     flexDirection: "row",
