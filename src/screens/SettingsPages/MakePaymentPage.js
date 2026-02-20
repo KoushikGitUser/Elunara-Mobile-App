@@ -10,8 +10,8 @@ import {
   Keyboard,
   AppState,
   BackHandler,
-  Linking,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { scaleFont } from "../../utils/responsive";
@@ -29,6 +29,7 @@ import {
   setRemainingTime,
   setPaymentSuccess,
 } from "../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { Gift } from "lucide-react-native";
@@ -37,7 +38,7 @@ import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
 import { triggerToast } from "../../services/toast";
 
-const COUNTDOWN_DURATION = 300; // 5 minutes in seconds
+const COUNTDOWN_DURATION = 900; // 15 minutes in seconds
 const CIRCLE_SIZE = 180;
 const STROKE_WIDTH = 8;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
@@ -56,6 +57,7 @@ const MakePaymentPage = () => {
   const appStateRef = useRef(AppState.currentState);
 
   const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
+  const apiWalletStates = useSelector((state) => state.API.walletStates);
   const isPaymentInitiated = paymentStates.isPaymentInitiated;
   const remainingTime = paymentStates.remainingTime;
   const paymentSuccess = paymentStates.paymentSuccess;
@@ -180,18 +182,26 @@ const MakePaymentPage = () => {
     dispatch(setHideSettingsBackButton(false));
   };
 
-  const startPaymentFlow = () => {
-    // Set payment initiated state
-    dispatch(setIsPaymentInitiated(true));
-    dispatch(setRemainingTime(COUNTDOWN_DURATION));
-    timerStartRef.current = Date.now();
-
-    // Hide back button in header
-    dispatch(setHideSettingsBackButton(true));
-
-    // Redirect to payment gateway
-    Linking.openURL("https://www.google.com");
+  const startPaymentFlow = (amount) => {
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "POST",
+        url: "/payments/initiate",
+        data: { amount },
+        name: "initiatePayment",
+      })
+    );
   };
+
+  // Watch for payment API fulfillment to start timer
+  useEffect(() => {
+    if (apiWalletStates.isPaymentFulfilled === true) {
+      dispatch(setIsPaymentInitiated(true));
+      dispatch(setRemainingTime(COUNTDOWN_DURATION));
+      timerStartRef.current = Date.now();
+      dispatch(setHideSettingsBackButton(true));
+    }
+  }, [apiWalletStates.isPaymentFulfilled]);
 
   const handlePresetSelect = (preset) => {
     setSelectedPreset(preset.id);
@@ -224,12 +234,12 @@ const MakePaymentPage = () => {
   };
 
   const handleInitialRecharge = () => {
-    startPaymentFlow()
+    startPaymentFlow(999);
   };
 
   const handleMakePayment = () => {
     if (!validateAmount()) return;
-    startPaymentFlow();
+    startPaymentFlow(parseInt(rechargeAmount));
   };
 
   // Payment success redirect
@@ -456,12 +466,17 @@ const MakePaymentPage = () => {
 
               <TouchableOpacity
                 onPress={handleInitialRecharge}
-                style={styles.initialRechargeButton}
+                style={[styles.initialRechargeButton, apiWalletStates.isPaymentLoading && { opacity: 0.5 }]}
                 activeOpacity={0.8}
+                disabled={apiWalletStates.isPaymentLoading}
               >
-                <Text style={styles.primaryButtonText}>
-                  Recharge for ₹999
-                </Text>
+                {apiWalletStates.isPaymentLoading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={styles.primaryButtonText}>
+                    Recharge for ₹999
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
 
@@ -564,15 +579,19 @@ const MakePaymentPage = () => {
             onPress={handleMakePayment}
             style={[
               styles.primaryButton,
-              { opacity: !rechargeAmount ? 0.5 : 1 },
+              { opacity: !rechargeAmount || apiWalletStates.isPaymentLoading ? 0.5 : 1 },
             ]}
-            disabled={!rechargeAmount}
+            disabled={!rechargeAmount || apiWalletStates.isPaymentLoading}
           >
-            <Text style={styles.primaryButtonText}>
-              {rechargeAmount
-                ? `Recharge ₹${parseInt(rechargeAmount).toLocaleString("en-IN")}`
-                : "Enter Amount"}
-            </Text>
+            {apiWalletStates.isPaymentLoading ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Text style={styles.primaryButtonText}>
+                {rechargeAmount
+                  ? `Recharge ₹${parseInt(rechargeAmount).toLocaleString("en-IN")}`
+                  : "Enter Amount"}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       )}

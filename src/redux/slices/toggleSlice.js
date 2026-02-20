@@ -273,7 +273,7 @@ const toggleSlice = createSlice({
     },
     resetPaymentFlow: (state) => {
       state.paymentStates.isPaymentInitiated = false;
-      state.paymentStates.remainingTime = 300;
+      state.paymentStates.remainingTime = 900;
       state.paymentStates.paymentSuccess = false;
     },
   },

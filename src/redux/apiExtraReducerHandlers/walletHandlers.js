@@ -1,3 +1,19 @@
+export const handleInitiatePayment = {
+  pending: (state) => {
+    state.walletStates.isPaymentLoading = true;
+  },
+  fulfilled: (state, action) => {
+    console.log("initiatePayment fulfilled:", JSON.stringify(action.payload));
+    state.walletStates.isPaymentLoading = false;
+    state.walletStates.isPaymentFulfilled = true;
+  },
+  rejected: (state, action) => {
+    console.log("initiatePayment rejected:", JSON.stringify(action.payload));
+    state.walletStates.isPaymentLoading = false;
+    state.walletStates.isPaymentFulfilled = false;
+  },
+};
+
 export const handleGetTransactions = {
   pending: (state) => {
     state.walletStates.isTransactionsFetched = false;

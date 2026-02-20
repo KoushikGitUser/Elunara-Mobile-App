@@ -51,7 +51,7 @@ const linking = {
       "verify-email": "verify-email/:emailToken",
       "auth-using-provider":"oauth/callback",
       "universalSearch": "search",
-      "paymentStatus":"payment/:status/:reason"
+      "paymentStatus":"payments/callback"
     },
   },
 };

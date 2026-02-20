@@ -6,6 +6,8 @@ export const walletStates = {
   walletTransactions: [],
   isWalletInfoFetched: false,
   isTransactionsFetched: false,
+  isPaymentLoading: false,
+  isPaymentFulfilled: false,
   // Threshold constants (not state, but accessible)
   FILE_FEATURE_THRESHOLD: 799,
   MIN_RECHARGE: 99,
