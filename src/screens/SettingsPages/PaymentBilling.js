@@ -123,8 +123,11 @@ const PaymentBilling = ({ handleScroll }) => {
             <Text style={styles.promoSubText}>
               {walletStates.isInitialRechargeCompleted
                 ? "Enjoy full access to all platform features. Your ₹999 initial recharge will be active after the free trial ends."
-                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}  
-            </Text> 
+                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}
+            </Text>
+            <Text style={styles.promoDaysCount}>
+              {walletStates.promotionalDaysRemaining} days remaining
+            </Text>
           </View>
         )}
 
@@ -188,6 +191,12 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#535862",
     lineHeight: 20,
+  },
+  promoDaysCount: {
+    fontSize: scaleFont(22),
+    fontFamily: "Mukta-Bold",
+    color: "#10B981",
+    marginTop: 12,
   },
   header: {
     fontSize: scaleFont(20),

@@ -1,9 +1,11 @@
 import { View, Text, Image, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setSettingsInnerPageHeaderTitle, setHideSettingsBackButton } from "../../redux/slices/globalDataSlice";
+import { setIsPaymentInitiated, resetPaymentFlow } from "../../redux/slices/toggleSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import authLoader from "../../assets/images/authLoader.gif";
@@ -15,29 +17,45 @@ const PaymentStatusPage = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const route = useRoute();
-  const status = route.params?.status;
-  const reason = route.params?.reason || null;
-  const [isLoading, setIsLoading] = useState(true);
+  const orderId = route.params?.order_id;
 
+  const apiWalletStates = useSelector((state) => state.API.walletStates);
+  const isVerifying = apiWalletStates.isVerifyingPayment;
+  const status = apiWalletStates.verifyPaymentStatus;
+  const message = apiWalletStates.verifyPaymentMessage;
+
+  // Reset MakePaymentPage states on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    dispatch(setIsPaymentInitiated(false));
+    dispatch(resetPaymentFlow());
+    dispatch(setHideSettingsBackButton(false));
   }, []);
 
-  // Auto go back 3 seconds after status is shown
+  // Hit verify API on mount
   useEffect(() => {
-    if (!isLoading) {
+    if (orderId) {
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "POST",
+          url: `/payments/verify/${orderId}`,
+          name: "verifyPayment",
+        })
+      );
+    }
+  }, [orderId]);
+
+  // Auto redirect to Payment and Billings after status is shown
+  useEffect(() => {
+    if (!isVerifying && status) {
       const goBackTimer = setTimeout(() => {
         dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
         navigation.navigate("settingsInnerPages", { page: 2 });
       }, 3000);
       return () => clearTimeout(goBackTimer);
     }
-  }, [isLoading]);
+  }, [isVerifying, status]);
 
-  if (isLoading) {
+  if (isVerifying) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loaderContainer}>
@@ -56,10 +74,10 @@ const PaymentStatusPage = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.successContainer}>
           <View style={styles.chakraLogo}>
-            <Image source={chakraLogo} style={{ height: 200, width: 160,objectFit:"contain" }} />
+            <Image source={chakraLogo} style={{ height: 200, width: 160, objectFit: "contain" }} />
           </View>
           <View style={styles.successfulIconAndText}>
-            <PaymentSuccessFrame/>
+            <PaymentSuccessFrame />
           </View>
         </View>
       </SafeAreaView>
@@ -82,9 +100,9 @@ const PaymentStatusPage = () => {
           <AuthGradientText fontSize={25}>
             Payment Failed
           </AuthGradientText>
-          {reason && (
+          {message && (
             <Text style={styles.errorReason}>
-               {reason}
+              {message}
             </Text>
           )}
         </View>

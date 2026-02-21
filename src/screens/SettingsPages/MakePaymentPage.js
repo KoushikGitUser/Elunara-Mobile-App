@@ -12,6 +12,7 @@ import {
   BackHandler,
   Modal,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { scaleFont } from "../../utils/responsive";
@@ -29,7 +30,7 @@ import {
   setRemainingTime,
   setPaymentSuccess,
 } from "../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetPaymentInitiated } from "../../redux/slices/apiCommonSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { Gift } from "lucide-react-native";
@@ -193,13 +194,21 @@ const MakePaymentPage = () => {
     );
   };
 
-  // Watch for payment API fulfillment to start timer
+  // Watch for payment API fulfillment to start timer and open payment URL
   useEffect(() => {
     if (apiWalletStates.isPaymentFulfilled === true) {
       dispatch(setIsPaymentInitiated(true));
       dispatch(setRemainingTime(COUNTDOWN_DURATION));
       timerStartRef.current = Date.now();
       dispatch(setHideSettingsBackButton(true));
+
+      // Open payment URL in browser and reset loader state
+      if (apiWalletStates.paymentUrl) {
+        Linking.openURL(apiWalletStates.paymentUrl);
+      }
+
+      // Reset payment API state to initial
+      dispatch(resetPaymentInitiated());
     }
   }, [apiWalletStates.isPaymentFulfilled]);
 
@@ -421,6 +430,9 @@ const MakePaymentPage = () => {
                 <Text style={styles.promoSubText}>
                   Enjoy full access to all platform features. Recharge your
                   wallet before the trial ends to continue uninterrupted.
+                </Text>
+                <Text style={styles.promoDaysCount}>
+                  {walletStates.promotionalDaysRemaining} days remaining
                 </Text>
               </View>
             )}
@@ -748,6 +760,12 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#535862",
     lineHeight: 20,
+  },
+  promoDaysCount: {
+    fontSize: scaleFont(22),
+    fontFamily: "Mukta-Bold",
+    color: "#10B981",
+    marginTop: 12,
   },
   initialRechargeCard: {
     backgroundColor: "#ffffff",

@@ -135,6 +135,11 @@ const apiCommonSlice = createSlice({
     setHasEnoughBalanceForFiles: (state, action) => {
       state.paymentStates.hasEnoughBalanceForFiles = action.payload;
     },
+    resetPaymentInitiated: (state) => {
+      state.walletStates.isPaymentLoading = false;
+      state.walletStates.isPaymentFulfilled = false;
+      state.walletStates.paymentUrl = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -182,6 +187,7 @@ export const {
   // Payment States
   setHasBalance,
   setHasEnoughBalanceForFiles,
+  resetPaymentInitiated,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

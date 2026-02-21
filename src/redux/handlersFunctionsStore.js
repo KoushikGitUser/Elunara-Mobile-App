@@ -99,6 +99,7 @@ import {
   handleGetUserWalletInfo,
   handleGetTransactions,
   handleInitiatePayment,
+  handleVerifyPayment,
 } from "./apiExtraReducerHandlers/walletHandlers";
 
 // Settings Handlers
@@ -229,4 +230,5 @@ export const walletHandlersFunctions = {
   getUserWalletInfo: handleGetUserWalletInfo,
   getTransactions: handleGetTransactions,
   initiatePayment: handleInitiatePayment,
+  verifyPayment: handleVerifyPayment,
 };

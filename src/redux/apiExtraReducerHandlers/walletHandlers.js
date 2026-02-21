@@ -6,11 +6,37 @@ export const handleInitiatePayment = {
     console.log("initiatePayment fulfilled:", JSON.stringify(action.payload));
     state.walletStates.isPaymentLoading = false;
     state.walletStates.isPaymentFulfilled = true;
+    state.walletStates.paymentUrl = action.payload?.data?.data?.payment_url || null;
   },
   rejected: (state, action) => {
     console.log("initiatePayment rejected:", JSON.stringify(action.payload));
     state.walletStates.isPaymentLoading = false;
     state.walletStates.isPaymentFulfilled = false;
+  },
+};
+
+export const handleVerifyPayment = {
+  pending: (state) => {
+    state.walletStates.isVerifyingPayment = true;
+    state.walletStates.verifyPaymentStatus = null;
+    state.walletStates.verifyPaymentMessage = null;
+  },
+  fulfilled: (state, action) => {
+    console.log("verifyPayment fulfilled:", JSON.stringify(action.payload));
+    const data = action.payload?.data;
+    state.walletStates.isVerifyingPayment = false;
+    state.walletStates.verifyPaymentStatus = data?.status;
+    state.walletStates.verifyPaymentMessage = data?.message || null;
+    if (data?.status === "success" && data?.data?.wallet_balance !== undefined) {
+      state.walletStates.walletBalance = data.data.wallet_balance;
+      state.walletStates.isInitialRechargeCompleted = true;
+    }
+  },
+  rejected: (state, action) => {
+    console.log("verifyPayment rejected:", JSON.stringify(action.payload));
+    state.walletStates.isVerifyingPayment = false;
+    state.walletStates.verifyPaymentStatus = "error";
+    state.walletStates.verifyPaymentMessage = action.payload?.message || "Payment verification failed.";
   },
 };
 
