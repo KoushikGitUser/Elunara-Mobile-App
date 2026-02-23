@@ -137,7 +137,7 @@ const PaymentBilling = ({ handleScroll }) => {
         {/* Transaction History — hide for promo users who haven't activated */}
         {!(walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0 && !walletStates.isInitialRechargeCompleted) && (
           <>
-            <Text style={styles.header}>Transaction History</Text>
+            <Text style={styles.header}>Billing History</Text>
             <View style={{ marginBottom: 40 }}>
               {transactions.length > 0 ? (
                 transactions.map((item) => (
