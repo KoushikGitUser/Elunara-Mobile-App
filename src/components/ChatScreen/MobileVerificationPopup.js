@@ -124,7 +124,11 @@ const MobileVerificationPopup = ({
       dispatch(setUserMobileNumberForMobileVerification(mobileNumber));
       const formData = new FormData();
       formData.append("phone_number", mobileNumber);
-      dispatch(getOTPForMobileNumber(formData));
+      dispatch(getOTPForMobileNumber(formData))
+        .unwrap()
+        .catch((error) => {
+          console.log("getOTPForMobileNumber rejected:", JSON.stringify(error));
+        });
     }
   };
 

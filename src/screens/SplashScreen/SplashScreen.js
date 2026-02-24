@@ -1,17 +1,9 @@
-import { DarkTheme, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  ActivityIndicator,
   StatusBar,
-  ImageBackground,
-  Image,
 } from "react-native";
-import { scaleFont } from "../../utils/responsive";
-import chakraLogoSplash from "../../assets/images/chakraBig.png";
-import elunaraLogoSplash from "../../assets/images/ElunaraLogoSplash.png";
 import { getToken } from "../../utils/Secure/secureStore";
 import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,27 +13,59 @@ import {
   setIsPromotionalUser,
   setPromotionalDaysRemaining,
 } from "../../redux/slices/toggleSlice";
+import { VideoView, useVideoPlayer } from "expo-video";
 
-const SplashScreen = ({ navigation }) => { 
+const splashVideo = require("../../assets/images/splashVideo.mp4");
+
+const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const hasNavigated = useRef(false); // Track if we've already navigated
-  const isInitialMount = useRef(true); // Track if this is the initial mount
+  const hasNavigated = useRef(false);
+  const isInitialMount = useRef(true);
+  const [videoFinished, setVideoFinished] = useState(false);
+  const pendingNavigateRef = useRef(null);
 
+  const player = useVideoPlayer(splashVideo, (p) => {
+    p.loop = false;
+    p.muted = true;
+    p.play();
+  });
+
+  // Detect video end
+  useEffect(() => {
+    const subscription = player.addListener("playingChange", (event) => {
+      if (!event.isPlaying) {
+        setVideoFinished(true);
+      }
+    });
+    return () => subscription.remove();
+  }, [player]);
+
+  // When video finishes, execute any pending navigation
+  useEffect(() => {
+    if (videoFinished && pendingNavigateRef.current) {
+      pendingNavigateRef.current();
+      pendingNavigateRef.current = null;
+    }
+  }, [videoFinished]);
+
+  // Auth check & API calls
   useEffect(() => {
     const checkAuthAndNavigate = async () => {
-      // Prevent re-running if already navigated
       if (hasNavigated.current) return;
 
       const accessToken = await getToken();
 
-      // If no access token available, navigate to welcome screen
       if (!accessToken) {
         hasNavigated.current = true;
-        navigation.navigate("welcome");
+        const go = () => navigation.navigate("welcome");
+        if (videoFinished) {
+          go();
+        } else {
+          pendingNavigateRef.current = go;
+        }
         return;
       }
 
-      // If access token exists (with or without refresh token), fetch profile info and wallet info
       dispatch(commonFunctionForAPICalls({
         method: "GET",
         url: "/settings/profile",
@@ -59,7 +83,7 @@ const SplashScreen = ({ navigation }) => {
 
   const { settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
 
-  // Sync wallet data to Toggle slice whenever wallet API resolves
+  // Sync wallet data to Toggle slice
   useEffect(() => {
     if (apiWalletStates.isWalletInfoFetched === true) {
       dispatch(setWalletBalance(apiWalletStates.walletBalance));
@@ -78,31 +102,34 @@ const SplashScreen = ({ navigation }) => {
       const accessToken = await getToken();
       if (!accessToken) return;
 
-      if (
-        settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true
-      ) {
+      if (settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true) {
         hasNavigated.current = true;
         isInitialMount.current = false;
-        navigation.navigate("chat");
+        const go = () => navigation.navigate("chat");
+        if (videoFinished) {
+          go();
+        } else {
+          pendingNavigateRef.current = go;
+        }
       }
     };
 
     handleFetchResults();
-  }, [
-    settingsStates.allPersonalisationsSettings.isPersonalInfosFetched,
-  ]);
+  }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched, videoFinished]);
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        resizeMode="contain"
-        style={styles.bigLogo}
-        imageStyle={{ opacity: 0.2 }}
-        source={chakraLogoSplash}
-      >
-        <Image source={elunaraLogoSplash} style={styles.elunaraLogoSplash} />
-        <StatusBar backgroundColor="#081A35" barStyle="light-content" />
-      </ImageBackground>
+      <StatusBar hidden />
+      <VideoView
+        style={StyleSheet.absoluteFillObject}
+        player={player}
+        allowsFullscreen={false}
+        allowsPictureInPicture={false}
+        nativeControls={false}
+        contentFit="cover"
+      />
+      {/* Transparent overlay to block any touch on video controls */}
+      <View style={StyleSheet.absoluteFillObject} pointerEvents="none" />
     </View>
   );
 };
@@ -110,34 +137,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#081A35",
-  },
-  logo: {
-    fontSize: scaleFont(48),
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
-  },
-  elunaraLogoSplash: {
-    height: 100,
-    width: 300,
-    opacity: 1,
-  },
-  bigLogo: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  tagline: {
-    fontSize: scaleFont(16),
-    color: "#E1BEE7",
-    marginBottom: 40,
-  },
-  loader: {
-    marginTop: 20,
+    backgroundColor: "#000",
   },
 });
 
