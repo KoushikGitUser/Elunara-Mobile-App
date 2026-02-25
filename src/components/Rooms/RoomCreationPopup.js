@@ -100,7 +100,7 @@ const RoomCreationPopup = () => {
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 320], // average keyboard height
-                  outputRange: [0, -(keyboardHeight * 2.3)],
+                  outputRange: [0, -(keyboardHeight * 2.7)],
                   // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
