@@ -13,6 +13,8 @@ import {
   handleUpdateGeneralSettings,
   handleUpdatePersonalisationsSettings,
   handleGetAllProfileInfos,
+  handleGetUserData,
+  handleUpdateGuideSeen,
   handleUpdateProfileName,
   handleUpdateProfileImage,
   handleUpdateProfileAvatarImage,
@@ -108,6 +110,8 @@ export const settingsHandlersFunctions = {
   getAllGeneralSettings: handleGetAllGeneralSettings,
   getAllPersonalisationsSettings: handleGetAllPersonalisationsSettings,
   getAllProfileInfos: handleGetAllProfileInfos,
+  getUserData: handleGetUserData,
+  updateGuideSeen: handleUpdateGuideSeen,
 
   // get master datas
   getAllLLMsAvailable: handleGetAllLLMsAvailable,

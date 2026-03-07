@@ -14,6 +14,7 @@ import { setToggleChatScreenGuideStart } from "../../redux/slices/toggleSlice";
 import { setGuidedTourStepsCount } from "../../redux/slices/globalDataSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SpotlightOverlay from "./SpotlightOverlay";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 
 const { height, width } = Dimensions.get("window");
 
@@ -67,6 +68,14 @@ const UniversalTooltip = ({
     if (nextStep > 2) {
       dispatch(setToggleChatScreenGuideStart(false));
       await AsyncStorage.setItem("isNewUser", "false");
+
+      // Update guide_seen to true via API
+      const payload = {
+        method: "PATCH",
+        url: "/user/guide-seen",
+        name: "updateGuideSeen",
+      };
+      dispatch(commonFunctionForAPICalls(payload));
     }
   };
 

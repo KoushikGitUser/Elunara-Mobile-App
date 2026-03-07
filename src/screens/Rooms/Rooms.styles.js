@@ -56,7 +56,7 @@ export const createStyles = ({}) =>
       width: 51,
     },
     middleBelowAddSection: {
-      minHeight: verticalScale(192),
+      minHeight: "auto",
       width: "100%",
       borderWidth: 1,
       borderRadius: 20,

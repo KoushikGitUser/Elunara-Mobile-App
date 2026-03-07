@@ -49,15 +49,7 @@ const IndividualPinnedRoom = ({ title, translateX, room }) => {
     <TouchableOpacity
       onPress={handleRoomPress}
       onLongPress={() => {
-        setIsLongPressed(!isLongPressed);
-        dispatch(setToggleChatHistorySidebar(false));
-        Animated.timing(translateX, {
-          toValue: toggleStates.toggleChatHistorySidebar
-            ? 0
-            : SCREEN_WIDTH * 0.75,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
+handleRoomPress()
       }}
       style={styles.individualPinnedRooms}
     >

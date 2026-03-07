@@ -174,7 +174,7 @@ const RenameChatPopup = () => {
                   {/* Title */}
 
                   <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-                    Rename Chat
+                    {chatsStates.allChatsDatas.currentActionChatDetails?.name ? "Rename Chat" : "Rename Learning Lab"}
                   </Text>
                   <View style={styles.inputSection}>
                     <Text
@@ -234,16 +234,8 @@ const RenameChatPopup = () => {
                           },
                         };
                         dispatch(commonFunctionForAPICalls(payload));
-                        // Close popup immediately for room updates
+                        // Close popup immediately for room updates (toast is handled by the handler)
                         dispatch(setToggleRenameChatPopup(false));
-                        setTimeout(() => {
-                          triggerToast(
-                            "Renamed!",
-                            "Your learning lab has been successfully renamed",
-                            "success",
-                            3000,
-                          );
-                        }, 500);
                       } else {
                         // Fallback to createdChatDetails
                         const fallbackChatUUID = chatsStates.allChatsDatas.createdChatDetails?.id;

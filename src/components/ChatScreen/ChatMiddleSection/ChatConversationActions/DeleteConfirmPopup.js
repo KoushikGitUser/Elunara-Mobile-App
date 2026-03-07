@@ -189,8 +189,8 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                 : globalDataStates.deleteConfirmPopupFrom == "allChats"
                   ? `Delete ${chatCount} chat${chatCount > 1 ? "s" : ""}?`
                   : globalDataStates.deleteConfirmPopupFrom == "rooms"
-                    ? "Delete room?"
-                    : "Delete <10> rooms?"}
+                    ? "Delete Learning Lab?"
+                    : "Delete <10> Learning Labs?"}
             </Text>
 
             {/* Description */}
@@ -243,27 +243,34 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                       };
                       dispatch(commonFunctionForAPICalls(payload));
 
-                      // Navigate back to rooms list
-                      navigation.navigate("allRooms");
+                      // Close the popup first
+                      dispatch(setToggleDeleteChatConfirmPopup(false));
+
+                      // Navigate back to rooms list after a small delay
+                      setTimeout(() => {
+                        navigation.navigate("allRooms");
+                      }, 100);
 
                       // Trigger Toast with Undo Action
-                      const undoCallback = () => {
-                        const undoPayload = {
-                          method: "POST",
-                          url: `/rooms/${roomUuid}/undo-delete`,
-                          name: "undo-delete-room",
+                      setTimeout(() => {
+                        const undoCallback = () => {
+                          const undoPayload = {
+                            method: "POST",
+                            url: `/rooms/${roomUuid}/undo-delete`,
+                            name: "undo-delete-room",
+                          };
+                          dispatch(commonFunctionForAPICalls(undoPayload));
                         };
-                        dispatch(commonFunctionForAPICalls(undoPayload));
-                      };
 
-                      triggerToastWithAction(
-                        "Room Deleted",
-                        "This action can be undone",
-                        "success",
-                        5000,
-                        "Undo",
-                        undoCallback,
-                      );
+                        triggerToastWithAction(
+                          "Learning Lab Deleted",
+                          "This action can be undone",
+                          "success",
+                          5000,
+                          "Undo",
+                          undoCallback,
+                        );
+                      }, 300);
                     }
                   } else if (isBulkDelete) {
                     // Bulk delete operation

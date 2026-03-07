@@ -33,6 +33,11 @@ export const settingsStates = {
   },
   allProfileInfos: {},
 
+  // User Data
+  userData: {},
+  isFetchingUserData: false,
+  isUserDataFetched: false,
+
   // Profile Image Upload
   uploadingProfileImage: false,
 

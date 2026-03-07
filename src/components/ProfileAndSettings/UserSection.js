@@ -21,6 +21,7 @@ const UserSection = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [isMobileVerified, setIsMobileVerified] = useState(true);
   const [profileImage, setProfileImage] = useState(userImg);
+  const [daysLeft, setDaysLeft] = useState(0);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
@@ -31,6 +32,17 @@ const UserSection = () => {
     checkMobileVerification();
   }, [settingsStates?.allProfileInfos?.phone_verified]);
 
+  // Calculate days left for mobile verification (10 days limit from creation date)
+  useEffect(() => {
+    if (settingsStates?.userData?.created_at) {
+      const createdDate = new Date(settingsStates.userData.created_at);
+      const currentDate = new Date();
+      const diffTime = currentDate - createdDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const remainingDays = 10 - diffDays;
+      setDaysLeft(remainingDays > 0 ? remainingDays : 0);
+    }
+  }, [settingsStates?.userData?.created_at]);
 
   useEffect(() => {
     const payload = {
@@ -171,7 +183,7 @@ const UserSection = () => {
               fontFamily: "Mukta-Bold",
             }}
           >
-            Verify mobile no. — few days left
+            Verify mobile no. — {daysLeft} {daysLeft === 1 ? "day" : "days"} left
           </Text>
         </TouchableOpacity>
       )}

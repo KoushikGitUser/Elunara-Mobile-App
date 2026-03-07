@@ -12,6 +12,7 @@ export const walletStates = {
   isVerifyingPayment: true,
   verifyPaymentStatus: null,
   verifyPaymentMessage: null,
+  verifyPaymentAmount: null,
   // Threshold constants (not state, but accessible)
   FILE_FEATURE_THRESHOLD: 799,
   MIN_RECHARGE: 99,

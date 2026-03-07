@@ -26,7 +26,6 @@ import ChatHeader from "../../components/ChatScreen/ChatHeader";
 import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/ChatMiddleWrapper";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   setToggleChatScreenGuideStart,
   setToggleChatHistorySidebar,
@@ -178,6 +177,16 @@ const ChatScreen = () => {
       method: "GET",
       url: "/settings/profile",
       name: "getAllProfileInfos",
+    };
+    dispatch(commonFunctionForAPICalls(payload));
+  }, []);
+
+  // Fetch user data on mount to check guide_seen status
+  useEffect(() => {
+    const payload = {
+      method: "GET",
+      url: "/user",
+      name: "getUserData",
     };
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
@@ -424,16 +433,18 @@ const ChatScreen = () => {
     chatsStates.allChatsDatas.fetchedMessages,
   ]);
 
+  // Check if user has seen the guide based on API response
   useEffect(() => {
-    const checkNewUser = async () => {
-      const isNewUser = await AsyncStorage.getItem("isNewUser");
-      if (isNewUser === null && !globalDataStates.manualGuidedTourRunning) {
+    if (settingsStates.isUserDataFetched === true && settingsStates.userData) {
+      const userGuideSeen = settingsStates.userData.user_guide_seen;
+
+      // Show tooltip only if user_guide_seen is false and no manual tour is running
+      if (userGuideSeen === false && !globalDataStates.manualGuidedTourRunning) {
         dispatch(setToggleChatScreenGuideStart(true));
         dispatch(setGuidedTourStepsCount(1));
       }
-    };
-    checkNewUser();
-  }, []);
+    }
+  }, [settingsStates.isUserDataFetched, settingsStates.userData]);
 
   // Handle sidebar auto-open for guided tours
   useEffect(() => {

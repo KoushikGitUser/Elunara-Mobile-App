@@ -90,7 +90,7 @@ const PlusButtonPopup = ({ setAddOptionsPopup, visible, popupPosition }) => {
           >
             <FilesIcon />
             <Text style={{ fontFamily: "Mukta-Regular", flex: 1 }}>
-              Add Chat to Learning Lab
+              Add Chat to Learning Lab 
             </Text>
             {isZeroBalance && <LockIcon />}
           </Pressable>

@@ -27,6 +27,7 @@ export const handleVerifyPayment = {
     state.walletStates.isVerifyingPayment = false;
     state.walletStates.verifyPaymentStatus = data?.status;
     state.walletStates.verifyPaymentMessage = data?.message || null;
+    state.walletStates.verifyPaymentAmount = data?.data?.amount || null;
     if (data?.status === "success" && data?.data?.wallet_balance !== undefined) {
       state.walletStates.walletBalance = data.data.wallet_balance;
       state.walletStates.isInitialRechargeCompleted = true;

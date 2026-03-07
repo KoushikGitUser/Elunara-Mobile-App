@@ -227,6 +227,32 @@ export const handleGetAllProfileInfos = {
   },
 };
 
+export const handleGetUserData = {
+  pending: (state) => {
+    state.settingsStates.isFetchingUserData = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.userData = action.payload.data.data;
+    state.settingsStates.isFetchingUserData = false;
+    state.settingsStates.isUserDataFetched = true;
+  },
+  rejected: (state, action) => {
+    state.settingsStates.isFetchingUserData = false;
+    state.settingsStates.isUserDataFetched = false;
+  },
+};
+
+export const handleUpdateGuideSeen = {
+  pending: (state) => {},
+  fulfilled: (state, action) => {
+    // Update the user_guide_seen field in userData
+    if (state.settingsStates.userData) {
+      state.settingsStates.userData.user_guide_seen = true;
+    }
+  },
+  rejected: (state, action) => {},
+};
+
 export const handleUpdateProfileName = {
   pending: (state) => {},
   fulfilled: (state, action) => {

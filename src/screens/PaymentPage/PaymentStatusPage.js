@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -11,7 +11,8 @@ import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import authLoader from "../../assets/images/authLoader.gif";
 import PaymentSuccessFrame from "../../../assets/SvgIconsComponent/PaymentBillingIcons/PaymentSuccessFrame";
 import AuthGradientText from "../../components/common/AuthGradientText";
-import { Wallet, X } from "lucide-react-native";
+import { Wallet, X, ArrowLeft } from "lucide-react-native";
+import { appColors } from "../../themes/appColors";
 
 const PaymentStatusPage = () => {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ const PaymentStatusPage = () => {
   const isVerifying = apiWalletStates.isVerifyingPayment;
   const status = apiWalletStates.verifyPaymentStatus;
   const message = apiWalletStates.verifyPaymentMessage;
+  const amount = apiWalletStates.verifyPaymentAmount;
 
   // Reset MakePaymentPage states on mount
   useEffect(() => {
@@ -44,16 +46,10 @@ const PaymentStatusPage = () => {
     }
   }, [orderId]);
 
-  // Auto redirect to Payment and Billings after status is shown
-  useEffect(() => {
-    if (!isVerifying && status) {
-      const goBackTimer = setTimeout(() => {
-        dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
-        navigation.navigate("settingsInnerPages", { page: 2 });
-      }, 3000);
-      return () => clearTimeout(goBackTimer);
-    }
-  }, [isVerifying, status]);
+  const handleGoBack = () => {
+    dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
+    navigation.navigate("settingsInnerPages", { page: 2 });
+  };
 
   if (isVerifying) {
     return (
@@ -78,6 +74,22 @@ const PaymentStatusPage = () => {
           </View>
           <View style={styles.successfulIconAndText}>
             <PaymentSuccessFrame />
+            <View style={styles.successInfoCard}>
+              <Text style={styles.successInfoTitle}>Order ID - {orderId}</Text>
+              <Text style={styles.successAmount}>
+               Amount - <Text style={{ color: "#10B981" }}>₹{amount ? amount.toLocaleString("en-IN") : "0"}</Text>
+              </Text>
+              <Text style={styles.successMessage}>
+                Your Payment is successful and your wallet has been credited.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleGoBack}
+              activeOpacity={0.8}
+            >
+              <ArrowLeft size={24} color="#FFFFFF" strokeWidth={2} />
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -105,6 +117,13 @@ const PaymentStatusPage = () => {
               {message}
             </Text>
           )}
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={handleGoBack}
+            activeOpacity={0.8}
+          >
+            <ArrowLeft size={24} color="#FFFFFF" strokeWidth={2} />
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -143,6 +162,45 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     gap: 10,
+  },
+  successInfoCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth:2,
+    borderColor:"#D3DAE5",
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 16,
+    marginHorizontal: 30,
+    alignItems: "center",
+    width: "85%",
+  },
+  successInfoTitle: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Medium",
+    color: "#6B7280",
+    marginBottom: 8,
+  },
+  successAmount: {
+    fontSize: scaleFont(20),
+    fontFamily: "Mukta-Bold",
+    color: "#5E5E5E",
+    marginBottom: 12,
+  },
+  successMessage: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: appColors.navyBlueShade,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
   },
   errorContainer: {
     flex: 1,
