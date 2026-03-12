@@ -88,7 +88,7 @@ const AllChatsPage = () => {
       setChecked(false);
 
       // Refetch all chats
-      const payload = {
+      const payload = { 
         method: "GET",
         url: "/chats?page=1&per_page=20",
         name: "fetchAllUserChatsAvailable"
