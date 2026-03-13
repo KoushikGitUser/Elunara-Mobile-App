@@ -3,10 +3,11 @@ export const handleInitiatePayment = {
     state.walletStates.isPaymentLoading = true;
   },
   fulfilled: (state, action) => {
-    console.log("initiatePayment fulfilled:", JSON.stringify(action.payload));
+    const fullPayload = action.payload?.data?.data;
+    console.log("initiatePayment fulfilled - full payload:", JSON.stringify(fullPayload));
     state.walletStates.isPaymentLoading = false;
     state.walletStates.isPaymentFulfilled = true;
-    state.walletStates.paymentUrl = action.payload?.data?.data?.payment_url || null;
+    state.walletStates.hyperPayload = fullPayload || null;
   },
   rejected: (state, action) => {
     console.log("initiatePayment rejected:", JSON.stringify(action.payload));

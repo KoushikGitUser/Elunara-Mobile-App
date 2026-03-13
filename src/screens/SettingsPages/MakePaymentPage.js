@@ -8,13 +8,12 @@ import {
   Dimensions,
   Image,
   Keyboard,
-  AppState,
   BackHandler,
   Modal,
   ActivityIndicator,
-  Linking,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import HyperSdkReact from "hyper-sdk-react";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
@@ -27,23 +26,13 @@ import {
 } from "../../redux/slices/globalDataSlice";
 import {
   setIsPaymentInitiated,
-  setRemainingTime,
   setPaymentSuccess,
 } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls, resetPaymentInitiated } from "../../redux/slices/apiCommonSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { Gift } from "lucide-react-native";
-import Svg, { Circle } from "react-native-svg";
 import { BlurView } from "@react-native-community/blur";
-import { appColors } from "../../themes/appColors";
-import { triggerToast } from "../../services/toast";
-
-const COUNTDOWN_DURATION = 900; // 15 minutes in seconds
-const CIRCLE_SIZE = 180;
-const STROKE_WIDTH = 8;
-const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const MakePaymentPage = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -53,14 +42,9 @@ const MakePaymentPage = () => {
   const [amountError, setAmountError] = useState("");
   const [showBackPressPopup, setShowBackPressPopup] = useState(false);
 
-  const timerStartRef = useRef(null);
-  const timerIntervalRef = useRef(null);
-  const appStateRef = useRef(AppState.currentState);
-
   const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
   const apiWalletStates = useSelector((state) => state.API.walletStates);
   const isPaymentInitiated = paymentStates.isPaymentInitiated;
-  const remainingTime = paymentStates.remainingTime;
   const paymentSuccess = paymentStates.paymentSuccess;
   const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
   const currentBalance = walletStates.walletBalance;
@@ -93,76 +77,13 @@ const MakePaymentPage = () => {
     };
   }, []);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-      dispatch(setHideSettingsBackButton(false));
-    };
-  }, []);
-
-  // AppState listener - recalculate remaining time when coming back from background
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (
-        appStateRef.current.match(/inactive|background/) &&
-        nextAppState === "active" &&
-        isPaymentInitiated &&
-        timerStartRef.current
-      ) {
-        // Recalculate remaining time based on actual elapsed time
-        const elapsed = Math.floor(
-          (Date.now() - timerStartRef.current) / 1000
-        );
-        const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
-        dispatch(setRemainingTime(newRemaining));
-
-        if (newRemaining <= 0) {
-          handleTimerExpired();
-        }
-      }
-      appStateRef.current = nextAppState;
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [isPaymentInitiated]);
-
-  // Countdown timer interval
-  useEffect(() => {
-    if (isPaymentInitiated && remainingTime > 0) {
-      timerIntervalRef.current = setInterval(() => {
-        if (!timerStartRef.current) return;
-
-        const elapsed = Math.floor(
-          (Date.now() - timerStartRef.current) / 1000
-        );
-        const newRemaining = Math.max(0, COUNTDOWN_DURATION - elapsed);
-        dispatch(setRemainingTime(newRemaining));
-
-        if (newRemaining <= 0) {
-          handleTimerExpired();
-        }
-      }, 1000);
-
-      return () => {
-        if (timerIntervalRef.current) {
-          clearInterval(timerIntervalRef.current);
-        }
-      };
-    }
-  }, [isPaymentInitiated, remainingTime > 0]);
-
   // BackHandler - show popup when payment is pending
   useEffect(() => {
     if (!isPaymentInitiated) return;
 
     const backAction = () => {
       setShowBackPressPopup(true);
-      return true; // Prevent default back behavior
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -172,16 +93,6 @@ const MakePaymentPage = () => {
 
     return () => backHandler.remove();
   }, [isPaymentInitiated]);
-
-  const handleTimerExpired = () => {
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-    timerStartRef.current = null;
-    dispatch(setIsPaymentInitiated(false));
-    dispatch(setRemainingTime(COUNTDOWN_DURATION));
-    dispatch(setHideSettingsBackButton(false));
-  };
 
   const startPaymentFlow = (amount) => {
     dispatch(
@@ -194,21 +105,23 @@ const MakePaymentPage = () => {
     );
   };
 
-  // Watch for payment API fulfillment to start timer and open payment URL
+  // On API fulfillment — open payment page directly
   useEffect(() => {
     if (apiWalletStates.isPaymentFulfilled === true) {
       dispatch(setIsPaymentInitiated(true));
-      dispatch(setRemainingTime(COUNTDOWN_DURATION));
-      timerStartRef.current = Date.now();
       dispatch(setHideSettingsBackButton(true));
 
-      // Open payment URL in browser and reset loader state
-      if (apiWalletStates.paymentUrl) {
-        Linking.openURL(apiWalletStates.paymentUrl);
-      }
-
-      // Reset payment API state to initial
+      const sdkPayload = apiWalletStates.hyperPayload?.sdk_payload;
       dispatch(resetPaymentInitiated());
+      if (sdkPayload) {
+        try {
+          HyperSdkReact.openPaymentPage(JSON.stringify(sdkPayload));
+        } catch (e) {
+          console.log("openPaymentPage error:", e);
+          dispatch(setIsPaymentInitiated(false));
+          dispatch(setHideSettingsBackButton(false));
+        }
+      }
     }
   }, [apiWalletStates.isPaymentFulfilled]);
 
@@ -264,76 +177,6 @@ const MakePaymentPage = () => {
 
   const screenHeight = Dimensions.get("window").height;
 
-  // Format remaining time as MM:SS
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
-
-  // Calculate circle progress (strokeDashoffset)
-  const progress = remainingTime / COUNTDOWN_DURATION;
-  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
-
-  // Payment Pending UI
-  const renderPaymentPending = () => (
-    <View style={styles.pendingContainer}>
-      <View style={styles.pendingContent}>
-        {/* Countdown Circle */}
-        <View style={styles.circleContainer}>
-          <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
-            {/* Background circle */}
-            <Circle
-              cx={CIRCLE_SIZE / 2}
-              cy={CIRCLE_SIZE / 2}
-              r={RADIUS}
-              stroke={remainingTime <= 60 ? "#FECACA" : "#E9F2FF"}
-              strokeWidth={STROKE_WIDTH}
-              fill="none"
-            />
-            {/* Progress circle */}
-            <Circle
-              cx={CIRCLE_SIZE / 2}
-              cy={CIRCLE_SIZE / 2}
-              r={RADIUS}
-              stroke={remainingTime <= 60 ? "#EF4444" : appColors.navyBlueShade}
-              strokeWidth={STROKE_WIDTH}
-              fill="none"
-              strokeLinecap="round"
-              strokeDasharray={CIRCUMFERENCE}
-              strokeDashoffset={strokeDashoffset}
-              transform={`rotate(-90, ${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2})`}
-            />
-          </Svg>
-          {/* Timer text in center */}
-          <View style={styles.timerTextContainer}>
-            <Text
-              style={[
-                styles.timerText,
-                remainingTime <= 60 && { color: "#EF4444" },
-              ]}
-            >
-              {formatTime(remainingTime)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Pending message */}
-        <Text style={styles.pendingTitle}>Payment Initiated</Text>
-        <Text style={styles.pendingDescription}>
-          Your payment is pending, complete the payment in the browser and come
-          back for successful payment.
-        </Text>
-
-        {remainingTime <= 0 && (
-          <Text style={styles.expiredText}>
-            Payment session expired. Please try again.
-          </Text>
-        )}
-      </View>
-    </View>
-  );
-
   // Back Press Popup
   const renderBackPressPopup = () => (
     <Modal
@@ -387,9 +230,7 @@ const MakePaymentPage = () => {
     <View style={[styles.container]}>
       {renderBackPressPopup()}
 
-      {isPaymentInitiated ? (
-        renderPaymentPending()
-      ) : paymentSuccess ? (
+      {paymentSuccess ? (
         <View
           style={{
             flex: 1,
@@ -863,54 +704,6 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
 
-  // Payment Pending Styles
-  pendingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pendingContent: {
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-  circleContainer: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 32,
-  },
-  timerTextContainer: {
-    position: "absolute",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  timerText: {
-    fontSize: scaleFont(32),
-    fontFamily: "Mukta-Bold",
-    color: "#081A35",
-  },
-  pendingTitle: {
-    fontSize: scaleFont(22),
-    fontFamily: "Mukta-Bold",
-    color: "#1F2937",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  pendingDescription: {
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Regular",
-    color: "#6B7280",
-    lineHeight: 22,
-    textAlign: "center",
-  },
-  expiredText: {
-    fontSize: scaleFont(14),
-    fontFamily: "Mukta-Medium",
-    color: "#EF4444",
-    marginTop: 16,
-    textAlign: "center",
-  },
 
   // Back Press Popup Styles
   popupOverlay: {

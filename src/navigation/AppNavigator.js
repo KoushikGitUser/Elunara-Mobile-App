@@ -1,6 +1,12 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect } from "react";
+import { NativeModules, NativeEventEmitter } from "react-native";
+import HyperSdkReact from "hyper-sdk-react";
+import { NavigationContainer, StackActions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Store from "../redux/store/Store";
+import { setIsPaymentInitiated } from "../redux/slices/toggleSlice";
+import { setHideSettingsBackButton } from "../redux/slices/globalDataSlice";
+import { resetVerifyPayment } from "../redux/slices/apiCommonSlice";
 import SplashScreen from "../screens/SplashScreen/SplashScreen";
 import SignIn from "../screens/auth/SignIn/SignIn";
 import SignUp from "../screens/auth/SignUp/SignUp";
@@ -59,6 +65,41 @@ const linking = {
 
 
 const AppNavigator = () => {
+  useEffect(() => {
+    const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
+    const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
+      try {
+        const data = JSON.parse(resp);
+        const event = data.event || "";
+        console.log("[Global] HyperEvent received:", event, JSON.stringify(data));
+
+        if (event === "process_result") {
+          const innerPayload = data.payload || {};
+          const status = innerPayload.status || "";
+          console.log("[Global] process_result status:", status, "orderId:", data.orderId);
+
+          Store.dispatch(setIsPaymentInitiated(false));
+          Store.dispatch(setHideSettingsBackButton(false));
+
+          if (status !== "backpressed" && status !== "user_aborted") {
+            Store.dispatch(resetVerifyPayment());
+            if (navigationRef.isReady()) {
+              navigationRef.current.dispatch(
+                StackActions.push("paymentStatus", { order_id: data.orderId })
+              );
+            }
+          }
+        }
+      } catch (e) {
+        console.log("[Global] HyperEvent parse error:", e);
+      }
+    });
+
+    return () => {
+      hyperListener.remove();
+    };
+  }, []);
+
   return (
     <NavigationContainer ref={navigationRef} linking={linking}>
       <Stack.Navigator

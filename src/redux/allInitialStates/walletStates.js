@@ -9,6 +9,7 @@ export const walletStates = {
   isPaymentLoading: false,
   isPaymentFulfilled: false,
   paymentUrl: null,
+  hyperPayload: null,
   isVerifyingPayment: true,
   verifyPaymentStatus: null,
   verifyPaymentMessage: null,

@@ -139,6 +139,13 @@ const apiCommonSlice = createSlice({
       state.walletStates.isPaymentLoading = false;
       state.walletStates.isPaymentFulfilled = false;
       state.walletStates.paymentUrl = null;
+      state.walletStates.hyperPayload = null;
+    },
+    resetVerifyPayment: (state) => {
+      state.walletStates.isVerifyingPayment = true;
+      state.walletStates.verifyPaymentStatus = null;
+      state.walletStates.verifyPaymentMessage = null;
+      state.walletStates.verifyPaymentAmount = null;
     },
   },
   extraReducers: (builder) => {
@@ -188,6 +195,7 @@ export const {
   setHasBalance,
   setHasEnoughBalanceForFiles,
   resetPaymentInitiated,
+  resetVerifyPayment,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;
