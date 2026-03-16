@@ -11,13 +11,16 @@ import {
   BackHandler,
   Modal,
   ActivityIndicator,
+  NativeModules,
+  NativeEventEmitter,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import HyperSdkReact from "hyper-sdk-react";
 import { scaleFont } from "../../utils/responsive";
 import chakraLogo from "../../assets/images/BigGrayChakra.png";
 import paymentSuccessLogo from "../../assets/images/paymentSuccess.jpg";
 import paymentSuccessText from "../../assets/images/Title.png";
+import authLoader from "../../assets/images/authLoader.gif";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,11 +31,16 @@ import {
   setIsPaymentInitiated,
   setPaymentSuccess,
 } from "../../redux/slices/toggleSlice";
-import { commonFunctionForAPICalls, resetPaymentInitiated } from "../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, resetPaymentInitiated, resetVerifyPayment } from "../../redux/slices/apiCommonSlice";
 import { rechargePresets } from "../../data/datas";
 import AuthGradientText from "../../components/common/AuthGradientText";
-import { Gift } from "lucide-react-native";
+import PaymentSuccessFrame from "../../../assets/SvgIconsComponent/PaymentBillingIcons/PaymentSuccessFrame";
+import { Gift, Wallet, X, ArrowLeft } from "lucide-react-native";
 import { BlurView } from "@react-native-community/blur";
+import { appColors } from "../../themes/appColors";
+
+// Module-level: tracks which MakePaymentPage instance owns the current payment
+let currentPaymentSessionId = 0;
 
 const MakePaymentPage = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -41,6 +49,8 @@ const MakePaymentPage = () => {
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [amountError, setAmountError] = useState("");
   const [showBackPressPopup, setShowBackPressPopup] = useState(false);
+  const [paymentResultOrderId, setPaymentResultOrderId] = useState(null);
+  const mySessionRef = useRef(null);
 
   const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
   const apiWalletStates = useSelector((state) => state.API.walletStates);
@@ -77,6 +87,59 @@ const MakePaymentPage = () => {
     };
   }, []);
 
+  // HyperSDK event listener — only resets state, does NOT navigate
+  useEffect(() => {
+    const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
+    const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
+      try {
+        const data = JSON.parse(resp);
+        const event = data.event || "";
+        console.log("[MakePayment] HyperEvent:", event);
+
+        if (event === "process_result") {
+          if (mySessionRef.current !== currentPaymentSessionId) {
+            console.log("[MakePayment] Stale listener, ignoring process_result");
+            return;
+          }
+          // Mark this session as handled so no duplicate fires
+          currentPaymentSessionId++;
+
+          const innerPayload = data.payload || {};
+          const status = innerPayload.status || "";
+          console.log("[MakePayment] process_result status:", status, "orderId:", data.orderId);
+
+          // Reset ALL state — Redux + local
+          dispatch(setIsPaymentInitiated(false));
+          dispatch(setHideSettingsBackButton(false));
+          dispatch(resetPaymentInitiated());
+          setShowBackPressPopup(false);
+
+
+          if (status === "backpressed" || status === "user_aborted") {
+            console.log("[MakePayment] User cancelled payment");
+          } else {
+            // Show payment result modal + call verify API
+            dispatch(resetVerifyPayment());
+            setPaymentResultOrderId(data.orderId);
+            dispatch(
+              commonFunctionForAPICalls({
+                method: "POST",
+                url: `/payments/verify/${data.orderId}`,
+                name: "verifyPayment",
+              })
+            );
+          }
+        }
+      } catch (e) {
+        console.log("[MakePayment] HyperEvent error:", e);
+      }
+    });
+
+    return () => {
+      hyperListener.remove();
+    };
+  }, []);
+
   // BackHandler - show popup when payment is pending
   useEffect(() => {
     if (!isPaymentInitiated) return;
@@ -95,6 +158,8 @@ const MakePaymentPage = () => {
   }, [isPaymentInitiated]);
 
   const startPaymentFlow = (amount) => {
+    currentPaymentSessionId++;
+    mySessionRef.current = currentPaymentSessionId;
     dispatch(
       commonFunctionForAPICalls({
         method: "POST",
@@ -164,6 +229,90 @@ const MakePaymentPage = () => {
     startPaymentFlow(parseInt(rechargeAmount));
   };
 
+  const handlePaymentResultClose = () => {
+    setPaymentResultOrderId(null);
+    dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
+    navigation.navigate("settingsInnerPages", { page: 2 });
+  };
+
+  const renderPaymentResultModal = () => {
+    const isVerifying = apiWalletStates.isVerifyingPayment;
+    const verifyStatus = apiWalletStates.verifyPaymentStatus;
+    const verifyMessage = apiWalletStates.verifyPaymentMessage;
+    const verifyAmount = apiWalletStates.verifyPaymentAmount;
+
+    return (
+      <Modal
+        visible={!!paymentResultOrderId}
+        transparent={false}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={statusStyles.container}>
+          {isVerifying ? (
+            <View style={statusStyles.loaderContainer}>
+              <Image
+                source={authLoader}
+                style={{ width: 150, height: 150 }}
+                resizeMode="contain"
+              />
+            </View>
+          ) : verifyStatus === "success" ? (
+            <View style={statusStyles.successContainer}>
+              <View style={statusStyles.chakraLogo}>
+                <Image source={chakraLogo} style={{ height: 200, width: 160, objectFit: "contain" }} />
+              </View>
+              <View style={statusStyles.centerContent}>
+                <PaymentSuccessFrame />
+                <View style={statusStyles.infoCard}>
+                  <Text style={statusStyles.infoTitle}>Order ID - {paymentResultOrderId}</Text>
+                  <Text style={statusStyles.infoAmount}>
+                    Amount - <Text style={{ color: "#10B981" }}>₹{verifyAmount ? verifyAmount.toLocaleString("en-IN") : "0"}</Text>
+                  </Text>
+                  <Text style={statusStyles.infoMessage}>
+                    Your Payment is successful and your wallet has been credited.
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={statusStyles.backButton}
+                  onPress={handlePaymentResultClose}
+                  activeOpacity={0.8}
+                >
+                  <ArrowLeft size={24} color="#FFFFFF" strokeWidth={2} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : verifyStatus === "error" ? (
+            <View style={statusStyles.errorContainer}>
+              <View style={statusStyles.chakraLogo}>
+                <Image source={chakraLogo} style={{ height: 200, width: 160, objectFit: "contain" }} />
+              </View>
+              <View style={statusStyles.errorIconWrapper}>
+                <Wallet size={90} color="#6B7280" strokeWidth={1.2} />
+                <View style={statusStyles.crossBadge}>
+                  <X size={24} color="#FFFFFF" strokeWidth={3} />
+                </View>
+              </View>
+              <AuthGradientText fontSize={25}>
+                Payment Failed
+              </AuthGradientText>
+              {verifyMessage && (
+                <Text style={statusStyles.errorReason}>{verifyMessage}</Text>
+              )}
+              <TouchableOpacity
+                style={statusStyles.backButton}
+                onPress={handlePaymentResultClose}
+                activeOpacity={0.8}
+              >
+                <ArrowLeft size={24} color="#FFFFFF" strokeWidth={2} />
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
+      </Modal>
+    );
+  };
+
   // Payment success redirect
   useEffect(() => {
     setTimeout(() => {
@@ -229,6 +378,7 @@ const MakePaymentPage = () => {
   return (
     <View style={[styles.container]}>
       {renderBackPressPopup()}
+      {renderPaymentResultModal()}
 
       {paymentSuccess ? (
         <View
@@ -800,6 +950,104 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: scaleFont(12),
     fontFamily: "Mukta-Bold",
+  },
+});
+
+const statusStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  successContainer: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chakraLogo: {
+    position: "absolute",
+    top: 50,
+    right: -20,
+  },
+  centerContent: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 10,
+  },
+  infoCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#D3DAE5",
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 16,
+    marginHorizontal: 30,
+    alignItems: "center",
+    width: "85%",
+  },
+  infoTitle: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Medium",
+    color: "#6B7280",
+    marginBottom: 8,
+  },
+  infoAmount: {
+    fontSize: scaleFont(20),
+    fontFamily: "Mukta-Bold",
+    color: "#5E5E5E",
+    marginBottom: 12,
+  },
+  infoMessage: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Regular",
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: appColors.navyBlueShade,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  errorIconWrapper: {
+    position: "relative",
+    marginBottom: 20,
+  },
+  crossBadge: {
+    position: "absolute",
+    bottom: -4,
+    left: -4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#EF4444",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FAFAFA",
+  },
+  errorReason: {
+    fontSize: scaleFont(14),
+    fontFamily: "Mukta-Medium",
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 8,
   },
 });
 
