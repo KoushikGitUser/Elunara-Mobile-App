@@ -18,15 +18,17 @@ import maleStudentAvatar from "../../../assets/images/Student Male2.png";
 import femaleStudentAvatar from "../../../assets/images/Student Female2.png";
 import { moderateScale } from "../../../utils/responsive";
 import spark from "../../../assets/images/spark.png";
-import GradientText from "../../common/GradientText";
+import AuthGradientText from "../../common/AuthGradientText";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatHistorySidebar,
   setToggleProPlanUpgradePopup,
 } from "../../../redux/slices/toggleSlice";
+import { setSettingsInnerPageHeaderTitle, setSettingsInnerPageComponentToRender } from "../../../redux/slices/globalDataSlice";
 import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/SparkleIcon";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { appColors } from "../../../themes/appColors";
+import GradientText from "../../common/GradientText";
 
 const SidebarFooter = ({ translateX }) => {
   const styleProps = {};
@@ -34,7 +36,7 @@ const SidebarFooter = ({ translateX }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
-  const { settingsStates } = useSelector((state) => state.API);
+  const { settingsStates, walletStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const [profileImage, setProfileImage] = useState(null);
 
@@ -114,26 +116,22 @@ const SidebarFooter = ({ translateX }) => {
           Profile
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => dispatch(setToggleProPlanUpgradePopup(true))}
+            <TouchableOpacity
+        onPress={() => {
+          dispatch(setToggleChatHistorySidebar(false));
+          navigation.navigate("settingsInnerPages", { page: 11 });
+          dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+          dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+        }}
         style={styles.upgradeBtn}
       >
         <SparkleIcon color={appColors.navyBlueShade} />
-        <View>
+        <View style={{width:"100%"}}>
           <GradientText
-            children="Upgrade plan"
+            children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
             fullWidth={true}
             fontSize={20}
           />
-          <Text
-            style={{
-              fontSize: moderateScale(11),
-              color: "#757575",
-              fontFamily: "Mukta-Regular",
-            }}
-          >
-            More access to the best models
-          </Text>
         </View>
       </TouchableOpacity>
       <View style={styles.madeinindia}>

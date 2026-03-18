@@ -14,6 +14,7 @@ import {
   EllipsisVertical,
   IndianRupee,
   MessageCirclePlus,
+  Wallet,
 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -24,7 +25,7 @@ import {
   setToggleIsChattingWithAI,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
-import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles } from "../../redux/slices/globalDataSlice";
+import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles, setSettingsInnerPageHeaderTitle, setSettingsInnerPageComponentToRender } from "../../redux/slices/globalDataSlice";
 import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
@@ -40,7 +41,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
   const dispatch = useDispatch();
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, walletStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
 
   // Get chat details
@@ -172,15 +173,17 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
             //   "Upgrade",
             //   action
             // );
-            dispatch(setToggleElunaraProWelcomePopup(true))
+            navigation.navigate("settingsInnerPages", { page: 11 });
+            dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+            dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
           }}
           style={styles.upgradeButton}
         >
-          <SparkleIcon />
+          {walletStates.isInitialRechargeCompleted ? <Wallet size={16} color="#000" /> : <SparkleIcon />}
           <Text
-            style={{ fontSize: 14, fontWeight: 600, fontFamily: "Mukta-Bold" }}
+            style={{ fontSize: 14, fontWeight: 600, fontFamily: "Mukta-Bold",marginLeft: walletStates.isInitialRechargeCompleted ? 10 : 0 }}
           >
-            Upgrade Plan
+            {walletStates.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
           </Text>
         </TouchableOpacity>
       )}  

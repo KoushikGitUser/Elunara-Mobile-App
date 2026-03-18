@@ -12,7 +12,7 @@ import SparkleIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIco
 import GradientText from "../common/GradientText";
 import { moderateScale, scaleFont, verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setSettingsInnerPageComponentToRender,
   setSettingsInnerPageHeaderTitle,
@@ -28,6 +28,7 @@ import { appColors } from "../../themes/appColors";
 const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { walletStates } = useSelector((state) => state.API);
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -76,17 +77,18 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
       })}
 
       {/* Upgrade button */}
-      <TouchableOpacity style={styles.upgradeBtn}>
+      <TouchableOpacity style={styles.upgradeBtn} onPress={() => {
+        navigation.navigate("settingsInnerPages", { page: 11 });
+        dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+        dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+      }}>
         <SparkleIcon color={appColors.navyBlueShade} />
-        <View>
+        <View style={{width:"100%"}}>
           <GradientText
-            children="Upgrade plan"
+            children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
             fullWidth={true}
             fontSize={18}
           />
-          <Text style={{ fontSize: moderateScale(13), color: "#757575",fontFamily:"Mukta-Regular"}}>
-            More access to the best models
-          </Text>
         </View>
       </TouchableOpacity>
     </ScrollView>
@@ -117,7 +119,6 @@ const styles = StyleSheet.create({
   },
   upgradeBtn: {
     width: "100%",
-    minHeight: verticalScale(65),
     borderWidth: 1,
     borderColor: "#D3DAE5",
     borderRadius: 16,
