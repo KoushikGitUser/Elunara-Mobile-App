@@ -65,18 +65,25 @@ const Topics = ({ item, index }) => {
     >
       <View style={styles.contentWrapper}>
         <View style={styles.imageandIcon}>
-          <View
-            style={[
-              styles.topicIcon,
-              {
-                backgroundColor: item?.iconBg,
-                borderColor: item?.borderColor,
-                marginBottom: 7,
-              },
-            ]}
-          >
-            <View style={styles.iconWrapper}>{item?.icon}</View>
-          </View>
+          {item?.icon_url ? (
+            <Image
+              source={{ uri: item.icon_url }}
+              style={{ width: 26, height: 26, resizeMode: "contain", marginBottom: 7 }}
+            />
+          ) : item?.icon ? (
+            <View
+              style={[
+                styles.topicIcon,
+                {
+                  backgroundColor: item?.iconBg,
+                  borderColor: item?.borderColor,
+                  marginBottom: 7,
+                },
+              ]}
+            >
+              <View style={styles.iconWrapper}>{item?.icon}</View>
+            </View>
+          ) : null}
           {index == 5 && <CircleChevronRight strokeWidth={1.5} />}
         </View>
 

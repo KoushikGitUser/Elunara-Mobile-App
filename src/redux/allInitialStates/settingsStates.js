@@ -62,6 +62,8 @@ export const settingsStates = {
     hasCurriculum: false,
     degreeProgramId: null,
   },
+  fetchingCurriculumSubjects: false,
+  curriculumSubjects: [],
 
   // Analytics
   fetchingAnalyticsDashboard: false,

@@ -433,6 +433,40 @@ export const handleGetAnalyticsSubjects = {
   },
 };
 
+// Curriculum Topics
+export const handleGetCurriculumTopics = {
+  pending: (state) => {
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = "pending";
+  },
+  fulfilled: (state, action) => {
+    const data = action.payload?.data?.data || [];
+    console.log("getCurriculumTopics fulfilled:", JSON.stringify(data));
+    state.chatsStates.allChatsDatas.allTopicsOfSelectedSubjects = data;
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = true;
+  },
+  rejected: (state, action) => {
+    console.log("getCurriculumTopics rejected:", JSON.stringify(action.payload || action.error));
+    state.chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched = false;
+  },
+};
+
+// Curriculum Subjects
+export const handleGetCurriculumSubjects = {
+  pending: (state) => {
+    state.settingsStates.fetchingCurriculumSubjects = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingCurriculumSubjects = false;
+    const data = action.payload?.data?.data;
+    console.log("getCurriculumSubjects fulfilled:", JSON.stringify(data));
+    state.settingsStates.curriculumSubjects = data || [];
+  },
+  rejected: (state, action) => {
+    console.log("getCurriculumSubjects rejected:", JSON.stringify(action.payload || action.error));
+    state.settingsStates.fetchingCurriculumSubjects = false;
+  },
+};
+
 // Curriculum Status
 export const handleGetCurriculumStatus = {
   pending: (state) => {

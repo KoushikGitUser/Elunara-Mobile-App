@@ -18,6 +18,7 @@ const ChatTopicsMain = () => {
 
     const topicsWithIcons = apiTopics.map((topic, index) => ({
       ...topic,
+      icon_url: topic.icon || null,
       icon: topicsSheetInitial[index]?.icon,
       iconBg: topicsSheetInitial[index]?.iconBg,
       borderColor: topicsSheetInitial[index]?.borderColor,

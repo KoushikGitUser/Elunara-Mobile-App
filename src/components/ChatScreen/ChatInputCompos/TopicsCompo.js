@@ -38,6 +38,7 @@ const TopicsCompo = () => {
       title: topic.name,
       id:topic.id,
       description: topic.description,
+      icon_url: topic.icon || null,
       icon: topicsSheet[index]?.icon,
       iconBg: topicsSheet[index]?.iconBg,
       borderColor: topicsSheet[index]?.borderColor,

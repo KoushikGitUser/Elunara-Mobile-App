@@ -40,6 +40,7 @@ import {
   setIsInitialRechargeCompleted,
   setIsPromotionalUser,
   setPromotionalDaysRemaining,
+  setToggleShowCurriculumView,
 } from "../../redux/slices/toggleSlice";
 import {
   setGuidedTourStepsCount,
@@ -100,6 +101,13 @@ const ChatScreen = () => {
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates, settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
+  // Switch to chat view when chatting starts
+  useEffect(() => {
+    if (toggleStates.toggleIsChattingWithAI && toggleStates.toggleShowCurriculumView) {
+      dispatch(setToggleShowCurriculumView(false));
+    }
+  }, [toggleStates.toggleIsChattingWithAI]);
+
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;

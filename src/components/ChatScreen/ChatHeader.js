@@ -218,7 +218,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
               } else {
                 triggerToast(
                   "No Curriculum found",
-                  "Your Course is not set in the Personalisation section, set it first to get curriculum subjects and topics.",
+                  "Your Degree Program is not set in the Personalisation section, set it first to get curriculum subjects and topics.",
                   "alert",
                   8000
                 );
@@ -228,7 +228,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
             {toggleStates.toggleShowCurriculumView ? (
               <House size={30} strokeWidth={1.25} color="#000" />
             ) : (
-              <CurriculumIcon size={32} color={hasCurriculum ? "#000" : "#B0B0B0"} strokeWidth={1.5} />
+              <CurriculumIcon size={28} color={hasCurriculum ? "#000" : "#B0B0B0"} strokeWidth={1.5} />
             )}
           </TouchableOpacity>
         )}
