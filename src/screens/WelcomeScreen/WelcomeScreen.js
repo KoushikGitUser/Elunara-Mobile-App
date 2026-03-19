@@ -115,6 +115,20 @@ const WelcomeScreen = () => {
               </Text>
             </TouchableOpacity>
 
+            {/* Apple Button */}
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+                );
+              }}
+              style={[styles.socialButton, { marginBottom: 0 }]}
+              activeOpacity={0.7}
+            >
+              <Image source={apple} style={styles.socialIcons} />
+              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+            </TouchableOpacity>
+
             {/* Demo Button */}
             {/* <TouchableOpacity
               onPress={() => navigation.navigate("changepass", { isForTokenOrOTP: "OTP" })}

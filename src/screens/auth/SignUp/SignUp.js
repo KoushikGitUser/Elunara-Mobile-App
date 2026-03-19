@@ -190,7 +190,7 @@ const SignUp = () => {
     formData.append("email", email.trim());
     formData.append("password", password);
     formData.append("password_confirmation", confirmPassword);
-    formData.append("platform","android");
+    formData.append("platform", "android");
     dispatch(setUserMailIDOnSignup(email.trim()));
     dispatch(userSignUp(formData));
   };
@@ -283,7 +283,7 @@ const SignUp = () => {
                   fontSize: scaleFont(24),
                   paddingLeft: 0,
                   fontFamily: "Mukta-Regular",
-                  lineHeight:30
+                  lineHeight: 30
                 },
               ]}
             >
@@ -767,6 +767,20 @@ const SignUp = () => {
           >
             <Image source={LinkedIn} style={styles.socialIcons} />
             <Text style={styles.socialButtonText}>Continue with LinkedIn</Text>
+          </TouchableOpacity>
+
+          {/* Apple Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+              );
+            }}
+            style={[styles.socialButton, { marginBottom: 0 }]}
+            activeOpacity={0.7}
+          >
+            <Image source={apple} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
