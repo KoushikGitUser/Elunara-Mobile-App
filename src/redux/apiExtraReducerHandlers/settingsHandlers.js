@@ -432,3 +432,23 @@ export const handleGetAnalyticsSubjects = {
     state.settingsStates.fetchingAnalyticsSubjects = false;
   },
 };
+
+// Curriculum Status
+export const handleGetCurriculumStatus = {
+  pending: (state) => {
+    state.settingsStates.fetchingCurriculumStatus = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.fetchingCurriculumStatus = false;
+    const data = action.payload?.data?.data;
+    console.log("getCurriculumStatus fulfilled:", JSON.stringify(action.payload?.data));
+    state.settingsStates.curriculumStatus = {
+      hasCurriculum: data?.has_curriculum || false,
+      degreeProgramId: data?.degree_program_id || null,
+    };
+  },
+  rejected: (state, action) => {
+    console.log("getCurriculumStatus rejected:", JSON.stringify(action.payload || action.error));
+    state.settingsStates.fetchingCurriculumStatus = false;
+  },
+};

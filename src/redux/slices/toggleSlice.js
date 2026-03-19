@@ -13,6 +13,9 @@ const toggleSlice = createSlice({
     setToggleIsChattingWithAI: (state, action) => {
       state.toggleStates.toggleIsChattingWithAI = action.payload;
     },
+    setToggleShowCurriculumView: (state, action) => {
+      state.toggleStates.toggleShowCurriculumView = action.payload;
+    },
     setToggleChatMenuPopup: (state, action) => {
       state.toggleStates.toggleChatMenuPopup = action.payload;
     },
@@ -287,6 +290,7 @@ const toggleSlice = createSlice({
 export const {
   setToggleChatHistorySidebar,
   setToggleIsChattingWithAI,
+  setToggleShowCurriculumView,
   setToggleChatMenuPopup,
   setToggleAddItemsToInputPopup,
   setToggleTopicsPopup,

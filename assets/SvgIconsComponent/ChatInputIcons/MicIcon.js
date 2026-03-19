@@ -6,9 +6,9 @@ const MicIcon = () => {
   return (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={30}
-    height={30}
-    viewBox='0 0 25 25'
+    width={26}
+    height={26}
+    viewBox='0 0 26 26'
     fill="none"
   >
     <Path

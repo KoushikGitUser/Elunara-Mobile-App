@@ -10,6 +10,9 @@ import {
   Alert,
   PermissionsAndroid,
   ActivityIndicator,
+  NativeModules,
+  NativeEventEmitter,
+  Animated,
 } from "react-native";
 import React, {
   useMemo,
@@ -86,6 +89,7 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
   const [isRecording, setIsRecording] = useState(false);
   const [recognizedText, setRecognizedText] = useState("");
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   // Refs for guided tour measurement
   const inputSectionRef = useRef(null);
@@ -144,9 +148,109 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
     }
   };
 
+  // Pulse animation for mic recording
+  useEffect(() => {
+    if (isRecording) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.4,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      pulse.start();
+      return () => pulse.stop();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isRecording]);
+
+  // Speech-to-text setup
+  const speechModule = NativeModules.SpeechToTextModule;
+  const speechEmitter = useRef(null);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || !speechModule) return;
+
+    speechEmitter.current = new NativeEventEmitter(speechModule);
+
+    const startSub = speechEmitter.current.addListener("onSpeechStart", () => {
+      setIsRecording(true);
+    });
+
+    const partialSub = speechEmitter.current.addListener("onSpeechPartialResults", (e) => {
+      if (e.text) {
+        setRecognizedText(e.text);
+        dispatch(setUserMessagePrompt(e.text));
+      }
+    });
+
+    const resultsSub = speechEmitter.current.addListener("onSpeechResults", (e) => {
+      setIsRecording(false);
+      if (e.text) {
+        setRecognizedText(e.text);
+        dispatch(setUserMessagePrompt(e.text));
+      }
+    });
+
+    const endSub = speechEmitter.current.addListener("onSpeechEnd", () => {
+      setIsRecording(false);
+    });
+
+    const errorSub = speechEmitter.current.addListener("onSpeechError", (e) => {
+      setIsRecording(false);
+      if (e.code !== 8 && e.code !== 7) {
+        // Ignore NO_MATCH and NO_SPEECH_INPUT silently
+        Alert.alert("Speech Error", e.error || "Something went wrong");
+      }
+    });
+
+    return () => {
+      startSub.remove();
+      partialSub.remove();
+      resultsSub.remove();
+      endSub.remove();
+      errorSub.remove();
+    };
+  }, []);
+
   // Handle mic button press
-  const handleMicPress = () => {
-Alert.alert("Feature not available","Currently this feature is not implemented")
+  const handleMicPress = async () => {
+    if (Platform.OS !== "android") {
+      Alert.alert("Not supported", "Speech-to-text is only available on Android");
+      return;
+    }
+
+    if (isRecording) {
+      speechModule.stopListening();
+      setIsRecording(false);
+      return;
+    }
+
+    // Request RECORD_AUDIO permission
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      {
+        title: "Microphone Permission",
+        message: "Elunara needs access to your microphone for voice input",
+        buttonPositive: "Allow",
+        buttonNegative: "Deny",
+      }
+    );
+
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+      Alert.alert("Permission Denied", "Microphone permission is required for voice input");
+      return;
+    }
+
+    speechModule.startListening(null);
   };
 
   const sendMessageDirectly = () => {
@@ -645,33 +749,6 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
           </ScrollView>
         )}
 
-        {isRecording && (
-          <View style={{
-            paddingHorizontal: 15,
-            paddingVertical: 10,
-            backgroundColor: '#FEE2E2',
-            borderRadius: 10,
-            marginBottom: 5,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10,
-          }}>
-            <View style={{
-              width: 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: '#EF4444',
-            }} />
-            <Text style={{
-              fontFamily: 'Mukta-Regular',
-              fontSize: 14,
-              color: '#DC2626',
-            }}>
-              Listening...
-            </Text>
-          </View>
-        )}
-
         <TextInput
           value={globalDataStates.userMessagePrompt}
           onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
@@ -743,18 +820,36 @@ Alert.alert("Feature not available","Currently this feature is not implemented")
             </TouchableOpacity>
           </View>
           <View style={styles.inputRightActionIcons}>
-            {/* <TouchableOpacity
-              onPress={handleMicPress}
-              style={[
-                isRecording && {
-                  backgroundColor: '#EF4444',
-                  borderRadius: 25,
-                  padding: 8,
-                }
-              ]}
-            >
-              <MicIcon color={isRecording ? 'white' : undefined} />
-            </TouchableOpacity> */}
+            <View style={{ alignItems: 'center', justifyContent: 'center', width: isRecording ? 40 : 'auto', height: isRecording ? 40 : 'auto' }}>
+              {isRecording && (
+                <Animated.View
+                  style={{
+                    position: 'absolute',
+                    width: 40,
+                    height: 40,
+                    borderRadius: 26,
+                    borderWidth: 3,
+                    borderColor: '#BFD6FE',
+                    backgroundColor: 'transparent',
+                    transform: [{ scale: pulseAnim }],
+                  }}
+                />
+              )}
+              <TouchableOpacity
+                onPress={handleMicPress}
+                style={{
+                  width: isRecording ? 44 : 'auto',
+                  height: isRecording ? 44 : 'auto',
+                  padding: isRecording ? 0 : 8,
+                  borderRadius: 22,
+                  backgroundColor: isRecording ? '#EBF1FB' : 'transparent',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <MicIcon color={isRecording ? '#1F2937' : undefined} />
+              </TouchableOpacity>
+            </View>
             {globalDataStates.userMessagePrompt !== "" && (
               <TouchableOpacity
                 onPress={() => {

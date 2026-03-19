@@ -28,6 +28,7 @@ import {
   handleFetchResponseStylesAvailable,
   handleFetchCitationFormatsAvailable,
   handleFetchResponseLanguagesAvailable,
+  handleGetCurriculumStatus,
 } from "./apiExtraReducerHandlers/settingsHandlers";
 
 import {
@@ -148,6 +149,9 @@ export const settingsHandlersFunctions = {
   getAnalyticsDashboard: handleGetAnalyticsDashboard,
   getAnalyticsTopics: handleGetAnalyticsTopics,
   getAnalyticsSubjects: handleGetAnalyticsSubjects,
+
+  // Curriculum
+  getCurriculumStatus: handleGetCurriculumStatus,
 };
 
 export const chatsHandlersFunctions = {

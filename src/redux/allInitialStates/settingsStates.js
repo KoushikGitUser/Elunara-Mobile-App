@@ -56,6 +56,13 @@ export const settingsStates = {
   deletingAcademicLink: false,
   academicLinkDeleted: false,
 
+  // Curriculum
+  fetchingCurriculumStatus: false,
+  curriculumStatus: {
+    hasCurriculum: false,
+    degreeProgramId: null,
+  },
+
   // Analytics
   fetchingAnalyticsDashboard: false,
   analyticsDashboard: {},

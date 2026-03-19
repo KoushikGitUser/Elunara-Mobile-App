@@ -1,6 +1,7 @@
 export const toggleStates = {
       toggleChatHistorySidebar: false,
       toggleIsChattingWithAI:false,
+      toggleShowCurriculumView:false,
       toggleChatMenuPopup:false,
       toggleAddItemsToInputPopup:false,
       toggleTopicsPopup:false,

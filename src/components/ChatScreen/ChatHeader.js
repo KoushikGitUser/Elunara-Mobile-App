@@ -6,16 +6,18 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useMemo, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useMemo, useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreenCompo.styles";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   EllipsisVertical,
+  House,
   IndianRupee,
   MessageCirclePlus,
   Wallet,
 } from "lucide-react-native";
+import CurriculumIcon from "../../../assets/SvgIconsComponent/CurriculumIcon";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleChatHistorySidebar,
@@ -23,9 +25,11 @@ import {
   setToggleChatScreenGuideStart,
   setToggleElunaraProWelcomePopup,
   setToggleIsChattingWithAI,
+  setToggleShowCurriculumView,
 } from "../../redux/slices/toggleSlice";
 import ChatOptionsPopup from "../Modals/ChatScreen/ChatOptionsPopup";
 import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration, setGuidedTourStepsCount, setNavigationBasicsGuideTourSteps, setUserMessagePrompt, setSelecetdFiles, setSettingsInnerPageHeaderTitle, setSettingsInnerPageComponentToRender } from "../../redux/slices/globalDataSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import { scaleFont } from "../../utils/responsive";
 import PenNib from "../../../assets/SvgIconsComponent/PenNib";
 import ArchiveDarkIcon from "../../../assets/SvgIconsComponent/ArchiveDarkIcon";
@@ -43,6 +47,16 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
   const { globalDataStates } = useSelector((state) => state.Global);
   const { chatsStates, walletStates } = useSelector((state) => state.API);
   const SCREEN_WIDTH = Dimensions.get("window").width;
+  // Fetch curriculum status
+  useEffect(() => {
+    dispatch(commonFunctionForAPICalls({
+      method: "GET",
+      url: "/curriculum/status",
+      name: "getCurriculumStatus",
+    }));
+  }, []);
+
+  const hasCurriculum = useSelector((state) => state.API?.settingsStates?.curriculumStatus?.hasCurriculum);
 
   // Get chat details
   const chatDetails = chatsStates.allChatsDatas.createdChatDetails;
@@ -162,49 +176,62 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
           )}
         </View>
       ) : (
-        <TouchableOpacity
-          onPress={() => {
-            // triggerToast("Connection Failed","Please check your API key and try again.","alert",1000)
-            // triggerToastWithAction(
-            //   "This is toast",
-            //   "This desc of toast",
-            //   "success",
-            //   5000,
-            //   "Upgrade",
-            //   action
-            // );
-            navigation.navigate("settingsInnerPages", { page: 11 });
-            dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
-            dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
-          }}
-          style={styles.upgradeButton}
-        >
-          {walletStates.isInitialRechargeCompleted ? <Wallet size={16} color="#000" /> : <SparkleIcon />}
-          <Text
-            style={{ fontSize: 14, fontWeight: 600, fontFamily: "Mukta-Bold",marginLeft: walletStates.isInitialRechargeCompleted ? 10 : 0 }}
+        (!walletStates.isInitialRechargeCompleted || walletStates.walletBalance <= 0) && (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("settingsInnerPages", { page: 11 });
+              dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+              dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+            }}
+            style={styles.upgradeButton}
           >
-            {walletStates.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
-          </Text>
-        </TouchableOpacity>
+            {walletStates.isInitialRechargeCompleted ? <Wallet size={16} color="#000" /> : <SparkleIcon />}
+            <Text
+              style={{ fontSize: 14, fontWeight: 600, fontFamily: "Mukta-Bold",marginLeft: walletStates.isInitialRechargeCompleted ? 10 : 0 }}
+            >
+              {walletStates.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
+            </Text>
+          </TouchableOpacity>
+        )
       )}  
 
       <View style={styles.rightChatHeaderIcons}>
-        <TouchableOpacity
-          onPress={async() => {
-            dispatch(setChatMessagesArray([]));
-            dispatch(setMessageIDsArray([]));
-            dispatch(setCurrentAIMessageIndexForRegeneration(null));
-            dispatch(setToggleIsChattingWithAI(false));
-            // Clear chat input text and attachments
-            dispatch(setUserMessagePrompt(""));
-            dispatch(setSelecetdFiles([]));
-            // dispatch(setToggleChatScreenGuideStart(true));
-            // dispatch(setGuidedTourStepsCount(1))
-            //  await AsyncStorage.setItem("isNewUser", "true");
-          }}
-        >
-          <MessageCirclePlus size={30} strokeWidth={1.25} />
-        </TouchableOpacity>
+        {toggleStates.toggleIsChattingWithAI ? (
+          <TouchableOpacity
+            onPress={async() => {
+              dispatch(setChatMessagesArray([]));
+              dispatch(setMessageIDsArray([]));
+              dispatch(setCurrentAIMessageIndexForRegeneration(null));
+              dispatch(setToggleIsChattingWithAI(false));
+              // Clear chat input text and attachments
+              dispatch(setUserMessagePrompt(""));
+              dispatch(setSelecetdFiles([]));
+            }}
+          >
+            <MessageCirclePlus size={30} strokeWidth={1.25} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              if (hasCurriculum) {
+                dispatch(setToggleShowCurriculumView(!toggleStates.toggleShowCurriculumView));
+              } else {
+                triggerToast(
+                  "No Curriculum found",
+                  "Your Course is not set in the Personalisation section, set it first to get curriculum subjects and topics.",
+                  "alert",
+                  8000
+                );
+              }
+            }}
+          >
+            {toggleStates.toggleShowCurriculumView ? (
+              <House size={30} strokeWidth={1.25} color="#000" />
+            ) : (
+              <CurriculumIcon size={32} color={hasCurriculum ? "#000" : "#B0B0B0"} strokeWidth={1.5} />
+            )}
+          </TouchableOpacity>
+        )}
         {toggleStates.toggleIsChattingWithAI && (
           <TouchableOpacity
             ref={chatOptionsIconRef}

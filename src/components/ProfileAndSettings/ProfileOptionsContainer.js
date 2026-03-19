@@ -24,6 +24,7 @@ import PaymentBilling from "../../screens/SettingsPages/PaymentBilling";
 import adImg from "../../assets/images/Upgrade.jpg";
 import { setToggleAdFreeExpPopup, setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
 import { appColors } from "../../themes/appColors";
+import { Wallet } from "lucide-react-native";
 
 const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
   const navigation = useNavigation();
@@ -82,7 +83,11 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
         dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
         dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
       }}>
-        <SparkleIcon color={appColors.navyBlueShade} />
+        {walletStates?.isInitialRechargeCompleted ? (
+          <Wallet size={29} strokeWidth={1.5} color={appColors.navyBlueShade} />
+        ) : (
+          <SparkleIcon color={appColors.navyBlueShade} />
+        )}
         <View style={{width:"100%"}}>
           <GradientText
             children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}

@@ -29,6 +29,7 @@ import SparkleIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebar
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { appColors } from "../../../themes/appColors";
 import GradientText from "../../common/GradientText";
+import { Wallet } from "lucide-react-native";
 
 const SidebarFooter = ({ translateX }) => {
   const styleProps = {};
@@ -125,7 +126,11 @@ const SidebarFooter = ({ translateX }) => {
         }}
         style={styles.upgradeBtn}
       >
-        <SparkleIcon color={appColors.navyBlueShade} />
+        {walletStates?.isInitialRechargeCompleted ? (
+          <Wallet size={29} strokeWidth={1.5} color={appColors.navyBlueShade} />
+        ) : (
+          <SparkleIcon color={appColors.navyBlueShade} />
+        )}
         <View style={{width:"100%"}}>
           <GradientText
             children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}

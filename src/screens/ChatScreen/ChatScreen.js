@@ -24,6 +24,7 @@ import { createStyles } from "./ChatScreen.styles";
 import ChatInputMain from "../../components/ChatScreen/ChatInputMain";
 import ChatHeader from "../../components/ChatScreen/ChatHeader";
 import ChatMiddleWrapper from "../../components/ChatScreen/ChatMiddleSection/ChatMiddleWrapper";
+import CurriculumContentWrapper from "../../components/ChatScreen/ChatMiddleSection/CurriculumContentWrapper";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -1323,7 +1324,11 @@ const ChatScreen = () => {
 
           <ToasterWithAction />
           {/* middle section */}
-          <ChatMiddleWrapper />
+          {toggleStates.toggleShowCurriculumView ? (
+            <CurriculumContentWrapper />
+          ) : (
+            <ChatMiddleWrapper />
+          )}
           {/* middle section */}
 
           {/* chatInput section */}
