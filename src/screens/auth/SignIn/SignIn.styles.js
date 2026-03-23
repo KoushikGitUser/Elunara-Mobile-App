@@ -167,7 +167,7 @@ export const createStyles = (props = {}) =>
       borderRadius: moderateScale(100),
       alignItems: "center",
       justifyContent: "center",
-      height: verticalScale(40),
+      paddingVertical: 12,
       width: "100%",
     },
     emailButtonText: {

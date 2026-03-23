@@ -193,7 +193,7 @@ export const createStyles = ({}) =>
       borderBottomRightRadius: 16,
       borderTopWidth: 1,
       borderColor: "lightgrey",
-      marginBottom: 30,
+      marginBottom: 10,
     },
     profileButton: {
       width: "100%",
@@ -225,6 +225,7 @@ export const createStyles = ({}) =>
     },
     madeinindia: {
       width: "100%",
+      
     },
     chatInputMainWrapper: {
       width: "100%",

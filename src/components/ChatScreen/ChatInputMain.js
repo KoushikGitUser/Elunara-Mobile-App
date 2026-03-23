@@ -90,6 +90,7 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
   const [isRecording, setIsRecording] = useState(false);
   const [recognizedText, setRecognizedText] = useState("");
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const textBeforeRecordingRef = useRef("");
 
   // Refs for guided tour measurement
   const inputSectionRef = useRef(null);
@@ -187,16 +188,21 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
 
     const partialSub = speechEmitter.current.addListener("onSpeechPartialResults", (e) => {
       if (e.text) {
-        setRecognizedText(e.text);
-        dispatch(setUserMessagePrompt(e.text));
+        const prefix = textBeforeRecordingRef.current;
+        const combined = prefix ? prefix + " " + e.text : e.text;
+        setRecognizedText(combined);
+        dispatch(setUserMessagePrompt(combined));
       }
     });
 
     const resultsSub = speechEmitter.current.addListener("onSpeechResults", (e) => {
       setIsRecording(false);
       if (e.text) {
-        setRecognizedText(e.text);
-        dispatch(setUserMessagePrompt(e.text));
+        const prefix = textBeforeRecordingRef.current;
+        const combined = prefix ? prefix + " " + e.text : e.text;
+        setRecognizedText(combined);
+        dispatch(setUserMessagePrompt(combined));
+        textBeforeRecordingRef.current = combined;
       }
     });
 
@@ -250,6 +256,7 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
       return;
     }
 
+    textBeforeRecordingRef.current = globalDataStates.userMessagePrompt || "";
     speechModule.startListening(null);
   };
 

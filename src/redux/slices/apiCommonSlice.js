@@ -110,6 +110,21 @@ const apiCommonSlice = createSlice({
     resetChatPinUnpinUpdated: (state) => {
       state.chatsStates.loaderStates.isChatPinUnpinUpdated = null;
     },
+    resetForNewChat: (state) => {
+      state.chatsStates.loaderStates.isChatCreatedWithAI = null;
+      state.chatsStates.loaderStates.isMessagesFetched = null;
+      state.chatsStates.loaderStates.isAllMessagesOfChatFetched = null;
+      state.chatsStates.loaderStates.isAIResponseRegenerated = null;
+      state.chatsStates.loaderStates.isVersionSwitched = null;
+      state.chatsStates.allChatsDatas.createdChatDetails = {};
+      state.chatsStates.allChatsDatas.chatMessages = {};
+      state.chatsStates.allChatsDatas.fetchedMessages = {};
+      state.chatsStates.allChatsDatas.aiMessageContent = null;
+      state.chatsStates.allChatsDatas.regeneratedResponse = {};
+      state.chatsStates.allChatsDatas.switchedVersionData = {};
+      state.chatsStates.allChatsDatas.latestUserMessageData = null;
+      state.chatsStates.allChatsDatas.latestAiMessageData = null;
+    },
     setCurrentActionChatDetails: (state, action) => {
       state.chatsStates.allChatsDatas.currentActionChatDetails = action.payload;
     },
@@ -196,6 +211,7 @@ export const {
   setHasEnoughBalanceForFiles,
   resetPaymentInitiated,
   resetVerifyPayment,
+  resetForNewChat,
 } = apiCommonSlice.actions;
 
 export default apiCommonSlice.reducer;

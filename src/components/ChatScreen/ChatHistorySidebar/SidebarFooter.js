@@ -147,7 +147,7 @@ const SidebarFooter = ({ translateX }) => {
             fontFamily: "Mukta-Regular",
           }}
         >
-          Made in India
+          A Globsyn Business School initiative
         </Text>
       </View>
     </View>

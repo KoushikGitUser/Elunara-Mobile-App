@@ -72,7 +72,7 @@ const CurriculumContentWrapper = () => {
             measureWidth={true}
           />
           <GradientText
-            children="& Topics"
+            children="& Topics as per AICTE"
             fullWidth={false}
             fontSize={24}
             measureWidth={true}

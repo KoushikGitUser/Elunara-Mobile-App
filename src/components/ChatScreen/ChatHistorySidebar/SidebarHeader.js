@@ -29,6 +29,7 @@ import {
   setUserMessagePrompt,
   setSelecetdFiles,
 } from "../../../redux/slices/globalDataSlice";
+import { resetForNewChat } from "../../../redux/slices/apiCommonSlice";
 import { scaleFont } from "../../../utils/responsive";
 
 const SidebarHeader = forwardRef(({ translateX }, ref) => {
@@ -70,6 +71,7 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
           dispatch(setToggleIsChattingWithAI(false));
           dispatch(setUserMessagePrompt(""));
           dispatch(setSelecetdFiles([]));
+          dispatch(resetForNewChat());
 
           Animated.timing(translateX, {
             toValue: toggleStates.toggleChatHistorySidebar
@@ -142,6 +144,7 @@ const SidebarHeader = forwardRef(({ translateX }, ref) => {
             dispatch(setToggleIsChattingWithAI(false));
             dispatch(setUserMessagePrompt(""));
             dispatch(setSelecetdFiles([]));
+            dispatch(resetForNewChat());
 
             Animated.timing(translateX, {
               toValue: toggleStates.toggleChatHistorySidebar
