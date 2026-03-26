@@ -95,7 +95,7 @@ const Topics = ({ item, index }) => {
           {item?.name}
         </Text>
         <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}
-        numberOfLines={1}
+        numberOfLines={2}
         ellipsizeMode="tail">
           {item.description}
         </Text>
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     minHeight: verticalScale(110),
     borderWidth: 1,
     borderColor: "#D3DAE5",
-    borderRadius: 20,
+    borderRadius: 17,
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "flex-start",

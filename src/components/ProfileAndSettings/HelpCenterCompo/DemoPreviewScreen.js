@@ -57,7 +57,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       3: {
         step: "3/4",
         title: "Pin Your Important Items",
-        description: "Pin important chats and Learning labs to keep them easily accessible at the top of your sidebar.",
+        description: "Pin important chats and Learning Labs to keep them easily accessible at the top of your sidebar.",
         spotlightRect: {
           x: 16,
           y: SCREEN_HEIGHT * 0.35,

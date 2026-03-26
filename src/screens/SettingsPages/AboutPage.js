@@ -77,7 +77,7 @@ const AboutPage = ({ handleScroll }) => {
           <View style={styles.graphIcon}>
             <GraphIcon />
           </View>
-          <Text style={styles.mainTitle}>Personalised Knowledge Linking</Text>
+          <Text style={styles.mainTitle}>Personalized Knowledge Linking</Text>
           <Text
             style={[
               styles.bodyText,
@@ -100,7 +100,7 @@ const AboutPage = ({ handleScroll }) => {
               { paddingBottom: 20, fontWeight: 400, color: "#757575" },
             ]}
           >
-            Avails high-quality, personalised education accessible to every
+            Avails high-quality, personalized education accessible to every
             learner, everywhere.
           </Text>
         </View>
@@ -117,7 +117,7 @@ const AboutPage = ({ handleScroll }) => {
             ]}
           >
             Adapts to your unique learning style to make education more
-            effective and personalised.
+            effective and personalized.
           </Text>
         </View>
         <OurValuesCompo />

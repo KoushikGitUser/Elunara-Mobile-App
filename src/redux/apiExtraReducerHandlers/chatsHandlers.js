@@ -536,6 +536,14 @@ export const handleGetAllMessagesOfParticularChat = {
       ],
       generation: msg.generation || null, // Store generation data for badges
       currentVersionIndex: 0,
+      attachments: (msg.attachments || []).map((att) => ({
+        id: att.id,
+        mimeType: att.mime_type,
+        name: decodeURIComponent(att.filename || ""),
+        uri: att.url,
+        type: att.type,
+        fileSize: att.file_size,
+      })),
     }));
 
     // Extract and store message IDs in messageIDsArray

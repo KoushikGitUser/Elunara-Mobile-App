@@ -33,7 +33,7 @@ const TermsOfUse = ({ handleScroll }) => {
         <View style={{ padding: 20, paddingBottom: 5 }}>
           <Text style={styles.sectionTitle}>Acceptance of Terms</Text>
           <Text style={[styles.bodyText, { paddingBottom: 20 }]}>
-            By accessing or using VedLynk, you confirm that you are at least 13
+            By accessing or using Elunara, you confirm that you are at least 13
             years old (or the minimum age required by your local laws) and that
             you agree to be bound by these Terms and our Privacy Policy.
           </Text>

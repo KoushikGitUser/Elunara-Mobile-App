@@ -928,14 +928,14 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
               position: "absolute",
               top: 0,
               left: 0,
-              right: 0,
+              right: 2,
               bottom: 0,
               backgroundColor: "transparent",
               borderRadius: 20,
               zIndex: 10,
               alignItems: "flex-end",
               paddingTop: 12,
-              paddingRight: 12,
+              paddingRight: 15,
             }}
           >
             <LockIcon />

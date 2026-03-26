@@ -84,10 +84,10 @@ const AdSettings = () => {
       {/* Push Notifications Section */}
       <View style={styles.settingItem}>
         <View style={styles.settingTextContainer}>
-          <Text style={styles.settingTitle}>Personalised Ads</Text>
+          <Text style={styles.settingTitle}>Personalized Ads</Text>
           <Text style={styles.settingDescription}>
             Choose the kinds of ads you want to see and which info can be used
-            to personalise them
+            to personalize them
           </Text>
         </View>
         <CustomSwitch

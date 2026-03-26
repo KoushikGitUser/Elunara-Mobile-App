@@ -10,7 +10,7 @@ import {
   Image,
   Modal,
 } from "react-native";
-import React, {             
+import React, {
   useEffect,
   useMemo,
   useCallback,
@@ -381,7 +381,11 @@ const ChatScreen = () => {
         ? chatCustomisationStates.selectedCitationFormat.id
         : parseInt(chatCustomisationStates.selectedCitationFormat.id);
     }
-
+    dispatch(commonFunctionForAPICalls({
+      method: "GET",
+      url: "/chats/recent?limit=10",
+      name: "getAllRecentChats",
+    }));
     const payload = {
       method: "POST",
       url: `/chats/${chatId}/messages`,
@@ -407,6 +411,13 @@ const ChatScreen = () => {
       const userMessage = chatMessages?.user_message;
       const id = userMessage?.id || "none";
       const content = userMessage?.content || "No content";
+
+      // Refetch recent chats so the new chat appears in sidebar
+      dispatch(commonFunctionForAPICalls({
+        method: "GET",
+        url: "/chats/recent?limit=10",
+        name: "getAllRecentChats",
+      }));
     }
     // Handle rejected case
     if (isWaitingForMessages && isMessagesFetched === false) {
@@ -1349,7 +1360,7 @@ const ChatScreen = () => {
                   fontFamily: "Mukta-Regular",
                   textAlign: "center",
                   marginBottom: 12,
-                  marginTop:10,
+                  marginTop: 10,
                 }}
               >
                 Archived chats are read-only. Unarchive to continue the conversation.
@@ -1370,7 +1381,7 @@ const ChatScreen = () => {
                   width: "100%",
                   backgroundColor: appColors.navyBlueShade,
                   paddingVertical: 10,
-                  marginTop:10,
+                  marginTop: 10,
                   borderRadius: 50,
                   alignItems: "center",
                   justifyContent: "center",

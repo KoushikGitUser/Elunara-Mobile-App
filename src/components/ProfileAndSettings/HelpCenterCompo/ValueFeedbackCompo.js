@@ -160,8 +160,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
                           style={styles.inputText}
                           value={feedbackMessage}
                           onChangeText={setFeedbackMessage}
-                          placeholder="Share your dream career, ambitions, 
-                          or anything else you'd like us to know about you..."
+                          placeholder="Share anything you'd like us to know…"
                           placeholderTextColor="#9CA3AF"
                           returnKeyType="done"
                           multiline

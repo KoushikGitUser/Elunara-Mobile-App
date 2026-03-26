@@ -825,7 +825,7 @@ export const allChatsOptionsPopupData = [
 // settingsData.js
 export const profileAndSettingsOptions = [
   { id: 1, title: "General Settings", icon: <SettingsIcon /> },
-  { id: 2, title: "Personalisation", icon: <PersonIcon /> },
+  { id: 2, title: "Personalization", icon: <PersonIcon /> },
   { id: 3, title: "Payment & Billings", icon: <MoneyIcon /> },
   { id: 4, title: "Academic Links", icon: <GradCapIcon /> },
   { id: 5, title: "About", icon: <InfoIcon /> },

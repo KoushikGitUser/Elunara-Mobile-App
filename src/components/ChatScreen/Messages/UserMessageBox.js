@@ -102,8 +102,9 @@ const UserMessageBox = ({ chat, messageIndex }) => {
     if (images.length === 0) return null;
 
     if (images.length === 1) {
+      const imgSource = images[0].uri ? { uri: images[0].uri } : images[0];
       return (
-        <Image source={images[0]} style={styles.attachedImage} />
+        <Image source={imgSource} style={styles.attachedImage} />
       );
     }
 
@@ -113,7 +114,7 @@ const UserMessageBox = ({ chat, messageIndex }) => {
         {images.map((image, index) => (
           <Image
             key={index}
-            source={image}
+            source={image.uri ? { uri: image.uri } : image}
             style={[
               styles.stackedImage,
               {
