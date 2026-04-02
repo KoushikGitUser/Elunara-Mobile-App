@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import { scaleFont } from "../../../utils/responsive";
+import { scaleFont, moderateScale, scale, isTablet } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUpdateProfilePicPopup } from "../../../redux/slices/toggleSlice";
@@ -234,7 +234,7 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
                   }, 500);
 
                 }}>
-                  <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?2.5:0,borderColor:"#081A35",borderRadius:16}} source={corporateAvatar} />
+                  <Image style={{height:isTablet ? scale(80) : moderateScale(60),width:isTablet ? scale(80) : moderateScale(60),objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?2.5:0,borderColor:"#081A35",borderRadius:16}} source={corporateAvatar} />
                   {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 1?<View style={styles.checkCircle}>
                     <Check size={16} color="#FFFFFF" strokeWidth={3} />
                   </View>:null}
@@ -248,7 +248,7 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
                  }}>
-                  <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 2?2.5:0,borderColor:"#081A35",borderRadius:16}} source={teacherAvatar} />
+                  <Image style={{height:isTablet ? scale(80) : moderateScale(60),width:isTablet ? scale(80) : moderateScale(60),objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 2?2.5:0,borderColor:"#081A35",borderRadius:16}} source={teacherAvatar} />
                   {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 2?<View style={styles.checkCircle}>
                     <Check size={16} color="#FFFFFF" strokeWidth={3} />
                   </View>:null}
@@ -262,7 +262,7 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
                  }}>
-                 <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 3?2.5:0,borderColor:"#081A35",borderRadius:16}} source={maleStudentAvatar} />
+                 <Image style={{height:isTablet ? scale(80) : moderateScale(60),width:isTablet ? scale(80) : moderateScale(60),objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 3?2.5:0,borderColor:"#081A35",borderRadius:16}} source={maleStudentAvatar} />
                  {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 3?<View style={styles.checkCircle}>
                    <Check size={16} color="#FFFFFF" strokeWidth={3} />
                  </View>:null}
@@ -276,7 +276,7 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
                      dispatch(setToggleUpdateProfilePicPopup(false));
                   }, 500);
                  }}>
-                    <Image style={{height:80,width:80,objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 4?2.5:0,borderColor:"#081A35",borderRadius:16}} source={femaleStudentAvatar} />
+                    <Image style={{height:isTablet ? scale(80) : moderateScale(60),width:isTablet ? scale(80) : moderateScale(60),objectFit:"contain",borderWidth:globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 4?2.5:0,borderColor:"#081A35",borderRadius:16}} source={femaleStudentAvatar} />
                     {globalDataStates.profilePictureType == "avatar" && globalDataStates.profilePictureAvatar == 4?<View style={styles.checkCircle}>
                       <Check size={16} color="#FFFFFF" strokeWidth={3} />
                     </View>:null}

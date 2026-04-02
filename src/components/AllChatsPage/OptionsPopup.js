@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     borderRadius: 21,
     padding: 7,
-    width: "auto",
+    minWidth: 220,
     right: 20,
     flexDirection: "column",
     alignItems: "flex-start",

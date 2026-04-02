@@ -129,135 +129,136 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
     },
   }));
 
+  const pinnedChatsCount = chatsStates.allChatsDatas.allUserChatsAvailable?.filter(
+    (chat) => chat.is_pinned,
+  )?.length || 0;
+  const pinnedRoomsCount = roomsStates.pinnedRooms?.length || 0;
+
   return (
     <ScrollView style={styles.chatHistorySidebarMiddle}>
-      <View ref={pinnedSectionRef} style={styles.pinnedSectionMain}>
-        <TouchableOpacity
-          onPress={() => {
-            setPinnedChatsOpened(!pinnedChatsOpened);
-            fetchAllPinnedChats();
-          }}
-          style={styles.pinnedBtn}
-        >
-          <PinIcon color="#888888" />
-          <Text
-            style={{
-              fontSize: moderateScale(12.5),
-              marginLeft: 20,
-              fontFamily: "Mukta-Regular",
-            }}
-          >
-            Pinned Chats (
-            {chatsStates.allChatsDatas.allUserChatsAvailable?.filter(
-              (chat) => chat.is_pinned,
-            )?.length || 0}
-            )
-          </Text>
-          {pinnedChatsOpened ? (
-            <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
-          ) : (
-            <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
-          )}
-        </TouchableOpacity>
-        {pinnedChatsOpened && (
-          <View style={styles.individualPinnedChatsMain}>
-            {chatsStates.loaderStates.isAllUserChatsFetched == true ? (
-              chatsStates.allChatsDatas.allUserChatsAvailable?.filter(
-                (chat) => chat.is_pinned,
-              )?.length > 0 ? (
-                chatsStates.allChatsDatas.allUserChatsAvailable
-                  .filter((chat) => chat.is_pinned)
-                  .map((chat, chatIndex) => {
-                    return (
-                      <IndividualPinnedChat
-                        translateX={translateX}
-                        key={chatIndex}
-                        item={chat}
-                      />
-                    );
-                  })
-              ) : (
-                <View
-                  style={{
-                    width: "100%",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    paddingVertical: 20,
-                  }}
-                >
-                  <Text style={{ color: "#081A35" }}>
-                    No pinned chats{"   "}
-                  </Text>
-                </View>
-              )
-            ) : chatsStates.loaderStates.isAllUserChatsFetched == "pending" ? (
-              <View
+      <View ref={pinnedSectionRef} style={[styles.pinnedSectionMain, pinnedChatsCount === 0 && pinnedRoomsCount === 0 && chatsStates.loaderStates.isAllUserChatsFetched === true && { borderBottomWidth: 0 }]}>
+        {(pinnedChatsCount > 0 || chatsStates.loaderStates.isAllUserChatsFetched !== true) && (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                setPinnedChatsOpened(!pinnedChatsOpened);
+                fetchAllPinnedChats();
+              }}
+              style={styles.pinnedBtn}
+            >
+              <PinIcon color="#888888" />
+              <Text
                 style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingVertical: 20,
+                  fontSize: moderateScale(12.5),
+                  marginLeft: 20,
+                  fontFamily: "Mukta-Regular",
                 }}
               >
-                <ActivityIndicator color="#081A35" size="small" />
-              </View>
-            ) : (
-              <View
-                style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingVertical: 20,
-                }}
-              >
-                <Text style={{ color: "#ff7474ff" }}>
-                  Something went wrong{"   "}
-                </Text>
-                <RotateCw onPress={fetchAllPinnedChats} color="#081A35" />
-              </View>
-            )}
-          </View>
-        )}
-        <TouchableOpacity
-          onPress={() => setPinnedRoomsOpened(!pinnedRoomsOpened)}
-          style={styles.pinnedBtn}
-        >
-          <PinIcon color="#888888" />
-          <Text
-            style={{
-              fontSize: moderateScale(12.5),
-              marginLeft: 20,
-              fontFamily: "Mukta-Regular",
-            }}
-          >
-            Pinned Learning Labs ({roomsStates.pinnedRooms?.length || 0})
-          </Text>
-          {pinnedRoomsOpened ? (
-            <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
-          ) : (
-            <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
-          )}
-        </TouchableOpacity>
-        {pinnedRoomsOpened && (
-          <View style={styles.individualPinnedChatsMain}>
-            {roomsStates.pinnedRooms?.length > 0 ? (
-              roomsStates.pinnedRooms.map((room, roomIndex) => (
-                <IndividualPinnedRoom
-                  translateX={translateX}
-                  key={room.uuid || roomIndex}
-                  title={room.name}
-                  room={room}
-                />
-              ))
-            ) : (
-              <Text style={{ paddingLeft: 20, fontSize: 12, color: "#6B7280" }}>
-                No pinned learning labs
+                Pinned Chats ({pinnedChatsCount})
               </Text>
+              {pinnedChatsOpened ? (
+                <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+              ) : (
+                <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+              )}
+            </TouchableOpacity>
+            {pinnedChatsOpened && (
+              <View style={styles.individualPinnedChatsMain}>
+                {chatsStates.loaderStates.isAllUserChatsFetched == true ? (
+                  pinnedChatsCount > 0 ? (
+                    chatsStates.allChatsDatas.allUserChatsAvailable
+                      .filter((chat) => chat.is_pinned)
+                      .map((chat, chatIndex) => {
+                        return (
+                          <IndividualPinnedChat
+                            translateX={translateX}
+                            key={chatIndex}
+                            item={chat}
+                          />
+                        );
+                      })
+                  ) : (
+                    <View
+                      style={{
+                        width: "100%",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingVertical: 20,
+                      }}
+                    >
+                      <Text style={{ color: "#081A35" }}>
+                        No pinned chats{"   "}
+                      </Text>
+                    </View>
+                  )
+                ) : chatsStates.loaderStates.isAllUserChatsFetched == "pending" ? (
+                  <View
+                    style={{
+                      width: "100%",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <ActivityIndicator color="#081A35" size="small" />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      width: "100%",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingVertical: 20,
+                    }}
+                  >
+                    <Text style={{ color: "#ff7474ff" }}>
+                      Something went wrong{"   "}
+                    </Text>
+                    <RotateCw onPress={fetchAllPinnedChats} color="#081A35" />
+                  </View>
+                )}
+              </View>
             )}
-          </View>
+          </>
+        )}
+        {pinnedRoomsCount > 0 && (
+          <>
+            <TouchableOpacity
+              onPress={() => setPinnedRoomsOpened(!pinnedRoomsOpened)}
+              style={styles.pinnedBtn}
+            >
+              <PinIcon color="#888888" />
+              <Text
+                style={{
+                  fontSize: moderateScale(12.5),
+                  marginLeft: 20,
+                  fontFamily: "Mukta-Regular",
+                }}
+              >
+                Pinned Learning Labs ({pinnedRoomsCount})
+              </Text>
+              {pinnedRoomsOpened ? (
+                <ChevronUp style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+              ) : (
+                <ChevronDown style={{ marginLeft: "auto" }} strokeWidth={1.25} />
+              )}
+            </TouchableOpacity>
+            {pinnedRoomsOpened && (
+              <View style={styles.individualPinnedChatsMain}>
+                {roomsStates.pinnedRooms.map((room, roomIndex) => (
+                  <IndividualPinnedRoom
+                    translateX={translateX}
+                    key={room.uuid || roomIndex}
+                    title={room.name}
+                    room={room}
+                  />
+                ))}
+              </View>
+            )}
+          </>
         )}
       </View>
       <View ref={recentChatsSectionRef} style={styles.pinnedSectionMain}>

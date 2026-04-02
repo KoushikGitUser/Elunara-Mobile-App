@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(13),
-    fontWeight: "500",
+    fontSize: scaleFont(15),
+    fontWeight: "700",
     letterSpacing: 0.3,
   },
 });

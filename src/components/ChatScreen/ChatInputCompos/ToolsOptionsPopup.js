@@ -6,8 +6,9 @@ import {
   Image,
   StyleSheet,
   Platform,
+  Animated,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { BlurView } from "@react-native-community/blur";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +26,19 @@ const ToolsOptionsPopup = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const blurOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (toggleStates.toggleToolsPopup) {
+      blurOpacity.setValue(0);
+      Animated.timing(blurOpacity, {
+        toValue: 1,
+        duration: 250,
+        delay: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [toggleStates.toggleToolsPopup]);
 
   return (
     <Modal
@@ -35,14 +49,15 @@ const ToolsOptionsPopup = () => {
     >
       <View style={styles.container}>
         {/* Blur Background */}
-
-        <BlurView
-          style={styles.blurView}
-          blurType="light"
-          blurAmount={7}
-          reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.43)"
-        />
-        <View style={styles.androidBlur} />
+        <Animated.View style={[styles.blurView, { opacity: blurOpacity }]}>
+          <BlurView
+            style={StyleSheet.absoluteFill}
+            blurType="light"
+            blurAmount={7}
+            reducedTransparencyFallbackColor="rgba(0, 0, 0, 0.43)"
+          />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(0, 0, 0, 0.18)" }]} />
+        </Animated.View>
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
@@ -95,14 +110,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  androidBlur: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.18)",
   },
   backdrop: {
     position: "absolute",
