@@ -43,8 +43,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       },
       2: {
         step: "2/4",
-        title: "Recent Chats",
-        description: "Quickly access your recent conversations. Tap any chat to continue where you left off.",
+        title: "Quickly Reach Your Recent Chats",
+        description: "Your 7 most recent chats appear right here for fast access. Want to see older conversations? Tap View All to open your full Chat History landing page.",
         spotlightRect: {
           x: 16,
           y: statusBarHeight + 80,
@@ -117,8 +117,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       },
       3: {
         step: "3/4",
-        title: "Tailor Your AI’s Replies",
-        description: "Easily change Elunara’s tone, style, or language to suit your needs directly in the chat.",
+        title: "Tailor Your AI's Replies",
+        description: "Easily change Elunara's tone, style, or language to suit your needs directly in the chat.",
         spotlightRects: [
           {
             // Change Response popup - positioned on the right side
@@ -130,15 +130,15 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           {
             // Back/Next buttons - from bottom: tooltip(20%) = 20% from bottom
             x: SCREEN_WIDTH * 0.45,
-            y: SCREEN_HEIGHT * (1 - 0.37 - 0.08), 
-            width: SCREEN_WIDTH * 0.3,
+            y: SCREEN_HEIGHT * (1 - 0.37 - 0.08),
+            width: SCREEN_WIDTH * 0.18,
             height: SCREEN_HEIGHT * 0.06,
           },
         ],
         showChangeResponsePopup: true,
         // Custom tooltip position - responsive based on screen size
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.09,   // 1% from bottom (adjusts to screen height)
+          bottom: SCREEN_HEIGHT * 0.11,   // 1% from bottom (adjusts to screen height)
           left: SCREEN_WIDTH * 0.05,      // 5% from left (adjusts to screen width)
           right: SCREEN_WIDTH * 0.05,     // 5% from right (adjusts to screen width)
         },
@@ -146,7 +146,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       4: {
         step: "4/4",
         title: "Manage your Chat",
-        description: "Access powerful chat management features including notes, organization, naming, pinning, and more - all in one place!",
+        description: "Use the menu to open notes, rename or pin this chat, archive, delete, or add it to a learning lab.",
         spotlightRects: [
           {
             // Bottom action buttons (Back/Explore lab features)
@@ -161,7 +161,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         showManageChatMenu: true,
         // Custom tooltip position - responsive based on screen size
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.55,   // 1% from bottom (adjusts to screen height)
+          bottom: SCREEN_HEIGHT * 0.60,   // 1% from bottom (adjusts to screen height)
           //bottom: 650,
           left: SCREEN_WIDTH * 0.05,      // 5% from left (adjusts to screen width)
           right: SCREEN_WIDTH * 0.05,     // 5% from right (adjusts to screen width)
@@ -173,11 +173,11 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       1: {
         step: "1/4",
         title: "Create Your First Learning Lab",
-        description: "Tap “New Learning Lab” in the sidebar to create a learning lab. It helps organise chats and sources into focused workspaces.",
+        description: 'Tap "New Learning Lab" in the sidebar to create a learning lab. It helps organise chats and sources into focused workspaces.',
         noSpotlight: true,
         showLabWelcome: true,
         tooltipPosition: {
-          top: SCREEN_HEIGHT * 0.3,
+          top: SCREEN_HEIGHT * 0.40,
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -231,7 +231,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         noSpotlight: true,
         showLabProgress: true,
         tooltipPosition: {
-          top: SCREEN_HEIGHT * 0.3,
+          bottom: SCREEN_HEIGHT * 0.32,
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -305,8 +305,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                 y={rect.y}
                 width={rect.width}
                 height={rect.height}
-                rx={16}
-                ry={16}
+                rx={showInputArea ? 20 : 16}
+                ry={showInputArea ? 20 : 16}
                 fill="black"
               />
             ))}
@@ -445,7 +445,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         </View>
 
         {/* Spotlight overlay */}
-        {!noSpotlight && activeSpotlightRect && <SpotlightOverlay />}
+        {!noSpotlight && !showOptions && activeSpotlightRect && <SpotlightOverlay />}
 
         {/* Spotlight highlight box */}
 
@@ -474,13 +474,17 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <Text style={styles.recentChatsTitle}>Recent Chats</Text>
               {recentChats.map((chat, index) => (
                 <View key={index} style={styles.chatItem}>
-                  <View style={[styles.chatIcon, { backgroundColor: chat.color }]}>
+                  <View style={[styles.chatIcon, { backgroundColor: "#FFFFFF" }]}>
                     <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} />
                   </View>
                   <Text style={styles.chatTitle} numberOfLines={1}>{chat.title}</Text>
                 </View>
               ))}
               <TouchableOpacity style={styles.viewAllBtn}>
+                <View style={styles.stackedIconContainer}>
+                  <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} style={styles.stackedIconBottom} />
+                  <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} style={styles.stackedIconTop} />
+                </View>
                 <Text style={styles.viewAllText}>View all Chats</Text>
                 <ChevronRight size={16} color="#1E3A5F" />
               </TouchableOpacity>
@@ -491,7 +495,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.pinnedItem}>
                 <View style={styles.pinnedItemLeft}>
                   <View style={styles.pinnedIconBox}>
-                    <Ionicons name="pin" size={14} color="#6B7280" />
+                    <Ionicons name="pin" size={14} color="#6B7280" style={styles.whatsappPinIcon} />
                   </View>
                   <Text style={styles.pinnedItemText}>Pinned Chats (07)</Text>
                 </View>
@@ -501,7 +505,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.pinnedItem}>
                 <View style={styles.pinnedItemLeft}>
                   <View style={styles.pinnedIconBox}>
-                    <Ionicons name="pin" size={14} color="#6B7280" />
+                    <Ionicons name="pin" size={14} color="#6B7280" style={styles.whatsappPinIcon} />
                   </View>
                   <Text style={styles.pinnedItemText}>Pinned Learning Labs (05)</Text>
                 </View>
@@ -614,7 +618,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <Text style={[styles.responseActionListText]}>Help us improve Elunaraa</Text>
             </View>
             {/* Bottom action icons row */}
-            <View style={styles.responseActionsBottomRow}>
+            <View style={styles.responseActionsBottomRowNew}>
               <View style={styles.responseBottomIcon}>
                 <Ionicons name="copy-outline" size={18} color="#6B7280" />
               </View>
@@ -647,13 +651,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             <View style={styles.optionsContent}>
               {/* Left - Project Updates item */}
               <View style={styles.optionsProjectItem}>
-                <View style={styles.optionsChatCheckbox} />
+                {/* <View style={styles.optionsChatCheckbox} /> */}
+                <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} />
                 <Text style={styles.optionsChatTitle}>Project Updates</Text>
               </View>
               {/* Right - white options popup positioned to start at Project Updates level */}
               <View style={styles.optionsPopup}>
                 <View style={styles.optionRow}>
-                  <Ionicons name="flask-outline" size={16} color="#6B7280" />
+                  <Ionicons name="folder-outline" size={16} color="#6B7280" />
                   <Text style={styles.optionText}>Add to Learning Lab</Text>
                 </View>
                 <View style={styles.optionRow}>
@@ -669,8 +674,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   <Text style={styles.optionText}>Archive</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <Ionicons name="trash-outline" size={16} color="#EF4444" />
-                  <Text style={[styles.optionText, { color: "#EF4444" }]}>Delete</Text>
+                  <Ionicons name="trash-outline" size={16} color="#6B7280" />
+                  <Text style={styles.optionText}>Delete</Text>
                 </View>
               </View>
             </View>
@@ -698,17 +703,17 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                 <Text style={styles.changeResponseTitle}>Change Response</Text>
                 <View style={styles.changeResponseOption}>
                   {/* <Ionicons name="flask" size={18} color="#1E3A5F" /> */}
-                  <LLMIcon color="#888888" />
+                  <LLMIcon color="#1F2937" />
                   <Text style={styles.changeResponseOptionText}>LLM</Text>
                 </View>
                 <View style={styles.changeResponseOption}>
                   {/* <Ionicons name="speedometer" size={18} color="#6B7280" /> */}
-                  <ResStyleIcon color="#888888" />
+                  <ResStyleIcon color="#1F2937" />
                   <Text style={styles.changeResponseOptionText}>Style</Text>
                 </View>
                 <View style={styles.changeResponseOption}>
                   {/* <Ionicons name="globe" size={18} color="#6B7280" /> */}
-                  <ResLangIcon color="#888888" />
+                  <ResLangIcon color="#1F2937" />
                   <Text style={styles.changeResponseOptionText}>Language</Text>
                 </View>
               </View>
@@ -721,14 +726,15 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                 {
                   top: spotlightAreas[1].y,
                   left: spotlightAreas[1].x,
-                  width: spotlightAreas[1].width,
+                  width: SCREEN_WIDTH * 0.18,
                   height: spotlightAreas[1].height,
                   backgroundColor: "#FFFFFF",
                   borderColor: "#FFFFFF",
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   alignItems: "center",
-                  paddingHorizontal: 16,
+                  gap: 4,
+                  paddingHorizontal: 8,
                 },
               ]}
             >
@@ -770,7 +776,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
 
                 <View style={styles.manageChatOption}>
                   <Text style={styles.manageChatOptionText}>Remove this chat permanently</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#EF4444" />
+                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
                 </View>
             </View>
 
@@ -906,7 +912,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
                 <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open" color="#1E3A5F" />
-                <Text style={styles.firstLabOrganizeHeaderText}>New Learning Lab</Text>
+                <Text style={styles.firstLabOrganizeHeaderText}>Learning labs</Text>
               </View>
           </View>
         )}
@@ -1302,6 +1308,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "flex-start",
     overflow: "hidden",
+    backgroundColor: "#FFFFFF",
   },
   recentChatsContent: {
     width: "100%",
@@ -1339,6 +1346,21 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginTop: 4,
   },
+  stackedIconContainer: {
+    width: 20,
+    height: 16,
+    position: "relative",
+  },
+  stackedIconBottom: {
+    position: "absolute",
+    top: 2,
+    left: 0,
+  },
+  stackedIconTop: {
+    position: "absolute",
+    top: 0,
+    left: 4,
+  },
   viewAllText: {
     fontSize: scaleFont(12),
     fontFamily: "Mukta-Medium",
@@ -1367,6 +1389,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
+  },
+  whatsappPinIcon: {
+    transform: [{ rotate: "45deg" }],
   },
   pinnedItemText: {
     fontSize: scaleFont(13),
@@ -1417,7 +1442,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     paddingVertical: 16,
-    width: "60%",
+    width: "85%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -1438,7 +1463,7 @@ const styles = StyleSheet.create({
   },
   // Input area box style for Chat Functions demo
   inputAreaBox: {
-    borderRadius: 28,
+    borderRadius: 20,
     padding: 0,
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -1516,7 +1541,7 @@ const styles = StyleSheet.create({
   borderColor: "#E5E7EB",
   paddingHorizontal: 12,
   paddingVertical: 6,
-  alignSelf: "flex-start", // 👈 fit to text
+  alignSelf: "flex-start", // �'� fit to text
   fontSize: scaleFont(13),
     fontFamily: "Mukta-Regular",
     color: "#374151",
@@ -1531,8 +1556,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   responseActionIcon: {
-    width: 28,
-    height: 28,
+    width: 40,
+    height: 40,
     borderRadius: 50,
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
@@ -1553,14 +1578,28 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 16,
     paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
+    // borderTopWidth: 1,
+    // borderTopColor: "#E5E7EB",
+  },
+  responseActionsBottomRowNew: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 10,
+    marginTop: 16,
+    // paddingTop: 12,
+    padding:6,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    alignSelf: "flex-start",
+    // borderTopWidth: 1,
+    // borderTopColor: "#E5E7EB",
   },
   responseBottomIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1568,7 +1607,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1585,6 +1624,9 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-SemiBold",
     color: "#1F2937",
     marginBottom: 4,
+    borderBottomWidth: 0.8,
+    borderBottomColor: "#1F2937",
+    paddingBottom: 8,
   },
   changeResponseOption: {
     flexDirection: "row",
@@ -1595,7 +1637,7 @@ const styles = StyleSheet.create({
   changeResponseOptionText: {
     fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
-    color: "#374151",
+    color: "#1F2937",
   },
   // Manage Chat menu styles
 manageChatOption: {
@@ -1608,7 +1650,7 @@ manageChatOption: {
   manageChatMenuList:{
     position: "relative",
     width: "100%",
-    top:-190,
+    top:-200,
   },
   manageLabsMenuList:{
     position: "relative",
@@ -1641,14 +1683,22 @@ manageChatOption: {
   // Learning Labs Stage 1 - Welcome
   firstLabWelcomeContainer:{
     position: "absolute",
-    top: SCREEN_HEIGHT * 0.35,
-    left: SCREEN_WIDTH * 0.1,
-    // right: SCREEN_WIDTH * 0.1,
-    alignItems: "center",
+    top: SCREEN_HEIGHT * 0.30,
+    left: SCREEN_WIDTH * 0.05,
+    right: SCREEN_WIDTH * 0.05,
+    alignItems: "flex-start",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   // Learning Labs Stage 3 - Organize
   labOrganizeContainer: {
