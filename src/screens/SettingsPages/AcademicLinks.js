@@ -140,7 +140,7 @@ const AcademicLinks = () => {
 
           {/* Plus Button - Centered to left content */}
           <TouchableOpacity onPress={handleAddLink} style={styles.addButton}>
-            <Plus size={28} color="#1F2937" strokeWidth={1.5} />
+            <Plus size={23} color="#1F2937" strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
       </View>
@@ -278,8 +278,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   addButton: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     borderRadius: 13,
     borderWidth: 1.5,
     borderColor: "#1F2937",

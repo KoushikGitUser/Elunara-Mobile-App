@@ -27,25 +27,34 @@ import DemoPopup from "../../components/ProfileAndSettings/HelpCenterCompo/DemoP
 const HelpCenter = ({ handleScroll }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [moreAccordions, setMoreAccordions] = useState(false);
-  const [toggleFeedbackPopup,setToggleFeedbackPopup] = useState(false);
-  const [toggleGuideTourStartPopup,setToggleGuideTourStartPopup] = useState(false);
+  const [toggleFeedbackPopup, setToggleFeedbackPopup] = useState(false);
+  const [toggleGuideTourStartPopup, setToggleGuideTourStartPopup] =
+    useState(false);
   const [toggleDemoPopup, setToggleDemoPopup] = useState(false);
   const navigation = useNavigation();
   const toggleAccordion = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-
   const handleFeedbackPress = () => {
-    setToggleFeedbackPopup(true)
+    setToggleFeedbackPopup(true);
   };
   const dispatch = useDispatch();
 
   return (
     <View style={styles.container}>
-      <ValueFeedbackCompo popupState={toggleFeedbackPopup} setPopupState={setToggleFeedbackPopup} />
-      <GuidedTourStartPopup popupState={toggleGuideTourStartPopup} setPopupState={setToggleGuideTourStartPopup} />
-      <DemoPopup popupState={toggleDemoPopup} setPopupState={setToggleDemoPopup} />
+      <ValueFeedbackCompo
+        popupState={toggleFeedbackPopup}
+        setPopupState={setToggleFeedbackPopup}
+      />
+      <GuidedTourStartPopup
+        popupState={toggleGuideTourStartPopup}
+        setPopupState={setToggleGuideTourStartPopup}
+      />
+      <DemoPopup
+        popupState={toggleDemoPopup}
+        setPopupState={setToggleDemoPopup}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView
         onScroll={handleScroll}
@@ -83,6 +92,26 @@ const HelpCenter = ({ handleScroll }) => {
             placeholderTextColor="#B5BECE"
             style={styles.searchInput}
           />
+        </View>
+
+        <View
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 0,
+          }}
+        >
+          <Text
+            style={[
+              styles.mainTitle,
+              { marginTop: 25, fontSize: scaleFont(20) },
+            ]}
+          >
+            Frequently Asked Questions
+          </Text>
+          <Text style={styles.introText}>
+            Get quick answers about Elunara features, billing, and account
+            help—browse or search to get instant support.
+          </Text>
         </View>
 
         {/* Cookies section */}
@@ -201,9 +230,12 @@ const HelpCenter = ({ handleScroll }) => {
 
         {/* Demo Button */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}> Explore Elunara with Our Guided Walkthrough</Text>
+          <Text style={styles.cardTitle}>
+            {" "}
+            Explore Elunara with Our Guided Walkthrough
+          </Text>
           <Text style={styles.cardDescription}>
-             Get familiar with Elunara's key features through an interactive
+            Get familiar with Elunara's key features through an interactive
             replay of the app. Perfect for first-time users or anyone needing a
             refresher.
           </Text>
@@ -387,7 +419,7 @@ const styles = StyleSheet.create({
   },
   accordionContainer: {
     padding: 0,
-    marginTop: 30,
+    marginTop: 20,
   },
   accordionItem: {
     marginBottom: 0,

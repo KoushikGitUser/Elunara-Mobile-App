@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Calendar, ChevronDown, UserRound } from "lucide-react-native";
+import { Calendar, ChevronDown, UserRound, X } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GenderDropdown from "./GenderDropdown";
@@ -170,6 +170,28 @@ const Personal = ({ scrollViewRef }) => {
     }, 150);
   };
 
+  // Parse hobbies string into array
+  const getHobbiesArray = () => {
+    if (!hobbiesText || hobbiesText.trim() === "") return [];
+    // Split by comma, space, or both
+    return hobbiesText
+      .split(/[,\s]+/)
+      .map(hobby => hobby.trim())
+      .filter(hobby => hobby !== "");
+  };
+
+  // Remove a hobby from the list
+  const removeHobby = (hobbyToRemove) => {
+    const hobbiesArray = getHobbiesArray();
+    const updatedHobbies = hobbiesArray
+      .filter(hobby => hobby !== hobbyToRemove)
+      .join(", ");
+    setHobbiesText(updatedHobbies);
+
+    // Update the API immediately with the remaining hobbies
+    updateUserHobbies(updatedHobbies);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
@@ -238,8 +260,25 @@ const Personal = ({ scrollViewRef }) => {
             returnKeyType="done"
             onFocus={() => setHobbiesFocused(true)}
             onBlur={() => setHobbiesFocused(false)}
+            cursorColor={appColors.navyBlueShade}
           />
         </View>
+        {/* Hobbies Pills */}
+        {getHobbiesArray().length > 0 && (
+          <View style={styles.pillsContainer}>
+            {getHobbiesArray().map((hobby, index) => (
+              <View key={index} style={styles.pill}>
+                <Text style={styles.pillText}>{hobby}</Text>
+                <TouchableOpacity
+                  onPress={() => removeHobby(hobby)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <X size={16} color="#5E5E5E" strokeWidth={2} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
       <View style={[styles.inputSection, { width: "100%" }]}>
         <Text style={styles.inputLabel}>About You</Text>
@@ -263,6 +302,7 @@ const Personal = ({ scrollViewRef }) => {
               scrollToAbout();
             }}
             onBlur={() => setAboutFocused(false)}
+            cursorColor={appColors.navyBlueShade}
           />
         </View>
       </View>
@@ -342,6 +382,28 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
     color: "black",
+  },
+  pillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    gap: 8,
+  },
+  pill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 50,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+  },
+  pillText: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
+    color: "#1F2937",
   },
 });
 

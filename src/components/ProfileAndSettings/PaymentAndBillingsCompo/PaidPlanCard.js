@@ -66,7 +66,7 @@ const PaidPlanCard = ({ isLoading = false }) => {
           ) : (
             <>
               {isPromoNotActivated ? (
-                <Text style={styles.freeTrialText}>Free Trial</Text>
+                <Text style={[styles.freeTrialText,{color:appColors.navyBlueShade}]}>Free Trial</Text>
               ) : (
                 <Text style={[styles.price, { color: getStatusColor() }]}>₹{balance.toLocaleString("en-IN")}</Text>
               )}

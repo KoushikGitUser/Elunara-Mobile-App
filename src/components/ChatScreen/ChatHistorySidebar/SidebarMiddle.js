@@ -149,7 +149,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
               <PinIcon color="#888888" />
               <Text
                 style={{
-                  fontSize: moderateScale(12.5),
+                  fontSize: moderateScale(15),
                   marginLeft: 20,
                   fontFamily: "Mukta-Regular",
                 }}
@@ -233,7 +233,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
               <PinIcon color="#888888" />
               <Text
                 style={{
-                  fontSize: moderateScale(12.5),
+                  fontSize: moderateScale(15),
                   marginLeft: 20,
                   fontFamily: "Mukta-Regular",
                 }}
@@ -271,7 +271,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
         >
           <Text
             style={{
-              fontSize: moderateScale(13),
+              fontSize: moderateScale(15),
               marginLeft: 20,
               fontFamily: "Mukta-Regular",
             }}
@@ -380,7 +380,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
           <FolderIcon />
           <Text
             style={{
-              fontSize: moderateScale(13),
+              fontSize: moderateScale(15),
               marginLeft: 20,
               fontFamily: "Mukta-Regular",
             }}

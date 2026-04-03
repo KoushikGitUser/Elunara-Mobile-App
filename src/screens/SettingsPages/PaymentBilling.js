@@ -115,7 +115,7 @@ const PaymentBilling = ({ handleScroll }) => {
         {walletStates.isPromotionalUser && walletStates.promotionalDaysRemaining > 0 && (
           <View style={styles.promoBanner}>
             <View style={styles.promoHeader}>
-              <Gift size={25} color="#10B981" strokeWidth={1.5} />
+              <Gift size={25} color="#a4a4a4" strokeWidth={1.5} />
               <Text style={styles.promoText}>
                 Promotional Free Trial is Active
               </Text>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   promoDaysCount: {
     fontSize: scaleFont(22),
     fontFamily: "Mukta-Bold",
-    color: "#10B981",
+    color: "#ff0000",
     marginTop: 12,
   },
   header: {
