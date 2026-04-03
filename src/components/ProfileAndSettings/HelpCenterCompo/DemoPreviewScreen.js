@@ -19,6 +19,7 @@ import ResStyleIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons
 import ResLangIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
 import FeedBackIcon from "../../../../assets/SvgIconsComponent/HelpCenterIcons/FeedBackIcon";
+import PinIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
@@ -34,7 +35,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         title: "Your Navigation Hub, The Sidebar",
         description: "The sidebar helps you navigate Elunara. Switch between Chats, Learning Labs (Pro), Settings, and more easily.",
         spotlightRect: {
-          x: 12,
+          x: 38,
           y: statusBarHeight + 8,
           width: 44,
           height: 44,
@@ -462,6 +463,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               (showSidebar || showPinned) && styles.recentChatsBox,
               showInputArea && styles.inputAreaBox,
               showResponseActions && styles.responseActionsBox,
+              demoType === "navigation" && currentStep === 1 && { backgroundColor: "#ffffff" },
             ]}
           >
           {demoType === "navigation" && currentStep === 1 && (
@@ -495,7 +497,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.pinnedItem}>
                 <View style={styles.pinnedItemLeft}>
                   <View style={styles.pinnedIconBox}>
-                    <Ionicons name="pin" size={14} color="#6B7280" style={styles.whatsappPinIcon} />
+                    <PinIcon size={16} color="#888888" />
                   </View>
                   <Text style={styles.pinnedItemText}>Pinned Chats (07)</Text>
                 </View>
@@ -505,7 +507,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.pinnedItem}>
                 <View style={styles.pinnedItemLeft}>
                   <View style={styles.pinnedIconBox}>
-                    <Ionicons name="pin" size={14} color="#6B7280" style={styles.whatsappPinIcon} />
+                    <PinIcon size={16} color="#888888" />
                   </View>
                   <Text style={styles.pinnedItemText}>Pinned Learning Labs (05)</Text>
                 </View>
@@ -666,7 +668,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   <Text style={styles.optionText}>Rename</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <Ionicons name="pin-outline" size={16} color="#6B7280" />
+                  <PinIcon color="#888888" size={16} />
                   <Text style={styles.optionText}>Unpin</Text>
                 </View>
                 <View style={styles.optionRow}>
@@ -766,7 +768,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
 
                 <View style={styles.manageChatOption}>
                   <Text style={styles.manageChatOptionText}>Keep this chat handy in the sidebar</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="pin-outline" size={20} color="#6B7280" />
+                  <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
                 </View>
 
                 <View style={styles.manageChatOption}>
@@ -807,7 +809,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabWelcome && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open" color="#1E3A5F" />
+                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
                 <Text style={styles.firstLabOrganizeHeaderText}>New Learning Lab</Text>
               </View>
           </View>
@@ -830,14 +832,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
 
                 <View style={styles.manageChatOption}>
                   <Text style={styles.manageChatOptionText}>Keep this learning lab handy in the sidebar</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="pin-outline" size={20} color="#6B7280" />
+                  <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
                 </View>
 
 
 
                 <View style={styles.manageChatOption}>
                   <Text style={styles.manageChatOptionText}>Remove this learning lab permanently</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#EF4444" />
+                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
                 </View>
             </View>
 
@@ -911,7 +913,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabProgress && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open" color="#1E3A5F" />
+                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
                 <Text style={styles.firstLabOrganizeHeaderText}>Learning labs</Text>
               </View>
           </View>
