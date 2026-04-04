@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Text as RNText, View } from "react-native";
-import Svg, { Text, Defs, LinearGradient, Stop } from "react-native-svg";
-import { scaleFont } from "../../utils/responsive";
+import React from "react";
+import { View } from "react-native";
+import Svg, { Text, TSpan, Defs, LinearGradient, Stop } from "react-native-svg";
 import { useFonts } from "expo-font";
 
-const GradientText = ({
+const SimpleGradientText = ({
   children,
+  gradientText, // Text to show with gradient
+  solidText, // Text to show in solid black
   colors = ["#1B365D", "#A5C0E7"],
   start = { x: 0, y: 0 },
   end = { x: 1, y: 1 },
@@ -13,16 +14,13 @@ const GradientText = ({
   fontWeight = "500",
   marginTop,
   marginBottom,
-  fullWidth,
   lineHeight,
-  measureWidth = false, // Deprecated - no longer used
 }) => {
-
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../assets/fonts/Mukta-Bold.ttf"),
   });
 
-  // Show nothing (or a loader) while fonts are loading
+  // Show nothing while fonts are loading
   if (!fontsLoaded) {
     return null;
   }
@@ -37,12 +35,17 @@ const GradientText = ({
   const finalFontWeight = fontWeight;
   const finalHeight = lineHeight || finalFontSize * 1.5;
 
+  // Use either the new props or fallback to children for backward compatibility
+  const textToDisplay = gradientText || children;
+  const hasSolidText = solidText && solidText.trim() !== "";
+
+  // Combine both texts to measure total width
+  const fullText = hasSolidText ? `${textToDisplay}${solidText}` : textToDisplay;
+  const totalWidth = finalFontSize * fullText.length * 0.6;
+
   return (
     <View style={{ marginTop: marginTop, marginBottom: marginBottom }}>
-      <Svg
-        height={finalHeight}
-        width={fullWidth ? "100%" : "100%"}
-      >
+      <Svg height={finalHeight} width={totalWidth}>
         <Defs>
           <LinearGradient id="grad" x1={x1} y1={y1} x2={x2} y2={y2}>
             {colors.map((color, index) => (
@@ -55,20 +58,21 @@ const GradientText = ({
             ))}
           </LinearGradient>
         </Defs>
+        {/* Combined Text with TSpan for different colors */}
         <Text
           style={{ fontFamily: "Mukta-Bold" }}
-          fill="url(#grad)"
           fontSize={finalFontSize}
           fontWeight={finalFontWeight}
-          letterSpacing={1}
-          x="2"
+          letterSpacing={0}
+          x="0"
           y={finalFontSize}
         >
-          {children}
+          <TSpan fill="url(#grad)">{textToDisplay}</TSpan>
+          {hasSolidText && <TSpan fill="#1F2937" dx="5">{solidText}</TSpan>}
         </Text>
       </Svg>
     </View>
   );
 };
 
-export default GradientText;
+export default SimpleGradientText;
