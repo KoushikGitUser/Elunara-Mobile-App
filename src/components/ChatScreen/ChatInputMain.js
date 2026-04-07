@@ -8,12 +8,12 @@ import {
   Platform,
   ScrollView,
   Alert,
-  PermissionsAndroid,
   ActivityIndicator,
   NativeModules,
   NativeEventEmitter,
   Animated,
 } from "react-native";
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import React, {
   useMemo,
   useState,
@@ -229,8 +229,8 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
 
   // Handle mic button press
   const handleMicPress = async () => {
-    if (Platform.OS !== "android") {
-      Alert.alert("Not supported", "Speech-to-text is only available on Android");
+    if (!speechModule) {
+      Alert.alert("Not supported", "Speech-to-text is not available on this device");
       return;
     }
 
@@ -240,20 +240,38 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
       return;
     }
 
-    // Request RECORD_AUDIO permission
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      {
-        title: "Microphone Permission",
-        message: "Elunara needs access to your microphone for voice input",
-        buttonPositive: "Allow",
-        buttonNegative: "Deny",
-      }
-    );
+    // Request mic permission (cross-platform via react-native-permissions)
+    const micPermission =
+      Platform.OS === "ios"
+        ? PERMISSIONS.IOS.MICROPHONE
+        : PERMISSIONS.ANDROID.RECORD_AUDIO;
 
-    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      Alert.alert("Permission Denied", "Microphone permission is required for voice input");
+    let status = await check(micPermission);
+    if (status !== RESULTS.GRANTED) {
+      status = await request(micPermission);
+    }
+
+    if (status !== RESULTS.GRANTED) {
+      Alert.alert(
+        "Permission Denied",
+        "Microphone permission is required for voice input"
+      );
       return;
+    }
+
+    // On iOS, also request Speech Recognition permission
+    if (Platform.OS === "ios") {
+      let speechStatus = await check(PERMISSIONS.IOS.SPEECH_RECOGNITION);
+      if (speechStatus !== RESULTS.GRANTED) {
+        speechStatus = await request(PERMISSIONS.IOS.SPEECH_RECOGNITION);
+      }
+      if (speechStatus !== RESULTS.GRANTED) {
+        Alert.alert(
+          "Permission Denied",
+          "Speech recognition permission is required for voice input"
+        );
+        return;
+      }
     }
 
     textBeforeRecordingRef.current = globalDataStates.userMessagePrompt || "";

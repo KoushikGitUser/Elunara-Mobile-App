@@ -7,6 +7,9 @@ import {
 } from "../../utils/responsive";
 import { appColors } from "../../themes/appColors";
 
+const screenHeight = Dimensions.get("window").height
+const screenWidth = Dimensions.get("window").width
+
 export const createStyles = (props = {}) =>
   StyleSheet.create({
     safeArea: {
@@ -14,14 +17,14 @@ export const createStyles = (props = {}) =>
       backgroundColor: "#ffffffff",
     },
     container: {
-      flex: 1,
+      height:screenWidth > 500? screenHeight - 50:screenHeight,
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
       backgroundColor: "#ffffffff",
     },
     header: {
-      marginTop: 50,
+      marginTop: 30,
       marginBottom: 10,
       width: "90%",
       flexDirection: "row",
@@ -123,7 +126,7 @@ export const createStyles = (props = {}) =>
       backgroundColor: props.socialButtonBg || "#FFFFFF",
       borderWidth: 1.5,
       borderColor: "#081A35",
-      paddingVertical: 12,
+      paddingVertical: 8,
       borderRadius: moderateScale(100),
       marginBottom: 15,
     },
@@ -142,7 +145,7 @@ export const createStyles = (props = {}) =>
       textAlign: "center",
       fontSize: scaleFont(16),
       color: props.dividerColor || "#8A97A3",
-      marginVertical: 10,
+      marginVertical: 8,
       fontFamily: "Mukta-Regular",
     },
     emailButton: {
@@ -150,9 +153,9 @@ export const createStyles = (props = {}) =>
       borderRadius: moderateScale(100),
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 12,
+      paddingVertical: 8,
       width: "90%",
-      marginBottom: 10,
+      marginBottom: 7,
     },
     emailButtonText: {
       fontSize: scaleFont(14),
@@ -163,7 +166,7 @@ export const createStyles = (props = {}) =>
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 25,
+      marginBottom: 20,
       marginTop: 10,
     },
     signupText: {

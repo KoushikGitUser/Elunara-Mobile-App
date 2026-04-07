@@ -6,6 +6,7 @@ import {
   StyleSheet,
   BackHandler,
   Alert,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,14 +37,22 @@ const AuthenticateUserUsingProvider = ({ route }) => {
   };
 
   useEffect(() => {
-    const backAction = () => {
-      return true; // prevent default behavior (exit)
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove(); // clean up
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        return true; // prevent default behavior (exit)
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+      return () => backHandler.remove(); // clean up
+    } else {
+      // iOS: prevent navigating back via swipe / stack back
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+      });
+      return unsub;
+    }
   }, [navigation]);
 
   useEffect(() => {

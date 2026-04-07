@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   NativeModules,
   NativeEventEmitter,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import HyperSdkReact from "hyper-sdk-react";
@@ -144,18 +145,27 @@ const MakePaymentPage = () => {
   useEffect(() => {
     if (!isPaymentInitiated) return;
 
-    const backAction = () => {
-      setShowBackPressPopup(true);
-      return true;
-    };
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        setShowBackPressPopup(true);
+        return true;
+      };
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
 
-    return () => backHandler.remove();
-  }, [isPaymentInitiated]);
+      return () => backHandler.remove();
+    } else {
+      // iOS: prevent navigating back, show same popup
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+        setShowBackPressPopup(true);
+      });
+      return unsub;
+    }
+  }, [isPaymentInitiated, navigation]);
 
   const startPaymentFlow = (amount) => {
     currentPaymentSessionId++;

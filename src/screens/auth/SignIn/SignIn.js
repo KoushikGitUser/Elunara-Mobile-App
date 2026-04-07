@@ -11,7 +11,8 @@ import {
   Linking,
   BackHandler,
   Keyboard,
-} from "react-native"; 
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";   
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect, useMemo, useState, useRef } from "react";
@@ -69,14 +70,22 @@ const SignIn = () => {
   }, [authStates.isSignedIn]);
 
   useEffect(() => {
-    const backAction = () => {
-      return true; // prevent default behavior (exit)
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove(); // clean up
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        return true; // prevent default behavior (exit)
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+      return () => backHandler.remove(); // clean up
+    } else {
+      // iOS: prevent navigating back via swipe / stack back
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+      });
+      return unsub;
+    }
   }, [navigation]);
 
   // Real-time validation functions
@@ -383,7 +392,7 @@ const SignIn = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                `https://api.elunara.ai/api/v1/auth/google/redirect?platform=${Platform.OS}`
               );
             }}
             style={styles.socialButton}
@@ -397,7 +406,7 @@ const SignIn = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                `https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=${Platform.OS}`
               );
             }}
             style={styles.socialButton}
@@ -411,7 +420,7 @@ const SignIn = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+                `http://api.elunara.ai/api/v1/auth/apple/redirect?platform=${Platform.OS}`
               );
             }}
             style={[styles.socialButton, { marginBottom: 0 }]}

@@ -61,15 +61,16 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
 
 
     useEffect(() => {
+      if (Platform.OS !== "android") return;
       const backAction = () => {
         return true; // prevent default behavior (exit)
       };
-  
+
       const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
         backAction
       );
-  
+
       return () => backHandler.remove(); // clean up
     }, []);
 

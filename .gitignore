@@ -37,11 +37,23 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# generated native folders
-/ios
+# generated native folders — track sources, ignore build artifacts
 android/app/build/
 android/.gradle/
 android/local.properties
+
+# iOS — track sources, ignore build artifacts and pods
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/.xcode.env.local
+ios/**/xcuserdata/
+ios/**/project.xcworkspace/xcuserdata/
+*.hmap
+*.ipa
+*.xcuserstate
+*.dSYM
+*.dSYM.zip
 
 # System files
 nul

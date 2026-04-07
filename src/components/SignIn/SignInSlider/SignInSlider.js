@@ -12,6 +12,7 @@ import { scaleFont, verticalScale } from "../../../utils/responsive";
 import AuthGradientText from "../../common/AuthGradientText";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
+
 const SignInSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef(null);
@@ -77,7 +78,7 @@ const SignInSlider = () => {
                     <AuthGradientText
                       fullWidth={true}
                       key={headIndex}
-                      fontSize={scaleFont(35)}
+                      fontSize={scaleFont(30)}
                       fontWeight="700"
                       textAlign="left"
                     >
@@ -112,29 +113,34 @@ const SignInSlider = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "column",
     zIndex: 1,
+    justifyContent: "center",
   },
   scrollView: {
     flex: 1,
+
   },
   slide: {
     width: SCREEN_WIDTH,
     flexDirection: "column",
     justifyContent: "flex-end",
-    marginBottom: 10,
+    marginTop: "auto",
+    marginBottom: "auto"
+
   },
   contentContainer: {
     flexDirection: "column",
     paddingHorizontal: 20,
     justifyContent: "flex-end",
-    marginTop: 40,
-    paddingVertical: 10,
+
+
   },
   headingContainer: {
     marginBottom: 10,
-    flexDirection:"column",
-    justifyContent:"space-between",
-    alignItems:"flex-start",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   gradientWrapper: {
     alignSelf: "flex-start",
@@ -147,17 +153,18 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(18),
+    fontSize: scaleFont(15),
     color: "#8A8A8A",
-    lineHeight: 30,
+    lineHeight: 27,
     maxWidth: SCREEN_WIDTH * 0.8,
-    fontFamily:"Mukta-Regular"
+    fontFamily: "Mukta-Regular"
   },
   paginationContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 50,
+    backgroundColor:"white"
   },
   dot: {
     height: 5,

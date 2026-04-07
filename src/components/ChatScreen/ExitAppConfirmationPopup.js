@@ -73,7 +73,10 @@ const ExitAppConfirmationPopup = ({ toggleExitAppConfirmPopup, setToggleExitAppC
                 ]} 
                 onPress={() => {
                    setToggleExitAppConfirmPopup(false);
-                   BackHandler.exitApp();
+                   if (Platform.OS === "android") {
+                     BackHandler.exitApp();
+                   }
+                   // iOS does not allow programmatic app exit; just dismiss the popup.
                 }}
                 activeOpacity={0.8}
               >

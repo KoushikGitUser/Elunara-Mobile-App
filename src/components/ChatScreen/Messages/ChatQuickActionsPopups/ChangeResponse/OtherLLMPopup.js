@@ -144,6 +144,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 9,
     elevation: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
   notesPopupOptions: {
     flexDirection: "row",

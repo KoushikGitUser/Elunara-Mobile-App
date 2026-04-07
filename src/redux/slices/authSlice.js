@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { resetAllStates } from "../actions/resetActions";
 import { allInitialStates } from "../allInitialStates";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 
 export const userSignUp = createAsyncThunk(
   "/userSignUp",
@@ -213,7 +213,7 @@ export const signWithGoogle = createAsyncThunk(
   "/signWithGoogle",
   async (_, { rejectWithValue }) => {
     try {
-      let res = await apiInstance.get("/auth/google/redirect?platform=android", {
+      let res = await apiInstance.get(`/auth/google/redirect?platform=${Platform.OS}`, {
         headers: {
           Accept: "application/json",
         },

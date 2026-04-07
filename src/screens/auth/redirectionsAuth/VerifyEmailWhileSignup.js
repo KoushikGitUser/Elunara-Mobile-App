@@ -5,6 +5,7 @@ import {
   Image,
   TouchableOpacity,
   BackHandler,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -46,15 +47,24 @@ const VerifyEmailWhileSignup = ({ route }) => {
   }, [authStates.isMailVerified]);
 
   useEffect(() => {
-    const backAction = () => {
-      navigation.navigate("signin");
-      return true; // prevent default behavior (exit)
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove(); // clean up
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        navigation.navigate("signin");
+        return true; // prevent default behavior (exit)
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+      return () => backHandler.remove(); // clean up
+    } else {
+      // iOS: redirect to signin if user attempts to leave
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+        navigation.navigate("signin");
+      });
+      return unsub;
+    }
   }, [navigation]);
 
   return (

@@ -10,6 +10,7 @@ import {
   BackHandler,
   Linking,
   Keyboard,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useState, useRef } from "react";
@@ -106,17 +107,25 @@ const SignUp = () => {
   }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
   useEffect(() => {
-    const backAction = () => {
-      return true; // prevent default behavior (exit)
-    };
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        return true; // prevent default behavior (exit)
+      };
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
 
-    return () => backHandler.remove(); // clean up
-  }, []);
+      return () => backHandler.remove(); // clean up
+    } else {
+      // iOS: prevent navigating back via swipe / stack back
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+      });
+      return unsub;
+    }
+  }, [navigation]);
 
   const styleProps = {};
 
@@ -745,7 +754,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+                `https://api.elunara.ai/api/v1/auth/google/redirect?platform=${Platform.OS}`
               );
             }}
             style={styles.socialButton}
@@ -759,7 +768,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+                `https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=${Platform.OS}`
               );
             }}
             style={styles.socialButton}
@@ -773,7 +782,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(
-                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+                `http://api.elunara.ai/api/v1/auth/apple/redirect?platform=${Platform.OS}`
               );
             }}
             style={[styles.socialButton, { marginBottom: 0 }]}

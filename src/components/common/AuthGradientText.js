@@ -8,7 +8,7 @@ const AuthGradientText = ({
   start = { x: 0, y: 0 },
   end = { x: 1, y: 0 },
   fontSize = 32,
-  fontWeight = "700",
+  fontWeight = "900",
   marginTop = 0,
   marginBottom = 0,
   style,

@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   Modal,
+  Platform,
 } from "react-native";
 import React, {
   useEffect,
@@ -655,18 +656,27 @@ const ChatScreen = () => {
   ]);
 
   useEffect(() => {
-    const backAction = () => {
-      setToggleExitAppConfirmPopup(true);
-      return true; // prevent default behavior (exit)
-    };
+    if (Platform.OS === "android") {
+      const backAction = () => {
+        setToggleExitAppConfirmPopup(true);
+        return true; // prevent default behavior (exit)
+      };
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction,
-    );
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction,
+      );
 
-    return () => backHandler.remove(); // clean up
-  }, [toggleExitAppConfirmPopup]);
+      return () => backHandler.remove(); // clean up
+    } else {
+      // iOS: prevent navigating back, show same exit confirmation popup
+      const unsub = navigation.addListener("beforeRemove", (e) => {
+        e.preventDefault();
+        setToggleExitAppConfirmPopup(true);
+      });
+      return unsub;
+    }
+  }, [toggleExitAppConfirmPopup, navigation]);
 
   // Note: postAddToNotes should be called with actual message uuid when user clicks "Add to Notes"
   // Example usage:
