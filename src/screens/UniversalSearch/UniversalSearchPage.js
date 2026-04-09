@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/BigSearchIcon";
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { appColors } from "../../themes/appColors";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Markdown from 'react-native-markdown-display';
 import { commonFunctionForAPICalls, setHighlightChatId, setHighlightRoomId } from "../../redux/slices/apiCommonSlice";
 import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration } from "../../redux/slices/globalDataSlice";
@@ -25,6 +25,8 @@ import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcon
 import { triggerToast } from "../../services/toast";
 
 const UniversalSearchPage = () => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const inputRef = useRef();
@@ -255,7 +257,7 @@ const UniversalSearchPage = () => {
   const noResults = startedSearching && debouncedSearch.length > 0 && !hasResults && !isSearching;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: statusBarHeight }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.container}>
         {/* Header */}
@@ -436,7 +438,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: 0,
   },
   container: {
     flex: 1,

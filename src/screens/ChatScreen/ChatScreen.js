@@ -18,7 +18,7 @@ import React, {
   useState,
   useRef,
 } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { createStyles } from "./ChatScreen.styles";
@@ -95,6 +95,8 @@ const mockChatMessages = [
 ];
 
 const ChatScreen = () => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -795,8 +797,6 @@ const ChatScreen = () => {
 
   // Get spotlight rectangle using measured values or fallbacks
   const getSpotlightRect = (tourType, step) => {
-    const statusBarHeight = StatusBar.currentHeight || 0;
-
     // Navigation Basics
     if (tourType === "navigation") {
       switch (step) {
@@ -956,7 +956,7 @@ const ChatScreen = () => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, width: "100%", marginTop: -StatusBar.currentHeight }}
+      style={{ flex: 1, width: "100%", marginTop: -statusBarHeight }}
     >
       {/* Full-screen loader for fetching messages */}
       {isAllMessagesOfChatFetched === "pending" && (
@@ -1002,7 +1002,7 @@ const ChatScreen = () => {
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <View
           style={{
-            height: StatusBar.currentHeight,
+            height: statusBarHeight,
             width: "100%",
             backgroundColor: "#FAFAFA",
             zIndex: 9999,

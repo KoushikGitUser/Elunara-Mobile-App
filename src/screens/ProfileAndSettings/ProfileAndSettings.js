@@ -1,6 +1,6 @@
-import { View, Text, Animated, StatusBar } from "react-native";
+import { View, Text, Animated, StatusBar, Platform } from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import ProfileHeader from "../../components/ProfileAndSettings/ProfileHeader";
 import UserSection from "../../components/ProfileAndSettings/UserSection";
 import ProfileOptionsContainer from "../../components/ProfileAndSettings/ProfileOptionsContainer";
@@ -12,6 +12,8 @@ import UnlockAdFreeExpPopup from "../../components/Monetisation/UnlockAdFreeExpP
 import { useFonts } from "expo-font";
 
 const ProfileAndSettings = () => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const translateX = React.useRef(new Animated.Value(0)).current;
   const { toggleStates } = useSelector((state) => state.Toggle);
   const [toggleLogOutConfirmPopup, setToggleLogOutConfirmPopup] =
@@ -38,7 +40,7 @@ const ProfileAndSettings = () => {
         flex: 1,
         backgroundColor: "#FAFAFA",
         paddingHorizontal: 20,
-        marginTop: -StatusBar.currentHeight,
+        marginTop: -statusBarHeight,
       }}
     >
       {toggleStates.toggleUnlockAnalyticsDashboardPopup && (
@@ -59,7 +61,7 @@ const ProfileAndSettings = () => {
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <View
           style={{
-            height: StatusBar.currentHeight,
+            height: statusBarHeight,
             width: "100%",
             backgroundColor: "#FAFAFA",
             zIndex: 9999,

@@ -4,9 +4,10 @@ import {
   TouchableOpacity,
   Animated,
   StatusBar,
+  Platform,
 } from "react-native";
 import { useEffect, useMemo, useRef, useCallback } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { createStyles } from "./Rooms.styles";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +30,8 @@ import {
 import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
 
 const Rooms = ({ route }) => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const { roomName, roomUuid } = route.params || {};
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
@@ -174,7 +177,7 @@ const Rooms = ({ route }) => {
 
   return (
     <SafeAreaView
-      style={[styles.mainWrapper, { marginTop: -StatusBar.currentHeight }]}
+      style={[styles.mainWrapper, { marginTop: -statusBarHeight }]}
     >
       <StatusBar
         backgroundColor="#000000ff"
@@ -202,7 +205,7 @@ const Rooms = ({ route }) => {
       >
         <View
           style={{
-            height: StatusBar.currentHeight,
+            height: statusBarHeight,
             width: "100%",
             backgroundColor: "#FAFAFA",
             zIndex: 9999,

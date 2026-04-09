@@ -7,8 +7,10 @@ import {
   Dimensions,
   StatusBar,
   ScrollView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
 import { X, Menu, PlusCircle, MessageSquare, ChevronRight, ChevronLeft, ChevronDown, EllipsisVertical, Plus } from "lucide-react-native";
@@ -25,7 +27,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
 const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const statusBarHeight = StatusBar.currentHeight || 0;
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
 
   // Demo configurations for each tour type with multiple steps
   const demoConfigs = {

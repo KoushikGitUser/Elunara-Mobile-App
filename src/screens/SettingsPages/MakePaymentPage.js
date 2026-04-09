@@ -90,6 +90,10 @@ const MakePaymentPage = () => {
 
   // HyperSDK event listener — only resets state, does NOT navigate
   useEffect(() => {
+    if (!NativeModules.HyperSdkReact) {
+      console.log("[MakePayment] HyperSdkReact native module not available");
+      return;
+    }
     const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
     const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
       try {
@@ -188,7 +192,7 @@ const MakePaymentPage = () => {
 
       const sdkPayload = apiWalletStates.hyperPayload?.sdk_payload;
       dispatch(resetPaymentInitiated());
-      if (sdkPayload) {
+      if (sdkPayload && HyperSdkReact) {
         try {
           HyperSdkReact.openPaymentPage(JSON.stringify(sdkPayload));
         } catch (e) {
@@ -196,6 +200,10 @@ const MakePaymentPage = () => {
           dispatch(setIsPaymentInitiated(false));
           dispatch(setHideSettingsBackButton(false));
         }
+      } else if (!HyperSdkReact) {
+        console.log("openPaymentPage: HyperSdkReact module not available");
+        dispatch(setIsPaymentInitiated(false));
+        dispatch(setHideSettingsBackButton(false));
       }
     }
   }, [apiWalletStates.isPaymentFulfilled]);

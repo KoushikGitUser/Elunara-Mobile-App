@@ -7,12 +7,13 @@ import {
   StatusBar,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import ChatHistorySidebar from "../../components/ChatScreen/ChatHistorySidebar/ChatHistorySidebar";
 import AllRoomsPageHeader from "../../components/Rooms/AllRoomsPageHeader";
 import AllRoomsPageSearchIcons from "../../components/Rooms/AllRoomsPageSearchIcons";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { scaleFont, verticalScale } from "../../utils/responsive";
 import ChatsScrollForAllRoomsPage from "../../components/Rooms/ChatsScrollForAllRoomsPage";
 import { Check, Trash2 } from "lucide-react-native";
@@ -24,6 +25,8 @@ import SearchHistory from "../../components/Search/SearchHistory";
 import SearchResults from "../../components/Search/SearchResults";
 
 const AllRoomsLandingPage = () => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const translateX = React.useRef(new Animated.Value(0)).current;
   const [isSearching, setIsSearching] = useState(false);
   const [selectedArray, setSelectedArray] = useState([]);
@@ -120,7 +123,7 @@ const AllRoomsLandingPage = () => {
       style={{
         flex: 1,
         backgroundColor: "#FAFAFA",
-        marginTop: -StatusBar.currentHeight,
+        marginTop: -statusBarHeight,
       }}
     >
       {toggleStates.toggleDeleteChatConfirmPopup && (

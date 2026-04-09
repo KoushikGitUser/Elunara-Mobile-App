@@ -8,6 +8,7 @@ import {
   StatusBar,
   Animated,
   Dimensions,
+  Platform,
 } from "react-native";
 import React, { useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -34,8 +35,11 @@ import UnlockLearningLabPopup from "../../Monetisation/UnlockLearningLabPopup";
 import ProPlanUpgradingPopup from "../../Monetisation/ProPlanUpgradingPopup";
 import UnlockNewChatLimitPopup from "../../Monetisation/UnlockNewChatLimitPopup";
 import { useFonts } from "expo-font";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -129,7 +133,7 @@ const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
             marginLeft: toggleStates.toggleChatHistorySidebar
               ? 0
               : -SCREEN_WIDTH * 0.75,
-              top:StatusBar.currentHeight
+              top:statusBarHeight
           },
         ]}
       >

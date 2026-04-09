@@ -5,8 +5,10 @@ import {
   Animated,
   Dimensions,
   StatusBar,
+  Platform,
 } from "react-native";
 import React, { useMemo, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleChatHistorySidebar } from "../../redux/slices/toggleSlice";
@@ -16,6 +18,8 @@ import { Feather } from "@expo/vector-icons";
 import { createStyles } from "../../screens/AllChatsPage/AllChatsPageStyles.style";
 
 const AllRoomsPageHeader = ({ isSearching, setIsSearching, translateX }) => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -24,7 +28,7 @@ const AllRoomsPageHeader = ({ isSearching, setIsSearching, translateX }) => {
   const dispatch = useDispatch();
 
   return (
-    <View style={[styles.chatHeader, { marginTop: StatusBar.currentHeight }]}>
+    <View style={[styles.chatHeader, { marginTop: statusBarHeight }]}>
       <StatusBar
         backgroundColor="#ff0000ff"
         barStyle="dark-content"

@@ -9,9 +9,10 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from "react-native";
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import AllChatsHeader from "../../components/AllChatsPage/AllChatsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -35,6 +36,8 @@ import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSec
 import { triggerToast } from "../../services/toast";
 
 const AllChatsPage = () => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -252,7 +255,7 @@ const AllChatsPage = () => {
       style={{
         flex: 1,
         backgroundColor: "#FAFAFA",
-        marginTop: -StatusBar.currentHeight,
+        marginTop: -statusBarHeight,
       }}
     >
       {toggleStates.toggleDeleteChatConfirmPopup && (
@@ -284,7 +287,7 @@ const AllChatsPage = () => {
       <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <View
           style={{
-            height: StatusBar.currentHeight,
+            height: statusBarHeight,
             width: "100%",
             backgroundColor: "#FAFAFA",
             zIndex: 9999,
