@@ -4,7 +4,6 @@ import {
   StatusBar,
   TouchableOpacity,
   Image,
-  ScrollView,
   Linking,
   BackHandler,
 } from "react-native";
@@ -29,7 +28,6 @@ import TermsOfUseModal from "../../components/WelcomeScreen/TermsOfUseModal";
 import PrivacyPolicyModal from "../../components/WelcomeScreen/PrivacyPolicyModal";
 
 const WelcomeScreen = () => {
-  // You can pass custom props to override default styles
   const styleProps = {};
 
   const styles = useMemo(() => createStyles(styleProps), []);
@@ -51,136 +49,128 @@ const WelcomeScreen = () => {
     }
   }, [fontsLoaded]);
 
-
-
   useEffect(() => {
     const backAction = () => {
-      return true; // prevent default behavior (exit)
+      return true;
     };
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
-    return () => backHandler.remove(); // clean up
+    return () => backHandler.remove();
   }, [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView>
-        <StatusBar
-          barStyle="dark-content"
-          hidden={false}
-          backgroundColor="#ff0000ff"
-        />
-        <View style={styles.container}>
-          {/* Header Section */}
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Image source={mainLogo} style={styles.mainLogo} />
-            </View>
-            <View>
-              <Image source={chakraLogo} style={styles.chakraLogo} />
-            </View>
+      <StatusBar
+        barStyle="dark-content"
+        hidden={false}
+        backgroundColor="#ff0000ff"
+      />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image source={mainLogo} style={styles.mainLogo} />
           </View>
-          <SignInSlider />
-          {/* Buttons Section */}
-          <View style={styles.buttonsContainer}>
-            {/* Google Button */}
-            <TouchableOpacity
-              onPress={() => {
-                Linking.openURL(
-                  "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
-                );
-              }}
-              style={styles.socialButton}
-              activeOpacity={0.7}
-            >
-              <Image source={google} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
-
-            {/* LinkedIn Button */}
-            <TouchableOpacity
-              onPress={() => {
-                Linking.openURL(
-                  "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
-                );
-              }}
-              style={styles.socialButton}
-              activeOpacity={0.7}
-            >
-              <Image source={LinkedIn} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>
-                Continue with LinkedIn
-              </Text>
-            </TouchableOpacity>
-
-            {/* Apple Button */}
-            <TouchableOpacity
-              onPress={() => {
-                Linking.openURL(
-                  "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
-                );
-              }}
-              style={[styles.socialButton, { marginBottom: 0 }]}
-              activeOpacity={0.7}
-            >
-              <Image source={apple} style={styles.socialIcons} />
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
-            </TouchableOpacity>
-
-            {/* Demo Button */}
-            {/* <TouchableOpacity
-              onPress={() => navigation.navigate("changepass", { isForTokenOrOTP: "OTP" })}
-              style={[styles.socialButton, { borderColor: "#EF4444", borderStyle: "dashed" }]}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.socialButtonText, { color: "#EF4444" }]}>Demo: Change Password (OTP)</Text>
-            </TouchableOpacity> */}
-
-            {/* Divider */}
-            <Text style={styles.divider}>or</Text>
-
-            {/* Email Button */}
-            <TouchableOpacity
-              onPress={() => navigation.navigate("signin")}
-              style={styles.emailButton}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.emailButtonText}>Login with Email</Text>
-            </TouchableOpacity>
-
-            {/* Sign Up Link */}
-            <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("signup")}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.signupLink}>Sign Up</Text>
-                <View style={styles.customUnderline} />
-              </TouchableOpacity>
-            </View>
-
-            {/* Footer Links */}
-            <View style={styles.footer}>
-              <TouchableOpacity
-                onPress={() => setShowTermsModal(true)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.footerLink}>Terms Of Use</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerDot}> • </Text>
-              <TouchableOpacity
-                onPress={() => setShowPrivacyModal(true)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.footerLink}>Privacy Policy</Text>
-              </TouchableOpacity>
-            </View>
+          <View>
+            <Image source={chakraLogo} style={styles.chakraLogo} />
           </View>
         </View>
-      </ScrollView>
+
+        {/* Slider Section */}
+        <View style={styles.sliderWrapper}>
+          <SignInSlider />
+        </View>
+
+        {/* Buttons Section */}
+        <View style={styles.buttonsContainer}>
+          {/* Google Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "https://api.elunara.ai/api/v1/auth/google/redirect?platform=android"
+              );
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            <Image source={google} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* LinkedIn Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "https://api.elunara.ai/api/v1/auth/linkedin/redirect?platform=android"
+              );
+            }}
+            style={styles.socialButton}
+            activeOpacity={0.7}
+          >
+            <Image source={LinkedIn} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>
+              Continue with LinkedIn
+            </Text>
+          </TouchableOpacity>
+
+          {/* Apple Button */}
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(
+                "http://api.elunara.ai/api/v1/auth/apple/redirect?platform=android"
+              );
+            }}
+            style={[styles.socialButton, { marginBottom: 0 }]}
+            activeOpacity={0.7}
+          >
+            <Image source={apple} style={styles.socialIcons} />
+            <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <Text style={styles.divider}>or</Text>
+
+          {/* Email Button */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate("signin")}
+            style={styles.emailButton}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.emailButtonText}>Login with Email</Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Link */}
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Don't have an account? </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("signup")}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.signupLink}>Sign Up</Text>
+              <View style={styles.customUnderline} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Footer Links */}
+          <View style={styles.footer}>
+            <TouchableOpacity
+              onPress={() => setShowTermsModal(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.footerLink}>Terms Of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerDot}> • </Text>
+            <TouchableOpacity
+              onPress={() => setShowPrivacyModal(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.footerLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
 
       {/* Modals */}
       <TermsOfUseModal

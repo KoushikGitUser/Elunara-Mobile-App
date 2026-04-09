@@ -77,7 +77,7 @@ const SignInSlider = () => {
                     <AuthGradientText
                       fullWidth={true}
                       key={headIndex}
-                      fontSize={scaleFont(35)}
+                      fontSize={scaleFont(30)}
                       fontWeight="700"
                       textAlign="left"
                     >
@@ -119,19 +119,20 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: SCREEN_WIDTH,
+    flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
-    marginBottom: 10,
+    marginBottom: verticalScale(6),
   },
   contentContainer: {
     flexDirection: "column",
     paddingHorizontal: 20,
     justifyContent: "flex-end",
-    marginTop: 40,
-    paddingVertical: 10,
+    marginTop: verticalScale(15),
+    paddingVertical: verticalScale(8),
   },
   headingContainer: {
-    marginBottom: 10,
+    marginBottom: verticalScale(8),
     flexDirection:"column",
     justifyContent:"space-between",
     alignItems:"flex-start",
@@ -147,9 +148,9 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: scaleFont(18),
+    fontSize: scaleFont(15),
     color: "#8A8A8A",
-    lineHeight: 30,
+    lineHeight: verticalScale(24),
     maxWidth: SCREEN_WIDTH * 0.8,
     fontFamily:"Mukta-Regular"
   },
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: verticalScale(8),
   },
   dot: {
     height: 5,
