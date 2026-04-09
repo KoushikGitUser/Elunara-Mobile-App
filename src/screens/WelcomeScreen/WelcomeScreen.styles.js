@@ -7,8 +7,7 @@ import {
 } from "../../utils/responsive";
 import { appColors } from "../../themes/appColors";
 
-const screenHeight = Dimensions.get("window").height
-const screenWidth = Dimensions.get("window").width
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export const createStyles = (props = {}) =>
   StyleSheet.create({
@@ -17,34 +16,36 @@ export const createStyles = (props = {}) =>
       backgroundColor: "#ffffffff",
     },
     container: {
-      height:screenWidth > 500? screenHeight - 50:screenHeight,
+      flex: 1,
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
       backgroundColor: "#ffffffff",
     },
     header: {
-      marginTop: 30,
-      marginBottom: 10,
+      marginTop: verticalScale(20),
+      marginBottom: verticalScale(5),
       width: "90%",
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "start",
+      alignItems: "flex-start",
     },
     logoContainer: {
       flexDirection: "row",
       alignItems: "flex-start",
     },
     mainLogo: {
-      height: 40,
-      width: 120,
+      height: verticalScale(44),
+      width: scale(110),
+      objectFit:"cover"
     },
     chakraLogo: {
-      height: 134,
-      width: 93,
+      height: verticalScale(150),
+      width: scale(80),
+      objectFit:"contain",
       position: "absolute",
-      right: -30,
-      marginTop: 15,
+      right: -scale(25),
+      marginTop: verticalScale(20),
       zIndex: 99,
     },
     logo: {
@@ -70,7 +71,6 @@ export const createStyles = (props = {}) =>
     content: {
       flex: 1,
       width: "90%",
-      marginBottom: 20,
     },
     flowerContainer: {
       position: "absolute",
@@ -79,27 +79,27 @@ export const createStyles = (props = {}) =>
       zIndex: 0,
     },
     headingContainer: {
-      marginTop: 80,
+      marginTop: verticalScale(40),
     },
     heading: {
-      fontSize: scaleFont(40),
+      fontSize: scaleFont(36),
       fontWeight: "700",
       color: props.headingColor || "#4D5F75",
       letterSpacing: -0.8,
     },
     subheading: {
-      fontSize: scaleFont(15),
+      fontSize: scaleFont(14),
       color: props.subheadingColor || "#939FA9",
-      lineHeight: moderateScale(25, 0.2),
+      lineHeight: moderateScale(22, 0.2),
       fontWeight: "400",
-      marginTop: 10,
-      marginBottom: 30,
+      marginTop: verticalScale(6),
+      marginBottom: verticalScale(16),
       letterSpacing: 0.1,
     },
     progressContainer: {
       flexDirection: "row",
       gap: scale(12),
-      marginBottom: verticalScale(10),
+      marginBottom: verticalScale(8),
     },
     progressBar: {
       width: scale(34),
@@ -110,13 +110,16 @@ export const createStyles = (props = {}) =>
     progressActive: {
       backgroundColor: props.progressBarActive || "#2C3E50",
     },
+    sliderWrapper: {
+      width: "100%",
+      height: SCREEN_HEIGHT * 0.36,
+      overflow: "hidden",
+    },
     buttonsContainer: {
-      paddingBottom: 20,
+      paddingBottom: verticalScale(16),
       width: "100%",
       flexDirection: "column",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginTop: 30,
     },
     socialButton: {
       flexDirection: "row",
@@ -126,26 +129,26 @@ export const createStyles = (props = {}) =>
       backgroundColor: props.socialButtonBg || "#FFFFFF",
       borderWidth: 1.5,
       borderColor: "#081A35",
-      paddingVertical: 8,
+      paddingVertical: verticalScale(10),
       borderRadius: moderateScale(100),
-      marginBottom: 15,
+      marginBottom: verticalScale(10),
     },
     socialButtonText: {
       fontSize: scaleFont(14),
       fontFamily: "Mukta-Bold",
-      color:appColors.navyBlueShade,
+      color: appColors.navyBlueShade,
       letterSpacing: -0.1,
       marginLeft: scale(12),
     },
     socialIcons: {
-      height: 25,
-      width: 25,
+      height: moderateScale(22),
+      width: moderateScale(22),
     },
     divider: {
       textAlign: "center",
-      fontSize: scaleFont(16),
+      fontSize: scaleFont(15),
       color: props.dividerColor || "#8A97A3",
-      marginVertical: 8,
+      marginVertical: verticalScale(6),
       fontFamily: "Mukta-Regular",
     },
     emailButton: {
@@ -153,9 +156,9 @@ export const createStyles = (props = {}) =>
       borderRadius: moderateScale(100),
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 8,
+      paddingVertical: verticalScale(10),
       width: "90%",
-      marginBottom: 7,
+      marginBottom: verticalScale(8),
     },
     emailButtonText: {
       fontSize: scaleFont(14),
@@ -166,25 +169,24 @@ export const createStyles = (props = {}) =>
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 20,
-      marginTop: 10,
+      marginBottom: verticalScale(14),
+      marginTop: verticalScale(4),
     },
     signupText: {
-      fontSize: scaleFont(14),
+      fontSize: scaleFont(13),
       color: props.signupTextColor || "#5A6B7D",
       fontFamily: "Mukta-Regular",
     },
     signupLink: {
-      fontSize: scaleFont(14),
+      fontSize: scaleFont(13),
       color: "#0F1419",
       fontFamily: "Mukta-Bold",
-      // remove textDecorationLine for manual underline
     },
     customUnderline: {
       height: 2,
       backgroundColor: "#0F1419",
-      width: "100%", // adjust based on text width
-      marginTop: 1, // pushes the line slightly downward
+      width: "100%",
+      marginTop: 1,
     },
     footer: {
       flexDirection: "row",

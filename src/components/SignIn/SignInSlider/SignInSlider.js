@@ -123,21 +123,20 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: SCREEN_WIDTH,
+    flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
-    marginTop: "auto",
-    marginBottom: "auto"
-
+    marginBottom: verticalScale(6),
   },
   contentContainer: {
     flexDirection: "column",
     paddingHorizontal: 20,
     justifyContent: "flex-end",
-
-
+    marginTop: verticalScale(15),
+    paddingVertical: verticalScale(8),
   },
   headingContainer: {
-    marginBottom: 10,
+    marginBottom: verticalScale(8),
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "flex-start",
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: scaleFont(15),
     color: "#8A8A8A",
-    lineHeight: 27,
+    lineHeight: verticalScale(24),
     maxWidth: SCREEN_WIDTH * 0.8,
     fontFamily: "Mukta-Regular"
   },
@@ -163,8 +162,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginBottom: 50,
-    backgroundColor:"white"
+    marginBottom: verticalScale(8),
   },
   dot: {
     height: 5,
