@@ -12,6 +12,8 @@ const SimpleGradientText = ({
   end = { x: 1, y: 1 },
   fontSize,
   fontWeight = "500",
+  solidFontWeight,
+  solidFontFamily,
   marginTop,
   marginBottom,
   lineHeight,
@@ -68,7 +70,7 @@ const SimpleGradientText = ({
           y={finalFontSize}
         >
           <TSpan fill="url(#grad)">{textToDisplay}</TSpan>
-          {hasSolidText && <TSpan fill="#1F2937" dx="5">{solidText}</TSpan>}
+          {hasSolidText && <TSpan fill="#1F2937" dx="5" fontWeight={solidFontWeight || finalFontWeight} fontFamily={solidFontFamily || "Mukta-Bold"}>{solidText}</TSpan>}
         </Text>
       </Svg>
     </View>

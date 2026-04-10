@@ -23,7 +23,7 @@ import { createStyles } from "./SignUp.styles";
 import VerificationMailPopup from "../../../components/SignUp/VerificationMailPopup";
 import MobileVerificationPopup from "../../../components/ChatScreen/MobileVerificationPopup";
 import { scaleFont } from "../../../utils/responsive";
-import GradientText from "../../../components/common/GradientText";
+import SimpleGradientText from "../../../components/common/SimpleGradientText";
 import { useDispatch, useSelector } from "react-redux";
 import { useFonts } from "expo-font";
 import { appColors } from "../../../themes/appColors";
@@ -273,31 +273,16 @@ const SignUp = () => {
               },
             ]}
           >
-            <GradientText
-              marginBottom={0}
-              marginTop={20}
-              children="Join Elunara"
-              fullWidth={false}
-              widthNumber={0.48}
+            <SimpleGradientText
+              gradientText="Join Elunara "
+              solidText="- Your AI"
               fontSize={scaleFont(25)}
               lineHeight={40}
-              measureWidth={true}
+              marginTop={20}
+              marginBottom={0}
+              solidFontWeight="400"
+              solidFontFamily="Mukta-Regular"
             />
-            <Text
-              style={[
-                styles.headTitle,
-                {
-                  marginTop: 25,
-                  color: "black",
-                  fontSize: scaleFont(24),
-                  paddingLeft: 0,
-                  fontFamily: "Mukta-Regular",
-                  lineHeight: 30
-                },
-              ]}
-            >
-              -  Your AI
-            </Text>
           </View>
           {/* </View> */}
 
