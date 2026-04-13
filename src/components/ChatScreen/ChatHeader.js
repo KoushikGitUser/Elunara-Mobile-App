@@ -5,7 +5,10 @@ import {
   Image,
   Animated,
   Dimensions,
+  Platform,
+  StatusBar,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useMemo, useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./ChatScreenCompo.styles";
@@ -39,6 +42,8 @@ import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ChatHeader = forwardRef(({ translateX }, ref) => {
+  const insets = useSafeAreaInsets();
+  const headerTop = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 30);
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -103,6 +108,7 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
       style={[
         styles.chatHeader,
         {
+          top: headerTop,
           borderWidth:
             toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
             globalDataStates.selectedFiles.length > 0 ||

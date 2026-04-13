@@ -113,7 +113,8 @@ const AppNavigator = () => {
           component={ChatScreen}
           options={{
             headerShown: false,
-          }} 
+            gestureEnabled: false,
+          }}
         />
 
         <Stack.Screen

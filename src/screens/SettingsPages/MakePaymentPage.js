@@ -14,6 +14,7 @@ import {
   NativeModules,
   NativeEventEmitter,
   Platform,
+  AppState,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import HyperSdkReact from "hyper-sdk-react";
@@ -106,6 +107,8 @@ const MakePaymentPage = () => {
             console.log("[MakePayment] Stale listener, ignoring process_result");
             return;
           }
+          // Mark as received so AppState fallback doesn't trigger
+          processResultReceivedRef.current = true;
           // Mark this session as handled so no duplicate fires
           currentPaymentSessionId++;
 
@@ -144,6 +147,33 @@ const MakePaymentPage = () => {
       hyperListener.remove();
     };
   }, []);
+
+  // Fallback: if HyperSDK closes without firing process_result,
+  // detect app returning to foreground and reset the stuck state
+  const processResultReceivedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isPaymentInitiated) return;
+    processResultReceivedRef.current = false;
+
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active" && !processResultReceivedRef.current) {
+        // App came to foreground but no process_result was received
+        // Wait briefly in case the event fires slightly after
+        setTimeout(() => {
+          if (!processResultReceivedRef.current) {
+            console.log("[MakePayment] Fallback: no process_result received, resetting state");
+            dispatch(setIsPaymentInitiated(false));
+            dispatch(setHideSettingsBackButton(false));
+            dispatch(resetPaymentInitiated());
+            setShowBackPressPopup(false);
+          }
+        }, 2000);
+      }
+    });
+
+    return () => sub.remove();
+  }, [isPaymentInitiated]);
 
   // BackHandler - show popup when payment is pending
   useEffect(() => {

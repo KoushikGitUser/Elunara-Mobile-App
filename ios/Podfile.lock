@@ -1,4 +1,5 @@
 PODS:
+  - Airborne (0.30.1)
   - BVLinearGradient (2.8.3):
     - React-Core
   - EXAV (16.0.7):
@@ -273,14 +274,15 @@ PODS:
     - hermes-engine/Pre-built (= 0.81.4)
   - hermes-engine/Pre-built (0.81.4)
   - hyper-sdk-react (5.0.29):
-    - HyperSDK (= 2.2.2.8)
+    - HyperSDK (= 2.2.7)
     - React-Core
     - React-RCTAppDelegate
-  - HyperCore (0.0.6)
-  - HyperSDK (2.2.2.8):
-    - HyperCore (= 0.0.6)
-    - JuspaySafeBrowser (= 0.1.87)
-  - JuspaySafeBrowser (0.1.87)
+  - HyperCore (1.0.0)
+  - HyperSDK (2.2.7):
+    - Airborne (= 0.30.1)
+    - HyperCore (= 1.0.0)
+    - JuspaySafeBrowser (= 0.1.94)
+  - JuspaySafeBrowser (0.1.94)
   - RCTDeprecation (0.81.4)
   - RCTRequired (0.81.4)
   - RCTTypeSafety (0.81.4):
@@ -2113,6 +2115,28 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - RNPermissions (5.5.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RNReanimated (4.1.2):
     - hermes-engine
     - RCTRequired
@@ -2485,6 +2509,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -2494,6 +2519,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Airborne
     - HyperCore
     - HyperSDK
     - JuspaySafeBrowser
@@ -2709,6 +2735,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -2723,6 +2751,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Airborne: 75d28fa4564da09a6873958c5e9bb5cc087bd7a8
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   EXAV: e3fefaca88f14624bca01d9a128562a5f8e738f8
   EXConstants: a95804601ee4a6aa7800645f9b070d753b1142b3
@@ -2754,10 +2783,10 @@ SPEC CHECKSUMS:
   EXUpdatesInterface: 5adf50cb41e079c861da6d9b4b954c3db9a50734
   FBLazyVector: 9e0cd874afd81d9a4d36679daca991b58b260d42
   hermes-engine: 35c763d57c9832d0eef764316ca1c4d043581394
-  hyper-sdk-react: 10f3ef48a2aa28518834cb0c6d326fa03e5f14c7
-  HyperCore: 9c17ce1c59618111acdfbe5da261f0d522c1847b
-  HyperSDK: e41414e0d05ceb9bd0b8645ce370e1483890585e
-  JuspaySafeBrowser: 34d7a75466948086321c09c0a5f9028a46bf21b7
+  hyper-sdk-react: 9e8d235b9e0283901f8f45421acad0a6aeebabeb
+  HyperCore: ecb6079d68718fbb45307d48d0282f82d9799c59
+  HyperSDK: 3f349da298264f44294201be8ab21e94cb424e7e
+  JuspaySafeBrowser: 8141eb92fe4d77da997907a0c5eadc0616bce2fa
   RCTDeprecation: 7487d6dda857ccd4cb3dd6ecfccdc3170e85dcbc
   RCTRequired: 54128b7df8be566881d48c7234724a78cb9b6157
   RCTTypeSafety: d2b07797a79e45d7b19e1cd2f53c79ab419fe217
@@ -2830,6 +2859,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: d2578d41c59b936db122b2798ba37e4722d21035
   RNDateTimePicker: a549e1aac0c173ce35fc768c80fd65c227d3a368
   RNGestureHandler: 2914750df066d89bf9d8f48a10ad5f0051108ac3
+  RNPermissions: d399c7a59280e8fb790531da7f76708fe9c6fd45
   RNReanimated: d87360cba850e1df46f5b74d6ee74653a520b631
   RNScreens: d8d6f1792f6e7ac12b0190d33d8d390efc0c1845
   RNSVG: 6c534e37eaaefe882b3f55294d0d607de20562dc

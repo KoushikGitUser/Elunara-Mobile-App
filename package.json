@@ -1,6 +1,7 @@
 {
   "name": "elunara",
   "version": "1.0.0",
+  "hyperSdkIOSVersion": "2.2.7",
   "main": "index.js",
   "scripts": {
     "start": "expo start",

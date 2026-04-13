@@ -303,7 +303,8 @@ customUnderline: {
   },
   otpInput: {
     width: "14%",
-    height: 50,
+    minHeight: 50,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
     borderWidth: 1,
     borderColor: "#B5BECE",
     backgroundColor: "white",

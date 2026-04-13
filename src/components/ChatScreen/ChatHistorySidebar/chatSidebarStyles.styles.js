@@ -30,10 +30,6 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
-      shadowColor: "#000000ff",
-      shadowOffset: { width: 15, height: 0 }, // 👈 horizontal shadow only (to right)
-      shadowOpacity: 1,
-      shadowRadius: 15,
       elevation: 10,
       paddingTop: 40,
     },
@@ -254,9 +250,9 @@ export const createStyles = ({}) =>
     },
     textInput: {
       width: "100%",
-      minHeight: verticalScale(37),
-      paddingTop: 8,
-      paddingBottom: 8,
+      minHeight: Platform.OS === 'ios' ? verticalScale(42) : verticalScale(37),
+      paddingTop: Platform.OS === 'ios' ? 10 : 8,
+      paddingBottom: Platform.OS === 'ios' ? 10 : 8,
       lineHeight: 20,
     },
     inputActionIconsMainWrapper: {

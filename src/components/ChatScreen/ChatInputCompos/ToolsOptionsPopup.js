@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    paddingBottom: Platform.OS === "ios" ? 30 : 24,
   },
   verifiedIcon: {
     height: 55,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 32,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 32,
   },
   iconContainer: {
     marginBottom: 24,
@@ -153,16 +153,16 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     lineHeight: 24,
     color: "#6B7280",
-    marginBottom: 32,
+    marginBottom: Platform.OS === 'ios' ? 0 : 32,
     letterSpacing: 0.2,
   },
   mainOptionsContainer: {
     width: "100%",
-    paddingVertical: 20,
+    paddingVertical: Platform.OS === 'ios' ? 0 : 20,
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 15,
+    gap: Platform.OS === 'ios' ? 10 : 15,
   },
   optionsMain: {
     width: "100%",

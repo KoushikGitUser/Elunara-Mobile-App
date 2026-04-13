@@ -345,7 +345,7 @@ const SignUp = () => {
                 <TextInput
                   style={{
                     flex: 1,
-                    height: "100%",
+                    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
                     paddingHorizontal: 15,
                     fontFamily: "Mukta-Regular",
                     fontSize: scaleFont(14),
@@ -407,7 +407,7 @@ const SignUp = () => {
                   ref={lastNameRef}
                   style={{
                     flex: 1,
-                    height: "100%",
+                    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
                     paddingHorizontal: 15,
                     fontFamily: "Mukta-Regular",
                     fontSize: scaleFont(14),
