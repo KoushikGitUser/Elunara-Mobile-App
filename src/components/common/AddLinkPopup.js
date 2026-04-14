@@ -31,24 +31,32 @@ const AddLinkPopup = ({ onLinkAdded }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const keyboardDidShow = Keyboard.addListener(showEvent, (e) => {
       const height = e.endCoordinates.height;
       setKeyboardVisible(true);
       setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5, // pushes up slightly, not fully
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+    const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
       setKeyboardVisible(false);
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      setKeyboardHeight(0);
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
     return () => {
@@ -66,7 +74,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
     >
       <Toaster />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? undefined : undefined}
         style={[styles.container]}
       >
         {/* Blur Background */}
@@ -80,7 +88,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
         <View
           style={[
             styles.gapFiller,
-            { height: isKeyboardVisible ? "50%" : "30%" },
+            { height: Platform.OS === 'ios' ? 0 : (isKeyboardVisible ? "50%" : "30%") },
           ]}
         />
 
@@ -94,12 +102,11 @@ const AddLinkPopup = ({ onLinkAdded }) => {
         />
         <Animated.View
           style={{
-            transform: [
+            transform: Platform.OS === 'ios' ? [] : [
               {
                 translateY: animatedValue.interpolate({
-                  inputRange: [0, 320], // average keyboard height
+                  inputRange: [0, 320],
                   outputRange: [0, -(keyboardHeight * 2.3)],
-                  // perfect lift without large gap
                   extrapolate: "clamp",
                 }),
               },
@@ -112,7 +119,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.modalSheet}>
+            <View style={[styles.modalSheet, Platform.OS === 'ios' && keyboardHeight > 0 && { paddingBottom: keyboardHeight }]}>
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
@@ -152,7 +159,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
                   style={[
                     styles.verifyButton,
                     !url && styles.verifyButtonDisabled,
-                    { marginBottom: 85 },
+                    { marginBottom: Platform.OS === 'ios' && keyboardHeight > 0 ? 10 : 85 },
                   ]}
                   onPress={() => {
                     // Basic URL validation

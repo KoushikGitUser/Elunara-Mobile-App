@@ -7,6 +7,7 @@ import {
   Keyboard,
   Dimensions,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { RichEditor, actions } from "react-native-pell-rich-editor";
@@ -120,12 +121,14 @@ const Notes = () => {
   const chatUuid = route.params?.chatUuid;
 
   useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) => {
       setKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height); // <-- set height
+      setKeyboardHeight(e.endCoordinates.height);
     });
 
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+    const hideSub = Keyboard.addListener(hideEvent, () => {
       setKeyboardVisible(false);
       setKeyboardHeight(0);
     });
@@ -807,7 +810,7 @@ const Notes = () => {
             styles.collapsedButton,
             {
               bottom: keyboardVisible
-                ? keyboardHeight + 10
+                ? (Platform.OS === 'ios' ? keyboardHeight + 10 : keyboardHeight + 10)
                 : 60,
             },
           ]}
@@ -822,7 +825,7 @@ const Notes = () => {
             styles.footerActions,
             {
               bottom: keyboardVisible
-                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                ? (Platform.OS === 'ios' ? keyboardHeight - 50 : keyboardHeight - (isGestureNavigation ? 10 : 5))
                 : 0,
             },
           ]}
@@ -893,7 +896,7 @@ const Notes = () => {
             styles.footerActions,
             {
               bottom: keyboardVisible
-                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                ? (Platform.OS === 'ios' ? keyboardHeight - 50 : keyboardHeight - (isGestureNavigation ? 10 : 5))
                 : 0,
             },
           ]}
@@ -973,7 +976,7 @@ const Notes = () => {
             styles.footerActions,
             {
               bottom: keyboardVisible
-                ? keyboardHeight - (isGestureNavigation ? 10 : 5)
+                ? (Platform.OS === 'ios' ? keyboardHeight - 50 : keyboardHeight - (isGestureNavigation ? 10 : 5))
                 : 0,
             },
           ]}

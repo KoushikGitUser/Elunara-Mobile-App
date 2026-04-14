@@ -1362,7 +1362,7 @@ const ChatScreen = () => {
 
           {/* chatInput section */}
           {(toggleStates.toggleIsChattingWithAI && (createdChatDetails?.is_archived || createdChatDetails?.archived)) ? (
-            <View style={{ width: "100%", paddingHorizontal: 20, paddingVertical: 30 }}>
+            <View style={{ width: "100%", paddingHorizontal: 20, paddingVertical: Platform.OS == "ios"? 10:30, paddingBottom: Platform.OS === 'ios' ? 50 : 30 }}>
               <Text
                 style={{
                   fontSize: 14,

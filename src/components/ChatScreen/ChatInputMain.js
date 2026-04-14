@@ -178,7 +178,7 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
   const speechEmitter = useRef(null);
 
   useEffect(() => {
-    if (Platform.OS !== "android" || !speechModule) return;
+    if (!speechModule) return;
 
     speechEmitter.current = new NativeEventEmitter(speechModule);
 
@@ -212,8 +212,13 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
 
     const errorSub = speechEmitter.current.addListener("onSpeechError", (e) => {
       setIsRecording(false);
-      if (e.code !== 8 && e.code !== 7) {
-        // Ignore NO_MATCH and NO_SPEECH_INPUT silently
+      // Silently ignore "no speech" errors on both platforms
+      // Android: code 7 (NO_MATCH), 8 (NO_SPEECH_INPUT)
+      // iOS: code 216, 1110 (kAFAssistantErrorDomain), or "No speech detected" message
+      const silentCodes = [7, 8, 216, 1110, 203, 209, 301];
+      const isSilentError = silentCodes.includes(e.code) ||
+        (e.error && e.error.toLowerCase().includes("no speech"));
+      if (!isSilentError) {
         Alert.alert("Speech Error", e.error || "Something went wrong");
       }
     });
@@ -781,12 +786,18 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
           placeholderTextColor="grey"
           style={[
             styles.textInput,
-            { height: inputHeight, fontFamily: "Mukta-Regular", fontSize: 16 },
+            {
+              height: Platform.OS === 'ios' ? undefined : inputHeight,
+              minHeight: Platform.OS === 'ios' ? MIN_HEIGHT : undefined,
+              maxHeight: Platform.OS === 'ios' ? MAX_HEIGHT : undefined,
+              fontFamily: "Mukta-Regular",
+              fontSize: 16,
+            },
           ]}
           multiline
-          textAlignVertical="top"
+          textAlignVertical={Platform.OS === 'android' ? "top" : undefined}
           onContentSizeChange={handleContentSizeChange}
-          scrollEnabled={inputHeight >= MAX_HEIGHT}
+          scrollEnabled={Platform.OS === 'ios' ? true : inputHeight >= MAX_HEIGHT}
           returnKeyType="default"
           editable={!isWaitingForResponse && !isRecording}
         />

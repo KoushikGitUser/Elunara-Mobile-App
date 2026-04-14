@@ -168,23 +168,29 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
   const isFormValid = isEmailValid && isPasswordValid;
 
   useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const keyboardDidShow = Keyboard.addListener(showEvent, (e) => {
       const height = e.endCoordinates.height;
       setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5, // pushes up slightly, not fully
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5, // pushes up slightly, not fully
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+    const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
     return () => {
@@ -219,7 +225,7 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
     >
       <Toaster />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? undefined : undefined}
         style={[styles.container]}
       >
         {/* Blur Background */}
@@ -242,7 +248,7 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
         />
         <Animated.View
           style={{
-            transform: [
+            transform: Platform.OS === 'ios' ? [] : [
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 700], // average keyboard height
@@ -462,7 +468,7 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
                 {/* Skip for now / Resend Code */}
                 {isCodeSent ? (
                   <TouchableOpacity
-                    style={[styles.skipButton, { marginBottom: 70 }]}
+                    style={[styles.skipButton, { marginBottom: Platform.OS === 'ios' && keyboardHeight > 0 ? 10 : 70 }]}
                     onPress={resendTimer === 0 ? resendCode : undefined}
                     activeOpacity={resendTimer === 0 ? 0.7 : 1}
                     disabled={resendTimer > 0}
@@ -513,7 +519,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "40%",
+    height: Platform.OS === 'ios' ? 0 : "40%",
     backgroundColor: "white",
   },
   backdrop: {
@@ -655,7 +661,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 80,
+    marginBottom: Platform.OS === 'ios' ? 10 : 80,
   },
   resendText: {
     fontSize: scaleFont(10),
@@ -673,8 +679,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop:20,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: Platform.OS === 'ios' ? 10 : 40,
   },
   verifyButtonDisabled: {
     backgroundColor: "#CDD5DC",

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -309,6 +310,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     color: "#1F2937",
     fontFamily:"Mukta-Regular",
+    paddingVertical: Platform.OS === 'ios' ? 10 : 0,
   },
   question: {
     fontSize: scaleFont(14),

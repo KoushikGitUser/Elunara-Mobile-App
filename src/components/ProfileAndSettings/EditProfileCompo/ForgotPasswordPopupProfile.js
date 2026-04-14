@@ -189,23 +189,29 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
 
   // Keyboard listeners
   useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const keyboardDidShow = Keyboard.addListener(showEvent, (e) => {
       const height = e.endCoordinates.height;
       setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+    const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
     return () => {
@@ -230,7 +236,7 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
     >
       <Toaster />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? undefined : undefined}
         style={[styles.container]}
       >
         <BlurView
@@ -248,7 +254,7 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
         />
         <Animated.View
           style={{
-            transform: [
+            transform: Platform.OS === 'ios' ? [] : [
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 700],
@@ -556,7 +562,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "40%",
+    height: Platform.OS === "ios" ? 0 : "40%",
     backgroundColor: "white",
   },
   backdrop: {

@@ -234,7 +234,7 @@ export const createStyles = ({}) =>
       paddingBottom: 20,
       borderWidth: 1,
       borderColor: "#ABB8CC",
-      borderRadius: 28,
+      borderRadius: Platform.OS == "ios"? 32:28,
       flexDirection: "column",
       alignItems: "center",
       gap: verticalScale(12),

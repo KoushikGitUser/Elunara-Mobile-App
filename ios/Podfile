@@ -20,6 +20,16 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 
 prepare_react_native_project!
 
+# react-native-permissions: enable iOS permission handlers
+require_relative '../node_modules/react-native-permissions/scripts/setup'
+
+setup_permissions([
+  'Microphone',
+  'SpeechRecognition',
+  'Camera',
+  'PhotoLibrary',
+])
+
 target 'Elunara' do
   use_expo_modules!
 

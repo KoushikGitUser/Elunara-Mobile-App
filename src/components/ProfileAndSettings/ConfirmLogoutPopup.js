@@ -34,9 +34,6 @@ const ConfirmLogoutPopup = ({
   useEffect(() => {
     const handleLogout = async () => {
       if (authStates.isLogOut === true) {
-        // Reset all Redux states
-        dispatch(resetAllStates());
-
         // Clear tokens
         await removeToken();
         await removeRefreshToken();
@@ -47,14 +44,11 @@ const ConfirmLogoutPopup = ({
         // Close popup
         setToggleLogOutConfirmPopup(false);
 
-        // Navigate to welcome screen
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "welcome" }],
-        });
+        // Navigate first, then reset state
 
-        // Reset logout state
+        dispatch(resetAllStates());
         dispatch(setIsLogOutToFalse());
+        navigation.navigate("welcome");
       }
     };
     handleLogout();
@@ -181,7 +175,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    paddingBottom: Platform.OS === "ios" ? 0 : 24,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

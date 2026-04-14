@@ -37,7 +37,7 @@ export const createStyles = (props = {}) =>
     mainLogo: {
       height: verticalScale(44),
       width: scale(110),
-      objectFit:"cover"
+      objectFit: Platform.OS === 'ios' ? "contain" : "cover",
     },
     chakraLogo: {
       height: verticalScale(150),

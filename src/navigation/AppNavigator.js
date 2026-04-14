@@ -65,13 +65,14 @@ const AppNavigator = () => {
         initialRouteName="Splash"
         screenOptions={{
           headerShown: false,
-          animation: "fade",
+          animation: "ios_from_right",
         }}
       >
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -80,6 +81,7 @@ const AppNavigator = () => {
           name="welcome"
           component={WelcomeScreen}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -88,6 +90,7 @@ const AppNavigator = () => {
           name="signin"
           component={SignIn}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -96,6 +99,7 @@ const AppNavigator = () => {
           name="signup"
           component={SignUp}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -104,6 +108,7 @@ const AppNavigator = () => {
           name="changepass"
           component={ChangePassword}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -169,6 +174,7 @@ const AppNavigator = () => {
           name="settingsInnerPages"
           component={SettingsProfileInnerPage}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -217,6 +223,7 @@ const AppNavigator = () => {
           name="paymentStatus"
           component={PaymentStatusPage}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
