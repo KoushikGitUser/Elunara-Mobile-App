@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
     color: "black",
-    paddingVertical: Platform.OS === 'ios' ? 10 : 0,
+    paddingVertical: 12,
   },
   pillsContainer: {
     flexDirection: "row",

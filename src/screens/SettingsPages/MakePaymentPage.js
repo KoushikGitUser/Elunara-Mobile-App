@@ -318,7 +318,7 @@ const MakePaymentPage = () => {
                     Amount - <Text style={{ color: "#10B981" }}>₹{verifyAmount ? verifyAmount.toLocaleString("en-IN") : "0"}</Text>
                   </Text>
                   <Text style={statusStyles.infoMessage}>
-                    Your Payment is successful and your wallet has been credited.
+                    Your Payment is successful and Learning Points has been credited.
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -541,11 +541,12 @@ const MakePaymentPage = () => {
         >
           {/* Current Balance */}
           <View style={styles.currentBalanceRow}>
-            <Text style={styles.currentBalanceLabel}>Current Balance:</Text>
+            <Text style={styles.currentBalanceLabel}>Current LP:</Text>
             <Text
-              style={[styles.currentBalanceValue, { color: getBalanceColor() }]}
+              style={[styles.currentBalanceValue, { color: appColors.navyBlueShade }]}
             >
-              ₹{currentBalance.toLocaleString("en-IN")}
+               
+              {currentBalance.toLocaleString("en-IN")}
             </Text>
           </View>
 
@@ -596,26 +597,7 @@ const MakePaymentPage = () => {
             ))}
           </View>
 
-          {/* Balance after recharge preview */}
-          {rechargeAmount ? (
-            <View style={styles.balancePreview}>
-              <Text style={styles.balancePreviewText}>
-                Balance after recharge:{" "}
-                <Text style={{ fontFamily: "Mukta-Bold", color: "#10B981" }}>
-                  ₹
-                  {(
-                    currentBalance + (parseInt(rechargeAmount) || 0)
-                  ).toLocaleString("en-IN")}
-                </Text>
-              </Text>
-              {currentBalance < 799 &&
-                currentBalance + (parseInt(rechargeAmount) || 0) >= 799 && (
-                  <Text style={styles.fileFeatureNote}>
-                    File uploads will be re-enabled
-                  </Text>
-                )}
-            </View>
-          ) : null}
+
 
           <View style={{ marginBottom: 100 }} />
           {keyboardVisible && (
@@ -675,12 +657,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   headerText: {
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(17),
     fontWeight: "400",
     fontFamily: "Mukta-Regular",
     color: "#64748b",
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 5,
   },
   currentBalanceRow: {
     flexDirection: "row",
@@ -689,7 +671,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   currentBalanceLabel: {
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(17),
     fontFamily: "Mukta-Regular",
     color: "#64748b",
   },
@@ -704,7 +686,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#ABB8CC",
-    borderRadius: 25,
+    borderRadius: 17,
     paddingHorizontal: 20,
     marginBottom: 8,
   },

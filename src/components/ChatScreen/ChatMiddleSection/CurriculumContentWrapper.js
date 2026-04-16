@@ -158,7 +158,7 @@ const CurriculumContentWrapper = () => {
 
 const cardStyles = StyleSheet.create({
   topicsMain: {
-    width: "48%",
+    minWidth: "48%",
     minHeight: verticalScale(110),
     borderWidth: 1,
     borderColor: "#D3DAE5",

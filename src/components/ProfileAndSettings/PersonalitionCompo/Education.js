@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     color: "#1F2937",
     fontFamily:"Mukta-Regular",
-    paddingVertical: Platform.OS === 'ios' ? 10 : 0,
+    paddingVertical: 12 ,
   },
   question: {
     fontSize: scaleFont(14),

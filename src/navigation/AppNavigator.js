@@ -65,7 +65,7 @@ const AppNavigator = () => {
         initialRouteName="Splash"
         screenOptions={{
           headerShown: false,
-          animation: "ios_from_right",
+          animation: "fade",
         }}
       >
         <Stack.Screen

@@ -5,6 +5,7 @@ import {
   scaleFont,
   verticalScale,
 } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -207,14 +208,22 @@ export const createStyles = ({}) =>
       fontSize: moderateScale(17),
       fontWeight: 600,
     },
+    coinstar:{
+      height:30,
+      width:30,
+      borderWidth:2,
+      borderRadius:50,
+      borderColor:appColors.navyBlueShade,
+      justifyContent:"center",
+      alignItems:"center"
+    },
     upgradeBtn: {
       width: "100%",
-
       borderWidth: 1,
       borderColor: "#D3DAE5",
       borderRadius: 16,
       padding: 12,
-      gap: 15,
+      gap: 7,
       flexDirection: "row",
       justifyContent: "flex-start",
       alignItems: "flex-start",
@@ -225,7 +234,7 @@ export const createStyles = ({}) =>
     },
     chatInputMainWrapper: {
       width: "100%",
-      paddingBottom: 20,
+      paddingBottom: Platform.OS == "ios"? 15:20,
       zIndex: 2,
     },
     chatInputMain: {

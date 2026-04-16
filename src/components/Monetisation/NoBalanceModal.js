@@ -15,6 +15,7 @@ import { Wallet, WalletMinimal } from "lucide-react-native";
 import { setToggleNoBalanceModal } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { appColors } from "../../themes/appColors";
 
 const NoBalanceModal = () => {
   const { toggleStates } = useSelector((state) => state.Toggle);
@@ -63,14 +64,18 @@ const NoBalanceModal = () => {
 
           <View style={styles.content}>
             <View style={styles.iconContainer}>
-              <Wallet size={40} color="#EF4444" strokeWidth={1.5} />
-              <Text style={styles.zeroBalance}>₹0</Text>
+            <View style={styles.iconCircle}>
+              <View style={styles.coinstar}>
+                <AntDesign  name="star" size={22} color={appColors.navyBlueShade} />
+              </View>
             </View>
-
-            <Text style={styles.title}>No Balance</Text>
+            
+            </View>
+<Text style={styles.title}>No Learning Point</Text>
+            
 
             <Text style={styles.description}>
-              Your wallet balance is ₹0 and you can't use any feature on this app. Recharge your wallet to re-enable the features.
+              Your LP is 0 and you can't use any feature on this app. Recharge your LP to re-enable the features.
             </Text>
 
             <View style={styles.btnsMain}>
@@ -79,7 +84,7 @@ const NoBalanceModal = () => {
                 onPress={handleRecharge}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Recharge</Text>
+                <Text style={styles.buttonText}>Recharge Learning Points</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -152,9 +157,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(25),
     fontFamily: "Mukta-Bold",
-    color: "#1F2937",
-    marginBottom: 16,
+    color: "#ff5151",
     letterSpacing: -0.5,
+    marginBottom:15
   },
   description: {
     fontSize: scaleFont(14),
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(16),
     fontWeight: "500",
     fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
@@ -183,6 +188,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 20,
+  },
+    coinstar: {
+    height: 35,
+    width: 35,
+    borderWidth: 2,
+    borderRadius: 50,
+    borderColor: appColors.navyBlueShade,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+    iconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    backgroundColor: "#EEF4FF",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

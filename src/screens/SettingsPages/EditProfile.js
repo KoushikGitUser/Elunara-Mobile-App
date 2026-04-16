@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     letterSpacing: 0.2,
     flex: 1,
-    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
+    paddingVertical: 12,
   },
   otpContainer: {
     flexDirection: "row",

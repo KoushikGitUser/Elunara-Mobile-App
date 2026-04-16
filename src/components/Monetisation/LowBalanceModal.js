@@ -15,6 +15,7 @@ import { Wallet } from "lucide-react-native";
 import { setToggleLowBalanceModal } from "../../redux/slices/toggleSlice";
 import { useNavigation } from "@react-navigation/native";
 import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle } from "../../redux/slices/globalDataSlice";
+import { appColors } from "../../themes/appColors";
 
 const LowBalanceModal = () => {
   const { toggleStates, walletStates } = useSelector((state) => state.Toggle);
@@ -63,15 +64,21 @@ const LowBalanceModal = () => {
           </View>
 
           <View style={styles.content}>
+
             <View style={styles.iconContainer}>
-              <Wallet size={40} color="#F59E0B" strokeWidth={1.5} />
-              <Text style={styles.balanceAmount}>₹{balance.toLocaleString("en-IN")}</Text>
+            <View style={styles.iconCircle}>
+              <View style={styles.coinstar}>
+                <AntDesign name="star" size={22} color={appColors.navyBlueShade} />
+              </View>
+            </View>
+              <Text style={styles.balanceAmount}>{balance.toLocaleString("en-IN")}</Text>
             </View>
 
-            <Text style={styles.title}>Low Balance</Text>
+
+            <Text style={styles.title}>Low Learning Point</Text>
 
             <Text style={styles.description}>
-              You don't have enough balance to use file related activities. Maintain the balance over ₹799 to use file related activities.
+              You don't have enough LP to use file related activities. Maintain the Lp over 79900 to use file related activities.
             </Text>
 
             <View style={styles.btnsMain}>
@@ -80,7 +87,7 @@ const LowBalanceModal = () => {
                 onPress={handleRecharge}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Recharge</Text>
+                <Text style={styles.buttonText}>Recharge Learning Points</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -109,6 +116,23 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.18)",
+  },
+  coinstar: {
+    height: 35,
+    width: 35,
+    borderWidth: 2,
+    borderRadius: 50,
+    borderColor: appColors.navyBlueShade,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+    iconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    backgroundColor: "#EEF4FF",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backdrop: {
     position: "absolute",
@@ -141,6 +165,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: "row",
+    justifyContent:"flex-start",
     alignItems: "center",
     gap: 10,
     marginBottom: 10,
@@ -148,7 +173,7 @@ const styles = StyleSheet.create({
   balanceAmount: {
     fontSize: scaleFont(28),
     fontFamily: "Mukta-Bold",
-    color: "#F59E0B",
+    color: appColors.navyBlueShade,
   },
   title: {
     fontSize: scaleFont(25),
@@ -174,7 +199,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(14),
+    fontSize: scaleFont(16),
     fontWeight: "500",
     fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,

@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle, setHideSettingsBackButton } from "../../../redux/slices/globalDataSlice";
 import { resetPaymentFlow } from "../../../redux/slices/toggleSlice";
 import { appColors } from "../../../themes/appColors";
+import { AntDesign, Entypo, Octicons } from "@expo/vector-icons";
 
 const PaidPlanCard = ({ isLoading = false }) => {
   const navigation = useNavigation();
@@ -38,72 +39,79 @@ const PaidPlanCard = ({ isLoading = false }) => {
   const getStatusDescription = () => {
     if (isPromoNotActivated) return `All features enabled until ${walletStates.promotionalDaysRemaining} days`;
     if (isPromoActivated) return "This recharge will be active after the free trial ends";
-    if (balance <= 0) return "All features disabled until you recharge your wallet";
+    if (balance <= 0) return "All features disabled until you add Learning Points";
     if (balance < 799) return "File uploads disabled below ₹799";
-    return "All features enabled";
+    return "This recharge will be active after the free trial ends";
   };
 
   return (
     <View style={styles.cardWrapper}>
-        <View style={styles.gradientWrapper}>
-          <ExpoLinearGradient
-            colors={["#1B365D", "#A5C0E7"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradientBackground}
-          />
-        </View>
-        <View style={styles.planCard}>
-          <View style={styles.planHeader}>
-            <PaidPlanChakraIcon />
-            <AuthGradientText fontSize={25} textAlign="left">Wallet Balance</AuthGradientText>
+      <View style={styles.gradientWrapper}>
+        <ExpoLinearGradient
+          colors={["#1B365D", "#A5C0E7"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientBackground}
+        />
+      </View>
+      <View style={styles.planCard}>
+        <View style={styles.planHeader}>
+          <View style={styles.coinstar}>
+            <AntDesign name="star" size={20} color={appColors.navyBlueShade} />
           </View>
 
-          {isLoading ? (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color={appColors.navyBlueShade} />
-            </View>
-          ) : (
-            <>
-              {isPromoNotActivated ? (
-                <Text style={[styles.freeTrialText,{color:appColors.navyBlueShade}]}>Free Trial</Text>
-              ) : (
-                <Text style={[styles.price, { color: getStatusColor() }]}>₹{balance.toLocaleString("en-IN")}</Text>
-              )}
-
-              <View style={styles.statusRow}>
-                <View style={[styles.statusDot, { backgroundColor: getStatusColor() }]} />
-                <Text style={[styles.statusText, { color: getStatusColor() }]}>
-                  {getStatusText()}
-                </Text>
-                <Text style={[styles.statusDescription, { color: getStatusColor() }]}>
-                  — {getStatusDescription()}
-                </Text>
-              </View>
-
-              {!isPromoNotActivated && (
-                <Text style={styles.infoText}>
-                  Usage-based deduction — no expiry on balance
-                </Text>
-              )}
-            </>
-          )}
-
-          <TouchableOpacity
-            onPress={() => {
-              dispatch(resetPaymentFlow());
-              dispatch(setHideSettingsBackButton(false));
-              navigation.navigate("settingsInnerPages", { page: 11 });
-              dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
-              dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
-            }}
-            style={[styles.rechargeButton, isLoading && { opacity: 0.5 }]}
-            activeOpacity={0.8}
-            disabled={isLoading}
-          >
-            <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
-          </TouchableOpacity>
+          <AuthGradientText fontSize={25} textAlign="left">Learning Points</AuthGradientText>
         </View>
+
+        {isLoading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color={appColors.navyBlueShade} />
+          </View>
+        ) : (
+          <>
+            {isPromoNotActivated ? (
+              <Text style={[styles.freeTrialText, { color: appColors.navyBlueShade }]}>Free Trial</Text>
+            ) : (
+              <Text style={[styles.price, { color: appColors.navyBlueShade }]}>
+                {/* 693100 */}
+                {balance.toLocaleString("en-IN")}
+
+              </Text>
+            )}
+
+            <View style={styles.statusRow}>
+              <Octicons name="dot-fill" size={22} color={getStatusColor()} />
+              <Text style={[styles.statusText, { color: getStatusColor() }]}>
+                {getStatusText()}
+              </Text>
+              {/* <Text style={[styles.statusDescription, { color: getStatusColor() }]}>
+                : {getStatusDescription()}
+              </Text> */}
+            </View>
+
+            {!isPromoNotActivated && (
+              <Text style={styles.infoText}>
+                Usage-based deduction — no expiry on Learning Points
+              </Text>
+            )}
+          </>
+        )}
+
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(resetPaymentFlow());
+            dispatch(setHideSettingsBackButton(false));
+            navigation.navigate("settingsInnerPages", { page: 11 });
+          dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
+            dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+          }}
+          style={[styles.rechargeButton, isLoading && { opacity: 0.5 }]}
+          activeOpacity={0.8}
+          disabled={isLoading}
+        >
+          <Text style={styles.rechargeButtonText}>Recharge Learning Points</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -154,6 +162,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 10,
   },
+  coinstar: {
+    height: 36,
+    width: 36,
+    borderWidth: 3,
+    borderRadius: 50,
+    backgroundColor: "#d8e3f2",
+    borderColor: "#bbcbe1",
+    justifyContent: "center",
+    alignItems: "center"
+  },
   price: {
     fontSize: scaleFont(32),
     fontWeight: "600",
@@ -170,9 +188,9 @@ const styles = StyleSheet.create({
   },
   statusRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    alignItems: "flex-start",
     marginBottom: 10,
+    gap:5
   },
   statusDot: {
     width: 10,
@@ -206,9 +224,8 @@ const styles = StyleSheet.create({
   },
   rechargeButtonText: {
     color: "#FFFFFF",
-    fontSize: scaleFont(14),
-    fontWeight: "500",
-    fontFamily: "Mukta-Medium",
+    fontSize: scaleFont(16),
+    fontFamily: "Mukta-bold",
     letterSpacing: 0.3,
   },
 });
