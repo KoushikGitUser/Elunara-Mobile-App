@@ -345,7 +345,7 @@ const SignUp = () => {
                 <TextInput
                   style={{
                     flex: 1,
-                    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
+                    paddingVertical: 10,
                     paddingHorizontal: 15,
                     fontFamily: "Mukta-Regular",
                     fontSize: scaleFont(14),
@@ -407,7 +407,7 @@ const SignUp = () => {
                   ref={lastNameRef}
                   style={{
                     flex: 1,
-                    paddingVertical: Platform.OS === 'ios' ? 12 : 0,
+                    paddingVertical:  10,
                     paddingHorizontal: 15,
                     fontFamily: "Mukta-Regular",
                     fontSize: scaleFont(14),
@@ -776,6 +776,10 @@ const SignUp = () => {
             <Image source={apple} style={styles.socialIcons} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
+
+          <Text style={[styles.infoText, { marginTop: 70,position:"absolute",top:"83%", textAlign: "center", fontFamily: "Mukta-Regular" }]}>
+                                    The Elunara App is promoted by Elunara Estates LLP
+                                  </Text>
         </View>
       </ScrollView>
 

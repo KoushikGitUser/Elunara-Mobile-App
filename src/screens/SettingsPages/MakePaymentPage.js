@@ -53,6 +53,7 @@ const MakePaymentPage = () => {
   const [showBackPressPopup, setShowBackPressPopup] = useState(false);
   const [paymentResultOrderId, setPaymentResultOrderId] = useState(null);
   const mySessionRef = useRef(null);
+  const pendingPayloadRef = useRef(null);
 
   const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
   const apiWalletStates = useSelector((state) => state.API.walletStates);
@@ -89,7 +90,50 @@ const MakePaymentPage = () => {
     };
   }, []);
 
-  // HyperSDK event listener — only resets state, does NOT navigate
+  // iOS custom bridge event listener
+  useEffect(() => {
+    if (Platform.OS !== 'ios' || !NativeModules.HyperPaymentBridge) return;
+    const bridgeEmitter = new NativeEventEmitter(NativeModules.HyperPaymentBridge);
+    const bridgeListener = bridgeEmitter.addListener("HyperPaymentEvent", (resp) => {
+      console.log("[MakePayment] iOS HyperPaymentEvent:", JSON.stringify(resp));
+      if (resp.error) {
+        console.log("[MakePayment] iOS bridge error:", resp.error);
+        dispatch(setIsPaymentInitiated(false));
+        dispatch(setHideSettingsBackButton(false));
+        return;
+      }
+      if (resp.data) {
+        try {
+          const data = JSON.parse(resp.data);
+          const event = data.event || "";
+          if (event === "process_result") {
+            processResultReceivedRef.current = true;
+            currentPaymentSessionId++;
+            const innerPayload = data.payload || {};
+            const status = innerPayload.status || "";
+            dispatch(setIsPaymentInitiated(false));
+            dispatch(setHideSettingsBackButton(false));
+            dispatch(resetPaymentInitiated());
+            setShowBackPressPopup(false);
+            if (status !== "backpressed" && status !== "user_aborted") {
+              dispatch(resetVerifyPayment());
+              setPaymentResultOrderId(data.orderId);
+              dispatch(commonFunctionForAPICalls({
+                method: "POST",
+                url: `/payments/verify/${data.orderId}`,
+                name: "verifyPayment",
+              }));
+            }
+          }
+        } catch (e) {
+          console.log("[MakePayment] iOS bridge parse error:", e);
+        }
+      }
+    });
+    return () => bridgeListener.remove();
+  }, []);
+
+  // HyperSDK event listener (Android + iOS fallback)
   useEffect(() => {
     if (!NativeModules.HyperSdkReact) {
       console.log("[MakePayment] HyperSdkReact native module not available");
@@ -101,6 +145,14 @@ const MakePaymentPage = () => {
         const data = JSON.parse(resp);
         const event = data.event || "";
         console.log("[MakePayment] HyperEvent:", event);
+
+        // iOS: after initiate completes, call process to show payment page
+        if (event === "initiate_result" && Platform.OS === "ios" && pendingPayloadRef.current) {
+          console.log("[MakePayment] iOS: initiate_result received, calling process...");
+          const payload = pendingPayloadRef.current;
+          pendingPayloadRef.current = null;
+          NativeModules.HyperSdkReact.process(payload);
+        }
 
         if (event === "process_result") {
           if (mySessionRef.current !== currentPaymentSessionId) {
@@ -221,17 +273,42 @@ const MakePaymentPage = () => {
       dispatch(setHideSettingsBackButton(true));
 
       const sdkPayload = apiWalletStates.hyperPayload?.sdk_payload;
+      console.log("[MakePayment] sdkPayload exists:", !!sdkPayload);
+      console.log("[MakePayment] HyperSdkReact exists:", !!HyperSdkReact);
+      console.log("[MakePayment] HyperSdkReact methods:", HyperSdkReact ? Object.keys(HyperSdkReact) : "N/A");
+      console.log("[MakePayment] Platform:", Platform.OS);
+      console.log("[MakePayment] typeof openPaymentPage:", typeof NativeModules.HyperSdkReact.openPaymentPage);
+      console.log("[MakePayment] typeof createHyperServices:", typeof NativeModules.HyperSdkReact.createHyperServices);
+      console.log("[MakePayment] typeof initiate:", typeof NativeModules.HyperSdkReact.initiate);
+      console.log("[MakePayment] typeof process:", typeof NativeModules.HyperSdkReact.process);
+      console.log("[MakePayment] sdkPayload:", JSON.stringify(sdkPayload).substring(0, 200));
       dispatch(resetPaymentInitiated());
       if (sdkPayload && HyperSdkReact) {
         try {
-          HyperSdkReact.openPaymentPage(JSON.stringify(sdkPayload));
+          const payloadStr = JSON.stringify(sdkPayload);
+          if (Platform.OS === 'ios') {
+            console.log("[MakePayment] iOS: Using HyperPaymentBridge...");
+            const HyperPaymentBridge = NativeModules.HyperPaymentBridge;
+            if (HyperPaymentBridge) {
+              console.log("[MakePayment] iOS: HyperPaymentBridge found, calling openPaymentPage...");
+              HyperPaymentBridge.openPaymentPage(payloadStr);
+            } else {
+              console.log("[MakePayment] iOS: HyperPaymentBridge NOT found, falling back...");
+              NativeModules.HyperSdkReact.openPaymentPage(payloadStr);
+            }
+            // process will be called when initiate_result is received (see HyperEvent listener)
+          } else {
+            console.log("[MakePayment] Android: Calling openPaymentPage...");
+            HyperSdkReact.openPaymentPage(payloadStr);
+          }
+          console.log("[MakePayment] Payment call completed");
         } catch (e) {
-          console.log("openPaymentPage error:", e);
+          console.log("[MakePayment] openPaymentPage error:", e);
           dispatch(setIsPaymentInitiated(false));
           dispatch(setHideSettingsBackButton(false));
         }
       } else if (!HyperSdkReact) {
-        console.log("openPaymentPage: HyperSdkReact module not available");
+        console.log("[MakePayment] openPaymentPage: HyperSdkReact module not available");
         dispatch(setIsPaymentInitiated(false));
         dispatch(setHideSettingsBackButton(false));
       }
@@ -294,7 +371,7 @@ const MakePaymentPage = () => {
         visible={!!paymentResultOrderId}
         transparent={false}
         animationType="fade"
-        onRequestClose={() => {}}
+        onRequestClose={() => { }}
       >
         <View style={statusStyles.container}>
           {isVerifying ? (
@@ -318,7 +395,7 @@ const MakePaymentPage = () => {
                     Amount - <Text style={{ color: "#10B981" }}>₹{verifyAmount ? verifyAmount.toLocaleString("en-IN") : "0"}</Text>
                   </Text>
                   <Text style={statusStyles.infoMessage}>
-                    Your Payment is successful and Learning Points has been credited.
+                    Your Payment is successful and your wallet has been credited.
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -329,6 +406,9 @@ const MakePaymentPage = () => {
                   <ArrowLeft size={24} color="#FFFFFF" strokeWidth={2} />
                 </TouchableOpacity>
               </View>
+              <Text style={[styles.infoText, { marginTop: 50,position:"absolute",top:"83%", textAlign: "center", fontFamily: "Mukta-Regular" }]}>
+                The Elunara App is promoted by Elunara Estates LLP
+              </Text>
             </View>
           ) : verifyStatus === "error" ? (
             <View style={statusStyles.errorContainer}>
@@ -541,12 +621,12 @@ const MakePaymentPage = () => {
         >
           {/* Current Balance */}
           <View style={styles.currentBalanceRow}>
-            <Text style={styles.currentBalanceLabel}>Current LP:</Text>
+            <Text style={styles.currentBalanceLabel}>Current Balance:</Text>
             <Text
               style={[styles.currentBalanceValue, { color: appColors.navyBlueShade }]}
             >
-               
-              {currentBalance.toLocaleString("en-IN")}
+              {/* 703000 */}
+              ₹{currentBalance.toLocaleString("en-IN")}
             </Text>
           </View>
 
@@ -588,7 +668,7 @@ const MakePaymentPage = () => {
                   style={[
                     styles.presetChipText,
                     selectedPreset === preset.id &&
-                      styles.presetChipTextSelected,
+                    styles.presetChipTextSelected,
                   ]}
                 >
                   {preset.label}
@@ -626,6 +706,9 @@ const MakePaymentPage = () => {
               </Text>
             )}
           </TouchableOpacity>
+          <Text style={[styles.infoText, { marginTop: 10, textAlign: "center" }]}>
+            The Elunara App is promoted by Elunara Estates LLP
+          </Text>
         </View>
       )}
 
@@ -655,6 +738,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flex: 1,
     width: "100%",
+  },
+  infoText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+    lineHeight: 20,
   },
   headerText: {
     fontSize: scaleFont(17),

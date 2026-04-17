@@ -429,6 +429,10 @@ const SignIn = () => {
             <Image source={apple} style={styles.socialIcons} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
+
+                        <Text style={[styles.infoText, { marginTop: 70,position:"absolute",top:"83%", textAlign: "center", fontFamily: "Mukta-Regular" }]}>
+                          The Elunara App is promoted by Elunara Estates LLP
+                        </Text>
         </View>
       </ScrollView>
     </SafeAreaView>

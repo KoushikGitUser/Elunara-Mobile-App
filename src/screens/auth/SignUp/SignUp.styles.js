@@ -153,6 +153,12 @@ export const createStyles = (props = {}) =>
       marginLeft: scale(12),
       fontFamily: "Mukta-Bold",
     },
+          infoText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+    lineHeight: 20,
+  },
     socialIcons: {
       height: 25,
       width: 25,

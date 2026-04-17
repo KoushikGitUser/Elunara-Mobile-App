@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { setSettingsInnerPageComponentToRender, setSettingsInnerPageHeaderTitle, setHideSettingsBackButton } from "../../../redux/slices/globalDataSlice";
 import { resetPaymentFlow } from "../../../redux/slices/toggleSlice";
 import { appColors } from "../../../themes/appColors";
-import { AntDesign, Entypo, Octicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, MaterialIcons, Octicons } from "@expo/vector-icons";
 
 const PaidPlanCard = ({ isLoading = false }) => {
   const navigation = useNavigation();
@@ -56,11 +56,12 @@ const PaidPlanCard = ({ isLoading = false }) => {
       </View>
       <View style={styles.planCard}>
         <View style={styles.planHeader}>
-          <View style={styles.coinstar}>
+          {/* <View style={styles.coinstar}>
             <AntDesign name="star" size={20} color={appColors.navyBlueShade} />
-          </View>
+          </View> */}
+          <PaidPlanChakraIcon />
 
-          <AuthGradientText fontSize={25} textAlign="left">Learning Points</AuthGradientText>
+          <AuthGradientText fontSize={25} textAlign="left">Wallet Balance</AuthGradientText>
         </View>
 
         {isLoading ? (
@@ -74,7 +75,8 @@ const PaidPlanCard = ({ isLoading = false }) => {
             ) : (
               <Text style={[styles.price, { color: appColors.navyBlueShade }]}>
                 {/* 693100 */}
-                {balance.toLocaleString("en-IN")}
+               ₹{balance.toLocaleString("en-IN")}
+                {/* 703000 */}
 
               </Text>
             )}
@@ -102,15 +104,19 @@ const PaidPlanCard = ({ isLoading = false }) => {
             dispatch(resetPaymentFlow());
             dispatch(setHideSettingsBackButton(false));
             navigation.navigate("settingsInnerPages", { page: 11 });
-          dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
+          // dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
+                    dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
             dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
           }}
           style={[styles.rechargeButton, isLoading && { opacity: 0.5 }]}
           activeOpacity={0.8}
           disabled={isLoading}
         >
-          <Text style={styles.rechargeButtonText}>Recharge Learning Points</Text>
+          <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
         </TouchableOpacity>
+        <Text style={[styles.infoText,{marginTop:10,textAlign:"center",fontFamily:"Mukta-Regular"}]}>
+                The Elunara App is promoted by Elunara Estates LLP
+              </Text>
       </View>
     </View>
   );
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
   rechargeButtonText: {
     color: "#FFFFFF",
     fontSize: scaleFont(16),
-    fontFamily: "Mukta-bold",
+    fontFamily: "Mukta-Bold",
     letterSpacing: 0.3,
   },
 });

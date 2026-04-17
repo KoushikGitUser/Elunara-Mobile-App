@@ -149,6 +149,12 @@ export const createStyles = (props = {}) =>
       letterSpacing: -0.1,
       marginLeft: scale(12),
     },
+      infoText: {
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    color: "#64748b",
+    lineHeight: 20,
+  },
     socialIcons: {
       height: 25,
       width: 25,
