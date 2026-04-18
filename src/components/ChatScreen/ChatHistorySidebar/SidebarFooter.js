@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./chatSidebarStyles.styles";
 import profilePic from "../../../assets/images/defaultUserPic.png";
@@ -117,23 +117,26 @@ const SidebarFooter = ({ translateX }) => {
           Profile
         </Text>
       </TouchableOpacity>
-            <TouchableOpacity
+      <TouchableOpacity
         onPress={() => {
           dispatch(setToggleChatHistorySidebar(false));
           navigation.navigate("settingsInnerPages", { page: 11 });
-          dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+          dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
           dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
         }}
         style={styles.upgradeBtn}
       >
-        {walletStates?.isInitialRechargeCompleted ? (
+        <View style={styles.coinstar}>
+          <AntDesign name="star" size={18} color={appColors.navyBlueShade} />
+        </View>
+        {/* {!walletStates?.isInitialRechargeCompleted ? (
           <Wallet size={29} strokeWidth={1.5} color={appColors.navyBlueShade} />
         ) : (
           <SparkleIcon color={appColors.navyBlueShade} />
-        )}
-        <View style={{width:"100%"}}>
+        )} */}
+        <View style={{ width: "100%" }}>
           <GradientText
-            children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
+            children={walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate LP"}
             fullWidth={true}
             fontSize={20}
           />

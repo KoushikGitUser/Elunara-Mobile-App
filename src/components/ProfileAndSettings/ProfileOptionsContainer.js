@@ -25,6 +25,7 @@ import adImg from "../../assets/images/Upgrade.jpg";
 import { setToggleAdFreeExpPopup, setToggleUnlockAnalyticsDashboardPopup } from "../../redux/slices/toggleSlice";
 import { appColors } from "../../themes/appColors";
 import { Wallet } from "lucide-react-native";
+import { AntDesign } from "@expo/vector-icons";
 
 const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
   const navigation = useNavigation();
@@ -57,20 +58,13 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
               style={styles.itemContainer}
             >
               {option.icon}
-              <Text style={[styles.title,{fontFamily:"Mukta-Regular"}]}>{option.title}</Text>
+              <Text style={[styles.title, { fontFamily: "Mukta-Regular" }]}>{option.title}</Text>
             </TouchableOpacity>
             {optionIndex == 5 && (
-              <TouchableOpacity onPress={()=>dispatch(setToggleAdFreeExpPopup(true))} style={{ width: "100%", marginTop: 10, marginBottom: 10 }}>
-                <Image
-                  style={{
-                    width: "100%",
-                    height: 100,
-                    borderWidth: 1,
-                    borderColor: "lightgrey",
-                    borderRadius: 18,
-                  }}
-                  source={adImg}
-                />
+              <TouchableOpacity style={styles.adBox}>
+                 <Text style={styles.adText}>
+                  -- Ad Space --
+                 </Text>
               </TouchableOpacity>
             )}
           </React.Fragment>
@@ -80,19 +74,22 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
       {/* Upgrade button */}
       <TouchableOpacity style={styles.upgradeBtn} onPress={() => {
         navigation.navigate("settingsInnerPages", { page: 11 });
-        dispatch(setSettingsInnerPageHeaderTitle("Recharge Wallet"));
+        dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
         dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
       }}>
-        {walletStates?.isInitialRechargeCompleted ? (
+        <View style={styles.coinstar}>
+          <AntDesign name="star" size={18} color={appColors.navyBlueShade} />
+        </View>
+        {/* {walletStates?.isInitialRechargeCompleted ? (
           <Wallet size={29} strokeWidth={1.5} color={appColors.navyBlueShade} />
         ) : (
           <SparkleIcon color={appColors.navyBlueShade} />
-        )}
-        <View style={{width:"100%"}}>
+        )} */}
+        <View style={{ width: "100%" }}>
           <GradientText
-            children={walletStates?.isInitialRechargeCompleted ? "Add Money" : "Activate Wallet"}
+            children={walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"}
             fullWidth={true}
-            fontSize={18}
+            fontSize={20}
           />
         </View>
       </TouchableOpacity>
@@ -135,6 +132,32 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
   },
+  coinstar: {
+    height: 30,
+    width: 30,
+    borderWidth: 2,
+    borderRadius: 50,
+    borderColor: appColors.navyBlueShade,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  adBox: {
+    width: "100%",
+    marginTop: 10, 
+    marginBottom: 10,
+    height:100,
+    backgroundColor:"#e1ebff",
+    borderRadius:20,
+    borderWidth:2,
+    borderColor:"#c4d8ff",
+    justifyContent:"center",
+    alignItems:"center"
+  },
+  adText:{
+    fontSize:20,
+    fontFamily:"Mukta-Bold",
+    color:"#7995cd"
+  }
 });
 
 export default ProfileOptionsContainer;

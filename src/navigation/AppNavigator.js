@@ -72,6 +72,7 @@ const AppNavigator = () => {
           name="Splash"
           component={SplashScreen}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -80,6 +81,7 @@ const AppNavigator = () => {
           name="welcome"
           component={WelcomeScreen}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -88,6 +90,7 @@ const AppNavigator = () => {
           name="signin"
           component={SignIn}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -96,6 +99,7 @@ const AppNavigator = () => {
           name="signup"
           component={SignUp}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -104,6 +108,7 @@ const AppNavigator = () => {
           name="changepass"
           component={ChangePassword}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -113,7 +118,8 @@ const AppNavigator = () => {
           component={ChatScreen}
           options={{
             headerShown: false,
-          }} 
+            gestureEnabled: false,
+          }}
         />
 
         <Stack.Screen
@@ -168,6 +174,7 @@ const AppNavigator = () => {
           name="settingsInnerPages"
           component={SettingsProfileInnerPage}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />
@@ -216,6 +223,7 @@ const AppNavigator = () => {
           name="paymentStatus"
           component={PaymentStatusPage}
           options={{
+            gestureEnabled: false,
             headerShown: false,
           }}
         />

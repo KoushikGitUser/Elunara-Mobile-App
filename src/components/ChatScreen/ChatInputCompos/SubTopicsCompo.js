@@ -11,8 +11,15 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Image,
+  NativeModules,
+  NativeEventEmitter,
+  Animated,
+  PermissionsAndroid,
+  Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
+import MicIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "@react-native-community/blur";
@@ -20,7 +27,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { subTopics } from "../../../data/datas";
 import { scaleFont } from "../../../utils/responsive";
 import SubTopicsCard from "./SubTopicsCard";
-import { ArrowLeft, Mic, Search } from "lucide-react-native";
+import { ArrowLeft, Search } from "lucide-react-native";
 import {
   setToggleSubTopics,
   setToggleTopicsPopup,
@@ -50,7 +57,96 @@ const SubTopicsCompo = () => {
   const [searchText, setSearchText] = useState("");
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [expandTextInput, setExpandTextInput] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const textBeforeRecordingRef = useRef("");
+  const speechModule = NativeModules.SpeechToTextModule;
+  const speechEmitter = useRef(null);
+
+  const LINE_HEIGHT = 20;
+  const PADDING_VERTICAL = 16;
+  const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL;
+  const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL;
+  const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
+
+  // Pulse animation for mic
+  useEffect(() => {
+    if (isRecording) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.4, duration: 1000, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        ])
+      );
+      pulse.start();
+      return () => pulse.stop();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isRecording]);
+
+  // Speech-to-text listeners
+  useEffect(() => {
+    if (!speechModule) return;
+    speechEmitter.current = new NativeEventEmitter(speechModule);
+
+    const startSub = speechEmitter.current.addListener("onSpeechStart", () => setIsRecording(true));
+    const partialSub = speechEmitter.current.addListener("onSpeechPartialResults", (e) => {
+      if (e.text) {
+        const prefix = textBeforeRecordingRef.current;
+        const combined = prefix ? prefix + " " + e.text : e.text;
+        setBelowSearchText(combined);
+      }
+    });
+    const resultsSub = speechEmitter.current.addListener("onSpeechResults", (e) => {
+      setIsRecording(false);
+      if (e.text) {
+        const prefix = textBeforeRecordingRef.current;
+        const combined = prefix ? prefix + " " + e.text : e.text;
+        setBelowSearchText(combined);
+        textBeforeRecordingRef.current = combined;
+      }
+    });
+    const endSub = speechEmitter.current.addListener("onSpeechEnd", () => setIsRecording(false));
+    const errorSub = speechEmitter.current.addListener("onSpeechError", (e) => {
+      setIsRecording(false);
+      const silentCodes = [7, 8, 216, 1110, 203, 209, 301];
+      const isSilentError = silentCodes.includes(e.code) || (e.error && e.error.toLowerCase().includes("no speech"));
+      if (!isSilentError) Alert.alert("Speech Error", e.error || "Something went wrong");
+    });
+
+    return () => { startSub.remove(); partialSub.remove(); resultsSub.remove(); endSub.remove(); errorSub.remove(); };
+  }, []);
+
+  const handleMicPress = async () => {
+    if (!speechModule) {
+      Alert.alert("Not supported", "Speech-to-text is not available on this device");
+      return;
+    }
+    if (isRecording) {
+      speechModule.stopListening();
+      setIsRecording(false);
+      return;
+    }
+    const micPermission = Platform.OS === "ios" ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO;
+    let status = await check(micPermission);
+    if (status !== RESULTS.GRANTED) status = await request(micPermission);
+    if (status !== RESULTS.GRANTED) { Alert.alert("Permission Denied", "Microphone permission is required"); return; }
+    if (Platform.OS === "ios") {
+      let speechStatus = await check(PERMISSIONS.IOS.SPEECH_RECOGNITION);
+      if (speechStatus !== RESULTS.GRANTED) speechStatus = await request(PERMISSIONS.IOS.SPEECH_RECOGNITION);
+      if (speechStatus !== RESULTS.GRANTED) { Alert.alert("Permission Denied", "Speech recognition permission is required"); return; }
+    }
+    textBeforeRecordingRef.current = belowSearchText || "";
+    speechModule.startListening(null);
+  };
+
+  const handleContentSizeChange = (event) => {
+    const contentHeight = event.nativeEvent.contentSize.height;
+    if (contentHeight < MIN_HEIGHT) setInputHeight(MIN_HEIGHT);
+    else if (contentHeight > MAX_HEIGHT) setInputHeight(MAX_HEIGHT);
+    else setInputHeight(contentHeight);
+  };
   const [filteredTopics, setFilteredTopics] = useState(
     chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || []
   );
@@ -223,7 +319,7 @@ const SubTopicsCompo = () => {
           }}
           keyboardType="text"
           returnKeyType="done"
-          style={{ fontFamily: "Mukta-Regular", fontSize: 17 }}
+          style={{ fontFamily: "Mukta-Regular", fontSize: 17, flex: 1, paddingVertical: Platform.OS === 'ios' ? 10 : 0 }}
         />
       </View>
 
@@ -263,9 +359,9 @@ const SubTopicsCompo = () => {
               style={[
                 styles.inputContainer,
                 {
-                  height: expandTextInput ? 110 : "50",
-                  flexDirection: expandTextInput ? "column" : "row",
-                  paddingTop: expandTextInput ? 0 : 10,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  paddingTop: 10,
                   paddingBottom: 10,
                 },
               ]}
@@ -274,40 +370,62 @@ const SubTopicsCompo = () => {
                 style={[
                   styles.belowInput,
                   {
-                    alignSelf: expandTextInput ? "flex-start" : "center",
                     fontFamily: "Mukta-Regular",
+                    height: Platform.OS === 'ios' ? undefined : inputHeight,
+                    minHeight: Platform.OS === 'ios' ? MIN_HEIGHT : undefined,
+                    maxHeight: Platform.OS === 'ios' ? MAX_HEIGHT : undefined,
                   },
                 ]}
-                onFocus={() => setExpandTextInput(true)}
-                onBlur={() => setExpandTextInput(false)}
-                placeholder="Can't find a topic? Just type it,I've got you"
+                placeholder={isRecording ? "Speak now..." : "Can't find a topic? Just type it, I've got you"}
                 placeholderTextColor="#B5BECE"
                 value={belowSearchText}
                 onChangeText={setBelowSearchText}
+                multiline
+                textAlignVertical={Platform.OS === 'android' ? "top" : undefined}
+                onContentSizeChange={handleContentSizeChange}
+                scrollEnabled={Platform.OS === 'ios' ? true : inputHeight >= MAX_HEIGHT}
+                editable={!isRecording}
               />
               <View
                 style={{
                   flexDirection: "row",
-                  alignSelf: expandTextInput ? "flex-end" : "center",
-                  gap: 0,
                   alignSelf: "flex-end",
+                  gap: 0,
                 }}
               >
-                <TouchableOpacity
-                  style={[
-                    styles.micButton,
-                    { alignSelf: expandTextInput ? "flex-end" : "center" },
-                  ]}
-                  activeOpacity={0.7}
-                >
-                  <Mic size={25} color="#1A1A1A" strokeWidth={1.5} />
-                </TouchableOpacity>
+                <View style={{ alignItems: 'center', justifyContent: 'center', width: isRecording ? 40 : 'auto', height: isRecording ? 40 : 'auto' }}>
+                  {isRecording && (
+                    <Animated.View
+                      style={{
+                        position: 'absolute',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        borderWidth: 3,
+                        borderColor: '#BFD6FE',
+                        backgroundColor: 'transparent',
+                        transform: [{ scale: pulseAnim }],
+                      }}
+                    />
+                  )}
+                  <TouchableOpacity
+                    onPress={handleMicPress}
+                    style={{
+                      width: isRecording ? 44 : 'auto',
+                      height: isRecording ? 44 : 'auto',
+                      padding: isRecording ? 0 : 8,
+                      borderRadius: 22,
+                      backgroundColor: isRecording ? '#EBF1FB' : 'transparent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <MicIcon color={isRecording ? '#1F2937' : undefined} />
+                  </TouchableOpacity>
+                </View>
                 {belowSearchText !== "" && (
                   <TouchableOpacity
-                    style={[
-                      styles.micButton,
-                      { alignSelf: expandTextInput ? "flex-end" : "center" },
-                    ]}
+                    style={styles.micButton}
                     activeOpacity={0.7}
                     onPress={handleSendButton}
                   >
@@ -371,7 +489,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    paddingBottom: Platform.OS === "ios" ? 0 : 24,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

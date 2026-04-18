@@ -80,7 +80,12 @@ const PaymentBilling = ({ handleScroll }) => {
     <View style={styles.billingItem}>
       <View style={styles.leftSection}>
         <Text style={styles.dateText}>{formatDate(item.created_at)}</Text>
-        <Text style={styles.paymentInfoText}>{item.description}</Text>
+        <Text style={styles.paymentInfoText}>
+          Recharge via HDFC SmartGateway
+          {/* {item.description} */}
+
+          
+        </Text>
       </View>
       <View style={styles.rightSection}>
         <Text style={[
@@ -123,7 +128,7 @@ const PaymentBilling = ({ handleScroll }) => {
             <Text style={styles.promoSubText}>
               {walletStates.isInitialRechargeCompleted
                 ? "Enjoy full access to all platform features. Your ₹999 initial recharge will be active after the free trial ends."
-                : "Enjoy full access to all platform features. Recharge your wallet before the trial ends to continue uninterrupted."}
+                : "Enjoy full access to all platform features. Activate LP before the trial ends to continue uninterrupted service."}
             </Text>
             <Text style={styles.promoDaysCount}>
               {walletStates.promotionalDaysRemaining} days remaining

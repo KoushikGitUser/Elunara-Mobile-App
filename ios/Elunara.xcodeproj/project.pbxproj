@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D5E5004E75CC3E8F660BDF5 /* HyperPaymentBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 594037AEE87DE7728FC315F8 /* HyperPaymentBridge.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		292D1B5D0BE062AAD298B962 /* SpeechToTextModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB347F01E5A123687EDA8F7 /* SpeechToTextModule.m */; };
+		2A4A6C8B09F5B764140A32B8 /* HyperPaymentBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B17D608628B1EBF00F9546D4 /* HyperPaymentBridge.m */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		8585F2B4D542F2EA329FC190 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1236595F41F7F8B1F9E373A6 /* ExpoModulesProvider.swift */; };
 		9BABF1321DF69C3CF05A4428 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6B5B78394FABF68470D178AD /* PrivacyInfo.xcprivacy */; };
@@ -24,16 +26,18 @@
 		13B07F961A680F5B00A75B9A /* Elunara.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Elunara.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Elunara/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Elunara/Info.plist; sourceTree = "<group>"; };
-		6B5B78394FABF68470D178AD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Elunara/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		594037AEE87DE7728FC315F8 /* HyperPaymentBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HyperPaymentBridge.swift; path = Elunara/HyperPaymentBridge.swift; sourceTree = "<group>"; };
+		6B5B78394FABF68470D178AD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Elunara/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		82089AE20F52F04A3075BCF4 /* Pods-Elunara.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Elunara.release.xcconfig"; path = "Target Support Files/Pods-Elunara/Pods-Elunara.release.xcconfig"; sourceTree = "<group>"; };
-		9CFB2AE0D9DC2B8CD8ECA7CE /* SpeechToTextModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechToTextModule.swift; sourceTree = "<group>"; };
+		9CFB2AE0D9DC2B8CD8ECA7CE /* SpeechToTextModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SpeechToTextModule.swift; path = Elunara/SpeechToTextModule.swift; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Elunara/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B17D608628B1EBF00F9546D4 /* HyperPaymentBridge.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HyperPaymentBridge.m; path = Elunara/HyperPaymentBridge.m; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		DAC2D1B9621F139229F2E66B /* Pods-Elunara.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Elunara.debug.xcconfig"; path = "Target Support Files/Pods-Elunara/Pods-Elunara.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Elunara/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Elunara-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Elunara-Bridging-Header.h"; path = "Elunara/Elunara-Bridging-Header.h"; sourceTree = "<group>"; };
-		FCB347F01E5A123687EDA8F7 /* SpeechToTextModule.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = SpeechToTextModule.m; sourceTree = "<group>"; };
+		FCB347F01E5A123687EDA8F7 /* SpeechToTextModule.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SpeechToTextModule.m; path = Elunara/SpeechToTextModule.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +72,8 @@
 				6B5B78394FABF68470D178AD /* PrivacyInfo.xcprivacy */,
 				9CFB2AE0D9DC2B8CD8ECA7CE /* SpeechToTextModule.swift */,
 				FCB347F01E5A123687EDA8F7 /* SpeechToTextModule.m */,
+				594037AEE87DE7728FC315F8 /* HyperPaymentBridge.swift */,
+				B17D608628B1EBF00F9546D4 /* HyperPaymentBridge.m */,
 			);
 			name = Elunara;
 			sourceTree = "<group>";
@@ -125,7 +131,6 @@
 				DAC2D1B9621F139229F2E66B /* Pods-Elunara.debug.xcconfig */,
 				82089AE20F52F04A3075BCF4 /* Pods-Elunara.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -285,6 +290,7 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoMediaLibrary/ExpoMediaLibrary_privacy.bundle",
 				"${PODS_ROOT}/HyperSDK/Fuse.rb",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage/RNCAsyncStorage_resources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNPermissions/RNPermissionsPrivacyInfo.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RNSVG/RNSVGFilters.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
@@ -318,6 +324,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExpoMediaLibrary_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fuse.rb",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNCAsyncStorage_resources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNPermissionsPrivacyInfo.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RNSVGFilters.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
@@ -355,6 +362,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Elunara/Pods-Elunara-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Airborne/Airborne.framework/Airborne",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyperCore/HyperCore.framework/HyperCore",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyperSDK/HyperSDK.framework/HyperSDK",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/JuspaySafeBrowser/JuspaySafeBrowser.framework/JuspaySafeBrowser",
@@ -364,6 +372,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Airborne.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyperCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyperSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JuspaySafeBrowser.framework",
@@ -387,6 +396,8 @@
 				8585F2B4D542F2EA329FC190 /* ExpoModulesProvider.swift in Sources */,
 				A3E6CABF067B5991AF47C059 /* SpeechToTextModule.swift in Sources */,
 				292D1B5D0BE062AAD298B962 /* SpeechToTextModule.m in Sources */,
+				0D5E5004E75CC3E8F660BDF5 /* HyperPaymentBridge.swift in Sources */,
+				2A4A6C8B09F5B764140A32B8 /* HyperPaymentBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,7 +411,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Elunara/Elunara.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XN6W2SYFD;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -421,6 +435,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.smgdev.elunara;
 				PRODUCT_NAME = Elunara;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Elunara/Elunara-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -436,7 +451,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Elunara/Elunara.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7XN6W2SYFD;
 				INFOPLIST_FILE = Elunara/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -452,6 +470,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.smgdev.elunara;
 				PRODUCT_NAME = Elunara;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Elunara/Elunara-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

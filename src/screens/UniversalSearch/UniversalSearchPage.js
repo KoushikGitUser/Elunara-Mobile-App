@@ -257,7 +257,7 @@ const UniversalSearchPage = () => {
   const noResults = startedSearching && debouncedSearch.length > 0 && !hasResults && !isSearching;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { paddingTop: statusBarHeight }]}>
+    <SafeAreaView style={[styles.safeArea, { paddingTop: Platform.OS === 'ios' ? 0 : statusBarHeight }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <View style={styles.container}>
         {/* Header */}

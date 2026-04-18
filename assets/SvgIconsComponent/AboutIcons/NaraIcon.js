@@ -1,15 +1,17 @@
-import { View, Text } from 'react-native'
+import { View, Text, Platform } from 'react-native'
 import React from 'react'
 import Svg, { Defs, Image, Path, Pattern, Use } from 'react-native-svg'
 
 const NaraIcon = () => {
   return (
+  <View style={{ width: 63, height: 23, overflow: 'hidden' }}>
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
     width={63}
     height={23}
     viewBox='0 0 40 15'
+    preserveAspectRatio="xMidYMid meet"
     fill="none"
   >
     <Path fill="url(#a)" d="M0 0h40v16H0z" />
@@ -31,6 +33,7 @@ const NaraIcon = () => {
       />
     </Defs>
   </Svg>
+  </View>
   )
 }
 

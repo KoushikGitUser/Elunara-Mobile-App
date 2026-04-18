@@ -75,7 +75,7 @@ const Personalisation = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
     >
       <Text style={{ fontSize: scaleFont(12), fontFamily: "Mukta-Regular" }}>
         Share about yourself for tailored responses!

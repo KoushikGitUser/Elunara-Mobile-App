@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Calendar, ChevronDown, UserRound, X } from "lucide-react-native";
@@ -225,7 +226,7 @@ const Personal = ({ scrollViewRef }) => {
             <DateTimePicker
               value={date}
               mode="date"
-              display="calendar" // spinner | calendar | default
+              display={Platform.OS === "ios" ? "inline" : "calendar"}
               onChange={onChange}
             />
           )}
@@ -382,6 +383,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
     color: "black",
+    paddingVertical: 12,
   },
   pillsContainer: {
     flexDirection: "row",

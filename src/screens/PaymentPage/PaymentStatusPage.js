@@ -80,7 +80,7 @@ const PaymentStatusPage = () => {
                Amount - <Text style={{ color: "#10B981" }}>₹{amount ? amount.toLocaleString("en-IN") : "0"}</Text>
               </Text>
               <Text style={styles.successMessage}>
-                Your Payment is successful and your wallet has been credited.
+                Your Payment is successful and Learning Points has been credited.
               </Text>
             </View>
             <TouchableOpacity

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Keyboard } from "react-native";
+import { View, Text, ScrollView, Image, Keyboard, Platform } from "react-native";
 import React, { useMemo, useRef, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "../ChatScreenCompo.styles";
@@ -63,11 +63,12 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
           toggleStates.toggleIsChattingWithAI
             ? styles.chakraLogoRight
             : {
-                height: 115,
-                width: 80,
+                height: Platform.OS === 'ios' ? 100 : 115,
+                width: Platform.OS === 'ios' ? 70 : 80,
                 position: "absolute",
                 right: -20,
-                top: 120,
+                objectFit:"contain",
+                top: Platform.OS === 'ios' ?80:120,
                 zIndex: 1,
               }
         }

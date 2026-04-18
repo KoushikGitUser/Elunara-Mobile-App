@@ -5,6 +5,7 @@ import {
   scaleFont,
   verticalScale,
 } from "../../../utils/responsive";
+import { appColors } from "../../../themes/appColors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -30,10 +31,6 @@ export const createStyles = ({}) =>
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
-      shadowColor: "#000000ff",
-      shadowOffset: { width: 15, height: 0 }, // 👈 horizontal shadow only (to right)
-      shadowOpacity: 1,
-      shadowRadius: 15,
       elevation: 10,
       paddingTop: 40,
     },
@@ -211,14 +208,22 @@ export const createStyles = ({}) =>
       fontSize: moderateScale(17),
       fontWeight: 600,
     },
+    coinstar:{
+      height:30,
+      width:30,
+      borderWidth:2,
+      borderRadius:50,
+      borderColor:appColors.navyBlueShade,
+      justifyContent:"center",
+      alignItems:"center"
+    },
     upgradeBtn: {
       width: "100%",
-
       borderWidth: 1,
       borderColor: "#D3DAE5",
       borderRadius: 16,
       padding: 12,
-      gap: 15,
+      gap: 7,
       flexDirection: "row",
       justifyContent: "flex-start",
       alignItems: "flex-start",
@@ -229,7 +234,7 @@ export const createStyles = ({}) =>
     },
     chatInputMainWrapper: {
       width: "100%",
-      paddingBottom: 20,
+      paddingBottom: Platform.OS == "ios"? 15:20,
       zIndex: 2,
     },
     chatInputMain: {
@@ -238,7 +243,7 @@ export const createStyles = ({}) =>
       paddingBottom: 20,
       borderWidth: 1,
       borderColor: "#ABB8CC",
-      borderRadius: 28,
+      borderRadius: Platform.OS == "ios"? 32:28,
       flexDirection: "column",
       alignItems: "center",
       gap: verticalScale(12),
@@ -254,9 +259,9 @@ export const createStyles = ({}) =>
     },
     textInput: {
       width: "100%",
-      minHeight: verticalScale(37),
-      paddingTop: 8,
-      paddingBottom: 8,
+      minHeight: Platform.OS === 'ios' ? verticalScale(42) : verticalScale(37),
+      paddingTop: Platform.OS === 'ios' ? 10 : 8,
+      paddingBottom: Platform.OS === 'ios' ? 10 : 8,
       lineHeight: 20,
     },
     inputActionIconsMainWrapper: {

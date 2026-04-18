@@ -5,6 +5,7 @@ import {
   scaleFont,
   verticalScale,
 } from "../../utils/responsive";
+import { appColors } from "../../themes/appColors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -19,6 +20,15 @@ export const createStyles = ({}) =>
       paddingHorizontal: 20,
       backgroundColor: "#FAFAFA",
       paddingBottom: 20,
+    },
+    coinstar:{
+      height:20,
+      width:20,
+      borderWidth:2,
+      borderRadius:50,
+      borderColor:appColors.navyBlueShade,
+      justifyContent:"center",
+      alignItems:"center"
     },
     chatHeader: {
       width: "100%",
@@ -38,7 +48,7 @@ export const createStyles = ({}) =>
       flexDirection: "row",
       justifyContent: "space-between",
       paddingHorizontal: 10,
-      paddingVertical: 2,
+      paddingVertical: 4,
       alignItems: "center",
       borderWidth: 1,
       borderColor: "#081A35",

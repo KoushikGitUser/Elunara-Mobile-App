@@ -54,7 +54,7 @@ const EducationDropDowns = ({dataArray, placeholder, triggerAPICall, initialValu
         if (selectorRef.current) {
           selectorRef.current.measureInWindow((x, y, width, height) => {
             setDropdownPosition({
-              top: y + height + 30,
+              top: y + height + (Platform.OS === 'ios' ? 1 : 30),
               left: x,
               width: width,
             });

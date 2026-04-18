@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { scaleFont } from "../../utils/responsive";
@@ -317,7 +318,7 @@ const EditProfile = () => {
         <View style={[styles.inputSection, { width: "100%" }]}>
           <Text style={styles.inputLabel}>Mobile number</Text>
           <View style={styles.input}>
-            <View style={{flexDirection:"row",gap:10}}> 
+            <View style={{flexDirection:"row",gap:10,flex:1}}>
               <TouchableOpacity
                 style={styles.countrySection}
                 disabled={true}
@@ -328,7 +329,7 @@ const EditProfile = () => {
               <TextInput
                 editable={false}
                 ref={passwordInputRef}
-                style={[styles.inputText]}
+                style={[styles.inputText, Platform.OS === 'ios' && { paddingVertical: 0 }]}
                 placeholder="Your password"
                 placeholderTextColor="#9CA3AF"
                 value={mobileNumber}
@@ -437,6 +438,8 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#1F2937",
     letterSpacing: 0.2,
+    flex: 1,
+    paddingVertical: 12,
   },
   otpContainer: {
     flexDirection: "row",

@@ -133,7 +133,13 @@ const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
             marginLeft: toggleStates.toggleChatHistorySidebar
               ? 0
               : -SCREEN_WIDTH * 0.75,
-              top:statusBarHeight
+              top:statusBarHeight,
+          },
+          toggleStates.toggleChatHistorySidebar && {
+            shadowColor: "#000",
+            shadowOffset: { width: 8, height: 0 },
+            shadowOpacity: 0.15,
+            shadowRadius: 10,
           },
         ]}
       >

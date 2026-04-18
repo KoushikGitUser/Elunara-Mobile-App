@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Platform } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { moderateScale, scaleFont } from "../../../utils/responsive";
@@ -40,7 +40,7 @@ const GenderDropdown = ({ triggerAPICall }) => {
     if (selectorRef.current) {
       selectorRef.current.measureInWindow((x, y, width, height) => {
         setDropdownPosition({
-          top: y + height + 30,
+          top: y + height + (Platform.OS === 'ios' ? 1 : 30),
           left: x,
           width: width,
         });
