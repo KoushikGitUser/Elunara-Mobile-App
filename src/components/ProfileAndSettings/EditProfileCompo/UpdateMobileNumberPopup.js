@@ -146,6 +146,9 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
     });
 
     const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
+      if (Platform.OS === "ios") {
+        setKeyboardHeight(0);
+      }
       if (Platform.OS === "android") {
         Animated.timing(animatedValue, {
           toValue: 0,
@@ -233,9 +236,8 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
             contentContainerStyle={[styles.scrollContent]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
-            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
           >
-            <View style={styles.modalSheet}>
+            <View style={[styles.modalSheet, Platform.OS === 'ios' && { paddingBottom: keyboardHeight }]}>
               {/* Content */}
               <View style={styles.content}>
                 {/* Title */}

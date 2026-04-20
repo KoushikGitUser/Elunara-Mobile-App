@@ -1,7 +1,7 @@
 {
   "name": "elunara",
   "version": "1.0.0",
-  "hyperSdkIOSVersion": "2.2.7",
+  "hyperSdkIOSVersion": "2.2.7.1",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -43,7 +43,7 @@
     "expo-status-bar": "~3.0.8",
     "expo-video": "^3.0.16",
     "formik": "^2.4.6",
-    "hyper-sdk-react": "^5.0.29",
+    "hyper-sdk-react": "^5.0.31",
     "lodash": "^4.17.21",
     "lucide-react-native": "^0.562.0",
     "moment": "^2.30.1",

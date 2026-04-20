@@ -1,16 +1,15 @@
 import Foundation
 import React
 import HyperSDK
+import WebKit
 
 @objc(HyperPaymentBridge)
-class HyperPaymentBridge: RCTEventEmitter {
+class HyperPaymentBridge: RCTEventEmitter, HyperDelegate {
 
   private var hasListeners = false
   private var hyperServices: HyperServices?
-
-  override init() {
-    super.init()
-  }
+  private var pendingProcessPayload: [String: Any]?
+  private var watchdogToken: Int = 0
 
   override static func requiresMainQueueSetup() -> Bool {
     return true
@@ -29,16 +28,15 @@ class HyperPaymentBridge: RCTEventEmitter {
   }
 
   private func emitEvent(_ body: [String: Any]) {
+    NSLog("HPBRIDGE Event: \(body)")
     if hasListeners {
       sendEvent(withName: "HyperPaymentEvent", body: body)
     }
-    // Also print for Xcode console
-    print("[HyperPaymentBridge] Event: \(body)")
   }
 
   @objc(openPaymentPage:)
   func openPaymentPage(_ data: NSString) {
-    print("[HyperPaymentBridge] openPaymentPage called")
+    NSLog("HPBRIDGE openPaymentPage called")
 
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
@@ -50,45 +48,89 @@ class HyperPaymentBridge: RCTEventEmitter {
         return
       }
 
-      guard let rootVC = self.getTopViewController() else {
+      guard let rootVC = RCTPresentedViewController() ?? self.getTopViewController() else {
         self.emitEvent(["error": "No root view controller found"])
         return
       }
 
-      self.emitEvent(["log": "VC found: \(type(of: rootVC)), creating HyperServices..."])
+      self.emitEvent(["log": "VC=\(type(of: rootVC)), window=\(rootVC.view.window != nil); SDK v=\(HyperServices.hyperSDKVersion())"])
 
-      // Create HyperServices instance
-      if self.hyperServices == nil {
-        self.hyperServices = HyperServices()
-      }
+      let services = HyperServices()
+      services.hyperDelegate = self
+      self.hyperServices = services
+      self.pendingProcessPayload = payload
+      self.watchdogToken += 1
+      let myToken = self.watchdogToken
 
-      // Set up delegate (nil bridge is fine for openPaymentPage)
-      self.emitEvent(["log": "Initiating with payload..."])
+      self.emitEvent(["log": "Calling initiate (new arch delegate wired)"])
 
-      // Use initiate first, then process
-      self.hyperServices?.initiate(rootVC, payload: payload) { [weak self] response in
-        self?.emitEvent(["log": "initiate callback: \(String(describing: response))"])
+      services.initiate(rootVC, payload: payload) { [weak self] response in
+        guard let self = self else { return }
+        let respDesc = response.map { "\($0)" } ?? "nil"
+        self.emitEvent(["log": "initiate callback: \(respDesc.prefix(400))"])
 
-        if let response = response,
-           let jsonData = try? JSONSerialization.data(withJSONObject: response),
+        guard let response = response else { return }
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: response),
            let jsonString = String(data: jsonData, encoding: .utf8) {
-          self?.emitEvent(["data": jsonString])
+          self.emitEvent(["data": jsonString])
         }
 
-        // After initiate, call process
-        DispatchQueue.main.async {
-          self?.emitEvent(["log": "Calling process..."])
-          self?.hyperServices?.process(payload)
+        let event = (response["event"] as? String) ?? ""
+        let innerPayload = (response["payload"] as? [String: Any]) ?? [:]
+        let status = (innerPayload["status"] as? String) ?? ""
+
+        if event == "initiate_result" {
+          if status.caseInsensitiveCompare("SUCCESS") == .orderedSame {
+            DispatchQueue.main.async { [weak self] in
+              guard let self = self else { return }
+              self.emitEvent(["log": "initiate SUCCESS; calling process"])
+              if let processPayload = self.pendingProcessPayload {
+                self.hyperServices?.process(processPayload)
+              }
+            }
+          } else {
+            self.emitEvent(["log": "initiate NON-SUCCESS status=\(status)"])
+          }
+        }
+      }
+
+      DispatchQueue.main.asyncAfter(deadline: .now() + 15.0) { [weak self] in
+        guard let self = self, self.watchdogToken == myToken else { return }
+        if self.pendingProcessPayload != nil {
+          self.emitEvent(["log": "WATCHDOG: 15s elapsed"])
         }
       }
     }
   }
 
+  // MARK: - HyperDelegate
+
+  func merchantView(forViewType viewType: String) -> UIView? {
+    emitEvent(["log": "merchantViewForViewType: \(viewType)"])
+    return nil
+  }
+
+  func onWebViewReady(_ webView: WKWebView) {
+    emitEvent(["log": "onWebViewReady; frame=\(webView.frame)"])
+  }
+
+  func didBackPressOnJuspaySafe() {
+    emitEvent(["log": "didBackPressOnJuspaySafe"])
+  }
+
+  // MARK: - VC lookup fallback
+
   private func getTopViewController() -> UIViewController? {
-    guard let windowScene = UIApplication.shared.connectedScenes
-      .compactMap({ $0 as? UIWindowScene })
-      .first,
-          let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+    let windows: [UIWindow]
+    if #available(iOS 13.0, *) {
+      windows = UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap { $0.windows }
+    } else {
+      windows = UIApplication.shared.windows
+    }
+    guard let rootVC = (windows.first(where: { $0.isKeyWindow }) ?? windows.first)?.rootViewController else {
       return nil
     }
     return topMost(of: rootVC)

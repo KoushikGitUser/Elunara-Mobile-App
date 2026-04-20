@@ -3,11 +3,15 @@ import React
 import ReactAppDependencyProvider
 
 @UIApplicationMain
-public class AppDelegate: ExpoAppDelegate {
+public class AppDelegate: ExpoAppDelegate, HyperSdkReactDelegate {
   var window: UIWindow?
 
   var reactNativeDelegate: ExpoReactNativeFactoryDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
+
+  public func getReactNativeFactory() -> Any! {
+    return reactNativeFactory
+  }
 
   public override func application(
     _ application: UIApplication,
