@@ -4,4 +4,6 @@
 
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+#import <React/RCTUtils.h>
+#import <hyper-sdk-react/HyperSdkReact.h>
 

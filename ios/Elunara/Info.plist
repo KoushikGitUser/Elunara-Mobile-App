@@ -50,10 +50,22 @@
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
-      <false/>
+      <true/>
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>upi</string>
+      <string>tez</string>
+      <string>gpay</string>
+      <string>phonepe</string>
+      <string>paytmmp</string>
+      <string>bhim</string>
+      <string>credpay</string>
+      <string>amazonpay</string>
+      <string>mobikwik</string>
+    </array>
     <key>NSCameraUsageDescription</key>
     <string>The app accesses your camera to let you take photos.</string>
     <key>NSFaceIDUsageDescription</key>

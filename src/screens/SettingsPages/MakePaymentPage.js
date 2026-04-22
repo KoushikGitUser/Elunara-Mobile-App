@@ -287,16 +287,8 @@ const MakePaymentPage = () => {
         try {
           const payloadStr = JSON.stringify(sdkPayload);
           if (Platform.OS === 'ios') {
-            console.log("[MakePayment] iOS: Using HyperPaymentBridge...");
-            const HyperPaymentBridge = NativeModules.HyperPaymentBridge;
-            if (HyperPaymentBridge) {
-              console.log("[MakePayment] iOS: HyperPaymentBridge found, calling openPaymentPage...");
-              HyperPaymentBridge.openPaymentPage(payloadStr);
-            } else {
-              console.log("[MakePayment] iOS: HyperPaymentBridge NOT found, falling back...");
-              NativeModules.HyperSdkReact.openPaymentPage(payloadStr);
-            }
-            // process will be called when initiate_result is received (see HyperEvent listener)
+            console.log("[MakePayment] iOS: Using HyperPaymentBridge (shouldUseViewController path)...");
+            NativeModules.HyperPaymentBridge.openPaymentPage(payloadStr);
           } else {
             console.log("[MakePayment] Android: Calling openPaymentPage...");
             HyperSdkReact.openPaymentPage(payloadStr);
