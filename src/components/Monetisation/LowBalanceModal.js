@@ -67,18 +67,22 @@ const LowBalanceModal = () => {
 
             <View style={styles.iconContainer}>
             <View style={styles.iconCircle}>
-              <View style={styles.coinstar}>
+              {/* <View style={styles.coinstar}>
                 <AntDesign name="star" size={22} color={appColors.navyBlueShade} />
-              </View>
+              </View> */}
+                 <Wallet color={appColors.navyBlueShade} size={30} />
             </View>
-              <Text style={styles.balanceAmount}>{balance.toLocaleString("en-IN")}</Text>
+              <Text style={styles.balanceAmount}>₹{balance.toLocaleString("en-IN")}</Text>
             </View>
 
 
-            <Text style={styles.title}>Low Learning Point</Text>
+            <Text style={styles.title}>Low Balance</Text>
 
-            <Text style={styles.description}>
+            {/* <Text style={styles.description}>
               You don't have enough LP to use file related activities. Maintain the Lp over 79900 to use file related activities.
+            </Text> */}
+               <Text style={styles.description}>
+              You don't have enough Balance to use file related activities. Maintain the Balance over ₹799 to use file related activities.
             </Text>
 
             <View style={styles.btnsMain}>
@@ -87,7 +91,8 @@ const LowBalanceModal = () => {
                 onPress={handleRecharge}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Recharge Learning Points</Text>
+                {/* <Text style={styles.buttonText}>Recharge Learning Points</Text> */}
+                <Text style={styles.buttonText}>Recharge Wallet</Text>
               </TouchableOpacity>
             </View>
           </View>

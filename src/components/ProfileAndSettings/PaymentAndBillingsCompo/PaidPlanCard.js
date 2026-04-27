@@ -39,7 +39,7 @@ const PaidPlanCard = ({ isLoading = false }) => {
   const getStatusDescription = () => {
     if (isPromoNotActivated) return `All features enabled until ${walletStates.promotionalDaysRemaining} days`;
     if (isPromoActivated) return "This recharge will be active after the free trial ends";
-    if (balance <= 0) return "All features disabled until you add Learning Points";
+    if (balance <= 0) return "All features disabled until you add Money to your Wallet";
     if (balance < 799) return "File uploads disabled below ₹799";
     return "This recharge will be active after the free trial ends";
   };

@@ -65,17 +65,22 @@ const NoBalanceModal = () => {
           <View style={styles.content}>
             <View style={styles.iconContainer}>
             <View style={styles.iconCircle}>
-              <View style={styles.coinstar}>
+              {/* <View style={styles.coinstar}>
                 <AntDesign  name="star" size={22} color={appColors.navyBlueShade} />
-              </View>
+              </View> */}
+              <Wallet color={appColors.navyBlueShade} size={30} />
             </View>
             
             </View>
-<Text style={styles.title}>No Learning Point</Text>
+{/* <Text style={styles.title}>No Learning Point</Text> */}
+<Text style={styles.title}>No Balance!</Text>
             
 
-            <Text style={styles.description}>
+            {/* <Text style={styles.description}>
               Your LP is 0 and you can't use any feature on this app. Recharge your LP to re-enable the features.
+            </Text> */}
+             <Text style={styles.description}>
+              Your Balance is 0 and you can't use any feature on this app. Recharge your Wallet to re-enable the features.
             </Text>
 
             <View style={styles.btnsMain}>
@@ -84,7 +89,8 @@ const NoBalanceModal = () => {
                 onPress={handleRecharge}
                 activeOpacity={0.8}
               >
-                <Text style={styles.buttonText}>Recharge Learning Points</Text>
+                {/* <Text style={styles.buttonText}>Recharge Learning Points</Text> */}
+                 <Text style={styles.buttonText}>Recharge Wallet</Text>
               </TouchableOpacity>
             </View>
           </View>

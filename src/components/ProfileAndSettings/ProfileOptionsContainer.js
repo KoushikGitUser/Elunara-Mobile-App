@@ -74,20 +74,20 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
       {/* Upgrade button */}
       <TouchableOpacity style={styles.upgradeBtn} onPress={() => {
         navigation.navigate("settingsInnerPages", { page: 11 });
-        dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"));
+        dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Recharge Wallet" : "Activate Wallet"));
         dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
       }}>
-        <View style={styles.coinstar}>
+        {/* <View style={styles.coinstar}>
           <AntDesign name="star" size={18} color={appColors.navyBlueShade} />
-        </View>
-        {/* {walletStates?.isInitialRechargeCompleted ? (
-          <Wallet size={29} strokeWidth={1.5} color={appColors.navyBlueShade} />
+        </View> */}
+        {walletStates?.isInitialRechargeCompleted ? (
+          <Wallet size={29} strokeWidth={1} color={appColors.navyBlueShade} />
         ) : (
           <SparkleIcon color={appColors.navyBlueShade} />
-        )} */}
+        )}
         <View style={{ width: "100%" }}>
           <GradientText
-            children={walletStates?.isInitialRechargeCompleted ? "Add Learning Points" : "Activate Learning Points"}
+            children={walletStates?.isInitialRechargeCompleted ? "Add Balance" : "Activate Wallet"}
             fullWidth={true}
             fontSize={20}
           />

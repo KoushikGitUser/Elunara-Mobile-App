@@ -6,12 +6,18 @@ import { View } from "react-native";
 import Toaster from "./src/components/UniversalToaster/Toaster";
 import { useFonts } from "expo-font";
 import NetworkProvider from "./src/providers/NetworkProvider";
+import HyperSdkReact from "hyper-sdk-react";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     "Mukta-Regular": require("./assets/fonts/Mukta-Regular.ttf"),
     "Mukta-Bold": require("./assets/fonts/Mukta-Bold.ttf"),
   });
+
+  useEffect(() => {
+    // Initialize HyperSDK
+    HyperSdkReact.createHyperServices();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded) {

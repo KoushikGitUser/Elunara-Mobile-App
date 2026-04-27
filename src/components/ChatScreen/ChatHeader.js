@@ -210,13 +210,14 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
               onPress={() => setShowLPModal(true)}
               style={styles.upgradeButton}
             >
-              <View style={styles.coinstar}>
+              {/* <View style={styles.coinstar}>
                 <AntDesign name="star" size={12} color={appColors.navyBlueShade} />
-              </View>
+              </View> */}   
+              <Wallet color={appColors.navyBlueShade} size={20} strokeWidth={1} /> 
               <Text
                 style={{ fontSize: 15, fontWeight: 600, fontFamily: "Mukta-Bold", marginLeft: !walletStates.isInitialRechargeCompleted ? 5 : 7 }}
               >
-                Activate LP
+                Activate Wallet
               </Text>
             </TouchableOpacity>
           )
