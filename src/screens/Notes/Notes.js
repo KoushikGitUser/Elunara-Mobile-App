@@ -337,10 +337,29 @@ const Notes = () => {
           }
         });
 
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'searchCount', count: count }));
+        // Store count in a custom data attribute on the body
+        document.body.setAttribute('data-search-count', count);
       })();
     `;
     richTextRef.current?.injectJavascript(script);
+
+    // Count matches in the current noteContent using regex
+    // This is more reliable than trying to communicate with the webview
+    setTimeout(() => {
+      // Strip HTML tags from noteContent to get plain text
+      const tempDiv = noteContent.replace(/<[^>]*>/g, ' ');
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escapedQuery, 'gi');
+      const matches = tempDiv.match(regex) || [];
+      const count = matches.length;
+      console.log('[Notes] Search query:', query);
+      console.log('[Notes] Match count:', count);
+      setMatchCount(count);
+      if (count > 0) {
+        setCurrentMatchIndex(0);
+        navigateToMatch(0);
+      }
+    }, 200);
   };
 
   const clearHighlights = () => {
@@ -382,6 +401,7 @@ const Notes = () => {
           highlights[idx].style.backgroundColor = '#FF9800';
           highlights[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
         return true;
       })();
     `;
@@ -621,19 +641,6 @@ const Notes = () => {
                 });
               `;
               richTextRef.current?.injectJavascript(blockImagePasteScript);
-            }}
-            onMessage={(message) => {
-              try {
-                const data = JSON.parse(message.data);
-                if (data.type === "searchCount") {
-                  setMatchCount(data.count);
-                  if (data.count > 0) {
-                    navigateToMatch(0);
-                  }
-                }
-              } catch (e) {
-                // Ignore non-JSON messages
-              }
             }}
             editorStyle={{
               backgroundColor: "transparent",

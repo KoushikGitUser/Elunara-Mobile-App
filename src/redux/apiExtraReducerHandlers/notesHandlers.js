@@ -24,7 +24,11 @@ export const handleUpdateNotes = {
     state.notesStates.savingNote = false;
     const updatedNote = action?.payload?.data?.data;
     if (updatedNote) {
-      state.notesStates.currentChatNotes = updatedNote;
+      // Merge the updated note with existing data to preserve qa_pairs
+      state.notesStates.currentChatNotes = {
+        ...state.notesStates.currentChatNotes,
+        ...updatedNote,
+      };
     }
     // triggerToast("Success", "Notes saved successfully", "success", 3000); // Optional: Toast might be annoying on auto-save
   },
