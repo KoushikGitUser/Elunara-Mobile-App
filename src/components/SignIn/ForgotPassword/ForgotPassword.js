@@ -82,24 +82,33 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
   const isEmailValid = email && !emailError;
 
   useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const keyboardDidShow = Keyboard.addListener(showEvent, (e) => {
       const height = e.endCoordinates.height;
       setKeyboardVisible(true);
       setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5, // pushes up slightly, not fully
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5, // pushes up slightly, not fully
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+    const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
       setKeyboardVisible(false);
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      if (Platform.OS === "ios") {
+        setKeyboardHeight(0);
+      }
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
     return () => {
@@ -119,7 +128,8 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
     >
       <Toaster/>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={undefined}
+        enabled={Platform.OS !== "ios"}
         style={[styles.container]}
       >
         {/* Blur Background */}
@@ -147,7 +157,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
         />
         <Animated.View
           style={{
-            transform: [
+            transform: Platform.OS === "ios" ? [] : [
               {
                 translateY: animatedValue.interpolate({
                   inputRange: [0, 320], // average keyboard height
@@ -165,7 +175,7 @@ const ForgotPassword = ({ close, toggleForgotPassword }) => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.modalSheet}>
+            <View style={[styles.modalSheet, Platform.OS === "ios" && { paddingBottom: keyboardHeight }]}>
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>

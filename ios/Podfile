@@ -67,28 +67,18 @@ target 'Elunara' do
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
 
-    # HyperSDK: Process merchant config and download assets
-    hyper_sdk_pod = installer.pods_project.targets.find { |t| t.name == 'HyperSDK' }
-    if hyper_sdk_pod
-      merchant_config_path = File.join(__dir__, 'Elunara', 'MerchantConfig.txt')
-      if File.exist?(merchant_config_path)
-        client_ids = File.readlines(merchant_config_path).map(&:strip).reject(&:empty?)
-        puts "HyperSDK: Found client IDs: #{client_ids}"
-
-        # Copy release_config to HyperSDK framework
-        hyper_sdk_path = File.join(installer.sandbox.root, 'HyperSDK', 'HyperSDK.xcframework')
-        ['ios-arm64'].each do |arch|
-          framework_path = File.join(hyper_sdk_path, arch, 'HyperSDK.framework')
-          if Dir.exist?(framework_path)
-            config_content = { "clientIds" => client_ids }.to_json
-            config_file = File.join(framework_path, 'release_config.json')
-            File.write(config_file, config_content)
-            puts "HyperSDK: Wrote release_config.json to #{arch}"
-          end
-        end
-      else
-        puts "HyperSDK: MerchantConfig.txt not found at #{merchant_config_path}"
+    # HyperSDK: Run Juspay's Fuse.rb. It reads ios/MerchantConfig.txt
+    # (format: "clientId = <your_client_id>"), downloads merchant-specific signed
+    # assets, and patches Info.plist with required URL/Query schemes.
+    fuse_path = File.join(__dir__, 'Pods', 'HyperSDK', 'Fuse.rb')
+    clean_assets = false # set true to force re-download of all assets
+    if File.exist?(fuse_path)
+      puts "HyperSDK: Running Fuse.rb..."
+      unless system("ruby", fuse_path.to_s, clean_assets.to_s)
+        puts "HyperSDK: Fuse.rb failed to run."
       end
+    else
+      puts "HyperSDK: Fuse.rb not found at #{fuse_path}"
     end
   end
 end

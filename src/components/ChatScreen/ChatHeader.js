@@ -207,7 +207,11 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
         ) : (
           (!walletStates.isInitialRechargeCompleted || walletStates.walletBalance <= 0) && (
             <TouchableOpacity
-              onPress={() => setShowLPModal(true)}
+                    onPress={() => {
+                      navigation.navigate("settingsInnerPages", { page: 11 });
+                    dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Recharge Wallet" : "Activate Wallet"));
+                      dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+                    }}
               style={styles.upgradeButton}
             >
               {/* <View style={styles.coinstar}>

@@ -271,36 +271,17 @@ const MakePaymentPage = () => {
     if (apiWalletStates.isPaymentFulfilled === true) {
       dispatch(setIsPaymentInitiated(true));
       dispatch(setHideSettingsBackButton(true));
-
       const sdkPayload = apiWalletStates.hyperPayload?.sdk_payload;
-      console.log("[MakePayment] sdkPayload exists:", !!sdkPayload);
-      console.log("[MakePayment] HyperSdkReact exists:", !!HyperSdkReact);
-      console.log("[MakePayment] HyperSdkReact methods:", HyperSdkReact ? Object.keys(HyperSdkReact) : "N/A");
-      console.log("[MakePayment] Platform:", Platform.OS);
-      console.log("[MakePayment] typeof openPaymentPage:", typeof NativeModules.HyperSdkReact.openPaymentPage);
-      console.log("[MakePayment] typeof createHyperServices:", typeof NativeModules.HyperSdkReact.createHyperServices);
-      console.log("[MakePayment] typeof initiate:", typeof NativeModules.HyperSdkReact.initiate);
-      console.log("[MakePayment] typeof process:", typeof NativeModules.HyperSdkReact.process);
-      console.log("[MakePayment] sdkPayload:", JSON.stringify(sdkPayload).substring(0, 200));
       dispatch(resetPaymentInitiated());
       if (sdkPayload && HyperSdkReact) {
         try {
           const payloadStr = JSON.stringify(sdkPayload);
-          if (Platform.OS === 'ios') {
-            console.log("[MakePayment] iOS: Using HyperPaymentBridge (shouldUseViewController path)...");
-            NativeModules.HyperPaymentBridge.openPaymentPage(payloadStr);
-          } else {
-            console.log("[MakePayment] Android: Calling openPaymentPage...");
             HyperSdkReact.openPaymentPage(payloadStr);
-          }
-          console.log("[MakePayment] Payment call completed");
         } catch (e) {
-          console.log("[MakePayment] openPaymentPage error:", e);
           dispatch(setIsPaymentInitiated(false));
           dispatch(setHideSettingsBackButton(false));
         }
       } else if (!HyperSdkReact) {
-        console.log("[MakePayment] openPaymentPage: HyperSdkReact module not available");
         dispatch(setIsPaymentInitiated(false));
         dispatch(setHideSettingsBackButton(false));
       }
