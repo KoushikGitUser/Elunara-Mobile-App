@@ -207,13 +207,17 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
         ) : (
           (!walletStates.isInitialRechargeCompleted || walletStates.walletBalance <= 0) && (
             <TouchableOpacity
-              onPress={() => setShowLPModal(true)}
+              onPress={() => {
+                navigation.navigate("settingsInnerPages", { page: 11 });
+                dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Recharge Wallet" : "Activate Wallet"));
+                dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+              }}
               style={styles.upgradeButton}
             >
               {/* <View style={styles.coinstar}>
                 <AntDesign name="star" size={12} color={appColors.navyBlueShade} />
-              </View> */}   
-              <Wallet color={appColors.navyBlueShade} size={20} strokeWidth={1} /> 
+              </View> */}
+              <Wallet color={appColors.navyBlueShade} size={20} strokeWidth={1} />
               <Text
                 style={{ fontSize: 15, fontWeight: 600, fontFamily: "Mukta-Bold", marginLeft: !walletStates.isInitialRechargeCompleted ? 5 : 7 }}
               >

@@ -227,6 +227,25 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         });
       }
 
+      // Update the message content in chatMessagesArray to show the selected compare response
+      if (regeneratedResponse.content) {
+        const updatedChatMessagesArray = globalDataStates.chatMessagesArray.map((msg, index) => {
+          if (index === messageIndex) {
+            return {
+              ...msg,
+              message: regeneratedResponse.content,
+              version: regeneratedResponse.version,
+              total_versions: regeneratedResponse.total_versions,
+              generation: regeneratedResponse.generation
+            };
+          }
+          return msg;
+        });
+
+        // Dispatch the updated array to Redux
+        dispatch(setChatMessagesArray(updatedChatMessagesArray));
+      }
+
       // Show toast notification
       triggerToast(`Comparison response selected - Version ${regeneratedResponse.version}`, "", "success", 3000);
 
