@@ -15,9 +15,13 @@ export const handleInitiatePayment = {
     console.log("initiatePayment rejected:", JSON.stringify(action.payload));
     state.walletStates.isPaymentLoading = false;
     state.walletStates.isPaymentFulfilled = false;
+
+    // Get the error message from the response
+    const errorMessage = action.payload?.message || "We are facing some issues right now, please try again later.";
+
     triggerToast(
       "Gateway Error",
-      "We are facing some issues right now, please try again later.",
+      errorMessage,
       "error",
       5000
     );
