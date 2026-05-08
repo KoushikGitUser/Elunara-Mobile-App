@@ -52,7 +52,7 @@
         "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.smgdev.elunara"
+      "bundleIdentifier": "com.elunara.ai"
     },
     "android": {
       "adaptiveIcon": {
