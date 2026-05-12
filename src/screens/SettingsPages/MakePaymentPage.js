@@ -12,7 +12,6 @@ import {
   Modal,
   ActivityIndicator,
   NativeModules,
-  NativeEventEmitter,
   Platform,
   AppState,
 } from "react-native";
@@ -32,6 +31,7 @@ import {
 import {
   setIsPaymentInitiated,
   setPaymentSuccess,
+  clearPaymentResultEvent,
 } from "../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls, resetPaymentInitiated, resetVerifyPayment } from "../../redux/slices/apiCommonSlice";
 import { rechargePresets } from "../../data/datas";
@@ -41,9 +41,6 @@ import { Gift, Wallet, X, ArrowLeft } from "lucide-react-native";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
 
-// Module-level: tracks which MakePaymentPage instance owns the current payment
-let currentPaymentSessionId = 0;
-
 const MakePaymentPage = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -52,13 +49,14 @@ const MakePaymentPage = () => {
   const [amountError, setAmountError] = useState("");
   const [showBackPressPopup, setShowBackPressPopup] = useState(false);
   const [paymentResultOrderId, setPaymentResultOrderId] = useState(null);
-  const mySessionRef = useRef(null);
-  const pendingPayloadRef = useRef(null);
+  const lastHandledEventTsRef = useRef(0);
+  const processResultReceivedRef = useRef(false);
 
   const { walletStates, paymentStates } = useSelector((state) => state.Toggle);
   const apiWalletStates = useSelector((state) => state.API.walletStates);
   const isPaymentInitiated = paymentStates.isPaymentInitiated;
   const paymentSuccess = paymentStates.paymentSuccess;
+  const paymentResultEvent = paymentStates.paymentResultEvent;
   const isFirstRecharge = !walletStates.isInitialRechargeCompleted;
   const currentBalance = walletStates.walletBalance;
   const isPromoActive =
@@ -90,120 +88,38 @@ const MakePaymentPage = () => {
     };
   }, []);
 
-  // iOS custom bridge event listener
+  // React to process_result dispatched by App-level HyperSDK listener
   useEffect(() => {
-    if (Platform.OS !== 'ios' || !NativeModules.HyperPaymentBridge) return;
-    const bridgeEmitter = new NativeEventEmitter(NativeModules.HyperPaymentBridge);
-    const bridgeListener = bridgeEmitter.addListener("HyperPaymentEvent", (resp) => {
-      console.log("[MakePayment] iOS HyperPaymentEvent:", JSON.stringify(resp));
-      if (resp.error) {
-        console.log("[MakePayment] iOS bridge error:", resp.error);
-        dispatch(setIsPaymentInitiated(false));
-        dispatch(setHideSettingsBackButton(false));
-        return;
-      }
-      if (resp.data) {
-        try {
-          const data = JSON.parse(resp.data);
-          const event = data.event || "";
-          if (event === "process_result") {
-            processResultReceivedRef.current = true;
-            currentPaymentSessionId++;
-            const innerPayload = data.payload || {};
-            const status = innerPayload.status || "";
-            dispatch(setIsPaymentInitiated(false));
-            dispatch(setHideSettingsBackButton(false));
-            dispatch(resetPaymentInitiated());
-            setShowBackPressPopup(false);
-            if (status !== "backpressed" && status !== "user_aborted") {
-              dispatch(resetVerifyPayment());
-              setPaymentResultOrderId(data.orderId);
-              dispatch(commonFunctionForAPICalls({
-                method: "POST",
-                url: `/payments/verify/${data.orderId}`,
-                name: "verifyPayment",
-              }));
-            }
-          }
-        } catch (e) {
-          console.log("[MakePayment] iOS bridge parse error:", e);
-        }
-      }
-    });
-    return () => bridgeListener.remove();
-  }, []);
+    if (!paymentResultEvent) return;
+    if (paymentResultEvent.ts === lastHandledEventTsRef.current) return;
+    lastHandledEventTsRef.current = paymentResultEvent.ts;
 
-  // HyperSDK event listener (Android + iOS fallback)
-  useEffect(() => {
-    if (!NativeModules.HyperSdkReact) {
-      console.log("[MakePayment] HyperSdkReact native module not available");
-      return;
+    const { orderId, status } = paymentResultEvent;
+    console.log("[MakePayment] paymentResultEvent:", status, "orderId:", orderId);
+
+    processResultReceivedRef.current = true;
+    dispatch(setIsPaymentInitiated(false));
+    dispatch(setHideSettingsBackButton(false));
+    dispatch(resetPaymentInitiated());
+    setShowBackPressPopup(false);
+
+    if (status !== "backpressed" && status !== "user_aborted") {
+      dispatch(resetVerifyPayment());
+      setPaymentResultOrderId(orderId);
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "POST",
+          url: `/payments/verify/${orderId}`,
+          name: "verifyPayment",
+        })
+      );
     }
-    const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
-    const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
-      try {
-        const data = JSON.parse(resp);
-        const event = data.event || "";
-        console.log("[MakePayment] HyperEvent:", event);
 
-        // iOS: after initiate completes, call process to show payment page
-        if (event === "initiate_result" && Platform.OS === "ios" && pendingPayloadRef.current) {
-          console.log("[MakePayment] iOS: initiate_result received, calling process...");
-          const payload = pendingPayloadRef.current;
-          pendingPayloadRef.current = null;
-          NativeModules.HyperSdkReact.process(payload);
-        }
-
-        if (event === "process_result") {
-          if (mySessionRef.current !== currentPaymentSessionId) {
-            console.log("[MakePayment] Stale listener, ignoring process_result");
-            return;
-          }
-          // Mark as received so AppState fallback doesn't trigger
-          processResultReceivedRef.current = true;
-          // Mark this session as handled so no duplicate fires
-          currentPaymentSessionId++;
-
-          const innerPayload = data.payload || {};
-          const status = innerPayload.status || "";
-          console.log("[MakePayment] process_result status:", status, "orderId:", data.orderId);
-
-          // Reset ALL state — Redux + local
-          dispatch(setIsPaymentInitiated(false));
-          dispatch(setHideSettingsBackButton(false));
-          dispatch(resetPaymentInitiated());
-          setShowBackPressPopup(false);
-
-
-          if (status === "backpressed" || status === "user_aborted") {
-            console.log("[MakePayment] User cancelled payment");
-          } else {
-            // Show payment result modal + call verify API
-            dispatch(resetVerifyPayment());
-            setPaymentResultOrderId(data.orderId);
-            dispatch(
-              commonFunctionForAPICalls({
-                method: "POST",
-                url: `/payments/verify/${data.orderId}`,
-                name: "verifyPayment",
-              })
-            );
-          }
-        }
-      } catch (e) {
-        console.log("[MakePayment] HyperEvent error:", e);
-      }
-    });
-
-    return () => {
-      hyperListener.remove();
-    };
-  }, []);
+    dispatch(clearPaymentResultEvent());
+  }, [paymentResultEvent, dispatch]);
 
   // Fallback: if HyperSDK closes without firing process_result,
   // detect app returning to foreground and reset the stuck state
-  const processResultReceivedRef = useRef(false);
-
   useEffect(() => {
     if (!isPaymentInitiated) return;
     processResultReceivedRef.current = false;
@@ -254,8 +170,6 @@ const MakePaymentPage = () => {
   }, [isPaymentInitiated, navigation]);
 
   const startPaymentFlow = (amount) => {
-    currentPaymentSessionId++;
-    mySessionRef.current = currentPaymentSessionId;
     dispatch(
       commonFunctionForAPICalls({
         method: "POST",

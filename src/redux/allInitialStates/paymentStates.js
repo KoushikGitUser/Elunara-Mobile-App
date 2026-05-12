@@ -4,4 +4,5 @@ export const paymentStates = {
   isPaymentInitiated: false,
   remainingTime: 900,
   paymentSuccess: false,
+  paymentResultEvent: null,
 };

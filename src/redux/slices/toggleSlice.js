@@ -278,6 +278,13 @@ const toggleSlice = createSlice({
       state.paymentStates.isPaymentInitiated = false;
       state.paymentStates.remainingTime = 900;
       state.paymentStates.paymentSuccess = false;
+      state.paymentStates.paymentResultEvent = null;
+    },
+    setPaymentResultEvent: (state, action) => {
+      state.paymentStates.paymentResultEvent = action.payload;
+    },
+    clearPaymentResultEvent: (state) => {
+      state.paymentStates.paymentResultEvent = null;
     },
   },
   extraReducers: (builder) => {
@@ -371,6 +378,8 @@ export const {
   setRemainingTime,
   setPaymentSuccess,
   resetPaymentFlow,
+  setPaymentResultEvent,
+  clearPaymentResultEvent,
 } = toggleSlice.actions;
 
 export default toggleSlice.reducer; 

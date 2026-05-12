@@ -1,12 +1,51 @@
 import React, { useEffect } from "react";
 import AppNavigator from "./src/navigation/AppNavigator";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import Store from "./src/redux/store/Store";
-import { View } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 import Toaster from "./src/components/UniversalToaster/Toaster";
 import { useFonts } from "expo-font";
 import NetworkProvider from "./src/providers/NetworkProvider";
 import HyperSdkReact from "hyper-sdk-react";
+import { setPaymentResultEvent } from "./src/redux/slices/toggleSlice";
+
+const HyperPaymentListeners = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    HyperSdkReact.createHyperServices();
+  }, []);
+
+  useEffect(() => {
+    if (!NativeModules.HyperSdkReact) {
+      console.log("[App] HyperSdkReact native module not available");
+      return;
+    }
+    const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
+    const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
+      try {
+        const data = JSON.parse(resp);
+        const event = data.event || "";
+        console.log("[App] HyperEvent:", event);
+        if (event === "process_result") {
+          const innerPayload = data.payload || {};
+          dispatch(
+            setPaymentResultEvent({
+              orderId: data.orderId,
+              status: innerPayload.status || "",
+              ts: Date.now(),
+            })
+          );
+        }
+      } catch (e) {
+        console.log("[App] HyperEvent parse error:", e);
+      }
+    });
+    return () => hyperListener.remove();
+  }, [dispatch]);
+
+  return null;
+};
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -14,17 +53,6 @@ export default function App() {
     "Mukta-Bold": require("./assets/fonts/Mukta-Bold.ttf"),
   });
 
-  useEffect(() => {
-    // Initialize HyperSDK
-    HyperSdkReact.createHyperServices();
-  }, []);
-
-  useEffect(() => {
-    if (fontsLoaded) {
-    }
-  }, [fontsLoaded]);
-
-  // Show nothing (or a loader) while fonts are loading
   if (!fontsLoaded) {
     return null;
   }
@@ -32,6 +60,7 @@ export default function App() {
   return (
     <NetworkProvider>
       <Provider store={Store}>
+        <HyperPaymentListeners />
         <AppNavigator />
         <Toaster />
       </Provider>
