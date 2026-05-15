@@ -21,12 +21,20 @@ const screenHeight = Dimensions.get("window").height;
 const DemoPopup = ({ popupState, setPopupState }) => {
   const [showDemoPreview, setShowDemoPreview] = useState(false);
   const [selectedDemoType, setSelectedDemoType] = useState("navigation");
+  const [pendingPreview, setPendingPreview] = useState(false);
 
   const handleDemoOptionPress = (optionIndex) => {
     // Map option index to demo type
     const demoTypes = ["navigation", "chatFunctions", "learningLabs"];
     setSelectedDemoType(demoTypes[optionIndex]);
-    setShowDemoPreview(true);
+    if (Platform.OS === "ios") {
+      // iOS can't stack two Modals; dismiss this one first, then open the
+      // preview in onDismiss (fires after the dismiss animation completes).
+      setPendingPreview(true);
+      setPopupState(false);
+    } else {
+      setShowDemoPreview(true);
+    }
   };
 
   const handleCloseDemoPreview = () => {
@@ -45,6 +53,16 @@ const DemoPopup = ({ popupState, setPopupState }) => {
       transparent={true}
       animationType="slide"
       onRequestClose={() => setPopupState(false)}
+      onDismiss={
+        Platform.OS === "ios"
+          ? () => {
+              if (pendingPreview) {
+                setPendingPreview(false);
+                setShowDemoPreview(true);
+              }
+            }
+          : undefined
+      }
     >
       <View style={styles.container}>
         {/* Blur Background */}
