@@ -9,7 +9,7 @@ import {
   Platform,
   TextInput,
   KeyboardAvoidingView,
-  ScrollView,
+  ScrollView, 
   Keyboard,
   Animated,
   ActivityIndicator,
@@ -44,6 +44,7 @@ const MobileVerificationPopup = ({
   const [mobileError, setMobileError] = useState("");
   const [isTouched, setIsTouched] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [footerHeight, setFooterHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -146,22 +147,14 @@ const MobileVerificationPopup = ({
   const isMobileValid = mobileNumber.length === 10 && !mobileError;
 
   useEffect(() => {
+    if (Platform.OS !== "ios") return;
+
     const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
-      const height = e.endCoordinates.height;
-      setKeyboardHeight(height);
-      Animated.timing(animatedValue, {
-        toValue: height / 2.5, // pushes up slightly, not fully
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      setKeyboardHeight(e.endCoordinates.height);
     });
 
     const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-      Animated.timing(animatedValue, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
+      setKeyboardHeight(0);
     });
 
     return () => {
@@ -169,6 +162,18 @@ const MobileVerificationPopup = ({
       keyboardDidHide.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "ios") return;
+
+    const offset =
+      keyboardHeight > 0 ? Math.max(0, keyboardHeight - footerHeight) : 0;
+    Animated.timing(animatedValue, {
+      toValue: -offset,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [keyboardHeight, footerHeight]);
 
   const handleChange = (index, value) => {
     if (/^\d*$/.test(value)) {
@@ -196,10 +201,7 @@ const MobileVerificationPopup = ({
       onRequestClose={() => close(false)}
     >
       <Toaster />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={[styles.container]}
-      >
+      <KeyboardAvoidingView style={[styles.container]}>
         {/* Blur Background */}
         <BlurView
           style={styles.blurView}
@@ -220,21 +222,7 @@ const MobileVerificationPopup = ({
         />
         <Animated.View
           style={{
-            transform: [
-              {
-                translateY: animatedValue.interpolate({
-                  inputRange: [0, 350], // average keyboard height
-                  outputRange: [
-                    0,
-                    isCodeSent
-                      ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),
-                  ],
-                  // perfect lift without large gap
-                  extrapolate: "clamp",
-                }),
-              },
-            ],
+            transform: [{ translateY: animatedValue }],
           }}
         >
           {/* Modal Sheet */}
@@ -397,45 +385,51 @@ const MobileVerificationPopup = ({
                   )}
                 </TouchableOpacity>
 
-                {/* Skip for now / Resend Code */}
-                {isCodeSent ? (
-                  <TouchableOpacity
-                    style={[styles.skipButton, { marginBottom: 70 }]}
-                    onPress={resendTimer === 0 ? resendCode : undefined}
-                    activeOpacity={resendTimer === 0 ? 0.7 : 1}
-                    disabled={resendTimer > 0}
-                  >
-                    <Text style={[
-                      styles.skipButtonText,
-                      resendTimer > 0 && { color: "#9CA3AF" }
-                    ]}>
-                      {resendTimer > 0
-                        ? `Resend Code in ${formatTimer(resendTimer)}`
-                        : "Resend Code"}
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  !isFromProfile && (
+                <View
+                  onLayout={(e) =>
+                    setFooterHeight(e.nativeEvent.layout.height)
+                  }
+                >
+                  {/* Skip for now / Resend Code */}
+                  {isCodeSent ? (
                     <TouchableOpacity
-                      style={[styles.skipButton, { marginBottom: 20 }]}
-                      onPress={() => close(false)}
-                      activeOpacity={0.7}
+                      style={[styles.skipButton, { marginBottom: 70 }]}
+                      onPress={resendTimer === 0 ? resendCode : undefined}
+                      activeOpacity={resendTimer === 0 ? 0.7 : 1}
+                      disabled={resendTimer > 0}
                     >
-                      <Text style={styles.skipButtonText}>Skip for now</Text>
+                      <Text style={[
+                        styles.skipButtonText,
+                        resendTimer > 0 && { color: "#9CA3AF" }
+                      ]}>
+                        {resendTimer > 0
+                          ? `Resend Code in ${formatTimer(resendTimer)}`
+                          : "Resend Code"}
+                      </Text>
                     </TouchableOpacity>
-                  )
-                )}
+                  ) : (
+                    !isFromProfile && (
+                      <TouchableOpacity
+                        style={[styles.skipButton, { marginBottom: 20 }]}
+                        onPress={() => close(false)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.skipButtonText}>Skip for now</Text>
+                      </TouchableOpacity>
+                    )
+                  )}
 
-                {/* Note */}
-                {!isCodeSent && (
-                  <View style={[styles.noteContainer, { marginBottom: 70 }]}>
-                    <Text style={styles.noteText}>
-                      <Text style={styles.noteBold}>Note:</Text> You can skip
-                      this step for now — but verification will be required
-                      within 7 days to continue using Elunara.
-                    </Text>
-                  </View>
-                )}
+                  {/* Note */}
+                  {!isCodeSent && (
+                    <View style={[styles.noteContainer, { marginBottom: 70 }]}>
+                      <Text style={styles.noteText}>
+                        <Text style={styles.noteBold}>Note:</Text> You can skip
+                        this step for now — but verification will be required
+                        within 7 days to continue using Elunara.
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </ScrollView>

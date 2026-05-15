@@ -27,6 +27,7 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
   const animatedValue = useState(new Animated.Value(0))[0];
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [resendTimer, setResendTimer] = useState(20);
   const inputRefs = useRef([]);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { authStates } = useSelector((state) => state.Auth);
@@ -98,6 +99,23 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
     if (key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
+  };
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const id = setInterval(() => setResendTimer((t) => t - 1), 1000);
+    return () => clearInterval(id);
+  }, [resendTimer]);
+
+  const handleResendOtp = () => {
+    // TODO: dispatch the resend-OTP API here when the endpoint is ready
+    setResendTimer(20);
+  };
+
+  const formatTimer = (s) => {
+    const mm = String(Math.floor(s / 60)).padStart(2, "0");
+    const ss = String(s % 60).padStart(2, "0");
+    return `${mm}:${ss}`;
   };
 
   return (
@@ -239,14 +257,20 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
                       )}
                     </TouchableOpacity>
 
-                    {/* Skip for now */}
+                    {/* Resend code */}
                     <TouchableOpacity
-                      style={[styles.skipButton, { marginBottom: 70 }]}
-                      onPress={() => close(false)}
+                      style={[
+                        styles.skipButton,
+                        { marginBottom: 70, opacity: resendTimer > 0 ? 0.5 : 1 },
+                      ]}
+                      onPress={handleResendOtp}
+                      disabled={resendTimer > 0}
                       activeOpacity={0.7}
                     >
                       <Text style={styles.skipButtonText}>
-                        Resend Code in 00:20
+                        {resendTimer > 0
+                          ? `Resend Code in ${formatTimer(resendTimer)}`
+                          : "Resend Code"}
                       </Text>
                     </TouchableOpacity>
                   </>

@@ -19,9 +19,6 @@ import BackArrowLeftIcon from "../../../../assets/SvgIconsComponent/BackArrowLef
 import { scaleFont } from "../../../utils/responsive";
 import { appColors } from "../../../themes/appColors";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { triggerToast } from "../../../services/toast";
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import {
   requestForEmailChange,
@@ -47,7 +44,6 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
-  const navigation = useNavigation();
   const { authStates } = useSelector((state) => state.Auth);
 
   const validateEmail = (text, touched = isEmailTouched) => {
@@ -73,22 +69,6 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
   };
 
   useEffect(() => {
-    if (authStates.isOTPReceivedForMobileVerification == true) {
-      setIsCodeSent(true);
-      setResendTimer(20);
-      dispatch(setIsOTPReceivedForMobileVerification(null));
-    }
-    if (authStates.isMobileOTPVerified == true) {
-      AsyncStorage.setItem("isMobileNumberVerifiedByOTP", "true");
-      close(false);
-      navigation.goBack();
-      triggerToast(
-        "Verified",
-        "Mobile number verified successfully",
-        "success",
-        3000
-      );
-    }
     if (authStates.isOTPSentForEmailChange == true) {
       setIsCodeSent(true);
       setResendTimer(20);
@@ -98,8 +78,6 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
       close(false);
     }
   }, [
-    authStates.isOTPReceivedForMobileVerification,
-    authStates.isMobileOTPVerified,
     authStates.isOTPSentForEmailChange,
     authStates.isEmailChangeRequestVerified,
   ]);
@@ -116,9 +94,11 @@ const UpdateEmailPopup = ({ updateEmailPopup, close }) => {
   }, [resendTimer]);
 
   const resendCode = () => {
-    const formData = new FormData();
-    formData.append("phone_number", mobileNumber);
-    dispatch(getOTPForMobileNumber(formData));
+    const payload = {
+      new_email: email,
+      current_password: password,
+    };
+    dispatch(requestForEmailChange(payload));
     setResendTimer(20);
   };
 
