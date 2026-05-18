@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import Svg, { Path } from 'react-native-svg'
 
-const FeedbackIcon = () => {
+const FeedbackIcon = ({ color = "#081A35" } = {}) => {
   return (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +12,7 @@ const FeedbackIcon = () => {
     fill="none"
   >
     <Path
-      fill="#081A35"
+      fill={color}
       fillRule="evenodd"
       stroke="#000"
       strokeWidth={0.2}

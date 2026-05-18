@@ -19,6 +19,7 @@ import { BlurView } from "@react-native-community/blur";
 import BackArrowLeftIcon from "../../../assets/SvgIconsComponent/BackArrowLeftIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyEmail } from "../../redux/slices/authSlice";
+import { commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
 import SuccessCheckMark from "./SuccessCheckMark";
 import { appColors } from "../../themes/appColors";
 import { useNavigation } from "@react-navigation/native";
@@ -108,7 +109,17 @@ const VerifyMailOtpPopup = ({ close, closeVerificationMailPopup, verifyMailOtpPo
   }, [resendTimer]);
 
   const handleResendOtp = () => {
-    // TODO: dispatch the resend-OTP API here when the endpoint is ready
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "POST",
+        url: "/resend-verification-email",
+        name: "resendVerificationOTPMail",
+        data: {
+          email: globalDataStates.userMailIDOnSignup,
+          platform: Platform.OS,
+        },
+      }),
+    );
     setResendTimer(20);
   };
 

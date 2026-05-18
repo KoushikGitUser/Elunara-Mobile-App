@@ -229,6 +229,7 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
   },
   accordionContent: {
+    width: "100%",
     paddingHorizontal: 14,
     paddingTop: 4,
     paddingBottom: 16,
@@ -237,6 +238,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   accordionContentText: {
+    alignSelf: "stretch",
+    flexShrink: 1,
     fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
     color: "#5E5E5E",

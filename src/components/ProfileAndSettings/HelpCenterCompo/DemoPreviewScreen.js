@@ -13,15 +13,35 @@ import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
-import { X, Menu, PlusCircle, MessageSquare, ChevronRight, ChevronLeft, ChevronDown, EllipsisVertical, Plus } from "lucide-react-native";
+import { X, Menu, PlusCircle, MessageSquare, ChevronRight, ChevronLeft, ChevronDown, EllipsisVertical, Plus, } from "lucide-react-native";
 import Svg, { Rect, Defs, Mask } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import LLMIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/LLMIcon";
 import ResStyleIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
 import ResLangIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
 import SwitchIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/SwitchIcon";
+import CopyIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/CopyIcon";
+import ShareIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/ShareIcon";
+import BookMarkIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/BookMarkIcon";
+import ChatFeedbackIcon from "../../../../assets/SvgIconsComponent/ChatMessagesActionIcons/FeedbackIcon";
 import FeedBackIcon from "../../../../assets/SvgIconsComponent/HelpCenterIcons/FeedBackIcon";
 import PinIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
+import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
+import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
+import FolderPlusIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon"
+import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon"
+import ArchiveIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon"
+import TrashIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon"
+import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import {
+  setChatFunctionsGuideTourSteps,
+  setLearningLabsGuideTourSteps,
+  setManualGuidedTourRunning,
+  setNavigationBasicsGuideTourSteps,
+} from "../../../redux/slices/globalDataSlice";
+import { setToggleChatScreenGuideStart } from "../../../redux/slices/toggleSlice";
+import ChatInputMain from "../../ChatScreen/ChatInputMain";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
@@ -29,6 +49,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const insets = useSafeAreaInsets();
   const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   // Demo configurations for each tour type with multiple steps
   const demoConfigs = {
@@ -79,14 +101,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         spotlightRect: {
           x: 16,
           y: SCREEN_HEIGHT * 0.18,
-          width: SCREEN_WIDTH * 0.6,
+          width: SCREEN_WIDTH * 0.7,
           height: 260,
         },
         showSidebar: false,
         showPinned: false,
         showOptions: true,
         tooltipPosition: {
-          top: SCREEN_HEIGHT * 0.53,
+          top: SCREEN_HEIGHT * 0.58,
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -114,7 +136,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         showSidebar: false,
         showResponseActions: true,
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.13,
+          bottom: 20,
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -127,14 +149,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           {
             // Change Response popup - positioned on the right side
             x: SCREEN_WIDTH * 0.45,
-            y: SCREEN_HEIGHT * (1 - 0.50 - 0.22), 
+            y: SCREEN_HEIGHT * (1 - 0.50 - 0.22),
             width: SCREEN_WIDTH * 0.5,
-            height: SCREEN_HEIGHT * 0.25,
+            height: SCREEN_HEIGHT * 0.28,
           },
           {
             // Back/Next buttons - from bottom: tooltip(20%) = 20% from bottom
             x: SCREEN_WIDTH * 0.45,
-            y: SCREEN_HEIGHT * (1 - 0.37 - 0.08),
+            y: SCREEN_HEIGHT * 0.58,
             width: SCREEN_WIDTH * 0.18,
             height: SCREEN_HEIGHT * 0.06,
           },
@@ -142,7 +164,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         showChangeResponsePopup: true,
         // Custom tooltip position - responsive based on screen size
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.11,   // 1% from bottom (adjusts to screen height)
+          bottom: 20,
           left: SCREEN_WIDTH * 0.05,      // 5% from left (adjusts to screen width)
           right: SCREEN_WIDTH * 0.05,     // 5% from right (adjusts to screen width)
         },
@@ -156,9 +178,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             // Bottom action buttons (Back/Explore lab features)
             x: SCREEN_WIDTH * 0.83,
             //y: SCREEN_HEIGHT * (1 - 0.32 - 0.08),
-            y:50,
+            y: 50,
             //width: SCREEN_WIDTH * 0.4,
-            width:54,
+            width: 54,
             height: SCREEN_HEIGHT * 0.05,
           },
         ],
@@ -269,8 +291,16 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
+      // Final step "Explore chat features": close preview, turn tutorial off,
+      // and land on the chat screen.
+      dispatch(setManualGuidedTourRunning(false));
+      dispatch(setToggleChatScreenGuideStart(false));
+      dispatch(setNavigationBasicsGuideTourSteps(0));
+      dispatch(setChatFunctionsGuideTourSteps(0));
+      dispatch(setLearningLabsGuideTourSteps(0));
       setCurrentStep(1);
       onClose();
+      setTimeout(() => navigation.navigate("chat"), 50);
     }
   };
 
@@ -321,7 +351,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           y="0"
           width={SCREEN_WIDTH}
           height={SCREEN_HEIGHT}
-          fill="rgba(0, 0, 0, 0.5)"
+          fill="rgba(0, 0, 0, 0)"
           mask="url(#spotlight-mask)"
         />
       </Svg>
@@ -338,9 +368,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       return { top: SCREEN_HEIGHT * 0.5, left: 20 };
     }
     if (demoType === "chatFunctions" && currentStep === 1) {
-      // Step 1: Position tooltip above the spotlight (input area)
+      // Step 1: Position tooltip just above the ChatInputMain spotlight area
       return {
-        bottom: SCREEN_HEIGHT - activeSpotlightRect.y + 55,
+        bottom: 170,
         left: 20,
       };
     }
@@ -350,6 +380,13 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         bottom: 10,
         left: 20,
         right: 20,
+      };
+    }
+    // Navigation Basics steps 1, 2, 3 — larger gap below the spotlight
+    if (demoType === "navigation") {
+      return {
+        top: activeSpotlightRect.y + activeSpotlightRect.height + 40,
+        left: 20,
       };
     }
     // All other cases: Position tooltip below the spotlight box
@@ -441,7 +478,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           <BlurView
             style={[StyleSheet.absoluteFill, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }]}
             blurType="light"
-            blurAmount={15}
+            blurAmount={9}
             reducedTransparencyFallbackColor="rgba(255, 255, 255, 0.9)"
           />
           {/* Additional blur layer for stronger effect */}
@@ -451,9 +488,25 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {/* Spotlight overlay */}
         {!noSpotlight && !showOptions && activeSpotlightRect && <SpotlightOverlay />}
 
+        {/* Real ChatInputMain rendered at its actual bottom position for chatFunctions step 1.
+            Wrapped in pointerEvents="none" so it's visually full-color but non-interactive. */}
+        {showInputArea && (
+          <View
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              width: "95%",
+              left: "2.5%",
+              bottom: 5,
+            }}
+          >
+            <ChatInputMain tutorialBorder />
+          </View>
+        )}
+
         {/* Spotlight highlight box */}
 
-        {!showOptions && !showChangeResponsePopup && !noSpotlight && activeSpotlightRect && (
+        {!showOptions && !showChangeResponsePopup && !showInputArea && !noSpotlight && activeSpotlightRect && (
           <View
             style={[
               styles.spotlightBox,
@@ -469,174 +522,149 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               demoType === "navigation" && currentStep === 1 && { backgroundColor: "#ffffff" },
             ]}
           >
-          {demoType === "navigation" && currentStep === 1 && (
-            <View style={styles.highlightedMenuIcon}>
-              <Menu size={22} color="#1F2937" strokeWidth={1.5} />
-            </View>
-          )}
-          {showSidebar && (
-            <View style={styles.recentChatsContent}>
-              <Text style={styles.recentChatsTitle}>Recent Chats</Text>
-              {recentChats.map((chat, index) => (
-                <View key={index} style={styles.chatItem}>
-                  <View style={[styles.chatIcon, { backgroundColor: "#FFFFFF" }]}>
-                    <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} />
+            {demoType === "navigation" && currentStep === 1 && (
+              <View style={styles.highlightedMenuIcon}>
+                <Menu size={26} color="#000000" strokeWidth={3.5} />
+              </View>
+            )}
+            {showSidebar && (
+              <View style={styles.recentChatsContent}>
+                <Text style={styles.recentChatsTitle}>Recent Chats</Text>
+                {recentChats.map((chat, index) => (
+                  <View key={index} style={styles.chatItem}>
+                    <View style={[styles.chatIcon, { backgroundColor: "#FFFFFF" }]}>
+                      <ChatIcon />
+                    </View>
+                    <Text style={styles.chatTitle} numberOfLines={1}>{chat.title}</Text>
                   </View>
-                  <Text style={styles.chatTitle} numberOfLines={1}>{chat.title}</Text>
-                </View>
-              ))}
-              <TouchableOpacity style={styles.viewAllBtn}>
-                <View style={styles.stackedIconContainer}>
-                  <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} style={styles.stackedIconBottom} />
-                  <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} style={styles.stackedIconTop} />
-                </View>
-                <Text style={styles.viewAllText}>View all Chats</Text>
-                <ChevronRight size={16} color="#1E3A5F" />
-              </TouchableOpacity>
-            </View>
-          )}
-          {showPinned && (
-            <View style={styles.pinnedContent}>
-              <View style={styles.pinnedItem}>
-                <View style={styles.pinnedItemLeft}>
-                  <View style={styles.pinnedIconBox}>
-                    <PinIcon size={16} color="#888888" />
+                ))}
+                <View style={styles.viewAllBtn}>
+                  <View style={styles.stackedIconContainer}>
+                    <ChatsIcon />
                   </View>
-                  <Text style={styles.pinnedItemText}>Pinned Chats (07)</Text>
+                  <Text style={styles.viewAllText}>View all Chats</Text>
+                  <ChevronRight style={{ marginLeft: "auto", marginTop: 10 }} size={16} color="#1E3A5F" />
                 </View>
-                <ChevronDown size={18} color="#6B7280" strokeWidth={1.5} />
               </View>
-              <View style={styles.pinnedDivider} />
-              <View style={styles.pinnedItem}>
-                <View style={styles.pinnedItemLeft}>
-                  <View style={styles.pinnedIconBox}>
-                    <PinIcon size={16} color="#888888" />
+            )}
+            {showPinned && (
+              <View style={styles.pinnedContent}>
+                <View style={styles.pinnedItem}>
+                  <View style={styles.pinnedItemLeft}>
+                    <View style={styles.pinnedIconBox}>
+                      <PinIcon size={23} color="#888888" />
+                    </View>
+                    <Text style={styles.pinnedItemText}>Pinned Chats (07)</Text>
                   </View>
-                  <Text style={styles.pinnedItemText}>Pinned Learning Labs (05)</Text>
+                  <ChevronDown size={22} color="#6B7280" strokeWidth={1.5} />
                 </View>
-                <ChevronDown size={18} color="#6B7280" strokeWidth={1.5} />
+                <View style={styles.pinnedDivider} />
+                <View style={styles.pinnedItem}>
+                  <View style={styles.pinnedItemLeft}>
+                    <View style={styles.pinnedIconBox}>
+                      <PinIcon size={23} color="#888888" />
+                    </View>
+                    <Text style={styles.pinnedItemText}>Pinned Learning Labs (05)</Text>
+                  </View>
+                  <ChevronDown size={22} color="#6B7280" strokeWidth={1.5} />
+                </View>
               </View>
-            </View>
-          )}
-          {showInputArea && (
-            <View style={styles.inputAreaContent}>
-              {/* Input text area */}
-              <Text style={styles.demoInputPlaceholder}>Ask anything</Text>
-              {/* Icon buttons row */}
-              <View style={styles.demoInputIcons}>
-                {/* Left icons */}
-                <View style={styles.demoInputLeftIcons}>
-                  <Ionicons name="attach" size={24} color="#343330" />
-                  <Ionicons name="book-outline" size={22} color="#343330" />
-                  <Ionicons name="options-outline" size={22} color="#343330" />
+            )}
+            {showResponseActions && (
+              <View style={styles.responseActionsContent}>
+                {/* Response action items */}
+                <View style={styles.responseActionItem}>
+                  <View style={styles.responseActionIcon}>
+                    <Ionicons name="copy-outline" size={16} color="#6B7280" />
+                  </View>
+                  <Text style={styles.responseActionText}>Copy insights instantly</Text>
                 </View>
-                {/* Right icons */}
-                <View style={styles.demoInputRightIcons}>
-                  <Ionicons name="mic-outline" size={24} color="#343330" />
-                  <View style={styles.demoSendBtn}>
-                    <Ionicons name="arrow-up" size={22} color="#FFFFFF" />
+                <View style={styles.responseActionItem}>
+                  <View style={styles.responseActionIcon}>
+                    <Ionicons name="share-social-outline" size={16} color="#6B7280" />
+                  </View>
+                  <Text style={styles.responseActionText}>Share your findings easily</Text>
+                </View>
+                <View style={styles.responseActionItem}>
+                  <View style={styles.responseActionIcon}>
+                    <Ionicons name="bookmark-outline" size={16} color="#6B7280" />
+                  </View>
+                  <Text style={styles.responseActionText}>Keep important info at hand</Text>
+                </View>
+                <View style={styles.responseActionItem}>
+                  <View style={styles.responseActionIcon}>
+                    <Ionicons name="bulb-outline" size={16} color="#6B7280" />
+                  </View>
+                  <Text style={styles.responseActionText}>Help us improve Elunara</Text>
+                </View>
+                {/* Bottom action icons row */}
+                <View style={styles.responseActionsBottomRow}>
+                  <View style={styles.responseBottomIcon}>
+                    <Ionicons name="copy-outline" size={18} color="#6B7280" />
+                  </View>
+                  <View style={styles.responseBottomIcon}>
+                    <Ionicons name="volume-high-outline" size={18} color="#6B7280" />
+                  </View>
+                  <View style={styles.responseBottomIcon}>
+                    <Ionicons name="refresh-outline" size={18} color="#6B7280" />
+                  </View>
+                  <View style={styles.responseBottomIcon}>
+                    <Ionicons name="ellipsis-horizontal" size={18} color="#6B7280" />
+                  </View>
+                  <View style={styles.responseBottomIconActive}>
+                    <Ionicons name="thumbs-up-outline" size={16} color="#1E3A5F" />
+                  </View>
+                  <View style={styles.responseBottomIcon}>
+                    <Ionicons name="thumbs-down-outline" size={16} color="#6B7280" />
                   </View>
                 </View>
               </View>
-            </View>
-          )}
-          {showResponseActions && (
-            <View style={styles.responseActionsContent}>
-              {/* Response action items */}
-              <View style={styles.responseActionItem}>
-                <View style={styles.responseActionIcon}>
-                  <Ionicons name="copy-outline" size={16} color="#6B7280" />
-                </View>
-                <Text style={styles.responseActionText}>Copy insights instantly</Text>
-              </View>
-              <View style={styles.responseActionItem}>
-                <View style={styles.responseActionIcon}>
-                  <Ionicons name="share-social-outline" size={16} color="#6B7280" />
-                </View>
-                <Text style={styles.responseActionText}>Share your findings easily</Text>
-              </View>
-              <View style={styles.responseActionItem}>
-                <View style={styles.responseActionIcon}>
-                  <Ionicons name="bookmark-outline" size={16} color="#6B7280" />
-                </View>
-                <Text style={styles.responseActionText}>Keep important info at hand</Text>
-              </View>
-              <View style={styles.responseActionItem}>
-                <View style={styles.responseActionIcon}>
-                  <Ionicons name="bulb-outline" size={16} color="#6B7280" />
-                </View>
-                <Text style={styles.responseActionText}>Help us improve Elunara</Text>
-              </View>
-              {/* Bottom action icons row */}
-              <View style={styles.responseActionsBottomRow}>
-                <View style={styles.responseBottomIcon}>
-                  <Ionicons name="copy-outline" size={18} color="#6B7280" />
-                </View>
-                <View style={styles.responseBottomIcon}>
-                  <Ionicons name="volume-high-outline" size={18} color="#6B7280" />
-                </View>
-                <View style={styles.responseBottomIcon}>
-                  <Ionicons name="refresh-outline" size={18} color="#6B7280" />
-                </View>
-                <View style={styles.responseBottomIcon}>
-                  <Ionicons name="ellipsis-horizontal" size={18} color="#6B7280" />
-                </View>
-                <View style={styles.responseBottomIconActive}>
-                  <Ionicons name="thumbs-up-outline" size={16} color="#1E3A5F" />
-                </View>
-                <View style={styles.responseBottomIcon}>
-                  <Ionicons name="thumbs-down-outline" size={16} color="#6B7280" />
-                </View>
-              </View>
-            </View>
-          )}
+            )}
           </View>
         )}
 
         {/* For showResponseActions without spotlight, render content directly */}
         {showResponseActions && !activeSpotlightRect && (
-          <View style={[styles.responseActionsContent,styles.responseActionsContentList]}>
+          <View style={[styles.responseActionsContent, styles.responseActionsContentList]}>
             {/* Response action items */}
             <View style={styles.responseActionItem}>
               <View style={styles.responseActionIcon}>
-                <Ionicons name="copy-outline" size={16} color="#6B7280" />
+                <CopyIcon color="#000000" />
               </View>
               <Text style={[styles.responseActionListText]}>Copy insights instantly</Text>
             </View>
             <View style={styles.responseActionItem}>
               <View style={styles.responseActionIcon}>
-                <Ionicons name="share-social-outline" size={16} color="#6B7280" />
+                <ShareIcon color="#000000" />
               </View>
               <Text style={[styles.responseActionListText]}>Share your findings easily</Text>
             </View>
             <View style={styles.responseActionItem}>
               <View style={styles.responseActionIcon}>
-                <Ionicons name="bookmark-outline" size={16} color="#6B7280" />
+                <BookMarkIcon color="#000000" />
               </View>
               <Text style={[styles.responseActionListText]}>Keep important info at hand</Text>
             </View>
             <View style={styles.responseActionItem}>
               <View style={styles.responseActionIcon}>
-               
-                <FeedBackIcon size={16} color="#6B7280" />
+                <ChatFeedbackIcon color="#000000" />
               </View>
               <Text style={[styles.responseActionListText]}>Help us improve Elunaraa</Text>
             </View>
             {/* Bottom action icons row */}
             <View style={styles.responseActionsBottomRowNew}>
               <View style={styles.responseBottomIcon}>
-                <Ionicons name="copy-outline" size={18} color="#6B7280" />
+                <CopyIcon color="#000000" />
               </View>
               <View style={styles.responseBottomIcon}>
-                <Ionicons name="share-social-outline" size={18} color="#6B7280" />
+                <ShareIcon color="#000000" />
               </View>
               <View style={styles.responseBottomIcon}>
-                <Ionicons name="bookmark-outline" size={18} color="#6B7280" />
+                <BookMarkIcon color="#000000" />
               </View>
-              
+
               <View style={styles.responseBottomIconActive}>
-                <FeedBackIcon size={16} color="#6B7280" />
-               
+                <ChatFeedbackIcon color="#000000" />
               </View>
             </View>
           </View>
@@ -657,29 +685,33 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               {/* Left - Project Updates item */}
               <View style={styles.optionsProjectItem}>
                 {/* <View style={styles.optionsChatCheckbox} /> */}
-                <MessageSquare size={14} color="#6B7280" strokeWidth={1.5} />
+                <ChatIcon />
                 <Text style={styles.optionsChatTitle}>Project Updates</Text>
               </View>
               {/* Right - white options popup positioned to start at Project Updates level */}
               <View style={styles.optionsPopup}>
                 <View style={styles.optionRow}>
-                  <Ionicons name="folder-outline" size={16} color="#6B7280" />
+                  {/* <Ionicons name="folder-outline" size={20} color="#6B7280" /> */}
+                  <FolderPlusIcon />
                   <Text style={styles.optionText}>Add to Learning Lab</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <Ionicons name="pencil-outline" size={16} color="#6B7280" />
+                  {/* <Ionicons name="pencil-outline" size={16} color="#6B7280" /> */}
+                  <RenameIcon />
                   <Text style={styles.optionText}>Rename</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <PinIcon color="#888888" size={16} />
+                  <PinIcon color="#000000" size={22} />
                   <Text style={styles.optionText}>Unpin</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <Ionicons name="archive-outline" size={16} color="#6B7280" />
+                  {/* <Ionicons name="archive-outline" size={16} color="#6B7280" /> */}
+                  <ArchiveIcon />
                   <Text style={styles.optionText}>Archive</Text>
                 </View>
                 <View style={styles.optionRow}>
-                  <Ionicons name="trash-outline" size={16} color="#6B7280" />
+                  {/* <Ionicons name="trash-outline" size={16} color="#6B7280" /> */}
+                  <TrashIcon />
                   <Text style={styles.optionText}>Delete</Text>
                 </View>
               </View>
@@ -701,6 +733,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   height: spotlightAreas[0].height,
                   backgroundColor: "#FFFFFF",
                   borderColor: "#FFFFFF",
+                  paddingBottom:20
                 },
               ]}
             >
@@ -734,17 +767,17 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   width: SCREEN_WIDTH * 0.18,
                   height: spotlightAreas[1].height,
                   backgroundColor: "#FFFFFF",
-                  borderColor: "#FFFFFF",
                   flexDirection: "row",
                   justifyContent: "center",
                   alignItems: "center",
                   gap: 4,
                   paddingHorizontal: 8,
+                  borderRadius:15
                 },
               ]}
             >
               <View><SwitchIcon color="#6B7280" /></View>
-              <View><ChevronDown  color="#6B7280" /></View>
+              <View><ChevronDown color="#6B7280" /></View>
             </View>
           </>
         )}
@@ -755,34 +788,34 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             {/* Manage Chat menu box */}
             <View style={[styles.manageChatMenuList]}>
               <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>View and edit your saved notes</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
-                </View>
+                <Text style={styles.manageChatOptionText}>View and edit your saved notes</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Organize chats by project</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Organize chats by project</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Give this chat a custom name</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Give this chat a custom name</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Keep this chat handy in the sidebar</Text>
-                  <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Keep this chat handy in the sidebar</Text>
+                <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Hide this chat without deleting</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="eye-off-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Hide this chat without deleting</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="eye-off-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Remove this chat permanently</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Remove this chat permanently</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
+              </View>
             </View>
 
             {/* Bottom action buttons (Back/Explore lab features) */}
@@ -812,9 +845,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabWelcome && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
-                <Text style={styles.firstLabOrganizeHeaderText}>New Learning Lab</Text>
-              </View>
+              <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
+              <Text style={styles.firstLabOrganizeHeaderText}>New Learning Lab</Text>
+            </View>
           </View>
         )}
 
@@ -824,26 +857,26 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             {/* Manage Labs menu box */}
             <View style={[styles.manageLabsMenuList]}>
               <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Give this learning lab a custom name</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
-                </View>
+                <Text style={styles.manageChatOptionText}>Give this learning lab a custom name</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Update instructions at anytime</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Update instructions at anytime</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Keep this learning lab handy in the sidebar</Text>
-                  <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Keep this learning lab handy in the sidebar</Text>
+                <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
+              </View>
 
 
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Remove this learning lab permanently</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Remove this learning lab permanently</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
+              </View>
             </View>
 
             {/* Bottom action button */}
@@ -876,15 +909,15 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           <>
             {/* Manage Labs menu box */}
             <View style={[styles.manageConnectedMenuList]}>
-               <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Start a  new chat</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Start a  new chat</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+              </View>
 
-                <View style={styles.manageChatOption}>
-                  <Text style={styles.manageChatOptionText}>Add a already existing chat to the learning labs</Text>
-                  <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
-                </View>
+              <View style={styles.manageChatOption}>
+                <Text style={styles.manageChatOptionText}>Add a already existing chat to the learning labs</Text>
+                <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
+              </View>
             </View>
 
             {/* Bottom action button */}
@@ -916,9 +949,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabProgress && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-                <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
-                <Text style={styles.firstLabOrganizeHeaderText}>Learning labs</Text>
-              </View>
+              <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
+              <Text style={styles.firstLabOrganizeHeaderText}>Learning labs</Text>
+            </View>
           </View>
         )}
 
@@ -928,10 +961,10 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             styles.tooltip,
             usesBottomPosition
               ? {
-                  bottom: tooltipPosition.bottom,
-                  left: tooltipPosition.left,
-                  ...(tooltipPosition.right !== undefined && { right: tooltipPosition.right })
-                }
+                bottom: tooltipPosition.bottom,
+                left: tooltipPosition.left,
+                ...(tooltipPosition.right !== undefined && { right: tooltipPosition.right })
+              }
               : { top: tooltipPosition.top, left: tooltipPosition.left },
           ]}
         >
@@ -949,11 +982,11 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               styles.pointer,
               (showLabWelcome || showLabProgress || showResponseActions)
                 ? styles.pointerTopCenterLeft
-                : (showLabManage || showLabOrganize || showManageChatMenu)
-                ? styles.pointerRightSide
-                : showChangeResponsePopup
-                ? styles.pointerTopCenterRight
-                : (usesBottomPosition ? styles.pointerDown : styles.pointerUp),
+                : (showLabManage || showLabOrganize || showManageChatMenu || showOptions)
+                  ? styles.pointerRightSide
+                  : showChangeResponsePopup
+                    ? styles.pointerTopCenterRight
+                    : (usesBottomPosition ? styles.pointerDown : styles.pointerUp),
             ]} />
           )}
 
@@ -965,14 +998,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           <View style={styles.buttonsContainer}>
             {currentStep > 1 ? (
               <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-                <ChevronLeft size={18} color="#FFFFFF" strokeWidth={2} />
+                {/* <ChevronLeft size={18} color="#FFFFFF" strokeWidth={2} /> */}
                 <Text style={styles.backButtonText}>Back</Text>
               </TouchableOpacity>
             ) : (
               <View style={styles.emptyButton} />
             )}
             <TouchableOpacity style={[styles.nextButton, currentStep === 4 && styles.exploreButton]} onPress={handleNext}>
-              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#1E3A5F" }]}>{currentStep === 4 ? "Explore chat features" : "Next"}</Text>
+              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#ffffff" }]}>{currentStep === 4 ? "Explore chat features" : "Next"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1171,11 +1204,11 @@ const styles = StyleSheet.create({
   },
   spotlightBox: {
     position: "absolute",
-    borderRadius: 10,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#afccff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -1185,12 +1218,13 @@ const styles = StyleSheet.create({
   highlightedMenuIcon: {
     justifyContent: "center",
     alignItems: "center",
+
   },
   tooltip: {
     position: "absolute",
-    width: SCREEN_WIDTH * 0.9,
+    width: SCREEN_WIDTH * 0.85,
     backgroundColor: "#1E3A5F",
-    borderRadius: 16,
+    borderRadius: 30,
     padding: 16,
     paddingTop: 12,
   },
@@ -1225,6 +1259,8 @@ const styles = StyleSheet.create({
   },
   pointerDown: {
     bottom: -12,
+    left: "50%",
+    marginLeft: -12,
     borderTopWidth: 12,
     borderTopColor: "#1E3A5F",
   },
@@ -1242,11 +1278,11 @@ const styles = StyleSheet.create({
   },
   pointerRightSide: {
     top: -12,
-    right: 50,
+    right: 100,
     left: "auto",
-    borderLeftWidth: 6,
+    borderLeftWidth: 12,
     borderLeftColor: "transparent",
-    borderRightWidth: 6,
+    borderRightWidth: 12,
     borderRightColor: "transparent",
     borderBottomWidth: 12,
     borderBottomColor: "#1E3A5F",
@@ -1266,18 +1302,18 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
-    gap: 12,
+    gap: 25,
+
   },
   backButton: {
-    flex: 1,
     flexDirection: "row",
     backgroundColor: "transparent",
     paddingVertical: 10,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+
   },
   backButtonText: {
     color: "#FFFFFF",
@@ -1286,17 +1322,17 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   nextButton: {
-    flex: 1,
     backgroundColor: "transparent",
     borderWidth: 1.5,
     borderColor: "#FFFFFF",
     borderRadius: 25,
     paddingVertical: 10,
+    paddingHorizontal: 50,
     alignItems: "center",
   },
   exploreButton: {
-    backgroundColor: "#FFFFFF",
-    flex: 1.5,
+    paddingHorizontal: 20,
+    color: "white"
   },
   nextButtonText: {
     color: "#FFFFFF",
@@ -1310,16 +1346,19 @@ const styles = StyleSheet.create({
   recentChatsBox: {
     borderRadius: 16,
     padding: 14,
+    width: "70%",
     alignItems: "flex-start",
     justifyContent: "flex-start",
     overflow: "hidden",
     backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#aac9ff"
   },
   recentChatsContent: {
     width: "100%",
   },
   recentChatsTitle: {
-    fontSize: scaleFont(13),
+    fontSize: scaleFont(15),
     fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 6,
@@ -1329,6 +1368,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingVertical: 6,
+    paddingLeft: 20
   },
   chatIcon: {
     width: 26,
@@ -1338,7 +1378,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   chatTitle: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontFamily: "Mukta-Regular",
     color: "#1F2937",
     flex: 1,
@@ -1367,9 +1407,11 @@ const styles = StyleSheet.create({
     left: 4,
   },
   viewAllText: {
-    fontSize: scaleFont(12),
+    fontSize: scaleFont(14),
     fontFamily: "Mukta-Medium",
     color: "#1E3A5F",
+    marginLeft: 10,
+    marginTop: 10
   },
   // Pinned items styles
   pinnedContent: {
@@ -1391,7 +1433,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 6,
-    backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1418,6 +1459,8 @@ const styles = StyleSheet.create({
   optionsProjectItem: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#afcdff",
     paddingVertical: 12,
     paddingHorizontal: 14,
     flexDirection: "row",
@@ -1428,7 +1471,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
-    width:"100%",
+    width: "100%",
   },
   optionsChatCheckbox: {
     width: 18,
@@ -1445,9 +1488,11 @@ const styles = StyleSheet.create({
   },
   optionsPopup: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    borderRadius: 13,
+    borderWidth: 1.5,
+    borderColor: "#afcdff",
     paddingVertical: 16,
-    width: "85%",
+    width: "75%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -1536,21 +1581,22 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     gap: 4,
   },
-  responseActionsContentList:{
-    position:"relative",
-    top: - 420,
+  responseActionsContentList: {
+    position: "relative",
+    top: - 300,
   },
   responseActionListText: {
-  borderRadius: 15,
-  backgroundColor: "#FFFFFF",
-  borderColor: "#E5E7EB",
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  alignSelf: "flex-start", // �'� fit to text
-  fontSize: scaleFont(13),
+    borderRadius: 10,
+    borderTopLeftRadius:0,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: "flex-start", // �'� fit to text
+    fontSize: scaleFont(13),
     fontFamily: "Mukta-Regular",
     color: "#374151",
-},
+  },
 
   responseActionItem: {
     flexDirection: "row",
@@ -1593,10 +1639,12 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 16,
     // paddingTop: 12,
-    padding:6,
-    borderRadius: 16,
+    padding: 6,
+    borderRadius: 12,
     backgroundColor: "#FFFFFF",
     alignSelf: "flex-start",
+        borderWidth: 1.5,
+    borderColor: "#afcdff",
     // borderTopWidth: 1,
     // borderTopColor: "#E5E7EB",
   },
@@ -1626,7 +1674,7 @@ const styles = StyleSheet.create({
   },
   changeResponseTitle: {
     fontSize: scaleFont(16),
-    fontFamily: "Mukta-SemiBold",
+    fontFamily: "Mukta-Bold",
     color: "#1F2937",
     marginBottom: 4,
     borderBottomWidth: 0.8,
@@ -1645,27 +1693,27 @@ const styles = StyleSheet.create({
     color: "#1F2937",
   },
   // Manage Chat menu styles
-manageChatOption: {
-  flexDirection: "row",
-  justifyContent: "flex-end",
-  paddingVertical: 9,
-  paddingHorizontal: 29,
+  manageChatOption: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingVertical: 9,
+    paddingHorizontal: 29,
 
-},
-  manageChatMenuList:{
+  },
+  manageChatMenuList: {
     position: "relative",
     width: "100%",
-    top:-200,
+    top: -200,
   },
-  manageLabsMenuList:{
+  manageLabsMenuList: {
     position: "relative",
     width: "100%",
-    top:-270,
+    top: -270,
   },
-  manageConnectedMenuList:{
+  manageConnectedMenuList: {
     position: "relative",
     // width: "100%",
-    top:-300,
+    top: -300,
   },
   manageChatOptionText: {
     fontSize: scaleFont(14),
@@ -1673,7 +1721,7 @@ manageChatOption: {
     color: "#374151",
     marginRight: 10,
     borderRadius: 8,
-    borderTopRightRadius:0,
+    borderTopRightRadius: 0,
     backgroundColor: "#ffffff",
     paddingHorizontal: 5,
     textAlign: "right"
@@ -1686,7 +1734,7 @@ manageChatOption: {
     backgroundColor: "#ffffff",
   },
   // Learning Labs Stage 1 - Welcome
-  firstLabWelcomeContainer:{
+  firstLabWelcomeContainer: {
     position: "absolute",
     top: SCREEN_HEIGHT * 0.30,
     left: SCREEN_WIDTH * 0.05,
@@ -1726,7 +1774,7 @@ manageChatOption: {
     flexDirection: "row",
     alignItems: "center",
     //gap: 12,
-    width:250,
+    width: 250,
     borderBottomColor: "#E5E7EB",
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -1736,12 +1784,12 @@ manageChatOption: {
     fontFamily: "Mukta-SemiBold",
     color: "#1F2937",
   },
-  firstLabOrganizeHeaderText:{
+  firstLabOrganizeHeaderText: {
     fontSize: scaleFont(13),
     fontFamily: "Mukta-SemiBold",
     color: "#1F2937",
   },
-  firstLabOrganizeHeaderIcon:{
+  firstLabOrganizeHeaderIcon: {
     //fontSize: scaleFont(13),
     paddingRight: 10,
   },

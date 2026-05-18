@@ -9,7 +9,7 @@ const ChakraBigIcon = () => {
     xmlnsXlink="http://www.w3.org/1999/xlink"
     width={35}
     height={35}
-    viewBox='0 0 21 21'
+    viewBox='0 0 20 20'
     fill="none"
   >
     <Path fill="url(#a)" d="M0 0h20v20H0z" />

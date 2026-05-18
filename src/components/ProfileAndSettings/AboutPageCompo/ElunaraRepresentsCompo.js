@@ -3,6 +3,7 @@ import React from "react";
 import { scaleFont } from "../../../utils/responsive";
 import ElunaraLogoIcon from "../../../../assets/SvgIconsComponent/ElunaraLogoIcon";
 import elunaraLogo from '../../../assets/images/elunaraLogo.png';
+import naraImage from '../../../assets/images/naraPng.png';
 import ChakraIcon from '../../../../assets/SvgIconsComponent/AboutIcons/ChakraBigIcon'
 import NaraIcon from "../../../../assets/SvgIconsComponent/AboutIcons/NaraIcon";
 
@@ -39,7 +40,8 @@ const ElunaraRepresentsCompo = () => {
 
           {/* nara = Knowledge, Human Being */}
           <View style={[styles.definitionRow, styles.middleRow]}>
-            <NaraIcon/>
+            {/* <NaraIcon/> */}
+            <Image source={naraImage} style={{height:40,width:60,objectFit:"contain"}} />
             <Text style={styles.equals}> = </Text>
             <Text style={styles.meaning}>Knowledge, Human Being</Text>
           </View>

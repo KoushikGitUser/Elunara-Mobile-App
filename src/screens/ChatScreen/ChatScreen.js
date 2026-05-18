@@ -977,6 +977,30 @@ const ChatScreen = () => {
         </Modal>
       )}
 
+      {/* Full-screen overlay while subjects are loading (solid bg, no Modal so navigation isn't blocked) */}
+      {chatsStates.loaderStates.isSubjectsForChatFetched === "pending" && (
+        <View
+          pointerEvents="auto"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#FFFFFF",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 10000,
+            elevation: 10000,
+          }}
+        >
+          <Image
+            source={require("../../assets/images/authLoader.gif")}
+            style={{ width: 150, height: 150 }}
+          />
+        </View>
+      )}
+
       {/* Full-screen loader for regenerating AI response */}
       {chatsStates.loaderStates.isAIResponseRegenerated === "pending" && (
         <Modal visible={true} transparent={true} animationType="fade">

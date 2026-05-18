@@ -65,7 +65,7 @@ import NoBalanceModal from "../Monetisation/NoBalanceModal";
 import LowBalanceModal from "../Monetisation/LowBalanceModal";
 import LockIcon from "../../../assets/SvgIconsComponent/LockIcon";
 
-const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, ref) => {
+const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorder = false, ...props }, ref) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -701,6 +701,10 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, ...props }, r
           {
             paddingTop: globalDataStates.selectedFiles.length > 0 ? 0 : 10,
             opacity: isWaitingForResponse ? 0.5 : 1,
+          },
+          tutorialBorder && {
+            borderWidth: 1,
+            borderColor: "#afccff",
           },
         ]}
       >

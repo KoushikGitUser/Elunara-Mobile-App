@@ -39,6 +39,7 @@ export const chatsStates = {
     isAddToNotesPending: null,
     isRemoveFromNotesPending: null,
     isMessagesFetched: null,
+    isSubjectsForChatFetched: null,
     isTopicsOfSelectedSubjectsFetched: null,
     isUserMessageUpdated: null,
     isAIResponseRegenerated: null,

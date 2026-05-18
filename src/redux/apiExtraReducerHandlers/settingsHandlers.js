@@ -486,3 +486,28 @@ export const handleGetCurriculumStatus = {
     state.settingsStates.fetchingCurriculumStatus = false;
   },
 };
+
+// Resend Verification Email
+export const handleResendVerificationOTPMail = {
+  pending: (state) => {
+    state.settingsStates.resendingVerificationMail = true;
+  },
+  fulfilled: (state, action) => {
+    state.settingsStates.resendingVerificationMail = false;
+    triggerToast(
+      "Code Resent",
+      "Verification code has been resent to your email",
+      "success",
+      3000,
+    );
+  },
+  rejected: (state, action) => {
+    state.settingsStates.resendingVerificationMail = false;
+    triggerToast(
+      "Error",
+      action.payload?.message || "Failed to resend verification code",
+      "error",
+      3000,
+    );
+  },
+};

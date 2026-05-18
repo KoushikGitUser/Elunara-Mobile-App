@@ -73,12 +73,17 @@ export const handleGetAllDetailsOfChatByID = {
 };
 
 export const handleGetAllSubjectsForChat = {
-  pending: (state) => {},
+  pending: (state) => {
+    state.chatsStates.loaderStates.isSubjectsForChatFetched = "pending";
+  },
   fulfilled: (state, action) => {
     state.chatsStates.allChatsDatas.allSubjectsAvailable =
       action?.payload.data.data;
+    state.chatsStates.loaderStates.isSubjectsForChatFetched = true;
   },
-  rejected: (state, { payload }) => {},
+  rejected: (state, { payload }) => {
+    state.chatsStates.loaderStates.isSubjectsForChatFetched = false;
+  },
 };
 
 export const handleGetAllTopicsOfSelectedSubjects = {

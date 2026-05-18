@@ -31,6 +31,7 @@ import {
   handleGetCurriculumStatus,
   handleGetCurriculumSubjects,
   handleGetCurriculumTopics,
+  handleResendVerificationOTPMail,
 } from "./apiExtraReducerHandlers/settingsHandlers";
 
 import {
@@ -156,6 +157,9 @@ export const settingsHandlersFunctions = {
   getCurriculumStatus: handleGetCurriculumStatus,
   getCurriculumSubjects: handleGetCurriculumSubjects,
   getCurriculumTopics: handleGetCurriculumTopics,
+
+  // Auth
+  resendVerificationOTPMail: handleResendVerificationOTPMail,
 };
 
 export const chatsHandlersFunctions = {

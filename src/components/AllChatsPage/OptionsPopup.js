@@ -192,7 +192,6 @@ const OptionsPopup = ({ popupPosition }) => {
                     backgroundColor: pressed ? "#EEF4FF" : "transparent",
                   },
                   styles.notesPopupOptions,
-                  options.showLock && { paddingRight: 0 },
                 ]}
               >
                 {options?.icon}
@@ -217,7 +216,7 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     borderRadius: 21,
     padding: 7,
-    minWidth: 220,
+    minWidth: 250,
     right: 20,
     flexDirection: "column",
     alignItems: "flex-start",
@@ -233,7 +232,6 @@ const styles = StyleSheet.create({
     height: 45,
     padding: 9,
     borderRadius: 12,
-    paddingRight: 40,
   },
   optionsPopupWrapper: {
     flex: 1,

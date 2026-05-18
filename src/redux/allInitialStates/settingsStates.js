@@ -45,6 +45,9 @@ export const settingsStates = {
   isSubmittingFeedback: false,
   feedbackSubmitted: false,
 
+  // Resend Verification Email
+  resendingVerificationMail: false,
+
   // Academic Links
   fetchingAcademicLinks: false,
   academicLinks: {
