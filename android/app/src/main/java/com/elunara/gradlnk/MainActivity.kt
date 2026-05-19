@@ -1,4 +1,4 @@
-package com.smgdev.elunara
+package com.elunara.gradlnk
 
 import android.os.Build
 import android.os.Bundle

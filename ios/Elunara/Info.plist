@@ -40,7 +40,7 @@
 			<array>
 				<string>elunara</string>
 				<string>elunaraapp</string>
-				<string>com.smgdev.elunara</string>
+				<string>com.elunara.gradlnk</string>
 			</array>
 		</dict>
 		<dict>
@@ -51,7 +51,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>

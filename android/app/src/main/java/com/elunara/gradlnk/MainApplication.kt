@@ -1,4 +1,4 @@
-package com.smgdev.elunara
+package com.elunara.gradlnk
 
 import android.app.Application
 import android.content.res.Configuration

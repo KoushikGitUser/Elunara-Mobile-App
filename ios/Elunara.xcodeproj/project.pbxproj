@@ -433,7 +433,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.elunara.ai;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elunara.gradlnk;
 				PRODUCT_NAME = Elunara;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Elunara/Elunara-Bridging-Header.h";
@@ -468,7 +468,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.elunara.ai;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elunara.gradlnk;
 				PRODUCT_NAME = Elunara;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Elunara/Elunara-Bridging-Header.h";

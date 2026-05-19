@@ -52,7 +52,7 @@
         "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.elunara.ai"
+      "bundleIdentifier": "com.elunara.gradlnk"
     },
     "android": {
       "adaptiveIcon": {
@@ -60,7 +60,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.smgdev.elunara",
+      "package": "com.elunara.gradlnk",
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ]

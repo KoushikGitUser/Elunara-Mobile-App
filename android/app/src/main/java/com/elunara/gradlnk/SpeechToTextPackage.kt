@@ -1,4 +1,4 @@
-package com.smgdev.elunara
+package com.elunara.gradlnk
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
