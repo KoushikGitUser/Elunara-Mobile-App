@@ -11,11 +11,11 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { scaleFont } from "../../../utils/responsive";
+import { isTablet, scaleFont } from "../../../utils/responsive";
 import { BlurView } from "@react-native-community/blur";
-import { X, Menu, PlusCircle, MessageSquare, ChevronRight, ChevronLeft, ChevronDown, EllipsisVertical, Plus, } from "lucide-react-native";
+import { X, Menu, PlusCircle, MessageSquare, ChevronRight, ChevronLeft, ChevronDown, EllipsisVertical, Plus, MessageCirclePlus } from "lucide-react-native";
 import Svg, { Rect, Defs, Mask } from "react-native-svg";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import LLMIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/LLMIcon";
 import ResStyleIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResStyleIcon";
 import ResLangIcon from "../../../../assets/SvgIconsComponent/ToolsOptionsIcons/ResLangIcon";
@@ -28,10 +28,14 @@ import FeedBackIcon from "../../../../assets/SvgIconsComponent/HelpCenterIcons/F
 import PinIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
 import ChatIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatIcon";
 import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
+import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import FolderPlusIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon"
 import RenameIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/RenameIcon"
 import ArchiveIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/ArchiveIcon"
 import TrashIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/TrashIcon"
+import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
+import MenuPinIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon"
+import FilesIcon from "../../../../assets/SvgIconsComponent/RoomsIcons/FilesIcon"
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -75,7 +79,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           x: 16,
           y: statusBarHeight + 80,
           width: SCREEN_WIDTH * 0.58,
-          height: 380,
+          height: SCREEN_WIDTH >= 568?420:370,
         },
         showSidebar: true,
         showPinned: false,
@@ -108,7 +112,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         showPinned: false,
         showOptions: true,
         tooltipPosition: {
-          top: SCREEN_HEIGHT * 0.58,
+          top: SCREEN_HEIGHT * (SCREEN_WIDTH >= 568?0.54:0.58),
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -187,10 +191,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         showManageChatMenu: true,
         // Custom tooltip position - responsive based on screen size
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.60,   // 1% from bottom (adjusts to screen height)
-          //bottom: 650,
-          left: SCREEN_WIDTH * 0.05,      // 5% from left (adjusts to screen width)
-          right: SCREEN_WIDTH * 0.05,     // 5% from right (adjusts to screen width)
+          bottom: SCREEN_HEIGHT * 0.60 - 50 + (SCREEN_WIDTH >= 568 ? 70 : 0),
+          right: SCREEN_WIDTH * 0.05,
         },
       },
       totalSteps: 4,
@@ -224,8 +226,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           },
         ],
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.60,
-          left: SCREEN_WIDTH * 0.05,
+          bottom: SCREEN_HEIGHT * 0.60 - 20 + (SCREEN_WIDTH >= 568 ? 40 : 0),
           right: SCREEN_WIDTH * 0.05,
         },
       },
@@ -245,8 +246,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           },
         ],
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.55,
-          left: SCREEN_WIDTH * 0.05,
+          bottom: SCREEN_HEIGHT * 0.55 + (SCREEN_WIDTH >= 568 ? 40 : 0),
           right: SCREEN_WIDTH * 0.05,
         },
       },
@@ -257,7 +257,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         noSpotlight: true,
         showLabProgress: true,
         tooltipPosition: {
-          bottom: SCREEN_HEIGHT * 0.32,
+          bottom: SCREEN_HEIGHT * 0.26 + (SCREEN_WIDTH >= 568 ? 100 : 0),
           left: SCREEN_WIDTH * 0.05,
           right: SCREEN_WIDTH * 0.05,
         },
@@ -362,15 +362,23 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
   const getTooltipPosition = () => {
     // Check if config has custom tooltip position first
     if (config.tooltipPosition) {
+      // chatFunctions step 2 & 3 — on Android with a visible navigation bar, lift the tooltip up a little
+      if (demoType === "chatFunctions" && (currentStep === 2 || currentStep === 3) && Platform.OS === "android" && insets.bottom > 0) {
+        return {
+          ...config.tooltipPosition,
+          bottom: (config.tooltipPosition.bottom || 0) + 40,
+        };
+      }
       return config.tooltipPosition;
     }
     if (!activeSpotlightRect) {
       return { top: SCREEN_HEIGHT * 0.5, left: 20 };
     }
     if (demoType === "chatFunctions" && currentStep === 1) {
-      // Step 1: Position tooltip just above the ChatInputMain spotlight area
+      // Step 1: Position tooltip just above the ChatInputMain spotlight area.
+      // On Android with a visible navigation bar, push up by 40 to match the input shift.
       return {
-        bottom: 170,
+        bottom: 170 + (Platform.OS === "android" && insets.bottom > 0 ? 40 : 0),
         left: 20,
       };
     }
@@ -385,7 +393,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
     // Navigation Basics steps 1, 2, 3 — larger gap below the spotlight
     if (demoType === "navigation") {
       return {
-        top: activeSpotlightRect.y + activeSpotlightRect.height + 40,
+        top: activeSpotlightRect.y + activeSpotlightRect.height + 40 + (SCREEN_WIDTH >= 768 && showSidebar ? 300 : 0),
         left: 20,
       };
     }
@@ -489,7 +497,8 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {!noSpotlight && !showOptions && activeSpotlightRect && <SpotlightOverlay />}
 
         {/* Real ChatInputMain rendered at its actual bottom position for chatFunctions step 1.
-            Wrapped in pointerEvents="none" so it's visually full-color but non-interactive. */}
+            Wrapped in pointerEvents="none" so it's visually full-color but non-interactive.
+            On Android, push up by 40 when a navigation bar is present (insets.bottom > 0). */}
         {showInputArea && (
           <View
             pointerEvents="none"
@@ -497,7 +506,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               position: "absolute",
               width: "95%",
               left: "2.5%",
-              bottom: 5,
+              bottom: 5 + (Platform.OS === "android" && insets.bottom > 0 ? 40 : 0),
             }}
           >
             <ChatInputMain tutorialBorder />
@@ -506,7 +515,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
 
         {/* Spotlight highlight box */}
 
-        {!showOptions && !showChangeResponsePopup && !showInputArea && !noSpotlight && activeSpotlightRect && (
+        {!showOptions && !showChangeResponsePopup && !showInputArea && !showManageChatMenu && !noSpotlight && activeSpotlightRect && (
           <View
             style={[
               styles.spotlightBox,
@@ -517,14 +526,15 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                 height: activeSpotlightRect.height,
               },
               (showSidebar || showPinned) && styles.recentChatsBox,
+              (showSidebar || showPinned) && { height: undefined },
               showInputArea && styles.inputAreaBox,
               showResponseActions && styles.responseActionsBox,
-              demoType === "navigation" && currentStep === 1 && { backgroundColor: "#ffffff" },
+              demoType === "navigation" && currentStep === 1 && { backgroundColor: "#ffffff", borderRadius: 10 },
             ]}
           >
             {demoType === "navigation" && currentStep === 1 && (
               <View style={styles.highlightedMenuIcon}>
-                <Menu size={26} color="#000000" strokeWidth={3.5} />
+                <Menu size={26} color="#000000" strokeWidth={3} />
               </View>
             )}
             {showSidebar && (
@@ -733,7 +743,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   height: spotlightAreas[0].height,
                   backgroundColor: "#FFFFFF",
                   borderColor: "#FFFFFF",
-                  paddingBottom:20
+                  paddingBottom: 20
                 },
               ]}
             >
@@ -772,7 +782,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                   alignItems: "center",
                   gap: 4,
                   paddingHorizontal: 8,
-                  borderRadius:15
+                  borderRadius: 15
                 },
               ]}
             >
@@ -786,35 +796,35 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showManageChatMenu && (
           <>
             {/* Manage Chat menu box */}
-            <View style={[styles.manageChatMenuList]}>
+            <View style={[styles.manageChatMenuList, SCREEN_WIDTH >= 568 && { top: -250 }]}>
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>View and edit your saved notes</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><NotesIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Organize chats by project</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><FolderPlusIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Give this chat a custom name</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><RenameIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Keep this chat handy in the sidebar</Text>
-                <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
+                <View style={styles.manageChatOptionTextIcon}><MenuPinIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Hide this chat without deleting</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="eye-off-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><ArchiveIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Remove this chat permanently</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><TrashIcon /></View>
               </View>
             </View>
 
@@ -824,15 +834,15 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
                 styles.spotlightBox,
                 {
                   top: spotlightAreas[0].y,
-                  left: spotlightAreas[0].x,
-                  width: spotlightAreas[0].width,
-                  height: spotlightAreas[0].height,
+                  right:35,
+                  width: 40,
+                  height: 50,
                   backgroundColor: "#FFFFFF",
-                  borderColor: "#FFFFFF",
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  paddingHorizontal: 16,
+                  paddingHorizontal:5,
+                  borderRadius:13
                 },
               ]}
             >
@@ -845,7 +855,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabWelcome && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-              <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
+              <View style={styles.firstLabOrganizeHeaderIcon}>
+                <FolderPlusIcon />
+              </View>
               <Text style={styles.firstLabOrganizeHeaderText}>New Learning Lab</Text>
             </View>
           </View>
@@ -855,46 +867,44 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabManage && (
           <>
             {/* Manage Labs menu box */}
-            <View style={[styles.manageLabsMenuList]}>
+            <View style={[styles.manageLabsMenuList, SCREEN_WIDTH >= 568 && { top: -360 }]}>
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Give this learning lab a custom name</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="create-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><RenameIcon /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Update instructions at anytime</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><AntDesign name="file-text" size={20} color="#38537b" /></View>
               </View>
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Keep this learning lab handy in the sidebar</Text>
-                <View style={styles.manageChatOptionTextIcon}><PinIcon size={20} color="#6B7280" /></View>
+                <View style={styles.manageChatOptionTextIcon}><MenuPinIcon /></View>
               </View>
-
-
 
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Remove this learning lab permanently</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="trash-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}><TrashIcon /></View>
               </View>
             </View>
 
-            {/* Bottom action button */}
+            {/* Bottom action button - match chatFunctions step 4 (EllipsisVertical with blue border) */}
             {spotlightAreas && spotlightAreas[0] && (
               <View
                 style={[
                   styles.spotlightBox,
                   {
                     top: spotlightAreas[0].y,
-                    left: spotlightAreas[0].x,
-                    width: spotlightAreas[0].width,
-                    height: spotlightAreas[0].height,
+                    right: 35,
+                    width: 40,
+                    height: 50,
                     backgroundColor: "#FFFFFF",
-                    borderColor: "#FFFFFF",
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    paddingHorizontal: 16,
+                    paddingHorizontal: 5,
+                    borderRadius: 13,
                   },
                 ]}
               >
@@ -908,34 +918,38 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabOrganize && (
           <>
             {/* Manage Labs menu box */}
-            <View style={[styles.manageConnectedMenuList]}>
+            <View style={[styles.manageConnectedMenuList, SCREEN_WIDTH >= 568 && { top: -440 }]}>
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Start a  new chat</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="document-text-outline" size={20} color="#6B7280" />
+                <View style={styles.manageChatOptionTextIcon}>
+                  <MessageCirclePlus strokeWidth={1.25} color="#081A35" />
+                </View>
               </View>
 
               <View style={styles.manageChatOption}>
-                <Text style={styles.manageChatOptionText}>Add a already existing chat to the learning labs</Text>
-                <Ionicons style={[styles.manageChatOptionTextIcon]} name="folder-outline" size={20} color="#6B7280" />
+                <Text style={[styles.manageChatOptionText, { maxWidth: SCREEN_WIDTH * 0.7 }]}>Add a already existing chat to the learning labs</Text>
+                <View style={styles.manageChatOptionTextIcon}>
+                  <MaterialCommunityIcons name="playlist-plus" size={24} color="#081A35" />
+                </View>
               </View>
             </View>
 
-            {/* Bottom action button */}
+            {/* Bottom action button - match learningLabs step 2 styling */}
             {spotlightAreas && spotlightAreas[0] && (
               <View
                 style={[
                   styles.spotlightBox,
                   {
                     top: spotlightAreas[0].y,
-                    left: spotlightAreas[0].x,
-                    width: spotlightAreas[0].width,
-                    height: spotlightAreas[0].height,
+                    right: 35,
+                    width: 40,
+                    height: 50,
                     backgroundColor: "#FFFFFF",
-                    borderColor: "#FFFFFF",
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    paddingHorizontal: 16,
+                    paddingHorizontal: 5,
+                    borderRadius: 13,
                   },
                 ]}
               >
@@ -949,7 +963,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabProgress && (
           <View style={styles.firstLabWelcomeContainer}>
             <View style={styles.labOrganizeHeader}>
-              <Ionicons style={[styles.firstLabOrganizeHeaderIcon]} size={20} name="folder-open-outline" color="#1E3A5F" />
+              <View style={styles.firstLabOrganizeHeaderIcon}>
+                <FolderIcon />
+              </View>
               <Text style={styles.firstLabOrganizeHeaderText}>Learning labs</Text>
             </View>
           </View>
@@ -962,7 +978,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
             usesBottomPosition
               ? {
                 bottom: tooltipPosition.bottom,
-                left: tooltipPosition.left,
+                ...(tooltipPosition.left !== undefined && { left: tooltipPosition.left }),
                 ...(tooltipPosition.right !== undefined && { right: tooltipPosition.right })
               }
               : { top: tooltipPosition.top, left: tooltipPosition.left },
@@ -980,10 +996,14 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
           {(!noSpotlight || showLabManage || showLabOrganize || showLabWelcome || showLabProgress || showResponseActions) && (
             <View style={[
               styles.pointer,
-              (showLabWelcome || showLabProgress || showResponseActions)
-                ? styles.pointerTopCenterLeft
-                : (showLabManage || showLabOrganize || showManageChatMenu || showOptions)
-                  ? styles.pointerRightSide
+              (showLabWelcome || showLabProgress)
+                ? styles.pointerLeftEnd
+                : showResponseActions
+                  ? [styles.pointerTopCenterLeft, SCREEN_WIDTH >= 568 && { left: "10%" }]
+                  : (showManageChatMenu || showLabManage || showLabOrganize)
+                    ? styles.pointerRightEnd
+                    : showOptions
+                      ? styles.pointerRightSide
                   : showChangeResponsePopup
                     ? styles.pointerTopCenterRight
                     : (usesBottomPosition ? styles.pointerDown : styles.pointerUp),
@@ -1005,7 +1025,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.emptyButton} />
             )}
             <TouchableOpacity style={[styles.nextButton, currentStep === 4 && styles.exploreButton]} onPress={handleNext}>
-              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#ffffff" }]}>{currentStep === 4 ? "Explore chat features" : "Next"}</Text>
+              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#ffffff" }]}>{currentStep === 4 ? (demoType === "learningLabs" ? "Finish" : "Explore chat features") : "Next"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1272,13 +1292,30 @@ const styles = StyleSheet.create({
   },
   pointerTopCenterLeft: {
     top: -12,
-    left: "35%",
+    left: "25%",
+    borderBottomWidth: 12,
+    borderBottomColor: "#1E3A5F",
+  },
+  pointerLeftEnd: {
+    top: -12,
+    left: 30,
     borderBottomWidth: 12,
     borderBottomColor: "#1E3A5F",
   },
   pointerRightSide: {
     top: -12,
     right: 100,
+    left: "auto",
+    borderLeftWidth: 12,
+    borderLeftColor: "transparent",
+    borderRightWidth: 12,
+    borderRightColor: "transparent",
+    borderBottomWidth: 12,
+    borderBottomColor: "#1E3A5F",
+  },
+  pointerRightEnd: {
+    top: -12,
+    right: 30,
     left: "auto",
     borderLeftWidth: 12,
     borderLeftColor: "transparent",
@@ -1579,7 +1616,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 20,
     paddingVertical: 20,
-    gap: 4,
+    gap: 0,
   },
   responseActionsContentList: {
     position: "relative",
@@ -1587,7 +1624,7 @@ const styles = StyleSheet.create({
   },
   responseActionListText: {
     borderRadius: 10,
-    borderTopLeftRadius:0,
+    borderTopLeftRadius: 0,
     backgroundColor: "#FFFFFF",
     borderColor: "#E5E7EB",
     paddingHorizontal: 12,
@@ -1640,10 +1677,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     // paddingTop: 12,
     padding: 6,
-    borderRadius: 12,
+    borderRadius: 16,
     backgroundColor: "#FFFFFF",
     alignSelf: "flex-start",
-        borderWidth: 1.5,
+    borderWidth: 1.5,
     borderColor: "#afcdff",
     // borderTopWidth: 1,
     // borderTopColor: "#E5E7EB",
@@ -1678,7 +1715,7 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     marginBottom: 4,
     borderBottomWidth: 0.8,
-    borderBottomColor: "#1F2937",
+    borderBottomColor: "#c4c4c4",
     paddingBottom: 8,
   },
   changeResponseOption: {
@@ -1699,16 +1736,17 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     paddingHorizontal: 29,
 
+
   },
   manageChatMenuList: {
     position: "relative",
     width: "100%",
-    top: -200,
+    top: -100,
   },
   manageLabsMenuList: {
     position: "relative",
     width: "100%",
-    top: -270,
+    top: -240,
   },
   manageConnectedMenuList: {
     position: "relative",
@@ -1720,17 +1758,20 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#374151",
     marginRight: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     borderTopRightRadius: 0,
     backgroundColor: "#ffffff",
-    paddingHorizontal: 5,
+    paddingHorizontal: 12,
+    paddingVertical:4,
     textAlign: "right"
 
   },
   manageChatOptionTextIcon: {
-    borderRadius: 50,
-    paddingVertical: 5,
-    paddingHorizontal: 5,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#ffffff",
   },
   // Learning Labs Stage 1 - Welcome
@@ -1738,15 +1779,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: SCREEN_HEIGHT * 0.30,
     left: SCREEN_WIDTH * 0.05,
-    right: SCREEN_WIDTH * 0.05,
+    alignSelf: "flex-start",
     alignItems: "flex-start",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    borderRadius: 16,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#afccff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
