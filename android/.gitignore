@@ -14,3 +14,8 @@ local.properties
 
 # Bundle artifacts
 *.jsbundle
+
+# Release signing — never commit these
+elunara-upload-key.keystore
+keystore.properties
+*.jks
