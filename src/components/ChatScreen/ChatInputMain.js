@@ -75,6 +75,52 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorde
   // Use room customisation states when in room context, otherwise use chat customisation states
   const activeCustomisationStates = isRoomContext ? roomCustomisationStates : chatCustomisationStates;
   const { globalDataStates } = useSelector((state) => state.Global);
+
+  // Local text state for instant TextInput updates — Redux is updated via debounce.
+  // This avoids the round-trip lag where fast typing showed white/delayed text.
+  const [localInputText, setLocalInputText] = useState(globalDataStates.userMessagePrompt || "");
+  const lastDispatchedTextRef = useRef(globalDataStates.userMessagePrompt || "");
+  const textDispatchTimerRef = useRef(null);
+
+  // Sync from Redux → local whenever userMessagePrompt changes from an external source
+  // (e.g., speech recognition, edit mode prefill, clear after send).
+  useEffect(() => {
+    const reduxText = globalDataStates.userMessagePrompt || "";
+    if (reduxText !== lastDispatchedTextRef.current) {
+      setLocalInputText(reduxText);
+      lastDispatchedTextRef.current = reduxText;
+    }
+  }, [globalDataStates.userMessagePrompt]);
+
+  // Flush any pending debounced dispatch (used before send/edit so Redux has latest text)
+  const flushPendingInputText = () => {
+    if (textDispatchTimerRef.current) {
+      clearTimeout(textDispatchTimerRef.current);
+      textDispatchTimerRef.current = null;
+    }
+    if (localInputText !== lastDispatchedTextRef.current) {
+      lastDispatchedTextRef.current = localInputText;
+      dispatch(setUserMessagePrompt(localInputText));
+    }
+  };
+
+  const handleInputTextChange = (text) => {
+    setLocalInputText(text);
+    if (textDispatchTimerRef.current) {
+      clearTimeout(textDispatchTimerRef.current);
+    }
+    textDispatchTimerRef.current = setTimeout(() => {
+      lastDispatchedTextRef.current = text;
+      dispatch(setUserMessagePrompt(text));
+      textDispatchTimerRef.current = null;
+    }, 60);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (textDispatchTimerRef.current) clearTimeout(textDispatchTimerRef.current);
+    };
+  }, []);
   const { chatsStates } = useSelector((state) => state.API);
   const isMessagesFetched = chatsStates.loaderStates.isMessagesFetched;
   const aiMessageContent = chatsStates.allChatsDatas.aiMessageContent;
@@ -784,8 +830,8 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorde
         )}
 
         <TextInput
-          value={globalDataStates.userMessagePrompt}
-          onChangeText={(text) => dispatch(setUserMessagePrompt(text))}
+          value={localInputText}
+          onChangeText={handleInputTextChange}
           placeholder={isRecording ? "Speak now..." : "Ask anything"}
           placeholderTextColor="grey"
           style={[
@@ -890,9 +936,11 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorde
                 <MicIcon color={isRecording ? '#1F2937' : undefined} />
               </TouchableOpacity>
             </View>
-            {globalDataStates.userMessagePrompt !== "" && (
+            {localInputText !== "" && (
               <TouchableOpacity
                 onPress={() => {
+                  // Flush any pending text dispatch so Redux has the latest value before sending
+                  flushPendingInputText();
                   // Check if in editing mode
                   if (toggleStates.isEditingUserMessage) {
                     handleEditingModeSend();

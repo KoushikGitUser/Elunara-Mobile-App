@@ -78,6 +78,7 @@ const AuthGradientText = ({
         fontWeight={fontWeight}
         fontFamily="Mukta-Bold"
         letterSpacing={1.2}
+        fontVariantLigatures="none"
         x={xPosition}
         y={fontSize}
         textAnchor={textAlign === "center" ? "middle" : textAlign === "right" ? "end" : "start"}

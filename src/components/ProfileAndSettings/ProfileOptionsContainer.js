@@ -60,13 +60,13 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
               {option.icon}
               <Text style={[styles.title, { fontFamily: "Mukta-Regular" }]}>{option.title}</Text>
             </TouchableOpacity>
-            {optionIndex == 5 && (
+            {/* {optionIndex == 5 && (
               <TouchableOpacity style={styles.adBox}>
                  <Text style={styles.adText}>
                   -- Ad Space --
                  </Text>
               </TouchableOpacity>
-            )}
+            )} */}
           </React.Fragment>
         );
       })}

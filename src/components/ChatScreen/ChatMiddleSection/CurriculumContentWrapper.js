@@ -1,4 +1,7 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from "react-native";
+
+const { width: CARD_SCREEN_WIDTH } = Dimensions.get("screen");
+const IS_BIG_IPAD = CARD_SCREEN_WIDTH >= 1024;
 import React, { useMemo, useEffect } from "react";
 import { createStyles } from "../ChatScreenCompo.styles";
 import { useSelector, useDispatch } from "react-redux";
@@ -198,7 +201,7 @@ const cardStyles = StyleSheet.create({
     fontSize: moderateScale(12),
     fontWeight: "400",
     color: "#757575",
-    lineHeight: 15,
+    lineHeight: IS_BIG_IPAD ? moderateScale(12) * 1.4 : 15,
   },
   belowTopics: {
     backgroundColor: "#F2F7FF",

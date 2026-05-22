@@ -11,7 +11,11 @@ import {
   Linking,
   Keyboard,
   Platform,
+  Dimensions,
 } from "react-native";
+
+const { width: SIGNUP_SCREEN_WIDTH } = Dimensions.get("screen");
+const IS_BIG_IPAD = SIGNUP_SCREEN_WIDTH >= 768;
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
@@ -277,7 +281,7 @@ const SignUp = () => {
               gradientText="Join Elunara "
               solidText="- Your AI"
               fontSize={scaleFont(25)}
-              lineHeight={40}
+              lineHeight={IS_BIG_IPAD ? scaleFont(25) * 1.6 : 40}
               marginTop={20}
               marginBottom={0}
               solidFontWeight="400"

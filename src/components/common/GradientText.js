@@ -61,6 +61,7 @@ const GradientText = ({
           fontSize={finalFontSize}
           fontWeight={finalFontWeight}
           letterSpacing={1}
+          fontVariantLigatures="none"
           x="2"
           y={finalFontSize}
         >

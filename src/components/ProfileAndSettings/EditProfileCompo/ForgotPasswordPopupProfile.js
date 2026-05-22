@@ -278,11 +278,12 @@ const ForgotPasswordPopupProfile = ({ visible, close }) => {
                   <>
                     <Text style={styles.title}>Forgot Your Password?</Text>
                     <Text style={styles.description}>
-                      No worries! We'll send you a verification code on your
+                      No worries! We'll send you a verification code on your registered email to get you back on track.
+
                     </Text>
-                    <Text style={[styles.description, { marginBottom: 35 }]}>
-                      registered email to get you back on track.
-                    </Text>
+                    {/* <Text style={[styles.description, { marginBottom: 35 }]}>
+                      
+                    </Text> */}
 
                     <TouchableOpacity
                       style={[
@@ -607,6 +608,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#757575",
     fontFamily: "Mukta-Regular",
+    marginBottom:20
   },
   inputSection: {
     marginBottom: 20,

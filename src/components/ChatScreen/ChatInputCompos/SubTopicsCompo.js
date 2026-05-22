@@ -65,8 +65,8 @@ const SubTopicsCompo = () => {
 
   const LINE_HEIGHT = 20;
   const PADDING_VERTICAL = 16;
-  const MIN_HEIGHT = LINE_HEIGHT + PADDING_VERTICAL;
-  const MAX_HEIGHT = LINE_HEIGHT * 5 + PADDING_VERTICAL;
+  const MIN_HEIGHT = 60;
+  const MAX_HEIGHT = 100;
   const [inputHeight, setInputHeight] = useState(MIN_HEIGHT);
 
   // Pulse animation for mic
@@ -286,7 +286,7 @@ const SubTopicsCompo = () => {
   };
 
   return (
-    <View style={styles.content}>
+    <View style={[styles.content, { paddingBottom: belowSearchText ? 220 : 130 }]}>
       <View style={styles.closeModalMain}>
         <ArrowLeft
           onPress={() => dispatch(setToggleSubTopics(false))}
@@ -325,7 +325,13 @@ const SubTopicsCompo = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={styles.optionsContainer}
+        style={[
+          styles.optionsContainer,
+          belowSearchText && {
+            maxHeight: screenHeight * 0.28,
+            minHeight: screenHeight * 0.20,
+          },
+        ]}
         contentContainerStyle={styles.scrollContent}
       >
         {isTopicsLoading ? (
@@ -363,6 +369,7 @@ const SubTopicsCompo = () => {
                   alignItems: "flex-end",
                   paddingTop: 10,
                   paddingBottom: 10,
+                  height: belowSearchText ? 100 : 60,
                 },
               ]}
             >
@@ -371,9 +378,6 @@ const SubTopicsCompo = () => {
                   styles.belowInput,
                   {
                     fontFamily: "Mukta-Regular",
-                    height: Platform.OS === 'ios' ? undefined : inputHeight,
-                    minHeight: Platform.OS === 'ios' ? MIN_HEIGHT : undefined,
-                    maxHeight: Platform.OS === 'ios' ? MAX_HEIGHT : undefined,
                   },
                 ]}
                 placeholder={isRecording ? "Speak now..." : "Can't find a topic? Just type it, I've got you"}
@@ -381,7 +385,7 @@ const SubTopicsCompo = () => {
                 value={belowSearchText}
                 onChangeText={setBelowSearchText}
                 multiline
-                textAlignVertical={Platform.OS === 'android' ? "top" : undefined}
+                textAlignVertical="top"
                 onContentSizeChange={handleContentSizeChange}
                 scrollEnabled={Platform.OS === 'ios' ? true : inputHeight >= MAX_HEIGHT}
                 editable={!isRecording}
@@ -390,6 +394,7 @@ const SubTopicsCompo = () => {
                 style={{
                   flexDirection: "row",
                   alignSelf: "flex-end",
+                  alignItems: "center",
                   gap: 0,
                 }}
               >
@@ -477,6 +482,7 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     maxHeight: screenHeight * 0.45,
+    minHeight: screenHeight * 0.3,
     flexDirection: "column",
   },
   backdrop: {
@@ -639,6 +645,7 @@ const styles = StyleSheet.create({
   },
   noResultsContainer: {
     flex: 1,
+    minHeight: screenHeight * 0.3,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 50,

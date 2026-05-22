@@ -66,6 +66,7 @@ const SimpleGradientText = ({
           fontSize={finalFontSize}
           fontWeight={finalFontWeight}
           letterSpacing={0}
+          fontVariantLigatures="none"
           x="0"
           y={finalFontSize}
         >

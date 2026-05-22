@@ -96,7 +96,7 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
 
             {/* Description */}
             <Text style={styles.description}>
-              Your thoughts help us make Vedlynk better! Please select one of
+              Your thoughts help us make Elunara better! Please select one of
               the options below:
             </Text>
             <ScrollView

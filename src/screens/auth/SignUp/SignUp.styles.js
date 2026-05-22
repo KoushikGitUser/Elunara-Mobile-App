@@ -46,7 +46,7 @@ export const createStyles = (props = {}) =>
       height: 140,
       width: 100,
       position: "absolute",
-      right: -25,
+      right: -35,
       zIndex: 99,
       marginTop: 10,
       objectFit: "contain",
