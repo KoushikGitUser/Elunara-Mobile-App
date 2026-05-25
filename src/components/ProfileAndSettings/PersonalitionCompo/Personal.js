@@ -208,13 +208,7 @@ const Personal = ({ scrollViewRef }) => {
       <View style={styles.fullnameInput}>
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Birthday</Text>
-          <View style={[styles.input, { height: 50, paddingVertical: 5 }]}>
-            {/* <TextInput
-              style={styles.inputText}
-              placeholder="dd/mm/yy"
-              placeholderTextColor="#9CA3AF"
-              returnKeyType="done"
-            /> */}
+          <View style={styles.input}>
             <Text style={[styles.inputText, { color: "#a1a1a1ff" }]}>
               {date.toLocaleDateString()}
             </Text>

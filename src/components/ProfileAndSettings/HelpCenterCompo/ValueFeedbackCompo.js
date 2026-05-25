@@ -174,52 +174,52 @@ const ValueFeedbackCompo = ({ popupState, setPopupState }) => {
               {keyboardVisible && <View style={{ height: screenHeight }} />}
             </ScrollView>
             <View style={styles.btnsMain}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  const typeMap = { 0: "bug", 1: "feature", 2: "general" };
-                  const feedbackType = typeMap[selectedStyle];
+              {(() => {
+                const isFeedbackReady =
+                  selectedStyle !== null && feedbackMessage.trim().length > 0;
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      { backgroundColor: isFeedbackReady ? "#081A35" : "#CDD5DC" },
+                    ]}
+                    disabled={!isFeedbackReady}
+                    onPress={() => {
+                      const typeMap = { 0: "bug", 1: "feature", 2: "general" };
+                      const feedbackType = typeMap[selectedStyle];
 
-                  if (selectedStyle === null) {
-                    triggerToast(
-                      "Error",
-                      "Please select a feedback type",
-                      "error",
-                      3000
-                    );
-                    return;
-                  }
+                      if (feedbackMessage.trim().length < 10) {
+                        triggerToast(
+                          "Error",
+                          "Please provide detailed feedback (at least 10 characters)",
+                          "error",
+                          3000
+                        );
+                        return;
+                      }
 
-                  if (!feedbackMessage || feedbackMessage.trim().length < 10) {
-                    triggerToast(
-                      "Error",
-                      "Please provide detailed feedback (at least 10 characters)",
-                      "error",
-                      3000
-                    );
-                    return;
-                  }
+                      dispatch(
+                        commonFunctionForAPICalls({
+                          method: "POST",
+                          url: "/settings/help-center/feedback",
+                          data: {
+                            type: feedbackType,
+                            message: feedbackMessage.trim(),
+                          },
+                          name: "submitHelpCenterFeedback",
+                        })
+                      );
 
-                  dispatch(
-                    commonFunctionForAPICalls({
-                      method: "POST",
-                      url: "/settings/help-center/feedback",
-                      data: {
-                        type: feedbackType,
-                        message: feedbackMessage.trim(),
-                      },
-                      name: "submitHelpCenterFeedback",
-                    })
-                  );
-
-                  setPopupState(false);
-                  setSelectedStyle(null);
-                  setFeedbackMessage("");
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.buttonText}>Send Feedback</Text>
-              </TouchableOpacity>
+                      setPopupState(false);
+                      setSelectedStyle(null);
+                      setFeedbackMessage("");
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.buttonText}>Send Feedback</Text>
+                  </TouchableOpacity>
+                );
+              })()}
             </View>
           </View>
         </View>

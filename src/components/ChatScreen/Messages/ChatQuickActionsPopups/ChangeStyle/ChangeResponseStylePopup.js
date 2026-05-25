@@ -53,6 +53,12 @@ const getResponseStyleIcon = (name) => {
 
 const ChangeResponseStylePopup = () => {
   const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const SCREEN_WIDTH = Dimensions.get("window").width;
+  // Only tighten layout for Android phones (not iOS, not tablets).
+  // Tablet heuristic: shortest screen dimension >= 600.
+  const isAndroidPhone =
+    Platform.OS === "android" &&
+    Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) < 600;
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { settingsStates } = useSelector((state) => state.API);
   const { globalDataStates } = useSelector((state) => state.Global);
@@ -152,9 +158,11 @@ const ChangeResponseStylePopup = () => {
       visible={toggleStates.toggleChangeResponseStyleWhileChatPopup}
       transparent={true}
       animationType="slide"
-      onRequestClose={() =>
-        dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
-      }
+      onRequestClose={() => {
+        if (!toggleStates.toggleCompareStyleState) {
+          dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
+        }
+      }}
     >
 <Toaster/>
       <View style={styles.container}>
@@ -171,8 +179,10 @@ const ChangeResponseStylePopup = () => {
         <TouchableOpacity
           style={styles.backdrop}
           activeOpacity={1}
-          onPress={() =>
-            dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
+          onPress={
+            toggleStates.toggleCompareStyleState
+              ? undefined
+              : () => dispatch(setToggleChangeResponseStyleWhileChatPopup(false))
           }
         />
 
@@ -183,7 +193,7 @@ const ChangeResponseStylePopup = () => {
             selectedStylesForCompare={selectedStyleObjectsForCompare}
           />
         ) : (
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, isAndroidPhone && { maxHeight: SCREEN_HEIGHT * 0.8 }]}>
             {/* Handle Bar */}
             <View style={styles.closeModalMain}>
               <TouchableOpacity
@@ -202,8 +212,8 @@ const ChangeResponseStylePopup = () => {
             </View>
 
             {/* Content */}
-            <View style={styles.content}>
-              <View style={styles.currentLLMMain}>
+            <View style={[styles.content, isAndroidPhone && { paddingTop: 16, paddingBottom: 16 }]}>
+              <View style={[styles.currentLLMMain, isAndroidPhone && { paddingVertical: 8, marginBottom: 12 }]}>
                 <Text style={styles.currentResponse}>
                   Current Response Style
                 </Text>
@@ -215,7 +225,7 @@ const ChangeResponseStylePopup = () => {
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.categorySections}>
+              <View style={[styles.categorySections, isAndroidPhone && { marginBottom: 12 }]}>
                 <TouchableOpacity
                   onPress={() => setSelectedCategory(1)}
                   style={[
@@ -270,9 +280,9 @@ const ChangeResponseStylePopup = () => {
                   showsVerticalScrollIndicator={false}
                   style={{
                     width: "100%",
-                    maxHeight: SCREEN_HEIGHT * 0.45,
-                    paddingTop: 20,
-                    marginBottom: 20,
+                    maxHeight: SCREEN_HEIGHT * (isAndroidPhone ? 0.4 : 0.45),
+                    paddingTop: isAndroidPhone ? 10 : 20,
+                    marginBottom: isAndroidPhone ? 10 : 20,
                   }}
                 >
                   {allResponseStyles.map((styleOptions, optionsIndex) => {
@@ -284,6 +294,7 @@ const ChangeResponseStylePopup = () => {
                         <TouchableOpacity
                           style={[
                             styles.card,
+                            isAndroidPhone && { paddingVertical: 14, marginBottom: 12 },
                             {
                               backgroundColor:
                                 selectedStyle == optionsIndex
@@ -353,9 +364,9 @@ const ChangeResponseStylePopup = () => {
                   showsVerticalScrollIndicator={false}
                   style={{
                     width: "100%",
-                    maxHeight: SCREEN_HEIGHT * 0.45,
-                    paddingTop: 20,
-                    marginBottom: 20,
+                    maxHeight: SCREEN_HEIGHT * (isAndroidPhone ? 0.4 : 0.45),
+                    paddingTop: isAndroidPhone ? 10 : 20,
+                    marginBottom: isAndroidPhone ? 10 : 20,
                   }}
                 >
                   {allResponseStyles

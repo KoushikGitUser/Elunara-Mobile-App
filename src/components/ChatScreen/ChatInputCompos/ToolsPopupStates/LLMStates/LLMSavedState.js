@@ -298,7 +298,7 @@ const LLMSavedState = ({ setToggleIntegrateAi }) => {
             subscription.
           </Text>
         </TouchableOpacity> */}
-            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center"}}>
+            <View style={{flexDirection:"row",width:"100%",justifyContent:"center",alignItems:"center",marginTop:30}}>
               <Text
                 style={{
                   fontSize: moderateScale(13),

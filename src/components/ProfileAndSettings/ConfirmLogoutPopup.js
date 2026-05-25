@@ -34,18 +34,18 @@ const ConfirmLogoutPopup = ({
   useEffect(() => {
     const handleLogout = async () => {
       if (authStates.isLogOut === true) {
-        // Clear tokens
-        await removeToken();
-        await removeRefreshToken();
-
-        // Clear AsyncStorage
-        await AsyncStorage.setItem("authenticUser", "false");
+        // Clear persisted credentials in parallel — serial awaits added
+        // up to a noticeable freeze on slower Android devices.
+        await Promise.all([
+          removeToken(),
+          removeRefreshToken(),
+          AsyncStorage.setItem("authenticUser", "false"),
+        ]);
 
         // Close popup
         setToggleLogOutConfirmPopup(false);
 
         // Navigate first, then reset state
-
         dispatch(resetAllStates());
         dispatch(setIsLogOutToFalse());
         navigation.navigate("welcome");

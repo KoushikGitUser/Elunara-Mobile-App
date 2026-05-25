@@ -17,7 +17,6 @@ import BigSearchIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsI
 import AuthGradientText from "../../components/common/AuthGradientText";
 import { appColors } from "../../themes/appColors";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import Markdown from 'react-native-markdown-display';
 import { commonFunctionForAPICalls, setHighlightChatId, setHighlightRoomId } from "../../redux/slices/apiCommonSlice";
 import { setChatMessagesArray, setMessageIDsArray, setCurrentAIMessageIndexForRegeneration } from "../../redux/slices/globalDataSlice";
 import { setToggleIsChattingWithAI } from "../../redux/slices/toggleSlice";
@@ -186,55 +185,52 @@ const UniversalSearchPage = () => {
     }, 100);
   };
 
-  // Markdown styles for snippets (similar to AIMessageBox but smaller)
-  const snippetMarkdownStyles = {
-    body: {
-      fontFamily: "Mukta-Regular",
-      fontSize: scaleFont(13),
-      color: "#6B7280",
-      lineHeight: 18,
-    },
-    strong: {
-      fontFamily: "Mukta-Bold",
-      color: "#3A3A3A",
-    },
-    code_inline: {
-      fontFamily: "Mukta-Bold",
-      fontSize: scaleFont(13),
-      color: "#081A35",
-      backgroundColor: "#EEF4FF",      
-      paddingHorizontal: 2,
-      borderRadius: 2,
-    },
-    paragraph: {
-      marginVertical: 0,
-      marginTop: 0,
-      marginBottom: 0,
-    },
+  // Strip markdown syntax so snippet renders as plain, consistent body text
+  const stripMarkdown = (snippet) => {
+    if (!snippet) return "";
+    return snippet
+      .replace(/^#{1,6}\s+/gm, "")
+      .replace(/\*\*(.+?)\*\*/g, "$1")
+      .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "$1")
+      .replace(/__(.+?)__/g, "$1")
+      .replace(/`(.+?)`/g, "$1")
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/^\s*\d+\.\s+/gm, "")
+      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replace(/\s*\n+\s*/g, " ")
+      .trim();
   };
 
-  // Pre-process snippet to highlight search query with inline code markdown
-  const highlightSearchInSnippet = (snippet) => {
-    if (!snippet || !debouncedSearch.trim()) {
-      return snippet;
+  // Render snippet as plain text with the search query highlighted inline
+  const renderHighlightedSnippet = (snippet) => {
+    const clean = stripMarkdown(snippet);
+    const query = debouncedSearch.trim();
+
+    if (!query) {
+      return (
+        <Text style={styles.snippetText} numberOfLines={2}>
+          {clean}
+        </Text>
+      );
     }
 
-    const searchQuery = debouncedSearch.trim();
-    // Escape special regex characters in search query
-    const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Create case-insensitive regex
-    const regex = new RegExp(`(${escapedQuery})`, 'gi');
-    // Replace matches with inline code markdown (backticks) for highlighting
-    return snippet.replace(regex, '`$1`');
-  };
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    const parts = clean.split(regex);
+    const queryLower = query.toLowerCase();
 
-  // Render snippet with Markdown and highlighted search query
-  const renderHighlightedSnippet = (snippet) => {
-    const processedSnippet = highlightSearchInSnippet(snippet);
     return (
-      <Markdown style={snippetMarkdownStyles}>
-        {processedSnippet}
-      </Markdown>
+      <Text style={styles.snippetText} numberOfLines={2}>
+        {parts.map((part, i) =>
+          part.toLowerCase() === queryLower ? (
+            <Text key={i} style={styles.snippetMatch}>
+              {part}
+            </Text>
+          ) : (
+            part
+          ),
+        )}
+      </Text>
     );
   };
 
@@ -524,6 +520,17 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "Mukta-Regular",
     color: "#6B7280",
+  },
+  snippetText: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Regular",
+    color: "#6B7280",
+    lineHeight: 18,
+  },
+  snippetMatch: {
+    fontFamily: "Mukta-Bold",
+    color: "#081A35",
+    backgroundColor: "#EEF4FF",
   },
   dotSeparator: {
     color: "#6B7280",

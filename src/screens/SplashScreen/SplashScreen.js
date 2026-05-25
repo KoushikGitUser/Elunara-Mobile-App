@@ -16,13 +16,17 @@ import {
 import { VideoView, useVideoPlayer } from "expo-video";
 
 const splashVideo = require("../../assets/images/splashVideo.mp4");
+// Fallback if "playToEnd" event never fires (decode error / unusual codec / etc.)
+const VIDEO_MAX_WAIT_MS = 7000;
+// After video ends, give the profile API at most this long; then navigate to chat anyway.
+const PROFILE_FETCH_MAX_WAIT_MS = 8000;
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const hasNavigated = useRef(false);
-  const isInitialMount = useRef(true);
+  const hasNavigatedRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const apisDispatchedRef = useRef(false);
   const [videoFinished, setVideoFinished] = useState(false);
-  const pendingNavigateRef = useRef(null);
 
   const player = useVideoPlayer(splashVideo, (p) => {
     p.loop = false;
@@ -30,60 +34,95 @@ const SplashScreen = ({ navigation }) => {
     p.play();
   });
 
-  // Detect video end
+  const { settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
+
+  // Track mounted status so listeners/timers never setState on a torn-down view
   useEffect(() => {
-    const subscription = player.addListener("playingChange", (event) => {
-      if (!event.isPlaying) {
-        setVideoFinished(true);
-      }
+    return () => { isMountedRef.current = false; };
+  }, []);
+
+  // Detect actual video end — "playToEnd" fires only on genuine completion,
+  // unlike "playingChange" which also fires on pause / error / backgrounding.
+  useEffect(() => {
+    const subscription = player.addListener("playToEnd", () => {
+      if (isMountedRef.current) setVideoFinished(true);
     });
     return () => subscription.remove();
   }, [player]);
 
-  // When video finishes, execute any pending navigation
+  // Safety net: in case playToEnd never fires (rare decode/codec edge case)
   useEffect(() => {
-    if (videoFinished && pendingNavigateRef.current) {
-      pendingNavigateRef.current();
-      pendingNavigateRef.current = null;
-    }
-  }, [videoFinished]);
+    const fallback = setTimeout(() => {
+      if (isMountedRef.current) setVideoFinished(true);
+    }, VIDEO_MAX_WAIT_MS);
+    return () => clearTimeout(fallback);
+  }, []);
 
-  // Auth check & API calls
+  // After the video has fully played, decide what to do.
+  // Nothing — no API call, no navigation — happens before this point,
+  // so the axios interceptor's 401 → reset("signin") can't fire mid-video.
   useEffect(() => {
-    const checkAuthAndNavigate = async () => {
-      if (hasNavigated.current) return;
+    if (!videoFinished || hasNavigatedRef.current) return;
 
+    const decideNext = async () => {
       const accessToken = await getToken();
+      if (!isMountedRef.current) return;
 
+      // Flow A — no token: go straight to welcome.
       if (!accessToken) {
-        hasNavigated.current = true;
-        const go = () => navigation.navigate("welcome");
-        if (videoFinished) {
-          go();
-        } else {
-          pendingNavigateRef.current = go;
-        }
+        hasNavigatedRef.current = true;
+        navigation.navigate("welcome");
         return;
       }
 
-      dispatch(commonFunctionForAPICalls({
-        method: "GET",
-        url: "/settings/profile",
-        name: "getAllProfileInfos",
-      }));
-
-      dispatch(commonFunctionForAPICalls({
-        method: "GET",
-        url: "/wallet",
-        name: "getUserWalletInfo",
-      }));
+      // Flow B / C — token exists: fire profile + wallet APIs now.
+      // For Flow C (invalid token), the 401 from these calls makes the
+      // axios interceptor reset to "signin"; that's fine because the
+      // video has already completed and the splash is about to navigate.
+      if (!apisDispatchedRef.current) {
+        apisDispatchedRef.current = true;
+        dispatch(commonFunctionForAPICalls({
+          method: "GET",
+          url: "/settings/profile",
+          name: "getAllProfileInfos",
+        }));
+        dispatch(commonFunctionForAPICalls({
+          method: "GET",
+          url: "/wallet",
+          name: "getUserWalletInfo",
+        }));
+      }
     };
-    checkAuthAndNavigate();
-  }, []);
 
-  const { settingsStates, walletStates: apiWalletStates } = useSelector((state) => state.API);
+    decideNext();
+  }, [videoFinished]);
 
-  // Sync wallet data to Toggle slice
+  // Once profile is fetched (or our max-wait elapses), go to chat.
+  useEffect(() => {
+    if (!videoFinished || hasNavigatedRef.current) return;
+    if (!apisDispatchedRef.current) return;
+
+    if (settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true) {
+      hasNavigatedRef.current = true;
+      navigation.navigate("chat");
+      return;
+    }
+
+    // Fallback: don't keep the user staring at the last frame if the profile
+    // API is slow. After PROFILE_FETCH_MAX_WAIT_MS, navigate anyway — the
+    // chat screen has its own loading states.
+    const fallback = setTimeout(() => {
+      if (!isMountedRef.current || hasNavigatedRef.current) return;
+      hasNavigatedRef.current = true;
+      navigation.navigate("chat");
+    }, PROFILE_FETCH_MAX_WAIT_MS);
+    return () => clearTimeout(fallback);
+  }, [
+    videoFinished,
+    settingsStates.allPersonalisationsSettings.isPersonalInfosFetched,
+  ]);
+
+  // Sync wallet data to Toggle slice when wallet API responds
   useEffect(() => {
     if (apiWalletStates.isWalletInfoFetched === true) {
       dispatch(setWalletBalance(apiWalletStates.walletBalance));
@@ -93,37 +132,13 @@ const SplashScreen = ({ navigation }) => {
     }
   }, [apiWalletStates.isWalletInfoFetched]);
 
-  // Navigate to chat when profile is fetched
-  useEffect(() => {
-    const handleFetchResults = async () => {
-      if (!isInitialMount.current) return;
-      if (hasNavigated.current) return;
-
-      const accessToken = await getToken();
-      if (!accessToken) return;
-
-      if (settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true) {
-        hasNavigated.current = true;
-        isInitialMount.current = false;
-        const go = () => navigation.navigate("chat");
-        if (videoFinished) {
-          go();
-        } else {
-          pendingNavigateRef.current = go;
-        }
-      }
-    };
-
-    handleFetchResults();
-  }, [settingsStates.allPersonalisationsSettings.isPersonalInfosFetched, videoFinished]);
-
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       <VideoView
         style={StyleSheet.absoluteFillObject}
         player={player}
-        allowsFullscreen={false}
+        fullscreenOptions={{ enable: false }}
         allowsPictureInPicture={false}
         nativeControls={false}
         contentFit="cover"

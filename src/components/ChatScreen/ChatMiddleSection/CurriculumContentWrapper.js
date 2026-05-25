@@ -111,7 +111,7 @@ const CurriculumContentWrapper = () => {
           </View>
         ) : (
           <View style={styles.topicsMainWrapper}>
-            <View style={styles.grid}>
+            <View style={[styles.grid, { width: "100%" }]}>
               {subjects.map((subject, index) => (
                 <TouchableOpacity
                   key={subject.id || index}
@@ -161,10 +161,10 @@ const CurriculumContentWrapper = () => {
 
 const cardStyles = StyleSheet.create({
   topicsMain: {
-    minWidth: "48%",
+    width: "48%",
     minHeight: verticalScale(110),
     borderWidth: 1,
-    borderColor: "#D3DAE5",
+    borderColor: "#e5d3d3",
     borderRadius: 20,
     flexDirection: "column",
     justifyContent: "flex-start",

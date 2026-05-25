@@ -71,7 +71,12 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
   // Get chat details
   const chatDetails = chatsStates.allChatsDatas.createdChatDetails;
   const fullChatTitle = chatDetails?.name || "Chat Name";
-  const chatTitle = fullChatTitle.length > 15 ? fullChatTitle.substring(0, 15) + "..." : fullChatTitle;
+  const chatTitle =
+    fullChatTitle === "Chat with Elunara"
+      ? fullChatTitle
+      : fullChatTitle.length > 15
+        ? fullChatTitle.substring(0, 15) + "..."
+        : fullChatTitle;
   const roomName = chatDetails?.room?.name;
 
   // Refs for guided tour measurement

@@ -87,6 +87,27 @@ const LLMState = () => {
     dispatch(commonFunctionForAPICalls(payload));
   };
 
+  const llmSlots = [
+    {
+      label: "LLM 1",
+      initialValue:
+        settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_1,
+      onUpdate: updateLLM1,
+    },
+    {
+      label: "LLM 2",
+      initialValue:
+        settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_2,
+      onUpdate: updateLLM2,
+    },
+    // {
+    //   label: "LLM 3",
+    //   initialValue:
+    //     settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_3,
+    //   onUpdate: updateLLM3,
+    // },
+  ];
+
   const handleSaveLLMPreferences = async () => {
     setIsSaving(true);
 
@@ -173,63 +194,27 @@ const LLMState = () => {
               </Text>
             </View>
 
-            <Text
-              style={{
-                fontSize: moderateScale(11),
-                color: "#5E5E5E",
-                marginTop: 40,
-                fontFamily: "Mukta-Regular",
-              }}
-            >
-              LLM 1
-            </Text>
-            <DropDowns
-              initialSetValue={
-                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_1
-              }
-              triggerAPICall={updateLLM1}
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
-            />
-            <Text
-              style={{
-                fontSize: moderateScale(11),
-                color: "#5E5E5E",
-                marginTop: 40,
-                fontFamily: "Mukta-Regular",
-              }}
-            >
-              LLM 2
-            </Text>
-            <DropDowns
-              initialSetValue={
-                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_2
-              }
-              triggerAPICall={updateLLM2}
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
-            />
-            {/* <Text
-              style={{
-                fontSize: moderateScale(11),
-                color: "#5E5E5E",
-                marginTop: 40,
-                fontFamily: "Mukta-Regular",
-              }}
-            >
-              LLM 3
-            </Text>
-            <DropDowns
-              initialSetValue={
-                settingsStates.allGeneralSettings.preferredLLMs.preferred_llm_3
-              }
-              triggerAPICall={updateLLM3}
-              selectedCounts={selectedCountsArray}
-              setSelectedCounts={setSelectedCountsArray}
-              selectOptionsArray={LLMOptionsAvailable}
-            /> */}
+            {llmSlots.map((slot) => (
+              <React.Fragment key={slot.label}>
+                <Text
+                  style={{
+                    fontSize: moderateScale(11),
+                    color: "#5E5E5E",
+                    marginTop: 40,
+                    fontFamily: "Mukta-Regular",
+                  }}
+                >
+                  {slot.label}
+                </Text>
+                <DropDowns
+                  initialSetValue={slot.initialValue}
+                  triggerAPICall={slot.onUpdate}
+                  selectedCounts={selectedCountsArray}
+                  setSelectedCounts={setSelectedCountsArray}
+                  selectOptionsArray={LLMOptionsAvailable}
+                />
+              </React.Fragment>
+            ))}
 
             {/* Button */}
             <TouchableOpacity
@@ -237,12 +222,12 @@ const LLMState = () => {
                 styles.button,
                 {
                   backgroundColor:
-                    selectedCountsArray?.length >= 3 && !isSaving ? "#081A35" : "#CDD5DC",
+                    selectedCountsArray?.length >= llmSlots.length && !isSaving ? "#081A35" : "#CDD5DC",
                 },
               ]}
               onPress={handleSaveLLMPreferences}
               activeOpacity={0.8}
-              disabled={selectedCountsArray?.length < 3 || isSaving}
+              disabled={selectedCountsArray?.length < llmSlots.length || isSaving}
             >
               {isSaving ? (
                 <ActivityIndicator color="#FFFFFF" />
