@@ -5,6 +5,7 @@ export const walletStates = {
   promotionalDaysRemaining: 0,
   walletTransactions: [],
   isWalletInfoFetched: false,
+  walletInfoError: false,
   isTransactionsFetched: false,
   isPaymentLoading: false,
   isPaymentFulfilled: false,

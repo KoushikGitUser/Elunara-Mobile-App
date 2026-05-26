@@ -36,7 +36,7 @@ import TrashIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons
 import NotesIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/NotesIcon"
 import MenuPinIcon from "../../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/PinIcon"
 import FilesIcon from "../../../../assets/SvgIconsComponent/RoomsIcons/FilesIcon"
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import {
   setChatFunctionsGuideTourSteps,
@@ -44,8 +44,13 @@ import {
   setManualGuidedTourRunning,
   setNavigationBasicsGuideTourSteps,
 } from "../../../redux/slices/globalDataSlice";
-import { setToggleChatScreenGuideStart } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleChatScreenGuideStart,
+  setToggleRoomCreationPopup,
+  setTriggerLearningLabsHighlightTour,
+} from "../../../redux/slices/toggleSlice";
 import ChatInputMain from "../../ChatScreen/ChatInputMain";
+import ListPlusIcon from "../../../../assets/SvgIconsComponent/ListPlusIcon";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("screen");
 
@@ -55,6 +60,9 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
   const statusBarHeight = Platform.OS === 'ios' ? insets.top : (StatusBar.currentHeight || 0);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const roomsCount = useSelector(
+    (state) => state.API?.roomsStates?.rooms?.length || 0,
+  );
 
   // Demo configurations for each tour type with multiple steps
   const demoConfigs = {
@@ -151,16 +159,18 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         description: "Easily change Elunara's tone, style, or language to suit your needs directly in the chat.",
         spotlightRects: [
           {
-            // Change Response popup - positioned on the right side
+            // Change Response popup — pushed up (was ~0.28 → 0.22) to lift
+            // along with the chip below it.
             x: SCREEN_WIDTH * 0.45,
-            y: SCREEN_HEIGHT * (1 - 0.50 - 0.22),
+            y: SCREEN_HEIGHT * 0.25,
             width: SCREEN_WIDTH * 0.5,
             height: SCREEN_HEIGHT * 0.28,
           },
           {
-            // Back/Next buttons - from bottom: tooltip(20%) = 20% from bottom
+            // SwitchIcon + ChevronDown chip — pushed up to sit closer to the
+            // Change Response popup above it (was 0.58 → 0.5).
             x: SCREEN_WIDTH * 0.45,
-            y: SCREEN_HEIGHT * 0.58,
+            y: SCREEN_HEIGHT * 0.55,
             width: SCREEN_WIDTH * 0.18,
             height: SCREEN_HEIGHT * 0.06,
           },
@@ -291,8 +301,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final step "Explore chat features": close preview, turn tutorial off,
-      // and land on the chat screen.
+      // Final step: clear tour flags and close preview.
       dispatch(setManualGuidedTourRunning(false));
       dispatch(setToggleChatScreenGuideStart(false));
       dispatch(setNavigationBasicsGuideTourSteps(0));
@@ -300,7 +309,29 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
       dispatch(setLearningLabsGuideTourSteps(0));
       setCurrentStep(1);
       onClose();
-      setTimeout(() => navigation.navigate("chat"), 50);
+
+      // learningLabs tour ends here — user stays on the help center walkthrough.
+      if (demoType === "learningLabs") return;
+
+      // Other tours: navigate to chat first; only then fire the side effects
+      // so the chat screen + sidebar are mounted/focused before any popup
+      // or sidebar trigger reaches them.
+      setTimeout(() => {
+        navigation.navigate("chat");
+
+        if (demoType === "chatFunctions") {
+          const hasLabs = (roomsCount || 0) > 0;
+          // Generous delay so ChatScreen finishes its mount-time fetches and
+          // ChatHistorySidebar + SidebarMiddle are ready to consume the flag.
+          setTimeout(() => {
+            if (hasLabs) {
+              dispatch(setTriggerLearningLabsHighlightTour(true));
+            } else {
+              dispatch(setToggleRoomCreationPopup(true));
+            }
+          }, 700);
+        }
+      }, 50);
     }
   };
 
@@ -867,7 +898,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
         {showLabManage && (
           <>
             {/* Manage Labs menu box */}
-            <View style={[styles.manageLabsMenuList, SCREEN_WIDTH >= 568 && { top: -360 }]}>
+            <View style={[styles.manageLabsMenuList, SCREEN_WIDTH >= 568 && { top: -340 }]}>
               <View style={styles.manageChatOption}>
                 <Text style={styles.manageChatOptionText}>Give this learning lab a custom name</Text>
                 <View style={styles.manageChatOptionTextIcon}><RenameIcon /></View>
@@ -929,7 +960,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.manageChatOption}>
                 <Text style={[styles.manageChatOptionText, { maxWidth: SCREEN_WIDTH * 0.7 }]}>Add a already existing chat to the learning labs</Text>
                 <View style={styles.manageChatOptionTextIcon}>
-                  <MaterialCommunityIcons name="playlist-plus" size={24} color="#081A35" />
+                  <ListPlusIcon/>
                 </View>
               </View>
             </View>
@@ -1025,7 +1056,7 @@ const DemoPreviewScreen = ({ visible, onClose, demoType }) => {
               <View style={styles.emptyButton} />
             )}
             <TouchableOpacity style={[styles.nextButton, currentStep === 4 && styles.exploreButton]} onPress={handleNext}>
-              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#ffffff" }]}>{currentStep === 4 ? (demoType === "learningLabs" ? "Finish" : "Explore chat features") : "Next"}</Text>
+              <Text style={[styles.nextButtonText, currentStep === 4 && { color: "#ffffff" }]}>{currentStep === 4 ? (demoType === "learningLabs" ? "Finish" : "Explore lab features") : "Next"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1741,17 +1772,17 @@ const styles = StyleSheet.create({
   manageChatMenuList: {
     position: "relative",
     width: "100%",
-    top: -100,
+    top: -70,
   },
   manageLabsMenuList: {
     position: "relative",
     width: "100%",
-    top: -240,
+    top: -210,
   },
   manageConnectedMenuList: {
     position: "relative",
     // width: "100%",
-    top: -300,
+    top: -280,
   },
   manageChatOptionText: {
     fontSize: scaleFont(14),

@@ -449,7 +449,20 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
   return (
     <View style={styles.mainBox}>
       <View style={styles.messageBox}>
-         <Markdown style={markdownStyles}>
+         <Markdown
+            style={markdownStyles}
+            rules={{
+              // `selectable` on the leaf <Text> doesn't trigger native
+              // selection — the wrapping `textgroup` <Text> is the actual
+              // gesture owner. Mirror the library's default textgroup rule
+              // and just add `selectable` so long-press → drag → copy works.
+              textgroup: (node, children, parent, styles) => (
+                <Text key={node.key} style={styles.textgroup} selectable>
+                  {children}
+                </Text>
+              ),
+            }}
+          >
            {currentMessage?.message || message}
           </Markdown>
 

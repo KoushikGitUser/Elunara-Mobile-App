@@ -58,7 +58,9 @@ const AuthenticateUserUsingProvider = ({ route }) => {
   useEffect(() => {
     setTimeout(() => {
       if (isVerified == true) {
-        navigation.navigate("chat");
+        // Reset the stack so OAuth/welcome screens are wiped — back from
+        // chat must never land on the auth flow.
+        navigation.reset({ index: 0, routes: [{ name: "chat" }] });
         storeToken(token);
         triggerToast(
           "Logged in",

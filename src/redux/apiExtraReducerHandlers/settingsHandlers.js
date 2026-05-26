@@ -217,13 +217,19 @@ export const handleFetchResponseLanguagesAvailable = {
 export const handleGetAllProfileInfos = {
   pending: (state) => {
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
+    state.settingsStates.allPersonalisationsSettings.personalInfosError = false;
   },
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos = action.payload.data.data;
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = true;
+    state.settingsStates.allPersonalisationsSettings.personalInfosError = false;
   },
   rejected: (state, action) => {
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
+    // SplashScreen reads this to show the "Something went wrong" page.
+    // 401s are handled separately by the axios interceptor (resets nav to
+    // signin), so this flag only flips for non-auth failures.
+    state.settingsStates.allPersonalisationsSettings.personalInfosError = true;
   },
 };
 

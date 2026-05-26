@@ -22,6 +22,7 @@ import {
   removeRefreshToken,
 } from "../../utils/Secure/secureStore";
 import { resetAllStates } from "../../redux/actions/resetActions";
+import { navigationRef } from "../../services/navigationService";
 
 const ConfirmLogoutPopup = ({
   toggleLogOutConfirmPopup,
@@ -33,23 +34,40 @@ const ConfirmLogoutPopup = ({
 
   useEffect(() => {
     const handleLogout = async () => {
-      if (authStates.isLogOut === true) {
-        // Clear persisted credentials in parallel — serial awaits added
-        // up to a noticeable freeze on slower Android devices.
-        await Promise.all([
-          removeToken(),
-          removeRefreshToken(),
-          AsyncStorage.setItem("authenticUser", "false"),
-        ]);
+      if (authStates.isLogOut !== true) return;
 
-        // Close popup
-        setToggleLogOutConfirmPopup(false);
+      // 1. Clear persisted credentials in parallel — serial awaits added up
+      //    to a noticeable freeze on slower Android devices.
+      await Promise.all([
+        removeToken(),
+        removeRefreshToken(),
+        AsyncStorage.setItem("authenticUser", "false"),
+      ]);
 
-        // Navigate first, then reset state
-        dispatch(resetAllStates());
-        dispatch(setIsLogOutToFalse());
-        navigation.navigate("welcome");
+      // 2. Close the popup.
+      setToggleLogOutConfirmPopup(false);
+
+      // 3. Reset the navigation stack via the GLOBAL navigationRef instead of
+      //    the popup-scoped `navigation` from useNavigation(). The popup is
+      //    rendered inside an authed screen — using its local navigation
+      //    handle to `reset` can race with that screen's unmount and the
+      //    action gets dropped silently. The global ref is tied to the root
+      //    NavigationContainer, so the reset completes even if this popup
+      //    (and its host screen) tear down in the same frame.
+      //
+      //    `reset` (vs `navigate`) is critical: it unmounts every authed
+      //    screen synchronously, so their useSelectors detach BEFORE we wipe
+      //    redux below — no flash of empty-state renders, no black screen.
+      if (navigationRef.isReady()) {
+        navigationRef.reset({
+          index: 0,
+          routes: [{ name: "welcome" }],
+        });
       }
+
+      // 4. Now safe to wipe redux — no authed screens are subscribed anymore.
+      dispatch(resetAllStates());
+      dispatch(setIsLogOutToFalse());
     };
     handleLogout();
   }, [authStates.isLogOut]);

@@ -64,29 +64,12 @@ const SignIn = () => {
 
   useEffect(() => {
     if (authStates.isSignedIn == true) {
-      navigation.navigate("chat");
+      // Reset the stack so welcome/signin are wiped — back from chat must
+      // never land on the login screen.
+      navigation.reset({ index: 0, routes: [{ name: "chat" }] });
       dispatch(setIsSignedInToFalse());
     }
   }, [authStates.isSignedIn]);
-
-  useEffect(() => {
-    if (Platform.OS === "android") {
-      const backAction = () => {
-        return true; // prevent default behavior (exit)
-      };
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-      return () => backHandler.remove(); // clean up
-    } else {
-      // iOS: prevent navigating back via swipe / stack back
-      const unsub = navigation.addListener("beforeRemove", (e) => {
-        e.preventDefault();
-      });
-      return unsub;
-    }
-  }, [navigation]);
 
   // Real-time validation functions
   const validateEmail = (text) => {

@@ -10,6 +10,7 @@ import {
   Image,
   Modal,
   Platform,
+  ToastAndroid,
 } from "react-native";
 import React, {
   useEffect,
@@ -74,7 +75,6 @@ import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActio
 import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
-import ExitAppConfirmationPopup from "../../components/ChatScreen/ExitAppConfirmationPopup";
 import { commonFunctionForAPICalls, resetChatArchiveUnarchiveUpdated } from "../../redux/slices/apiCommonSlice";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
@@ -114,8 +114,6 @@ const ChatScreen = () => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
-  const [toggleExitAppConfirmPopup, setToggleExitAppConfirmPopup] =
-    useState(false);
 
   // Store original chat messages before mock injection
   const [originalChatMessages, setOriginalChatMessages] = useState([]);
@@ -157,6 +155,12 @@ const ChatScreen = () => {
   }, [fontsLoaded]);
 
   useEffect(() => {
+    // Skip the refetch if the subjects are already cached in redux from a
+    // previous mount — keeps the white loader from flashing every time the
+    // user navigates back to the chat screen.
+    const cached = chatsStates?.allChatsDatas?.allSubjectsAvailable;
+    if (Array.isArray(cached) && cached.length > 0) return;
+
     const payload = {
       method: "GET",
       url: "/master/subjects",
@@ -657,28 +661,35 @@ const ChatScreen = () => {
     globalDataStates.manualGuidedTourRunning,
   ]);
 
+  // Android hardware back:
+  //   - If there's a previous screen in the stack, let RN navigate back normally.
+  //   - If we're at the root (post-login reset → only [chat] in stack),
+  //     require a double-tap within 2s to exit. First press shows a toast.
+  // iOS has no hardware back; the stack has nothing to swipe back to at root
+  // either, so no special handling is needed.
+  const lastBackPressRef = useRef(0);
   useEffect(() => {
-    if (Platform.OS === "android") {
-      const backAction = () => {
-        setToggleExitAppConfirmPopup(true);
-        return true; // prevent default behavior (exit)
-      };
+    if (Platform.OS !== "android") return;
 
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction,
-      );
+    const backAction = () => {
+      if (navigation.canGoBack()) {
+        return false; // let RN handle — pops the stack to the previous screen
+      }
+      const now = Date.now();
+      if (now - lastBackPressRef.current < 2000) {
+        return false; // second tap within 2s — let RN exit/minimize
+      }
+      lastBackPressRef.current = now;
+      ToastAndroid.show("Press back again to exit", ToastAndroid.SHORT);
+      return true; // first tap — block exit
+    };
 
-      return () => backHandler.remove(); // clean up
-    } else {
-      // iOS: prevent navigating back, show same exit confirmation popup
-      const unsub = navigation.addListener("beforeRemove", (e) => {
-        e.preventDefault();
-        setToggleExitAppConfirmPopup(true);
-      });
-      return unsub;
-    }
-  }, [toggleExitAppConfirmPopup, navigation]);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, [navigation]);
 
   // Note: postAddToNotes should be called with actual message uuid when user clicks "Add to Notes"
   // Example usage:
@@ -1041,12 +1052,6 @@ const ChatScreen = () => {
           {toggleStates.toggleRenameChatPopup && <RenameChatPopup />}
           {toggleStates.toggleChangeResponseLLMWhileChatPopup && (
             <ChangeLLMPopup />
-          )}
-          {toggleExitAppConfirmPopup && (
-            <ExitAppConfirmationPopup
-              setToggleExitAppConfirmPopup={setToggleExitAppConfirmPopup}
-              toggleExitAppConfirmPopup={toggleExitAppConfirmPopup}
-            />
           )}
           {toggleStates.toggleChangeLangWhileChatPopup && <ChangeLangPopup />}
           {toggleStates.toggleChangeResponseStyleWhileChatPopup && (

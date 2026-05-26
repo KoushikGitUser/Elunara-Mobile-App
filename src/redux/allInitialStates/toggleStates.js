@@ -23,6 +23,7 @@ export const toggleStates = {
       toggleResetSettingsPopup:false,
       toggleIsPaidOrProUser:false,
       toggleRoomCreationPopup:false,
+      triggerLearningLabsHighlightTour:false,
       toggleAddedRoomDetails:false,
       toggleIsRoomEmpty:true,
       toggleLearningLabUnlockPopup:false,

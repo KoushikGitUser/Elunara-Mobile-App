@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Dimensions,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { AntDesign, Feather } from "@expo/vector-icons";
@@ -42,6 +43,127 @@ const providerImages = {
 const getProviderImage = (provider) => {
   const key = provider?.toLowerCase();
   return providerImages[key] || anthropic;
+};
+
+// Markdown styles tuned so headings/lists/code don't visually crash into each
+// other. Body uses 1.5x line-height; headings are sized above body and given
+// their own breathing room via marginTop/marginBottom.
+const compareMarkdownStyles = {
+  body: {
+    fontFamily: "Mukta-Regular",
+    fontSize: scaleFont(15),
+    lineHeight: 23,
+    color: "#5E5E5E",
+  },
+  heading1: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(19),
+    lineHeight: 28,
+    color: "#1F2937",
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  heading2: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(17),
+    lineHeight: 26,
+    color: "#1F2937",
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  heading3: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(16),
+    lineHeight: 24,
+    color: "#1F2937",
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  heading4: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(15),
+    lineHeight: 22,
+    color: "#1F2937",
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  heading5: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(14),
+    lineHeight: 21,
+    color: "#1F2937",
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  heading6: {
+    fontFamily: "Mukta-Bold",
+    fontSize: scaleFont(13),
+    lineHeight: 20,
+    color: "#1F2937",
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  paragraph: {
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  strong: {
+    fontFamily: "Mukta-Bold",
+    color: "#1F2937",
+  },
+  em: {
+    fontStyle: "italic",
+  },
+  bullet_list: {
+    marginVertical: 4,
+  },
+  ordered_list: {
+    marginVertical: 4,
+  },
+  list_item: {
+    marginVertical: 2,
+  },
+  code_inline: {
+    fontFamily: "Mukta-Regular",
+    backgroundColor: "#EEF4FF",
+    color: "#081A35",
+    paddingHorizontal: 4,
+    borderRadius: 4,
+    fontSize: scaleFont(13),
+  },
+  code_block: {
+    fontFamily: "Mukta-Regular",
+    backgroundColor: "#F1F5F9",
+    padding: 10,
+    borderRadius: 8,
+    fontSize: scaleFont(13),
+    marginVertical: 6,
+  },
+  fence: {
+    fontFamily: "Mukta-Regular",
+    backgroundColor: "#F1F5F9",
+    padding: 10,
+    borderRadius: 8,
+    fontSize: scaleFont(13),
+    marginVertical: 6,
+  },
+  blockquote: {
+    backgroundColor: "#F8FAFC",
+    borderLeftWidth: 3,
+    borderLeftColor: "#CBD5E1",
+    paddingLeft: 10,
+    paddingVertical: 4,
+    marginVertical: 6,
+  },
+  link: {
+    color: "#406DD8",
+    textDecorationLine: "underline",
+  },
+  hr: {
+    backgroundColor: "#E5E7EB",
+    height: 1,
+    marginVertical: 10,
+  },
 };
 
 // Helper function to get response style icon based on name
@@ -210,7 +332,7 @@ const CompareLLMOrStyleState = ({
       </View>
 
       {/* Content */}
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         <View style={styles.titleAndDropdown}>
           <View style={styles.leftSection}>
             {forStyleOrLLM == "style" ? (
@@ -302,18 +424,9 @@ const CompareLLMOrStyleState = ({
               />
             </View>
           ) : (
-            <ScrollView style={styles.responseBoxScroll}>
+            <ScrollView style={styles.responseBoxScroll} nestedScrollEnabled={true}>
               {firstResponse?.content ? (
-                <Markdown
-                  style={{
-                    body: {
-                      fontFamily: "Mukta-Regular",
-                      lineHeight: 20,
-                      fontSize: scaleFont(18),
-                      color: "#5E5E5E"
-                    }
-                  }}
-                >
+                <Markdown style={compareMarkdownStyles}>
                   {firstResponse.content}
                 </Markdown>
               ) : (
@@ -440,18 +553,9 @@ const CompareLLMOrStyleState = ({
               />
             </View>
           ) : (
-            <ScrollView style={styles.responseBoxScroll}>
+            <ScrollView style={styles.responseBoxScroll} nestedScrollEnabled={true}>
               {secondResponse?.content ? (
-                <Markdown
-                  style={{
-                    body: {
-                      fontFamily: "Mukta-Regular",
-                      lineHeight: 20,
-                      fontSize: scaleFont(18),
-                      color: "#5E5E5E"
-                    }
-                  }}
-                >
+                <Markdown style={compareMarkdownStyles}>
                   {secondResponse.content}
                 </Markdown>
               ) : (
@@ -488,10 +592,13 @@ const CompareLLMOrStyleState = ({
             Select this Response
           </Text>
         </TouchableOpacity>
-      </View>
+        <View style={{height:50}} />
+      </ScrollView>
     </View>
   );
 };
+
+const SCREEN_HEIGHT = Dimensions.get("window").height
 
 const styles = StyleSheet.create({
   container: {
@@ -533,6 +640,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 20,
+    maxHeight:SCREEN_HEIGHT
   },
   responseBoxMain: {
     width: "100%",
@@ -549,6 +657,7 @@ const styles = StyleSheet.create({
   responseBoxScroll: {
     flex: 1,
     width: "100%",
+
   },
   loadingContainer: {
     flex: 1,

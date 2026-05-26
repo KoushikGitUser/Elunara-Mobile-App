@@ -50,23 +50,6 @@ const WelcomeScreen = () => {
     }
   }, [fontsLoaded]);
 
-  useEffect(() => {
-    if (Platform.OS === "android") {
-      const backAction = () => {
-        return true;
-      };
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-      return () => backHandler.remove();
-    } else {
-      const unsub = navigation.addListener("beforeRemove", (e) => {
-        e.preventDefault();
-      });
-      return unsub;
-    }
-  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -30,6 +30,7 @@ export const settingsStates = {
     learningDevices: {},
     isAnythingChangedInPersonalisationSettings: false,
     isPersonalInfosFetched: false,
+    personalInfosError: false,
   },
   allProfileInfos: {},
 

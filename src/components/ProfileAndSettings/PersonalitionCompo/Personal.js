@@ -17,6 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Personal = ({ scrollViewRef }) => {
   const [date, setDate] = useState(new Date());
+  // tempDate holds the value the iOS spinner is currently scrolled to. It is
+  // only promoted to `date` (and pushed to the API) when the user taps Done.
+  const [tempDate, setTempDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [hobbiesFocused, setHobbiesFocused] = useState(false);
   const [aboutFocused, setAboutFocused] = useState(false);
@@ -44,20 +47,44 @@ const Personal = ({ scrollViewRef }) => {
     settingsStates.allPersonalisationsSettings.personalInfos.birthday,
   ]);
 
+  const commitBirthday = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    updateUserBirthday(`${year}-${month}-${day}`);
+  };
+
   const onChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-
-      // Format date to YYYY-MM-DD
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-
-      // Update birthday in backend
-      updateUserBirthday(formattedDate);
+    if (Platform.OS === "android") {
+      // Android's native dialog already has its own OK/Cancel — onChange
+      // fires only on confirm or dismiss, so commit immediately.
+      setShowDatePicker(false);
+      if (selectedDate) {
+        setDate(selectedDate);
+        commitBirthday(selectedDate);
+      }
+      return;
     }
+    // iOS: buffer the scroll value; don't close, don't push to API yet.
+    // The Done button below the spinner handles commit.
+    if (selectedDate) setTempDate(selectedDate);
+  };
+
+  const handleOpenDatePicker = () => {
+    // Seed the spinner with the currently saved date so users see their
+    // existing selection, not "today".
+    setTempDate(date);
+    setShowDatePicker(true);
+  };
+
+  const handleConfirmDate = () => {
+    setDate(tempDate);
+    commitBirthday(tempDate);
+    setShowDatePicker(false);
+  };
+
+  const handleCancelDate = () => {
+    setShowDatePicker(false);
   };
 
   const updateUserGender = (id) => {
@@ -210,19 +237,42 @@ const Personal = ({ scrollViewRef }) => {
           <Text style={styles.inputLabel}>Birthday</Text>
           <View style={styles.input}>
             <Text style={[styles.inputText, { color: "#a1a1a1ff" }]}>
-              {date.toLocaleDateString()}
+              {(showDatePicker && Platform.OS === "ios"
+                ? tempDate
+                : date
+              ).toLocaleDateString()}
             </Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <TouchableOpacity onPress={handleOpenDatePicker}>
               <Calendar size={23} strokeWidth={1.25} />
             </TouchableOpacity>
           </View>
           {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display={Platform.OS === "ios" ? "inline" : "calendar"}
-              onChange={onChange}
-            />
+            <>
+              <DateTimePicker
+                value={Platform.OS === "ios" ? tempDate : date}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "calendar"}
+                onChange={onChange}
+              />
+              {Platform.OS === "ios" && (
+                <View style={styles.datePickerActions}>
+                  <TouchableOpacity
+                    onPress={handleCancelDate}
+                    style={styles.datePickerCancelBtn}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.datePickerCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleConfirmDate}
+                    style={styles.datePickerDoneBtn}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.datePickerDoneText}>Select</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
           )}
         </View>
         <View style={styles.inputSection}>
@@ -292,6 +342,7 @@ const Personal = ({ scrollViewRef }) => {
             returnKeyType="done"
             multiline
             textAlignVertical="top"
+            maxLength={200}
             onFocus={() => {
               setAboutFocused(true);
               scrollToAbout();
@@ -300,6 +351,9 @@ const Personal = ({ scrollViewRef }) => {
             cursorColor={appColors.navyBlueShade}
           />
         </View>
+        <Text style={[styles.inputLabel, { marginTop: 6, marginBottom: 0 }]}>
+          200 characters
+        </Text>
       </View>
       {/* Empty view for spacing when About is focused */}
       <View ref={bottomRef} style={{ height: 50 }} />
@@ -400,6 +454,37 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     fontFamily: "Mukta-Regular",
     color: "#1F2937",
+  },
+  datePickerActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 4,
+  },
+  datePickerCancelBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#FFFFFF",
+  },
+  datePickerCancelText: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Bold",
+    color: "#1F2937",
+  },
+  datePickerDoneBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 50,
+    backgroundColor: appColors.navyBlueShade,
+  },
+  datePickerDoneText: {
+    fontSize: scaleFont(13),
+    fontFamily: "Mukta-Bold",
+    color: "#FFFFFF",
   },
 });
 

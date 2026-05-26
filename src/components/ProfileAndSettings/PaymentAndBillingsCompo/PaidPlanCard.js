@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   statusRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 10,
     gap:5
   },

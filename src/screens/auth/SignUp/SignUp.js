@@ -110,27 +110,6 @@ const SignUp = () => {
     }
   }, [authStates.isRedirectURLReceivedForLinkedIn]);
 
-  useEffect(() => {
-    if (Platform.OS === "android") {
-      const backAction = () => {
-        return true; // prevent default behavior (exit)
-      };
-
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-
-      return () => backHandler.remove(); // clean up
-    } else {
-      // iOS: prevent navigating back via swipe / stack back
-      const unsub = navigation.addListener("beforeRemove", (e) => {
-        e.preventDefault();
-      });
-      return unsub;
-    }
-  }, [navigation]);
-
   const styleProps = {};
 
   // Real-time validation functions

@@ -147,22 +147,18 @@ const SubTopicsCompo = () => {
     else if (contentHeight > MAX_HEIGHT) setInputHeight(MAX_HEIGHT);
     else setInputHeight(contentHeight);
   };
-  const [filteredTopics, setFilteredTopics] = useState(
-    chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || []
-  );
-
-  // Filter topics based on search text
-  useEffect(() => {
-    const allTopics = chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || [];
-    if (searchText.trim() === "") {
-      setFilteredTopics(allTopics);
-    } else {
-      const filtered = allTopics.filter((topic) =>
-        topic.name?.toLowerCase()?.includes(searchText.toLowerCase())
-      );
-      setFilteredTopics(filtered);
-    }
-  }, [searchText, chatsStates.allChatsDatas.allTopicsOfSelectedSubjects]);
+  // Derived during render — keeps filteredTopics in sync with redux + search
+  // text without a useState/useEffect roundtrip. The previous version flashed
+  // "No topics found" for one frame when the loader flipped from pending → true,
+  // because the effect that repopulated the state hadn't fired yet.
+  const allTopics =
+    chatsStates.allChatsDatas.allTopicsOfSelectedSubjects || [];
+  const filteredTopics =
+    searchText.trim() === ""
+      ? allTopics
+      : allTopics.filter((topic) =>
+          topic.name?.toLowerCase()?.includes(searchText.toLowerCase()),
+        );
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -319,7 +315,7 @@ const SubTopicsCompo = () => {
           }}
           keyboardType="text"
           returnKeyType="done"
-          style={{ fontFamily: "Mukta-Regular", fontSize: 17, flex: 1, paddingVertical: Platform.OS === 'ios' ? 10 : 0 }}
+          style={{ fontFamily: "Mukta-Regular", fontSize: 17, flex: 1, paddingVertical: Platform.OS === 'ios' ? 10 : 10 }}
         />
       </View>
 

@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import React, {
   useMemo,
@@ -39,7 +40,10 @@ import PinIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcon
 import FolderIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
 import ChatsIcon from "../../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/ChatsIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleChatHistorySidebar } from "../../../redux/slices/toggleSlice";
+import {
+  setToggleChatHistorySidebar,
+  setTriggerLearningLabsHighlightTour,
+} from "../../../redux/slices/toggleSlice";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"; 
 
 const SidebarMiddle = forwardRef(({ translateX }, ref) => {
@@ -58,6 +62,63 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   // Refs for guided tour measurement
   const pinnedSectionRef = useRef(null);
   const recentChatsSectionRef = useRef(null);
+
+  // Refs + animated values for the chat-functions "highlight labs" tour
+  const sidebarScrollRef = useRef(null);
+  const labsBlinkOpacity = useRef(new Animated.Value(0)).current;
+  const triggerLearningLabsHighlightTour =
+    toggleStates.triggerLearningLabsHighlightTour;
+
+  useEffect(() => {
+    if (!triggerLearningLabsHighlightTour) return;
+
+    // Step A (t=0): slide the sidebar in. Animation runs ~400ms.
+    Animated.timing(translateX, {
+      toValue: SCREEN_WIDTH * 0.75,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+    dispatch(setToggleChatHistorySidebar(true));
+
+    // Step B (t=700ms): expand the Learning Labs accordion. Buffer of 300ms
+    // after the slide finishes so the slide animation doesn't share frames
+    // with a heavy layout update on low-end devices.
+    const expandTimer = setTimeout(() => setRoomsOpened(true), 700);
+
+    // Step C (t=1200ms): scroll to the bottom. We retry once because RN may
+    // not have laid out the newly-expanded labs section by the first attempt
+    // (especially on slower devices), and scrollToEnd against a stale
+    // contentSize is a no-op.
+    const scrollTimer = setTimeout(() => {
+      sidebarScrollRef.current?.scrollToEnd({ animated: true });
+    }, 1200);
+
+    const scrollRetryTimer = setTimeout(() => {
+      sidebarScrollRef.current?.scrollToEnd({ animated: true });
+    }, 1500);
+
+    // Step D (t=1900ms): blink the labs container border. Animate opacity on
+    // the native (UI) thread so the pulses stay frame-perfect even if the JS
+    // thread is briefly busy with redux / scroll fallout. Sequence is flat —
+    // nested sequences sometimes drop frames between segments.
+    const PULSE = 600;
+    const blinkTimer = setTimeout(() => {
+      Animated.sequence([
+        Animated.timing(labsBlinkOpacity, { toValue: 1, duration: PULSE, useNativeDriver: true }),
+        Animated.timing(labsBlinkOpacity, { toValue: 0, duration: PULSE, useNativeDriver: true }),
+      ]).start(() => {
+        // Step E: reset the trigger so it can fire again next time.
+        dispatch(setTriggerLearningLabsHighlightTour(false));
+      });
+    }, 1900);
+
+    return () => {
+      clearTimeout(expandTimer);
+      clearTimeout(scrollTimer);
+      clearTimeout(scrollRetryTimer);
+      clearTimeout(blinkTimer);
+    };
+  }, [triggerLearningLabsHighlightTour]);
 
   // Fetch rooms and pinned rooms on mount
   useEffect(() => {
@@ -135,7 +196,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
   const pinnedRoomsCount = roomsStates.pinnedRooms?.length || 0;
 
   return (
-    <ScrollView style={styles.chatHistorySidebarMiddle}>
+    <ScrollView ref={sidebarScrollRef} style={styles.chatHistorySidebarMiddle}>
       <View ref={pinnedSectionRef} style={[styles.pinnedSectionMain, pinnedChatsCount === 0 && pinnedRoomsCount === 0 && chatsStates.loaderStates.isAllUserChatsFetched === true && { borderBottomWidth: 0 }]}>
         {(pinnedChatsCount > 0 || chatsStates.loaderStates.isAllUserChatsFetched !== true) && (
           <>
@@ -395,6 +456,19 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
         </TouchableOpacity>
         {roomsOpened && (
           <View style={styles.individualPinnedChatsMain}>
+            {/* Tour highlight: light-blue background blink, rendered first so
+                it sits BEHIND the labs content (siblings stack in JSX order). */}
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: "#E9F2FF",
+                  borderRadius: 12,
+                  opacity: labsBlinkOpacity,
+                },
+              ]}
+            />
             {roomsStates.rooms?.length > 0 ? (
               roomsStates.rooms
                 .slice(0, 5)

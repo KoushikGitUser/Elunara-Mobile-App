@@ -74,20 +74,26 @@ export const handleGetTransactions = {
 export const handleGetUserWalletInfo = {
   pending: (state) => {
     state.walletStates.isWalletInfoFetched = false;
+    state.walletStates.walletInfoError = false;
   },
   fulfilled: (state, action) => {
     const data = action.payload.data.data;
     console.log(data,"all wallet data");
-    
+
     state.walletStates.walletBalance = data.balance;
     state.walletStates.isInitialRechargeCompleted = data.is_initial_recharge_done;
     state.walletStates.isPromotionalUser = data.is_promo;
     state.walletStates.promotionalDaysRemaining = Math.floor(data.promo_days_left);
     state.walletStates.isWalletInfoFetched = true;
+    state.walletStates.walletInfoError = false;
   },
   rejected: (state, action) => {
     state.walletStates.isWalletInfoFetched = false;
+    // SplashScreen reads this for the "Something went wrong" page. 401s are
+    // handled by the axios interceptor (reset to signin), so this flag only
+    // flips for non-auth failures.
+    state.walletStates.walletInfoError = true;
     console.log("error",action.payload.message);
-    
+
   },
 };

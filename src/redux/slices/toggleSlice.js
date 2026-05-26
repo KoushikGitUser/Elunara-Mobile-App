@@ -79,6 +79,9 @@ const toggleSlice = createSlice({
     setToggleRoomCreationPopup: (state, action) => {
       state.toggleStates.toggleRoomCreationPopup = action.payload;
     },
+    setTriggerLearningLabsHighlightTour: (state, action) => {
+      state.toggleStates.triggerLearningLabsHighlightTour = action.payload;
+    },
     setToggleAddedRoomDetails: (state, action) => {
       state.toggleStates.toggleAddedRoomDetails = action.payload;
     },
@@ -319,6 +322,7 @@ export const {
   setToggleResetSettingsPopup,
   setToggleIsPaidOrProUser,
   setToggleRoomCreationPopup,
+  setTriggerLearningLabsHighlightTour,
   setToggleAddedRoomDetails,
   setToggleIsRoomEmpty,
   setToggleLearningLabUnlockPopup,

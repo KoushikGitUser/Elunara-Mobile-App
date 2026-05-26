@@ -126,14 +126,15 @@ const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
       {toggleStates.toggleLearningLabUnlockPopup && <UnlockLearningLabPopup />}
       {toggleStates.toggleProPlanUpgradePopup && <ProPlanUpgradingPopup />}
       {toggleStates.toggleUnlockNewChatPopup && <UnlockNewChatLimitPopup />}
-      <View
+      <Animated.View
         style={[
           styles.chatHistorySidebarWrapper,
           {
-            marginLeft: toggleStates.toggleChatHistorySidebar
-              ? 0
-              : -SCREEN_WIDTH * 0.75,
-              top:statusBarHeight,
+            // Static off-screen offset; sidebar slides into view via the same
+            // translateX that pushes the chat screen right, so both move together.
+            marginLeft: -SCREEN_WIDTH * 0.75,
+            top: statusBarHeight,
+            transform: [{ translateX }],
           },
           toggleStates.toggleChatHistorySidebar && {
             shadowColor: "#000",
@@ -159,7 +160,7 @@ const ChatHistorySidebar = forwardRef(({ translateX }, ref) => {
         {/* chat history footer */}
         <SidebarFooter translateX={translateX} />
         {/* chat history footer */}
-      </View>
+      </Animated.View>
     </>
   );
 });

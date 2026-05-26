@@ -33,7 +33,11 @@ const DemoPopup = ({ popupState, setPopupState }) => {
       setPendingPreview(true);
       setPopupState(false);
     } else {
+      // Android: open the preview AND close this parent modal so we don't end
+      // up with three stacked Modals later (parent + preview + e.g.
+      // RoomCreationPopup), which renders as a white screen on Android.
       setShowDemoPreview(true);
+      setPopupState(false);
     }
   };
 
