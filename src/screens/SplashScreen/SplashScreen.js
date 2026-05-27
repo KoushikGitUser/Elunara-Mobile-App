@@ -33,10 +33,6 @@ const SplashScreen = ({ navigation }) => {
   const isMountedRef = useRef(true);
   const apisDispatchedRef = useRef(false);
   const [videoFinished, setVideoFinished] = useState(false);
-  // Set true the moment the user taps "Try Again". If the retried fetches
-  // fail too, we redirect to welcome instead of showing the error screen
-  // a second time.
-  const [retryAttempted, setRetryAttempted] = useState(false);
   // Animated dots for the "Loading..." label
   const [loadingDots, setLoadingDots] = useState("");
 
@@ -50,14 +46,12 @@ const SplashScreen = ({ navigation }) => {
     (state) => state.API,
   );
 
-  const profileFetched =
-    settingsStates.allPersonalisationsSettings.isPersonalInfosFetched === true;
+  const userFetched = settingsStates.isUserDataFetched === true;
   const walletFetched = apiWalletStates.isWalletInfoFetched === true;
-  const profileError =
-    settingsStates.allPersonalisationsSettings.personalInfosError === true;
+  const userError = settingsStates.userDataError === true;
   const walletError = apiWalletStates.walletInfoError === true;
-  const hasError = profileError || walletError;
-  const allFetched = profileFetched && walletFetched;
+  const hasError = userError || walletError;
+  const allFetched = userFetched && walletFetched;
   // After the video ends, if the APIs aren't all back yet AND we don't have
   // an error to show, surface the loading indicator instead of staring at a
   // frozen last frame.
@@ -104,8 +98,8 @@ const SplashScreen = ({ navigation }) => {
     dispatch(
       commonFunctionForAPICalls({
         method: "GET",
-        url: "/settings/profile",
-        name: "getAllProfileInfos",
+        url: "/user",
+        name: "getUserData",
       }),
     );
     dispatch(
@@ -193,15 +187,12 @@ const SplashScreen = ({ navigation }) => {
 
     // Token exists — re-dispatch both APIs. Their `pending` handlers clear
     // the error flags, so the error screen drops back to the loading state.
-    // Setting retryAttempted last (after the dispatches commit the pending
-    // state) ensures the post-retry watcher below doesn't trip on the
-    // pre-retry hasError that's about to become false.
     apisDispatchedRef.current = true;
     dispatch(
       commonFunctionForAPICalls({
         method: "GET",
-        url: "/settings/profile",
-        name: "getAllProfileInfos",
+        url: "/user",
+        name: "getUserData",
       }),
     );
     dispatch(
@@ -211,17 +202,7 @@ const SplashScreen = ({ navigation }) => {
         name: "getUserWalletInfo",
       }),
     );
-    setRetryAttempted(true);
   }, [dispatch, navigation]);
-
-  // After a retry: if either API fails again, send the user to welcome
-  // instead of looping on the error screen.
-  useEffect(() => {
-    if (!retryAttempted || !hasError) return;
-    if (hasNavigatedRef.current) return;
-    hasNavigatedRef.current = true;
-    navigation.reset({ index: 0, routes: [{ name: "welcome" }] });
-  }, [retryAttempted, hasError, navigation]);
 
   // Error screen — visual mirror of NoInternetScreen with a different
   // icon/title/description. Only shown AFTER the video has fully played, so

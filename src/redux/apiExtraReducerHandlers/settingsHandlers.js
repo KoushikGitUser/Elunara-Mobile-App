@@ -216,15 +216,24 @@ export const handleFetchResponseLanguagesAvailable = {
 
 export const handleGetAllProfileInfos = {
   pending: (state) => {
+    console.log("👤 PROFILE API — pending");
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
     state.settingsStates.allPersonalisationsSettings.personalInfosError = false;
   },
   fulfilled: (state, action) => {
+    console.log(
+      "👤 PROFILE API — fulfilled:",
+      JSON.stringify(action?.payload?.data?.data, null, 2),
+    );
     state.settingsStates.allProfileInfos = action.payload.data.data;
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = true;
     state.settingsStates.allPersonalisationsSettings.personalInfosError = false;
   },
   rejected: (state, action) => {
+    console.log(
+      "👤 PROFILE API — rejected:",
+      JSON.stringify(action?.payload, null, 2),
+    );
     state.settingsStates.allPersonalisationsSettings.isPersonalInfosFetched = false;
     // SplashScreen reads this to show the "Something went wrong" page.
     // 401s are handled separately by the axios interceptor (resets nav to
@@ -235,16 +244,31 @@ export const handleGetAllProfileInfos = {
 
 export const handleGetUserData = {
   pending: (state) => {
+    console.log("🙋 USER API — pending");
     state.settingsStates.isFetchingUserData = true;
+    state.settingsStates.userDataError = false;
   },
   fulfilled: (state, action) => {
+    console.log(
+      "🙋 USER API — fulfilled:",
+      JSON.stringify(action?.payload?.data?.data, null, 2),
+    );
     state.settingsStates.userData = action.payload.data.data;
     state.settingsStates.isFetchingUserData = false;
     state.settingsStates.isUserDataFetched = true;
+    state.settingsStates.userDataError = false;
   },
   rejected: (state, action) => {
+    console.log(
+      "🙋 USER API — rejected:",
+      JSON.stringify(action?.payload, null, 2),
+    );
     state.settingsStates.isFetchingUserData = false;
     state.settingsStates.isUserDataFetched = false;
+    // SplashScreen reads this to show the "Something went wrong" page.
+    // 401s are handled by the axios interceptor (refresh + reset to signin),
+    // so this flag only flips for non-auth failures.
+    state.settingsStates.userDataError = true;
   },
 };
 

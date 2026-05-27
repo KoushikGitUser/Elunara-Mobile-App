@@ -44,12 +44,12 @@
     ],
     "ios": {
       "icon": "./assets/icon.png",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app requires camera access to take photos.",
-        "NSPhotoLibraryUsageDescription": "This app requires photo library access to select images.",
-        "NSMicrophoneUsageDescription": "This app requires microphone access for speech-to-text and audio features.",
-        "NSSpeechRecognitionUsageDescription": "This app requires speech recognition to convert your voice to text.",
+        "NSCameraUsageDescription": "Elunara uses the camera so you can take a photo and attach it to your chat. For example, you can snap a picture of a textbook page and ask Elunara to explain or summarise it.",
+        "NSPhotoLibraryUsageDescription": "Elunara accesses your photo library so you can pick an existing image to attach to a chat or set a new profile picture. For example, you can choose a screenshot of a math problem from your gallery and share it with Elunara to get help solving it.",
+        "NSMicrophoneUsageDescription": "Elunara uses the microphone so you can dictate your questions instead of typing them. Your voice is transcribed to text and is not recorded or stored. For example, you can say \"Summarise this chapter\" and the spoken words appear in the chat input.",
+        "NSSpeechRecognitionUsageDescription": "Elunara uses iOS speech recognition to convert your spoken questions into text inside the chat input. For example, instead of typing a long question, you can speak it and have it appear as text. Voice data is used only for this transcription and is not stored.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.elunara.gradlnk"

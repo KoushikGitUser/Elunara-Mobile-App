@@ -75,6 +75,7 @@ import ChangeLangPopup from "../../components/ChatScreen/Messages/ChatQuickActio
 import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/ChangeStyle/ChangeResponseStylePopup";
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
+import CompulsoryVerifyMobilePopup from "../../components/ChatScreen/CompulsoryVerifyMobilePopup";
 import { commonFunctionForAPICalls, resetChatArchiveUnarchiveUpdated } from "../../redux/slices/apiCommonSlice";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
@@ -114,6 +115,11 @@ const ChatScreen = () => {
   const SCREEN_WIDTH = Dimensions.get("window").width;
   const SCREEN_HEIGHT = Dimensions.get("window").height;
   const translateX = useRef(new Animated.Value(0)).current;
+
+  // Non-dismissible mobile verification popup. Shown when the logged-in user
+  // is past the 10-day grace window with phone_verified === false.
+  const [showCompulsoryVerifyPopup, setShowCompulsoryVerifyPopup] =
+    useState(false);
 
   // Store original chat messages before mock injection
   const [originalChatMessages, setOriginalChatMessages] = useState([]);
@@ -197,14 +203,18 @@ const ChatScreen = () => {
     dispatch(commonFunctionForAPICalls(payload));
   }, []);
 
-  // Fetch user data on mount to check guide_seen status
+  // Fetch user data only if SplashScreen hasn't already populated it.
+  // App-cold-open via splash → already fetched, skip. Fresh login → splash
+  // never ran for this session, so chat is the first place we need the data.
   useEffect(() => {
-    const payload = {
-      method: "GET",
-      url: "/user",
-      name: "getUserData",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    if (settingsStates.isUserDataFetched === true) return;
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/user",
+        name: "getUserData",
+      }),
+    );
   }, []);
 
   // Fetch pinned chats on mount (if not already fetched)
@@ -472,6 +482,33 @@ const ChatScreen = () => {
       }
     }
   }, [settingsStates.isUserDataFetched, settingsStates.userData]);
+
+  // Compulsory mobile verification gate. Once userData is loaded, show the
+  // non-dismissible popup if the user is past the 10-day grace window
+  // without a verified phone number. Mirrors the calculation in
+  // components/ProfileAndSettings/UserSection.js (10-day window from
+  // created_at). Re-evaluates whenever userData refreshes (e.g. right after
+  // the popup itself refetches /user on successful verify).
+  useEffect(() => {
+    if (settingsStates.isUserDataFetched !== true) return;
+    const userData = settingsStates.userData;
+    if (!userData) return;
+
+    if (userData.phone_verified === true) {
+      setShowCompulsoryVerifyPopup(false);
+      return;
+    }
+    if (!userData.created_at) return;
+    const createdDate = new Date(userData.created_at);
+    const diffDays = Math.floor(
+      (new Date() - createdDate) / (1000 * 60 * 60 * 24),
+    );
+    setShowCompulsoryVerifyPopup(diffDays >= 10);
+  }, [
+    settingsStates.isUserDataFetched,
+    settingsStates.userData?.phone_verified,
+    settingsStates.userData?.created_at,
+  ]);
 
   // Handle sidebar auto-open for guided tours
   useEffect(() => {
@@ -1076,6 +1113,13 @@ const ChatScreen = () => {
           )}
           {toggleStates.toggleElunaraProWelcomePopup && (
             <ElunaraProWelcomePopup />
+          )}
+
+          {showCompulsoryVerifyPopup && (
+            <CompulsoryVerifyMobilePopup
+              visible={showCompulsoryVerifyPopup}
+              onVerified={() => setShowCompulsoryVerifyPopup(false)}
+            />
           )}
 
           {/* Original new user guided tour tooltips */}

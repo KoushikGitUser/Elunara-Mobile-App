@@ -38,6 +38,7 @@ export const settingsStates = {
   userData: {},
   isFetchingUserData: false,
   isUserDataFetched: false,
+  userDataError: false,
 
   // Profile Image Upload
   uploadingProfileImage: false,
