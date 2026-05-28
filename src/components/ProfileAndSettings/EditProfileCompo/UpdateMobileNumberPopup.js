@@ -222,7 +222,9 @@ const UpdateMobileNumberPopup = ({mobileVerificationPopup,close}) => {
                     0,
                     isCodeSent
                       ? -(keyboardHeight * 2.7)
-                      : -(keyboardHeight * 2.3),
+                      // input step has no footer below the button (unlike the
+                      // verify popup), so it needs extra lift to clear it.
+                      : -(keyboardHeight * 3.2),
                   ],
                   // perfect lift without large gap
                   extrapolate: "clamp",
@@ -447,7 +449,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: Platform.OS === "ios" ? 0 : "30%",
+    // Sized to cover the input-step lift (~3.2x keyboard) so no blurred
+    // backdrop shows between the lifted sheet and the bottom of the screen.
+    height: Platform.OS === "ios" ? 0 : "40%",
     backgroundColor: "white",
   },
   backdrop: {

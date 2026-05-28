@@ -76,9 +76,15 @@ import ChangeResponseStylePopup from "../../components/ChatScreen/Messages/ChatQ
 import NotHelpfulFeedbackPopup from "../../components/ChatScreen/Messages/ChatQuickActionsPopups/Feedback/NotHelpfulFeedbackPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import CompulsoryVerifyMobilePopup from "../../components/ChatScreen/CompulsoryVerifyMobilePopup";
+import { parseApiDate } from "../../utils/parseApiDate";
 import { commonFunctionForAPICalls, resetChatArchiveUnarchiveUpdated } from "../../redux/slices/apiCommonSlice";
 import { BlurView } from "@react-native-community/blur";
 import { appColors } from "../../themes/appColors";
+
+// TEMP KILL-SWITCH: set to false to fully disable the compulsory mobile
+// verification popup gate (so the app stays usable while the verify flow is
+// being fixed). Set back to true to re-enable the gate.
+const COMPULSORY_MOBILE_VERIFY_ENABLED = false;
 
 // Mock chat messages for Chat Functions tour step 2
 const mockChatMessages = [
@@ -490,6 +496,11 @@ const ChatScreen = () => {
   // created_at). Re-evaluates whenever userData refreshes (e.g. right after
   // the popup itself refetches /user on successful verify).
   useEffect(() => {
+    // Kill-switch: keep the popup permanently hidden while disabled.
+    if (!COMPULSORY_MOBILE_VERIFY_ENABLED) {
+      setShowCompulsoryVerifyPopup(false);
+      return;
+    }
     if (settingsStates.isUserDataFetched !== true) return;
     const userData = settingsStates.userData;
     if (!userData) return;
@@ -498,8 +509,11 @@ const ChatScreen = () => {
       setShowCompulsoryVerifyPopup(false);
       return;
     }
-    if (!userData.created_at) return;
-    const createdDate = new Date(userData.created_at);
+    // parseApiDate handles the 6-digit-microsecond timestamps that Hermes
+    // (release engine) otherwise fails to parse — the reason this popup
+    // didn't appear in release builds.
+    const createdDate = parseApiDate(userData.created_at);
+    if (!createdDate) return;
     const diffDays = Math.floor(
       (new Date() - createdDate) / (1000 * 60 * 60 * 24),
     );

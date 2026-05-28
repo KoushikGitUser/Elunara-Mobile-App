@@ -307,6 +307,14 @@ const CompareLLMOrStyleState = ({
     }
   };
 
+  // The cross button closes the entire stack: this compare view AND whichever
+  // parent popup hosts it (Change Style or Change LLM).
+  const closeAllPopups = () => {
+    dispatch(setToggleCompareStyleState(false));
+    dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
+    dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
+  };
+
   return (
     <View style={styles.modalSheet}>
       {/* Handle Bar */}
@@ -321,10 +329,10 @@ const CompareLLMOrStyleState = ({
             }
           }}
           size={30}
-          strokeWidth={2} 
+          strokeWidth={2}
         />
         <AntDesign
-          onPress={() =>dispatch(setToggleChangeResponseLLMWhileChatPopup(false))}
+          onPress={closeAllPopups}
           name="close"
           size={24}
           color="black"
@@ -640,7 +648,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 20,
-    maxHeight:SCREEN_HEIGHT
+    maxHeight:Platform.OS== "android"?SCREEN_HEIGHT: SCREEN_HEIGHT * 0.9
   },
   responseBoxMain: {
     width: "100%",

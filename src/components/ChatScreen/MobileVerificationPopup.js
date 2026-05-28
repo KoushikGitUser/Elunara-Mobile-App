@@ -146,15 +146,38 @@ const MobileVerificationPopup = ({
 
   const isMobileValid = mobileNumber.length === 10 && !mobileError;
 
+  // Keyboard handling replicated from UpdateMobileNumberPopup (works on both
+  // platforms): iOS lifts via modalSheet paddingBottom (keyboardHeight),
+  // Android lifts via the Animated translateY below.
   useEffect(() => {
-    if (Platform.OS !== "ios") return;
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
+    const keyboardDidShow = Keyboard.addListener(showEvent, (e) => {
+      const height = e.endCoordinates.height;
+      setKeyboardHeight(height);
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: height / 2.5,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHeight(0);
+    const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
+      if (Platform.OS === "ios") {
+        setKeyboardHeight(0);
+      }
+      if (Platform.OS === "android") {
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      }
     });
 
     return () => {
@@ -162,18 +185,6 @@ const MobileVerificationPopup = ({
       keyboardDidHide.remove();
     };
   }, []);
-
-  useEffect(() => {
-    if (Platform.OS !== "ios") return;
-
-    const offset =
-      keyboardHeight > 0 ? Math.max(0, keyboardHeight - footerHeight) : 0;
-    Animated.timing(animatedValue, {
-      toValue: -offset,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  }, [keyboardHeight, footerHeight]);
 
   const handleChange = (index, value) => {
     if (/^\d*$/.test(value)) {
@@ -222,7 +233,23 @@ const MobileVerificationPopup = ({
         />
         <Animated.View
           style={{
-            transform: [{ translateY: animatedValue }],
+            transform:
+              Platform.OS === "ios"
+                ? []
+                : [
+                    {
+                      translateY: animatedValue.interpolate({
+                        inputRange: [0, 350],
+                        outputRange: [
+                          0,
+                          isCodeSent
+                            ? -(keyboardHeight * 2.7)
+                            : -(keyboardHeight * 2.3),
+                        ],
+                        extrapolate: "clamp",
+                      }),
+                    },
+                  ],
           }}
         >
           {/* Modal Sheet */}
@@ -231,7 +258,12 @@ const MobileVerificationPopup = ({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.modalSheet}>
+            <View
+              style={[
+                styles.modalSheet,
+                Platform.OS === "ios" && { paddingBottom: keyboardHeight },
+              ]}
+            >
               {/* Content */}
               <View style={styles.content}>
                 {/* Title */}
@@ -464,7 +496,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "30%",
+    height: Platform.OS === "ios" ? 0 : "30%",
     backgroundColor: "white",
   },
   backdrop: {

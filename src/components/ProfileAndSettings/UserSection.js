@@ -6,6 +6,7 @@ import teacherAvatar from "../../assets/images/Teacher2.png";
 import maleStudentAvatar from "../../assets/images/Student Male2.png";
 import femaleStudentAvatar from "../../assets/images/Student Female2.png";
 import { scaleFont } from "../../utils/responsive";
+import { parseApiDate } from "../../utils/parseApiDate";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -34,8 +35,10 @@ const UserSection = () => {
 
   // Calculate days left for mobile verification (10 days limit from creation date)
   useEffect(() => {
-    if (settingsStates?.userData?.created_at) {
-      const createdDate = new Date(settingsStates.userData.created_at);
+    // parseApiDate handles 6-digit-microsecond timestamps that Hermes
+    // (release engine) can't parse with a raw `new Date(...)`.
+    const createdDate = parseApiDate(settingsStates?.userData?.created_at);
+    if (createdDate) {
       const currentDate = new Date();
       const diffTime = currentDate - createdDate;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
