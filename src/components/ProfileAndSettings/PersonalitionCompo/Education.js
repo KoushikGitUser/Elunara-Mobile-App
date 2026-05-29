@@ -222,12 +222,12 @@ const Education = () => {
 
       <View style={[styles.inputSection, { width: "100%", marginTop: 15 }]}>
         <Text style={styles.inputLabel}>
-          Key Skill Gaps You Want to Address
+          Key Skill Gaps
         </Text>
         <View style={[styles.input, skillGapsFocused && { borderColor: appColors.navyBlueShade }]}>
           <TextInput
             style={[styles.inputText, { width: "100%" }]}
-            placeholder="e.g., Data analysis, public speaking, coding..."
+            placeholder="List skills you want to address (e.g. Data analysis...)"
             value={skillGapsText}
             onChangeText={setSkillGapsText}
             placeholderTextColor="#9CA3AF"
