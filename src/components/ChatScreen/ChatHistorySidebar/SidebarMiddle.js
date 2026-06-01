@@ -47,7 +47,7 @@ import {
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"; 
 
 const SidebarMiddle = forwardRef(({ translateX }, ref) => {
-  const [recentChatsOpened, setRecentChatsOpened] = useState(false);
+  const [recentChatsOpened, setRecentChatsOpened] = useState(true);
   const [pinnedChatsOpened, setPinnedChatsOpened] = useState(false);
   const [pinnedRoomsOpened, setPinnedRoomsOpened] = useState(false);
   const [roomsOpened, setRoomsOpened] = useState(false);
@@ -149,6 +149,18 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
       dispatch(commonFunctionForAPICalls(payload));
     }
   };
+
+  // Fetch recent chats when the sidebar OPENS (i.e., user taps the menu icon
+  // in ChatHeader). The internal guard in fetchAllRecentChats ensures this
+  // only actually hits the API if the data isn't already cached — so opening
+  // the sidebar multiple times in a row won't re-fetch. Other flows (chat
+  // create / delete / archive / rename) reset `isAllRecentChatsFetched` so
+  // the next sidebar open refetches fresh data.
+  useEffect(() => {
+    if (toggleStates.toggleChatHistorySidebar) {
+      fetchAllRecentChats();
+    }
+  }, [toggleStates.toggleChatHistorySidebar]);
 
   const fetchAllPinnedChats = () => {
     // Only fetch if not already fetched (check if loader state is not true)
@@ -324,10 +336,7 @@ const SidebarMiddle = forwardRef(({ translateX }, ref) => {
       </View>
       <View ref={recentChatsSectionRef} style={styles.pinnedSectionMain}>
         <TouchableOpacity
-          onPress={() => {
-            setRecentChatsOpened(!recentChatsOpened);
-            fetchAllRecentChats();
-          }}
+          onPress={() => setRecentChatsOpened(!recentChatsOpened)}
           style={[styles.pinnedBtn, { paddingLeft: 0 }]}
         >
           <Text

@@ -196,6 +196,15 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
           citation_format: regeneratedResponse.generation.citation_format || null
         });
       }
+
+      // Fire success toast — same message used by the compare-store flow
+      // (LLM / Style / Language change all end up here).
+      triggerToast(
+        "Response customized successfully",
+        "Browse earlier versions using the carousel below the response.",
+        "success",
+        3000,
+      );
     }
   }, [isAIResponseRegenerated, regeneratedResponse, currentAIMessageIndexForRegeneration, messageIndex]);
 
@@ -246,8 +255,13 @@ const AIMessageBox = ({ message, messageIndex, isSavedToNotes = false, suggestio
         dispatch(setChatMessagesArray(updatedChatMessagesArray));
       }
 
-      // Show toast notification
-      triggerToast(`Comparison response selected - Version ${regeneratedResponse.version}`, "", "success", 3000);
+      // Show success toast — unified wording with the regenerate flow.
+      triggerToast(
+        "Response customized successfully",
+        "Browse earlier versions using the carousel below the response.",
+        "success",
+        3000,
+      );
 
       // Reset the compare states to prevent toast from showing again when switching chats
       dispatch(resetCompareStates());

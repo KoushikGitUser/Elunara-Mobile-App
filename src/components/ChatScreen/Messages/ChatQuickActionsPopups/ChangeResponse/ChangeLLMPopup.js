@@ -93,19 +93,57 @@ const ChangeLLMPopup = () => {
     }
   }, [settingsStates?.allGeneralSettings?.preferredLLMs]);
 
-  // Initialize selected LLM from Redux state
+  // Combine Auto option with LLMs from API. Declared here (instead of below
+  // the JSX) because the current-message helpers + the initialization useEffect
+  // need to read it at render time.
+  const allLLMOptions = [
+    {
+      id: "auto",
+      icon: chakraLogo,
+      name: "Auto",
+      description:
+        "Elunara adjusts tone and style based on your query — from formal to friendly.",
+      provider: "chakra",
+    },
+    ...(settingsStates.settingsMasterDatas.allLLMsAvailable || []),
+  ];
+
+  // Identify the AI message being regenerated and read its CURRENT LLM from
+  // the message's own generation data so we can:
+  //   - default the radio to the LLM the response is already on
+  //   - disable that row (can't re-select the current one)
+  //   - keep the Update button disabled until a DIFFERENT LLM is picked
+  const currentMessage =
+    globalDataStates.chatMessagesArray?.[
+      globalDataStates.currentAIMessageIndexForRegeneration
+    ];
+  // When the message's generation has no LLM, the response was generated via
+  // "Auto", so the Auto option (id: "auto") is the current selection.
+  const currentLLMId = currentMessage?.generation?.llm?.id ?? "auto";
+  const currentLLMIndex = allLLMOptions.findIndex(
+    (o) => o.id === currentLLMId,
+  );
+  const hasCurrentMessage =
+    currentMessage !== undefined && currentLLMIndex !== -1;
+
+  // Initialize selected LLM: prefer the current message's LLM, fall back to
+  // chatCustomisationStates only when the message isn't known yet.
   useEffect(() => {
-    if (chatCustomisationStates?.selectedLLM?.id) {
+    if (hasCurrentMessage) {
+      setSelectedStyle(currentLLMIndex);
+    } else if (chatCustomisationStates?.selectedLLM?.id) {
       const index = allLLMOptions.findIndex(
         (option) => option.id === chatCustomisationStates.selectedLLM.id
       );
-      if (index !== -1) {
-        setSelectedStyle(index);
-      }
+      if (index !== -1) setSelectedStyle(index);
     } else {
       setSelectedStyle(0);
     }
-  }, [chatCustomisationStates?.selectedLLM]);
+  }, [
+    currentLLMIndex,
+    hasCurrentMessage,
+    chatCustomisationStates?.selectedLLM,
+  ]);
 
   // Reset comparison state when modal opens
   useEffect(() => {
@@ -115,46 +153,50 @@ const ChangeLLMPopup = () => {
     }
   }, [toggleStates.toggleChangeResponseLLMWhileChatPopup, dispatch]);
 
-  // Handle LLM selection
+  // Row tap: only update LOCAL selection. The "Update Response LLM" button
+  // below handles the actual commit + regenerate.
   const handleLLMSelection = (llmOption, index) => {
+    if (hasCurrentMessage && index === currentLLMIndex) return;
     setSelectedStyle(index);
+  };
+
+  // Triggered by the Update button on category 1.
+  const handleUpdateLLM = () => {
+    const llmOption = allLLMOptions[selectedStyle];
+    if (!llmOption) return;
     const selectedData = {
       id: llmOption.id === "auto" ? null : llmOption.id,
       name: llmOption.name,
     };
     dispatch(setSelectedLLM(selectedData));
 
-    // Get the AI message UUID for regeneration using the stored index
-    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageIndex =
+      globalDataStates.currentAIMessageIndexForRegeneration;
     const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
-    console.log("Message Index:", aiMessageIndex, "Message UUID:", aiMessageUuid);
 
     if (aiMessageUuid) {
-      // Build customisations payload
       const customisationsPayload = {
         llm_id: llmOption.id === "auto" ? null : llmOption.id,
         response_style_id: chatCustomisationStates.selectedResponseStyle?.id,
         language_id: chatCustomisationStates.selectedLanguage?.id,
         citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
       };
-
-      // Call regenerate API
       const regeneratePayload = {
         method: "POST",
         url: `/messages/${aiMessageUuid}/regenerate`,
         data: customisationsPayload,
         name: "regenerateAIResponse",
       };
-
       dispatch(commonFunctionForAPICalls(regeneratePayload));
-    }
-    else{
+    } else {
       console.log("cannot trigger");
     }
 
-    // Close the popup
     dispatch(setToggleChangeResponseLLMWhileChatPopup(false));
   };
+
+  const isUpdateLLMDisabled =
+    !hasCurrentMessage || selectedStyle === currentLLMIndex;
 
   // Radio button component
   const RadioButton = ({ selected }) => (
@@ -186,18 +228,6 @@ const ChangeLLMPopup = () => {
       }
     }
   };
-
-  // Combine Auto option with LLMs from API
-  const allLLMOptions = [
-    {
-      id: "auto",
-      icon: chakraLogo,
-      name: "Auto",
-      description: "Elunara adjusts tone and style based on your query — from formal to friendly.",
-      provider: "chakra",
-    },
-    ...(settingsStates.settingsMasterDatas.allLLMsAvailable || []),
-  ];
 
   return (
     <Modal
@@ -321,6 +351,8 @@ const ChangeLLMPopup = () => {
                     const isAuto = option.id === "auto";
                     const icon = isAuto ? option.icon : getProviderImage(option.provider);
                     const badgeText = isAuto ? "" : getBadgeText(option.provider);
+                    const isCurrentRow =
+                      hasCurrentMessage && optionsIndex === currentLLMIndex;
 
                     return (
                       <React.Fragment key={option.id || optionsIndex}>
@@ -331,9 +363,11 @@ const ChangeLLMPopup = () => {
                               backgroundColor: selectedStyle == optionsIndex ? "#EEF4FF" : "white",
                               borderColor: selectedStyle == optionsIndex ? "black" : "#D3DAE5",
                             },
+                            isCurrentRow && { opacity: 0.5 },
                           ]}
                           onPress={() => handleLLMSelection(option, optionsIndex)}
-                          activeOpacity={0.7}
+                          activeOpacity={isCurrentRow ? 1 : 0.7}
+                          disabled={isCurrentRow}
                         >
                           <View style={styles.contentMain}>
                             <View style={styles.iconContainer}>
@@ -519,6 +553,26 @@ const ChangeLLMPopup = () => {
                     })}
                   </View>
                 </ScrollView>
+              )}
+
+              {/* Update Response LLM (category 1) — disabled until a different LLM is picked */}
+              {selectedCategory == 1 && (
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: isUpdateLLMDisabled ? "#CDD5DC" : "#081A35",
+                      marginTop: 20,
+                    },
+                  ]}
+                  onPress={handleUpdateLLM}
+                  activeOpacity={0.8}
+                  disabled={isUpdateLLMDisabled}
+                >
+                  <Text style={[styles.buttonText, { fontFamily: "Mukta-Bold" }]}>
+                    Update Response LLM
+                  </Text>
+                </TouchableOpacity>
               )}
 
               {/* Compare Button */}

@@ -56,59 +56,85 @@ const SavedLang = () => {
     return languages;
   }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
 
-  // Initialize selected language from Redux state
+  // Identify the AI message being regenerated and read its CURRENT language
+  // from the message's own generation data, so we can:
+  //   - default the radio to the language the response is already in
+  //   - disable that row (can't re-select the current one)
+  //   - keep the Update button disabled until a DIFFERENT language is picked
+  const currentMessage =
+    globalDataStates.chatMessagesArray?.[
+      globalDataStates.currentAIMessageIndexForRegeneration
+    ];
+  const currentLanguageId = currentMessage?.generation?.language?.id ?? null;
+  const currentLanguageIndex = savedLanguages.findIndex(
+    (lang) => lang.id === currentLanguageId,
+  );
+  const hasCurrentMessage =
+    currentMessage !== undefined && currentLanguageIndex !== -1;
+
+  // Initialize selected language: prefer the current message's language;
+  // fall back to chatCustomisationStates only if we don't know the message.
   useEffect(() => {
-    if (chatCustomisationStates?.selectedLanguage?.id && savedLanguages.length > 0) {
+    if (hasCurrentMessage) {
+      setSelectedLanguageIndex(currentLanguageIndex);
+    } else if (
+      chatCustomisationStates?.selectedLanguage?.id &&
+      savedLanguages.length > 0
+    ) {
       const index = savedLanguages.findIndex(
-        (lang) => lang.id === chatCustomisationStates.selectedLanguage.id
+        (lang) => lang.id === chatCustomisationStates.selectedLanguage.id,
       );
-      if (index !== -1) {
-        setSelectedLanguageIndex(index);
-      }
+      if (index !== -1) setSelectedLanguageIndex(index);
     }
-  }, [chatCustomisationStates?.selectedLanguage, savedLanguages]);
+  }, [
+    currentLanguageIndex,
+    hasCurrentMessage,
+    chatCustomisationStates?.selectedLanguage,
+    savedLanguages,
+  ]);
 
-  // Handle language selection
+  // Row tap: only update LOCAL selection. No redux dispatch, no regenerate.
+  // The "Update Response Language" button below handles the actual commit.
   const handleLanguageSelection = (language, index) => {
+    if (hasCurrentMessage && index === currentLanguageIndex) return;
     setSelectedLanguageIndex(index);
+  };
 
-    // Update Redux state with selected language
-    const selectedData = {
-      id: language.id,
-      name: language.name,
-    };
+  // Triggered by the Update button: dispatch redux, fire regenerate, close.
+  const handleUpdateLanguage = () => {
+    const language = savedLanguages[selectedLanguageIndex];
+    if (!language) return;
+
+    const selectedData = { id: language.id, name: language.name };
     dispatch(setSelectedLanguage(selectedData));
 
-    // Get the AI message UUID for regeneration using the stored index
-    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageIndex =
+      globalDataStates.currentAIMessageIndexForRegeneration;
     const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
-    console.log("Message Index:", aiMessageIndex, "Message UUID:", aiMessageUuid);
 
     if (aiMessageUuid) {
-      // Build customisations payload
       const customisationsPayload = {
         llm_id: chatCustomisationStates.selectedLLM?.id,
         response_style_id: chatCustomisationStates.selectedResponseStyle?.id,
         language_id: language.id,
         citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
       };
-
-      // Call regenerate API
       const regeneratePayload = {
         method: "POST",
         url: `/messages/${aiMessageUuid}/regenerate`,
         data: customisationsPayload,
         name: "regenerateAIResponse",
       };
-
       dispatch(commonFunctionForAPICalls(regeneratePayload));
     } else {
       console.log("cannot trigger regeneration");
     }
 
-    // Close the popup
     dispatch(setToggleChangeLangWhileChatPopup(false));
   };
+
+  const isUpdateDisabled =
+    !hasCurrentMessage || selectedLanguageIndex === currentLanguageIndex;
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "#D3DAE5" }]}>
@@ -140,11 +166,15 @@ const SavedLang = () => {
       >
         <View style={styles.langContainer}>
           {savedLanguages.map((language, langIndex) => {
+            const isCurrent =
+              hasCurrentMessage && langIndex === currentLanguageIndex;
             return (
               <TouchableOpacity
                 key={langIndex}
                 onPress={() => handleLanguageSelection(language, langIndex)}
-                style={styles.langsMain}
+                style={[styles.langsMain, isCurrent && { opacity: 0.5 }]}
+                disabled={isCurrent}
+                activeOpacity={isCurrent ? 1 : 0.7}
               >
                 <Text
                   style={{
@@ -159,6 +189,21 @@ const SavedLang = () => {
             );
           })}
         </View>
+
+        {/* Update Response Language — disabled until a different language is picked */}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: isUpdateDisabled ? "#CDD5DC" : "#081A35" },
+          ]}
+          onPress={handleUpdateLanguage}
+          activeOpacity={0.8}
+          disabled={isUpdateDisabled}
+        >
+          <Text style={[styles.buttonText, { fontFamily: "Mukta-Bold" }]}>
+            Update Response Language
+          </Text>
+        </TouchableOpacity>
 
         <View
           style={{

@@ -81,19 +81,49 @@ const ChangeResponseStylePopup = () => {
   // Get all response styles
   const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
 
-  // Initialize selected style from Redux state
+  // Identify the AI message being regenerated and read its CURRENT style from
+  // the message's own generation data so we can:
+  //   - default the radio to the style the response is already in
+  //   - disable that row (can't re-select the current one)
+  //   - keep the Update button disabled until a DIFFERENT style is picked
+  const currentMessage =
+    globalDataStates.chatMessagesArray?.[
+      globalDataStates.currentAIMessageIndexForRegeneration
+    ];
+  const currentStyleId = currentMessage?.generation?.style?.id ?? null;
+  const currentStyleIndex = allResponseStyles.findIndex(
+    (s) => s.id === currentStyleId,
+  );
+  // If style is null/undefined, treat the Auto option as the current one.
+  const isCurrentAuto =
+    currentMessage !== undefined && currentStyleId === null;
+  const effectiveCurrentIndex = isCurrentAuto
+    ? allResponseStyles.findIndex(
+        (s) =>
+          s.name?.toLowerCase()?.includes("auto") || s.id === 0,
+      )
+    : currentStyleIndex;
+  const hasCurrentMessage =
+    currentMessage !== undefined && effectiveCurrentIndex !== -1;
+
+  // Initialize selected style: prefer the current message's style.
   useEffect(() => {
-    if (chatCustomisationStates?.selectedResponseStyle?.id) {
+    if (hasCurrentMessage) {
+      setSelectedStyle(effectiveCurrentIndex);
+    } else if (chatCustomisationStates?.selectedResponseStyle?.id) {
       const index = allResponseStyles.findIndex(
         (style) => style.id === chatCustomisationStates.selectedResponseStyle.id
       );
-      if (index !== -1) {
-        setSelectedStyle(index);
-      }
+      if (index !== -1) setSelectedStyle(index);
     } else {
-      setSelectedStyle(0); // Default to Auto
+      setSelectedStyle(0);
     }
-  }, [chatCustomisationStates?.selectedResponseStyle, allResponseStyles.length]);
+  }, [
+    effectiveCurrentIndex,
+    hasCurrentMessage,
+    chatCustomisationStates?.selectedResponseStyle,
+    allResponseStyles.length,
+  ]);
 
   // Reset comparison state when modal opens
   useEffect(() => {
@@ -105,46 +135,52 @@ const ChangeResponseStylePopup = () => {
     }
   }, [toggleStates.toggleChangeResponseStyleWhileChatPopup, dispatch]);
 
-  // Handle response style selection and trigger regeneration
+  // Row tap: only update LOCAL selection. The "Update Response Style" button
+  // below handles the actual commit + regenerate.
   const handleStyleSelection = (styleOption, index) => {
+    if (hasCurrentMessage && index === effectiveCurrentIndex) return;
     setSelectedStyle(index);
+  };
+
+  // Triggered by the Update button on category 1.
+  const handleUpdateStyle = () => {
+    const styleOption = allResponseStyles[selectedStyle];
+    if (!styleOption) return;
+
+    const isAuto = styleOption.name?.toLowerCase()?.includes("auto");
     const selectedData = {
-      id: styleOption.name?.toLowerCase()?.includes("auto") ? null : styleOption.id,
+      id: isAuto ? null : styleOption.id,
       name: styleOption.name,
     };
-
     dispatch(setSelectedResponseStyle(selectedData));
 
-    // Get the AI message UUID for regeneration using the stored index
-    const aiMessageIndex = globalDataStates.currentAIMessageIndexForRegeneration;
+    const aiMessageIndex =
+      globalDataStates.currentAIMessageIndexForRegeneration;
     const aiMessageUuid = globalDataStates.messageIDsArray[aiMessageIndex];
-    console.log("Message Index:", aiMessageIndex, "Message UUID:", aiMessageUuid);
 
     if (aiMessageUuid) {
-      // Build customisations payload
       const customisationsPayload = {
         llm_id: chatCustomisationStates.selectedLLM?.id,
-        response_style_id: styleOption.name?.toLowerCase()?.includes("auto") ? null : styleOption.id,
+        response_style_id: isAuto ? null : styleOption.id,
         language_id: chatCustomisationStates.selectedLanguage?.id,
         citation_format_id: chatCustomisationStates.selectedCitationFormat?.id,
       };
-
-      // Call regenerate API
       const regeneratePayload = {
         method: "POST",
         url: `/messages/${aiMessageUuid}/regenerate`,
         data: customisationsPayload,
         name: "regenerateAIResponse",
       };
-
       dispatch(commonFunctionForAPICalls(regeneratePayload));
     } else {
       console.log("cannot trigger regeneration");
     }
 
-    // Close the popup
     dispatch(setToggleChangeResponseStyleWhileChatPopup(false));
   };
+
+  const isUpdateStyleDisabled =
+    !hasCurrentMessage || selectedStyle === effectiveCurrentIndex;
 
   // Radio button component
   const RadioButton = ({ selected }) => (
@@ -288,6 +324,9 @@ const ChangeResponseStylePopup = () => {
                   {allResponseStyles.map((styleOptions, optionsIndex) => {
                     const icon = getResponseStyleIcon(styleOptions.name);
                     const isAuto = styleOptions.name?.toLowerCase()?.includes("auto") || styleOptions.id === 0;
+                    const isCurrentRow =
+                      hasCurrentMessage &&
+                      optionsIndex === effectiveCurrentIndex;
 
                     return (
                       <React.Fragment key={styleOptions.id || optionsIndex}>
@@ -305,7 +344,9 @@ const ChangeResponseStylePopup = () => {
                                   ? "black"
                                   : "#D3DAE5",
                             },
+                            isCurrentRow && { opacity: 0.5 },
                           ]}
+                          disabled={isCurrentRow}
                           onPress={() => handleStyleSelection(styleOptions, optionsIndex)}
                           activeOpacity={0.7}
                         >
@@ -399,12 +440,19 @@ const ChangeResponseStylePopup = () => {
                   style={[
                     styles.button,
                     {
-                      backgroundColor: selectedCategory == 2 && selectedStyleForCompare.length === 2 ? "#081A35" : selectedCategory == 2 ? "#CDD5DC" : "#081A35",
+                      backgroundColor:
+                        selectedCategory == 1
+                          ? isUpdateStyleDisabled
+                            ? "#CDD5DC"
+                            : "#081A35"
+                          : selectedStyleForCompare.length === 2
+                            ? "#081A35"
+                            : "#CDD5DC",
                     },
                   ]}
                   onPress={() => {
                     if (selectedCategory == 1) {
-                      //do something
+                      handleUpdateStyle();
                     } else {
                       if (selectedStyleForCompare.length === 2) {
                         // Get the AI message index
@@ -453,7 +501,11 @@ const ChangeResponseStylePopup = () => {
                     }
                   }}
                   activeOpacity={0.8}
-                  disabled={selectedCategory == 2 && selectedStyleForCompare.length !== 2}
+                  disabled={
+                    selectedCategory == 1
+                      ? isUpdateStyleDisabled
+                      : selectedStyleForCompare.length !== 2
+                  }
                 >
                   <Text style={styles.buttonText}>
                     {selectedCategory == 1
