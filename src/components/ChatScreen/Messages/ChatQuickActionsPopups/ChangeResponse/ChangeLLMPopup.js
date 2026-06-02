@@ -109,41 +109,28 @@ const ChangeLLMPopup = () => {
   ];
 
   // Identify the AI message being regenerated and read its CURRENT LLM from
-  // the message's own generation data so we can:
-  //   - default the radio to the LLM the response is already on
-  //   - disable that row (can't re-select the current one)
-  //   - keep the Update button disabled until a DIFFERENT LLM is picked
+  // the message's own generation data, so we can HIDE that LLM from the
+  // list (user can only switch to a different LLM from here).
   const currentMessage =
     globalDataStates.chatMessagesArray?.[
       globalDataStates.currentAIMessageIndexForRegeneration
     ];
   // When the message's generation has no LLM, the response was generated via
-  // "Auto", so the Auto option (id: "auto") is the current selection.
+  // "Auto", so Auto is the current and should be hidden too.
   const currentLLMId = currentMessage?.generation?.llm?.id ?? "auto";
-  const currentLLMIndex = allLLMOptions.findIndex(
-    (o) => o.id === currentLLMId,
-  );
-  const hasCurrentMessage =
-    currentMessage !== undefined && currentLLMIndex !== -1;
 
-  // Initialize selected LLM: prefer the current message's LLM, fall back to
-  // chatCustomisationStates only when the message isn't known yet.
+  // Filter out the current LLM — the list shows ONLY other LLMs.
+  const visibleLLMOptions = React.useMemo(() => {
+    if (currentMessage === undefined) return allLLMOptions;
+    return allLLMOptions.filter((o) => o.id !== currentLLMId);
+  }, [allLLMOptions, currentLLMId, currentMessage]);
+
+  // Reset the local selection whenever the visible list changes (e.g., user
+  // opens the popup on a different message). Start with no selection so the
+  // Update button is disabled until the user explicitly picks one.
   useEffect(() => {
-    if (hasCurrentMessage) {
-      setSelectedStyle(currentLLMIndex);
-    } else if (chatCustomisationStates?.selectedLLM?.id) {
-      const index = allLLMOptions.findIndex(
-        (option) => option.id === chatCustomisationStates.selectedLLM.id
-      );
-      if (index !== -1) setSelectedStyle(index);
-    } else {
-      setSelectedStyle(0);
-    }
-  }, [
-    currentLLMIndex,
-    hasCurrentMessage,
-    chatCustomisationStates?.selectedLLM,
-  ]);
+    setSelectedStyle(-1);
+  }, [visibleLLMOptions]);
 
   // Reset comparison state when modal opens
   useEffect(() => {
@@ -153,16 +140,15 @@ const ChangeLLMPopup = () => {
     }
   }, [toggleStates.toggleChangeResponseLLMWhileChatPopup, dispatch]);
 
-  // Row tap: only update LOCAL selection. The "Update Response LLM" button
-  // below handles the actual commit + regenerate.
+  // Row tap: only update LOCAL selection (index into visibleLLMOptions).
+  // The "Update Response LLM" button handles the actual commit + regenerate.
   const handleLLMSelection = (llmOption, index) => {
-    if (hasCurrentMessage && index === currentLLMIndex) return;
     setSelectedStyle(index);
   };
 
   // Triggered by the Update button on category 1.
   const handleUpdateLLM = () => {
-    const llmOption = allLLMOptions[selectedStyle];
+    const llmOption = visibleLLMOptions[selectedStyle];
     if (!llmOption) return;
     const selectedData = {
       id: llmOption.id === "auto" ? null : llmOption.id,
@@ -196,7 +182,7 @@ const ChangeLLMPopup = () => {
   };
 
   const isUpdateLLMDisabled =
-    !hasCurrentMessage || selectedStyle === currentLLMIndex;
+    selectedStyle < 0 || selectedStyle >= visibleLLMOptions.length;
 
   // Radio button component
   const RadioButton = ({ selected }) => (
@@ -347,12 +333,10 @@ const ChangeLLMPopup = () => {
                   style={{ maxHeight: SCREEN_HEIGHT * 0.55 }}
                 >
                 <View style={styles.optionsMain}>
-                  {allLLMOptions?.map((option, optionsIndex) => {
+                  {visibleLLMOptions?.map((option, optionsIndex) => {
                     const isAuto = option.id === "auto";
                     const icon = isAuto ? option.icon : getProviderImage(option.provider);
                     const badgeText = isAuto ? "" : getBadgeText(option.provider);
-                    const isCurrentRow =
-                      hasCurrentMessage && optionsIndex === currentLLMIndex;
 
                     return (
                       <React.Fragment key={option.id || optionsIndex}>
@@ -363,11 +347,9 @@ const ChangeLLMPopup = () => {
                               backgroundColor: selectedStyle == optionsIndex ? "#EEF4FF" : "white",
                               borderColor: selectedStyle == optionsIndex ? "black" : "#D3DAE5",
                             },
-                            isCurrentRow && { opacity: 0.5 },
                           ]}
                           onPress={() => handleLLMSelection(option, optionsIndex)}
-                          activeOpacity={isCurrentRow ? 1 : 0.7}
-                          disabled={isCurrentRow}
+                          activeOpacity={0.7}
                         >
                           <View style={styles.contentMain}>
                             <View style={styles.iconContainer}>

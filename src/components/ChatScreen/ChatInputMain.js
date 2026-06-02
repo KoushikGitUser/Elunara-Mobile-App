@@ -580,9 +580,28 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorde
   const latestUserMessageData = chatsStates.allChatsDatas.latestUserMessageData;
   const latestAiMessageData = chatsStates.allChatsDatas.latestAiMessageData;
 
-  // Real API flow - when AI message is fetched, add it to chat messages array with uuid
+  // Real API flow - when AI message is fetched, add it to chat messages array with uuid.
+  // IMPORTANT: this effect must NOT fire during regenerate or compare-store flows.
+  // Regenerate handler also writes aiMessageContent (which is a dep here), so
+  // without the regenerate/compare gates below this effect would append a NEW AI
+  // message to the chat — visible as a "duplicate" of the previous response
+  // appearing under the freshly updated one.
   useEffect(() => {
-    if (isMessagesFetched === true && aiMessageContent) {
+    const isRegenerating =
+      chatsStates.loaderStates.isAIResponseRegenerated === true ||
+      chatsStates.loaderStates.isAIResponseRegenerated === "pending";
+    const isStoringCompare =
+      chatsStates.loaderStates.isStoreCompareResponsePending === true ||
+      chatsStates.loaderStates.isStoreCompareResponsePending === "pending" ||
+      chatsStates.loaderStates.isStoreCompareStyleResponsePending === true ||
+      chatsStates.loaderStates.isStoreCompareStyleResponsePending === "pending";
+
+    if (
+      isMessagesFetched === true &&
+      aiMessageContent &&
+      !isRegenerating &&
+      !isStoringCompare
+    ) {
       console.log("Full AI Response:", JSON.stringify(chatsStates.allChatsDatas.chatMessages));
       console.log("Current messageIDsArray:", globalDataStates.messageIDsArray);
 

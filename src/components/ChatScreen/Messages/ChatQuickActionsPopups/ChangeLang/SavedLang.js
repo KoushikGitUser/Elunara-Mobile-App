@@ -57,52 +57,36 @@ const SavedLang = () => {
   }, [settingsStates?.allGeneralSettings?.responseLanguageSettings]);
 
   // Identify the AI message being regenerated and read its CURRENT language
-  // from the message's own generation data, so we can:
-  //   - default the radio to the language the response is already in
-  //   - disable that row (can't re-select the current one)
-  //   - keep the Update button disabled until a DIFFERENT language is picked
+  // from the message's own generation data, so we can HIDE that language from
+  // the list (user can only switch to a different language from here).
   const currentMessage =
     globalDataStates.chatMessagesArray?.[
       globalDataStates.currentAIMessageIndexForRegeneration
     ];
   const currentLanguageId = currentMessage?.generation?.language?.id ?? null;
-  const currentLanguageIndex = savedLanguages.findIndex(
-    (lang) => lang.id === currentLanguageId,
-  );
-  const hasCurrentMessage =
-    currentMessage !== undefined && currentLanguageIndex !== -1;
 
-  // Initialize selected language: prefer the current message's language;
-  // fall back to chatCustomisationStates only if we don't know the message.
+  // Filter out the current language — the list shows ONLY other languages.
+  const visibleLanguages = useMemo(
+    () => savedLanguages.filter((lang) => lang.id !== currentLanguageId),
+    [savedLanguages, currentLanguageId],
+  );
+
+  // Reset the local selection whenever the visible list changes (e.g., user
+  // opens the popup on a different message). Start with no selection so the
+  // Update button is disabled until the user explicitly picks one.
   useEffect(() => {
-    if (hasCurrentMessage) {
-      setSelectedLanguageIndex(currentLanguageIndex);
-    } else if (
-      chatCustomisationStates?.selectedLanguage?.id &&
-      savedLanguages.length > 0
-    ) {
-      const index = savedLanguages.findIndex(
-        (lang) => lang.id === chatCustomisationStates.selectedLanguage.id,
-      );
-      if (index !== -1) setSelectedLanguageIndex(index);
-    }
-  }, [
-    currentLanguageIndex,
-    hasCurrentMessage,
-    chatCustomisationStates?.selectedLanguage,
-    savedLanguages,
-  ]);
+    setSelectedLanguageIndex(-1);
+  }, [visibleLanguages]);
 
   // Row tap: only update LOCAL selection. No redux dispatch, no regenerate.
   // The "Update Response Language" button below handles the actual commit.
   const handleLanguageSelection = (language, index) => {
-    if (hasCurrentMessage && index === currentLanguageIndex) return;
     setSelectedLanguageIndex(index);
   };
 
   // Triggered by the Update button: dispatch redux, fire regenerate, close.
   const handleUpdateLanguage = () => {
-    const language = savedLanguages[selectedLanguageIndex];
+    const language = visibleLanguages[selectedLanguageIndex];
     if (!language) return;
 
     const selectedData = { id: language.id, name: language.name };
@@ -133,8 +117,10 @@ const SavedLang = () => {
     dispatch(setToggleChangeLangWhileChatPopup(false));
   };
 
+  // Disabled when no language is picked (or list is empty).
   const isUpdateDisabled =
-    !hasCurrentMessage || selectedLanguageIndex === currentLanguageIndex;
+    selectedLanguageIndex < 0 ||
+    selectedLanguageIndex >= visibleLanguages.length;
 
   const RadioButton = ({ selected }) => (
     <View style={[styles.radioOuter, { borderColor: selected ? "black" : "#D3DAE5" }]}>
@@ -156,8 +142,8 @@ const SavedLang = () => {
       </View>
 
       {/* Description */}
-      <Text style={[styles.description, { fontFamily: "Mukta-Regular", marginBottom: 20 }]}>
-        Update the current answer by selecting a different language
+      <Text style={[styles.description, { fontFamily: "Mukta-Regular", marginBottom: 20,textAlign:"center" }]}>
+        Select Another
       </Text>
 
       <ScrollView
@@ -165,29 +151,25 @@ const SavedLang = () => {
         style={{ maxHeight: SCREEN_HEIGHT * 0.55 }}
       >
         <View style={styles.langContainer}>
-          {savedLanguages.map((language, langIndex) => {
-            const isCurrent =
-              hasCurrentMessage && langIndex === currentLanguageIndex;
-            return (
-              <TouchableOpacity
-                key={langIndex}
-                onPress={() => handleLanguageSelection(language, langIndex)}
-                style={[styles.langsMain, isCurrent && { opacity: 0.5 }]}
-                disabled={isCurrent}
-                activeOpacity={isCurrent ? 1 : 0.7}
+          {visibleLanguages.map((language, langIndex) => (
+            <TouchableOpacity
+              key={langIndex}
+              onPress={() => handleLanguageSelection(language, langIndex)}
+              style={styles.langsMain}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={{
+                  fontFamily: "Mukta-Regular",
+                  fontSize: scaleFont(15),
+                }}
+                
               >
-                <Text
-                  style={{
-                    fontFamily: "Mukta-Regular",
-                    fontSize: scaleFont(15),
-                  }}
-                >
-                  {language.name}
-                </Text>
-                <RadioButton selected={selectedLanguageIndex === langIndex} />
-              </TouchableOpacity>
-            );
-          })}
+                {language.name}
+              </Text>
+              <RadioButton selected={selectedLanguageIndex === langIndex} />
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Update Response Language — disabled until a different language is picked */}

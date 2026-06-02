@@ -82,48 +82,33 @@ const ChangeResponseStylePopup = () => {
   const allResponseStyles = settingsStates?.settingsMasterDatas?.allResponseStylesAvailable || [];
 
   // Identify the AI message being regenerated and read its CURRENT style from
-  // the message's own generation data so we can:
-  //   - default the radio to the style the response is already in
-  //   - disable that row (can't re-select the current one)
-  //   - keep the Update button disabled until a DIFFERENT style is picked
+  // the message's own generation data, so we can HIDE that style from the
+  // list (user can only switch to a different style from here).
   const currentMessage =
     globalDataStates.chatMessagesArray?.[
       globalDataStates.currentAIMessageIndexForRegeneration
     ];
   const currentStyleId = currentMessage?.generation?.style?.id ?? null;
-  const currentStyleIndex = allResponseStyles.findIndex(
-    (s) => s.id === currentStyleId,
-  );
-  // If style is null/undefined, treat the Auto option as the current one.
-  const isCurrentAuto =
-    currentMessage !== undefined && currentStyleId === null;
-  const effectiveCurrentIndex = isCurrentAuto
-    ? allResponseStyles.findIndex(
-        (s) =>
-          s.name?.toLowerCase()?.includes("auto") || s.id === 0,
-      )
-    : currentStyleIndex;
-  const hasCurrentMessage =
-    currentMessage !== undefined && effectiveCurrentIndex !== -1;
 
-  // Initialize selected style: prefer the current message's style.
+  // Filter out the current style — the list shows ONLY other styles.
+  // A null/undefined generation.style means the response was generated via
+  // "Auto", so Auto is the current and should be hidden too.
+  const visibleStyles = React.useMemo(() => {
+    if (currentMessage === undefined) return allResponseStyles;
+    return allResponseStyles.filter((s) => {
+      const isAutoOption =
+        s.name?.toLowerCase()?.includes("auto") || s.id === 0;
+      if (currentStyleId === null) return !isAutoOption;
+      return s.id !== currentStyleId;
+    });
+  }, [allResponseStyles, currentStyleId, currentMessage]);
+
+  // Reset the local selection whenever the visible list changes (e.g., user
+  // opens the popup on a different message). Start with no selection so the
+  // Update button is disabled until the user explicitly picks one.
   useEffect(() => {
-    if (hasCurrentMessage) {
-      setSelectedStyle(effectiveCurrentIndex);
-    } else if (chatCustomisationStates?.selectedResponseStyle?.id) {
-      const index = allResponseStyles.findIndex(
-        (style) => style.id === chatCustomisationStates.selectedResponseStyle.id
-      );
-      if (index !== -1) setSelectedStyle(index);
-    } else {
-      setSelectedStyle(0);
-    }
-  }, [
-    effectiveCurrentIndex,
-    hasCurrentMessage,
-    chatCustomisationStates?.selectedResponseStyle,
-    allResponseStyles.length,
-  ]);
+    setSelectedStyle(-1);
+  }, [visibleStyles]);
 
   // Reset comparison state when modal opens
   useEffect(() => {
@@ -135,16 +120,15 @@ const ChangeResponseStylePopup = () => {
     }
   }, [toggleStates.toggleChangeResponseStyleWhileChatPopup, dispatch]);
 
-  // Row tap: only update LOCAL selection. The "Update Response Style" button
-  // below handles the actual commit + regenerate.
+  // Row tap: only update LOCAL selection (index into visibleStyles). The
+  // "Update Response Style" button handles the actual commit + regenerate.
   const handleStyleSelection = (styleOption, index) => {
-    if (hasCurrentMessage && index === effectiveCurrentIndex) return;
     setSelectedStyle(index);
   };
 
   // Triggered by the Update button on category 1.
   const handleUpdateStyle = () => {
-    const styleOption = allResponseStyles[selectedStyle];
+    const styleOption = visibleStyles[selectedStyle];
     if (!styleOption) return;
 
     const isAuto = styleOption.name?.toLowerCase()?.includes("auto");
@@ -180,7 +164,7 @@ const ChangeResponseStylePopup = () => {
   };
 
   const isUpdateStyleDisabled =
-    !hasCurrentMessage || selectedStyle === effectiveCurrentIndex;
+    selectedStyle < 0 || selectedStyle >= visibleStyles.length;
 
   // Radio button component
   const RadioButton = ({ selected }) => (
@@ -321,12 +305,9 @@ const ChangeResponseStylePopup = () => {
                     marginBottom: isAndroidPhone ? 10 : 20,
                   }}
                 >
-                  {allResponseStyles.map((styleOptions, optionsIndex) => {
+                  {visibleStyles.map((styleOptions, optionsIndex) => {
                     const icon = getResponseStyleIcon(styleOptions.name);
                     const isAuto = styleOptions.name?.toLowerCase()?.includes("auto") || styleOptions.id === 0;
-                    const isCurrentRow =
-                      hasCurrentMessage &&
-                      optionsIndex === effectiveCurrentIndex;
 
                     return (
                       <React.Fragment key={styleOptions.id || optionsIndex}>
@@ -344,9 +325,7 @@ const ChangeResponseStylePopup = () => {
                                   ? "black"
                                   : "#D3DAE5",
                             },
-                            isCurrentRow && { opacity: 0.5 },
                           ]}
-                          disabled={isCurrentRow}
                           onPress={() => handleStyleSelection(styleOptions, optionsIndex)}
                           activeOpacity={0.7}
                         >
