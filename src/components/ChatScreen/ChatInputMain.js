@@ -33,6 +33,7 @@ import {
   setToggleSubTopics,
   setToggleToolsPopup,
   setToggleTopicsPopup,
+  setToggleRoomToolsPopup,
   setToggleUnlockPersonalisationLimitPopup,
   setIsEditingUserMessage,
   setToggleNoBalanceModal,
@@ -919,7 +920,13 @@ const ChatInputMain = forwardRef(({ roomId, isRoomContext = false, tutorialBorde
                   : styles.toolsIconButton
               }
               // style={{marginLeft:10,borderWidth:1,padding:6,borderColor:"#BFD6FE",borderRadius:10,elevation:10,backgroundColor:"white",shadowColor:"#426eb9ff"}}
-              onPress={() => dispatch(setToggleToolsPopup(true))}
+              onPress={() =>
+                dispatch(
+                  isRoomContext
+                    ? setToggleRoomToolsPopup(true)
+                    : setToggleToolsPopup(true),
+                )
+              }
             >
               <ToolsIcon />
             </TouchableOpacity>

@@ -21,7 +21,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import MicIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/MicIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { subTopics } from "../../../data/datas";
@@ -48,7 +48,14 @@ const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, roomsStates } = useSelector((state) => state.API);
+  const route = useRoute();
+  // Same room-context handling as SubTopicsCard. The popup is mounted in both
+  // Rooms and ChatScreen — when invoked from Rooms, the new chat must carry
+  // room_id so the server attaches it to the current room AND so Rooms's
+  // send-first-message useFocusEffect picks it up via isRoomChat detection.
+  const isInsideRoom = route?.name === "rooms";
+  const roomUuid = roomsStates?.currentRoom?.uuid;
   const isTopicsLoading =
     chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === "pending" ||
     chatsStates.loaderStates.isTopicsOfSelectedSubjectsFetched === null;
@@ -230,14 +237,18 @@ const SubTopicsCompo = () => {
   };
 
   const createChatWithAIFunction = () => {
+    const data = {
+      name: belowSearchText,
+      subject_id: globalDataStates.selectedSubjectID,
+      topic_id: globalDataStates.selectedTopicsID,
+    };
+    if (isInsideRoom && roomUuid) {
+      data.room_id = roomUuid;
+    }
     const payload = {
       method: "POST",
       url: "/chats",
-      data: {
-        name: belowSearchText,
-        subject_id: globalDataStates.selectedSubjectID,
-        topic_id: globalDataStates.selectedTopicsID,
-      },
+      data,
       name: "createChatWithAI",
     };
     dispatch(commonFunctionForAPICalls(payload));

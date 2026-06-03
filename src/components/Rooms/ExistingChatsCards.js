@@ -63,13 +63,14 @@ const ExistingChatsCards = ({ chatName, projects, chat }) => {
           </View>
         </View>
 
-        {/* Menu Icon */}
+        {/* Plus Icon — same action as tapping the whole card */}
         <Pressable
           style={({ pressed }) => [
             styles.menuButton,
             pressed && styles.menuPressed,
           ]}
-          onPress={() => {}}
+          onPress={handleAddChat}
+          hitSlop={10}
         >
           <CirclePlus strokeWidth={2} size={27} />
         </Pressable>

@@ -14,7 +14,10 @@ export const createStyles = ({}) =>
       width: "100%",
       flex: 1,
       flexDirection: "column",
-      justifyContent: "space-between",
+      // Match ChatScreen: let the flex:1 middle section push the chat input
+      // to the bottom of the screen. Previously this used
+      // justifyContent: "space-between", which distributed leftover space
+      // between children and lifted the input off the bottom edge.
       alignItems: "center",
       backgroundColor: "#FAFAFA",
     },
@@ -34,15 +37,26 @@ export const createStyles = ({}) =>
       alignItems: "center",
       gap: 20,
     },
+    // Outer ScrollView style — fills the available space; layout/padding goes
+    // into the contentContainerStyle below so flexGrow + justifyContent work
+    // for both short (empty room) and long (many chats) content.
     roomMiddleMain: {
       flex: 1,
+      width: "100%",
+      zIndex: 2,
+    },
+    roomMiddleContent: {
+      flexGrow: 1,
       flexDirection: "column",
       justifyContent: "flex-end",
       alignItems: "center",
-      paddingHorizontal:20,
-      width: "100%",
+      paddingHorizontal: 20,
+      // Top padding clears the absolute-positioned RoomsHeader so first
+      // content isn't hidden behind it on initial render. Mirrors ChatScreen's
+      // greetings ScrollView (ChatMiddleWrapper, non-chatting branch).
+      paddingTop: 100,
+      paddingBottom: 20,
       gap: 25,
-      marginBottom:30
     },
     middleIconAndText: {
       flexDirection: "column",

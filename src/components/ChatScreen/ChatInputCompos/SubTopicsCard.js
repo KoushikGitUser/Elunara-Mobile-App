@@ -3,6 +3,7 @@ import React from "react";
 import { ArrowUpRight, File } from "lucide-react-native";
 import { scaleFont } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
+import { useRoute } from "@react-navigation/native";
 import {
   setChatInputContentLinesNumber,
   setChatMessagesArray,
@@ -19,9 +20,18 @@ import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"
 
 const SubTopicsCard = ({ item }) => {
   const dispatch = useDispatch();
+  const route = useRoute();
   const { globalDataStates } = useSelector((state) => state.Global);
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
-  const { chatsStates } = useSelector((state) => state.API);
+  const { chatsStates, roomsStates } = useSelector((state) => state.API);
+  // Topics popup is rendered in both Rooms and ChatScreen. When the user
+  // triggers it from inside Rooms, the new chat must be associated with the
+  // current room (room_id) — otherwise the server response comes back with
+  // room: null, Rooms's send-first-message effect skips it (isRoomChat=false),
+  // ChatScreen's effect also skips (it's not focused), and no AI response is
+  // ever requested for the freshly created chat.
+  const isInsideRoom = route?.name === "rooms";
+  const roomUuid = roomsStates?.currentRoom?.uuid;
 
   const sendMessageDirectly = () => {
     const chatUuid = chatsStates.allChatsDatas.createdChatDetails?.id;
@@ -73,14 +83,18 @@ const SubTopicsCard = ({ item }) => {
   };
 
   const createChatWithAIFunction = () => {
+    const data = {
+      name: item?.name,
+      subject_id: globalDataStates.selectedSubjectID,
+      topic_id: item?.id,
+    };
+    if (isInsideRoom && roomUuid) {
+      data.room_id = roomUuid;
+    }
     const payload = {
       method: "POST",
       url: "/chats",
-      data: {
-        name: item?.name,
-        subject_id: globalDataStates.selectedSubjectID,
-        topic_id: item?.id,
-      },
+      data,
       name: "createChatWithAI",
     };
     dispatch(commonFunctionForAPICalls(payload));

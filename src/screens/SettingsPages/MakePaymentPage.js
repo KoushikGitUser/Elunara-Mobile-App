@@ -103,7 +103,18 @@ const MakePaymentPage = () => {
     dispatch(resetPaymentInitiated());
     setShowBackPressPopup(false);
 
-    if (status !== "backpressed" && status !== "user_aborted") {
+    // Normalise — Android HyperSDK reports statuses like "USER_ABORTED" /
+    // "BACKPRESSED" / "CANCELLED" in uppercase, iOS sometimes in lowercase.
+    // Treat any of these as a user-cancellation: skip server verification,
+    // just reset state (already done above).
+    const normalised = (status || "").toLowerCase();
+    const isUserCancelled =
+      normalised.includes("backpress") ||
+      normalised.includes("user_abort") ||
+      normalised.includes("cancel") ||
+      normalised === "aborted";
+
+    if (!isUserCancelled) {
       dispatch(resetVerifyPayment());
       setPaymentResultOrderId(orderId);
       dispatch(
@@ -118,29 +129,46 @@ const MakePaymentPage = () => {
     dispatch(clearPaymentResultEvent());
   }, [paymentResultEvent, dispatch]);
 
-  // Fallback: if HyperSDK closes without firing process_result,
-  // detect app returning to foreground and reset the stuck state
+  // Fallback: HyperSDK on Android sometimes doesn't emit process_result on
+  // user-cancel (cross/back inside the Juspay page). Two complementary safety
+  // nets:
+  //   1. AppState-based — fires when the app goes to background and returns.
+  //      Works when Juspay opens as a separate Activity (iOS, most Android
+  //      configs).
+  //   2. Hard timeout — 90s after initiation. Catches the Android
+  //      fragment-based case where AppState never changes (Juspay overlays
+  //      our Activity without backgrounding it). 90s is long enough that a
+  //      legitimate payment flow won't be falsely cancelled while still
+  //      releasing the loader for a stuck-cancel scenario.
+  // Both reset isPaymentInitiated so the button loader stops AND the
+  // top-left back button (hidden via setHideSettingsBackButton) re-appears.
   useEffect(() => {
     if (!isPaymentInitiated) return;
     processResultReceivedRef.current = false;
 
-    const sub = AppState.addEventListener("change", (nextState) => {
+    const reset = (reason) => {
+      if (processResultReceivedRef.current) return;
+      console.log(`[MakePayment] Fallback reset (${reason})`);
+      dispatch(setIsPaymentInitiated(false));
+      dispatch(setHideSettingsBackButton(false));
+      dispatch(resetPaymentInitiated());
+      setShowBackPressPopup(false);
+    };
+
+    const appStateSub = AppState.addEventListener("change", (nextState) => {
       if (nextState === "active" && !processResultReceivedRef.current) {
-        // App came to foreground but no process_result was received
-        // Wait briefly in case the event fires slightly after
-        setTimeout(() => {
-          if (!processResultReceivedRef.current) {
-            console.log("[MakePayment] Fallback: no process_result received, resetting state");
-            dispatch(setIsPaymentInitiated(false));
-            dispatch(setHideSettingsBackButton(false));
-            dispatch(resetPaymentInitiated());
-            setShowBackPressPopup(false);
-          }
-        }, 2000);
+        setTimeout(() => reset("AppState→active without process_result"), 2000);
       }
     });
 
-    return () => sub.remove();
+    const hardTimeoutId = setTimeout(() => {
+      reset("90s hard timeout — no process_result event");
+    }, 90000);
+
+    return () => {
+      appStateSub.remove();
+      clearTimeout(hardTimeoutId);
+    };
   }, [isPaymentInitiated]);
 
   // BackHandler - show popup when payment is pending

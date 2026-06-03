@@ -24,21 +24,26 @@ const HyperPaymentListeners = () => {
     const hyperEmitter = new NativeEventEmitter(NativeModules.HyperSdkReact);
     const hyperListener = hyperEmitter.addListener("HyperEvent", (resp) => {
       try {
-        const data = JSON.parse(resp);
-        const event = data.event || "";
-        console.log("[App] HyperEvent:", event);
+        // Android hyper-sdk-react sometimes emits an object (WritableMap)
+        // directly while iOS emits a JSON string. Handle both. Same goes for
+        // the nested `payload` field.
+        const data = typeof resp === "string" ? JSON.parse(resp) : resp;
+        const event = data?.event || "";
+        const rawPayload = data?.payload;
+        const payload =
+          typeof rawPayload === "string" ? JSON.parse(rawPayload) : rawPayload || {};
+        console.log("[App] HyperEvent:", event, "payload:", JSON.stringify(payload));
         if (event === "process_result") {
-          const innerPayload = data.payload || {};
           dispatch(
             setPaymentResultEvent({
-              orderId: data.orderId,
-              status: innerPayload.status || "",
+              orderId: data?.orderId || payload?.orderId || "",
+              status: payload?.status || "",
               ts: Date.now(),
             })
           );
         }
       } catch (e) {
-        console.log("[App] HyperEvent parse error:", e);
+        console.log("[App] HyperEvent parse error:", e, "raw:", resp);
       }
     });
     return () => hyperListener.remove();

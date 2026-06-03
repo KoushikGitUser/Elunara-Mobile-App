@@ -77,6 +77,8 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
         <ScrollView
           ref={scrollViewRef}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           contentContainerStyle={{
             justifyContent: "flex-end",
             gap: 25,

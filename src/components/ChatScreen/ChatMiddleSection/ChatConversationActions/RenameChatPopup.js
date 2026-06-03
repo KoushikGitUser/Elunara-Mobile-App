@@ -60,6 +60,9 @@ const RenameChatPopup = () => {
     });
 
     const keyboardDidHide = Keyboard.addListener(hideEvent, () => {
+      // Reset for both platforms so the iOS paddingBottom lift releases and
+      // any keyboard-height-conditional styling resets cleanly.
+      setKeyboardHeight(0);
       if (Platform.OS === "android") {
         Animated.timing(animatedValue, {
           toValue: 0,
@@ -175,7 +178,7 @@ const RenameChatPopup = () => {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <View style={styles.modalSheet}>
+              <View style={[styles.modalSheet, Platform.OS === 'ios' && { paddingBottom: keyboardHeight }]}>
                 {/* Content */}
                 <View style={styles.content}>
                   {/* Title */}

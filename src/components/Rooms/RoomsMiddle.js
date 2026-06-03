@@ -126,7 +126,13 @@ const RoomsMiddle = ({ roomName }) => {
   };
 
   return (
-    <View style={styles.roomMiddleMain}>
+    <ScrollView
+      style={styles.roomMiddleMain}
+      contentContainerStyle={styles.roomMiddleContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+    >
       <View style={styles.middleIconAndText}>
         <Image source={roomLogo} style={styles.roomLogo} />
         <View>
@@ -257,8 +263,10 @@ const RoomsMiddle = ({ roomName }) => {
           <ActivityIndicator size="large" color="#081A35" />
         </View>
       ) : hasRoomChats ? (
-        // Show available chats
-        <ScrollView style={[styles.chatsScrollRooms, { zIndex: 9 }]}>
+        // Chats list — plain View now; the outer ScrollView (roomMiddleMain)
+        // handles all scrolling. Nesting a ScrollView here would cause
+        // gesture conflicts.
+        <View style={{ width: "100%", zIndex: 9 }}>
           {filteredRoomChats.map((chat, chatsIndex) => {
             return (
               <ChatsComponent
@@ -278,7 +286,7 @@ const RoomsMiddle = ({ roomName }) => {
               />
             );
           })}
-        </ScrollView>
+        </View>
       ) : hasDescription ? (
         // No chats but has description - show "Start Something Great Today"
         <View
@@ -390,7 +398,7 @@ const RoomsMiddle = ({ roomName }) => {
         selectedChatIds={selectedArray}
         onComplete={handleBulkOperationComplete}
       />
-    </View>
+    </ScrollView>
   );
 };
 

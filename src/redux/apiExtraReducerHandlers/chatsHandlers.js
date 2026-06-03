@@ -45,9 +45,15 @@ export const handleGetAllRecentChats = {
     state.chatsStates.loaderStates.isAllRecentChatsFetched = "pending";
   },
   fulfilled: (state, action) => {
-    state.chatsStates.allChatsDatas.allRecentChats = action?.payload.data.data;
+    const recentChats = action?.payload?.data?.data;
+    state.chatsStates.allChatsDatas.allRecentChats = recentChats;
     state.chatsStates.loaderStates.isAllRecentChatsFetched = true;
-    console.log(action?.payload.data.data, "chats");
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("📥 RECENT CHATS - FULFILLED");
+    console.log("📥 Count:", Array.isArray(recentChats) ? recentChats.length : 0);
+    console.log("📥 Full response data:");
+    console.log(JSON.stringify(recentChats, null, 2));
+    console.log("═══════════════════════════════════════════════════════");
   },
   rejected: (state, { payload }) => {
     state.chatsStates.loaderStates.isAllRecentChatsFetched = false;
@@ -564,7 +570,7 @@ export const handleGetAllMessagesOfParticularChat = {
     };
 
     state.chatsStates.loaderStates.isAllMessagesOfChatFetched = true;
-    console.log("All messages fetched:", chatMessagesArray);
+    console.log("All messages fetched:", JSON.stringify(chatMessagesArray));
     console.log("Message IDs array:", messageIDsArray);
   },
   rejected: (state, { payload }) => {

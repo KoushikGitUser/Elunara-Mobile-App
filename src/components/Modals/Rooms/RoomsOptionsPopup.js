@@ -21,7 +21,7 @@ import {
 } from "../../../redux/slices/toggleSlice";
 import { setDeleteConfirmPopupFrom } from "../../../redux/slices/globalDataSlice";
 import { triggerToast } from "../../../services/toast";
-import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
+import { commonFunctionForAPICalls, setCurrentActionChatDetails } from "../../../redux/slices/apiCommonSlice";
 import LockIcon from "../../../../assets/SvgIconsComponent/LockIcon";
 
 const { width, height } = Dimensions.get("window");
@@ -50,6 +50,9 @@ const RoomsOptionsPopup = ({ setRoomOptionsPopup, visible, popupPosition }) => {
           <Pressable
             onPress={() => {
               setRoomOptionsPopup(false);
+              // Clear any stale chat selection so RenameChatPopup treats this
+              // as a ROOM rename, not a chat rename.
+              dispatch(setCurrentActionChatDetails(null));
               dispatch(setToggleRenameChatPopup(true));
             }}
             style={({ pressed }) => [
@@ -166,7 +169,7 @@ const styles = StyleSheet.create({
     borderColor: "#D3DAE5",
     borderRadius: 21,
     padding: 7,
-    width: "auto",
+    width: 220,
     top: 0,
     right: 20,
     flexDirection: "column",

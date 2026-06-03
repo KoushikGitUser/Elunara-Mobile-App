@@ -119,46 +119,62 @@ const AddRoomDetails = () => {
     }
   }, [roomsStates.currentRoom]);
 
-  // Track changes to set unsaved changes flag
+  // Keep a synchronous mirror of hasUnsavedChanges so the beforeRemove listener
+  // and the discard handler can read the latest value without a stale closure.
+  const hasUnsavedChangesRef = useRef(false);
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  // Track changes to set unsaved changes flag.
+  // `?? null` normalises undefined → null so `null` (from initializeRoomCustomisation
+  // fallback) and `undefined` (from `room.llm?.id` when room.llm is null) compare equal.
   useEffect(() => {
     if (!hasInitialized.current) return;
 
+    const norm = (v) => v ?? null;
     const hasChanges =
       description !== initialValues.current.description ||
       instructions !== initialValues.current.instructions ||
-      roomCustomisationStates.selectedRoomLLM?.id !== initialValues.current.llm_id ||
-      roomCustomisationStates.selectedRoomResponseStyle?.id !== initialValues.current.response_style_id ||
-      roomCustomisationStates.selectedRoomLanguage?.id !== initialValues.current.response_language_id ||
-      roomCustomisationStates.selectedRoomCitationFormat?.id !== initialValues.current.citation_format_id;
+      norm(roomCustomisationStates.selectedRoomLLM?.id) !== norm(initialValues.current.llm_id) ||
+      norm(roomCustomisationStates.selectedRoomResponseStyle?.id) !== norm(initialValues.current.response_style_id) ||
+      norm(roomCustomisationStates.selectedRoomLanguage?.id) !== norm(initialValues.current.response_language_id) ||
+      norm(roomCustomisationStates.selectedRoomCitationFormat?.id) !== norm(initialValues.current.citation_format_id);
 
     setHasUnsavedChanges(hasChanges);
   }, [description, instructions, roomCustomisationStates.selectedRoomLLM, roomCustomisationStates.selectedRoomResponseStyle, roomCustomisationStates.selectedRoomLanguage, roomCustomisationStates.selectedRoomCitationFormat]);
 
-  // Clean up on unmount
+  // Clean up on unmount — also force-close the unsaved-changes popup so it
+  // doesn't reappear on the next mount of AddRoomDetails.
   useEffect(() => {
     return () => {
       dispatch(resetRoomCustomisation());
+      dispatch(setToggleUnsavedChangesConfirmPopup(false));
     };
   }, []);
 
-  // Handle back button press with unsaved changes alert
+  // Disable iOS swipe-back / Android native back gesture while there are
+  // unsaved changes. Prevents the native stack from popping behind React
+  // Navigation's back, which is what causes the "screen was removed natively
+  // but didn't get removed from JS state" warning.
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: !hasUnsavedChanges });
+  }, [navigation, hasUnsavedChanges]);
+
+  // Handle back button press with unsaved changes alert.
+  // Listener registers once; the ref keeps it in sync with the latest flag.
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      if (!hasUnsavedChanges) {
-        // If we don't have unsaved changes, just let the action proceed
+      if (!hasUnsavedChangesRef.current) {
         return;
       }
-
-      // Prevent default behavior of leaving the screen
       e.preventDefault();
-
-      // Store the navigation action and show custom modal
       setPendingNavigationAction(e.data.action);
       dispatch(setToggleUnsavedChangesConfirmPopup(true));
     });
 
     return unsubscribe;
-  }, [navigation, hasUnsavedChanges]);
+  }, [navigation]);
 
   const  handleSaveDetails = () => {
     // Use roomUuid from route params or currentRoom as fallback
@@ -186,7 +202,9 @@ const AddRoomDetails = () => {
     };
 
     dispatch(commonFunctionForAPICalls(payload));
+    hasUnsavedChangesRef.current = false;
     setHasUnsavedChanges(false);
+    dispatch(setToggleUnsavedChangesConfirmPopup(false));
     navigation.navigate("rooms", {
       roomName: roomsStates.currentRoom?.name || "Room",
       roomUuid: roomsStates.currentRoom?.uuid || roomsStates.currentRoom?.id,
@@ -195,6 +213,13 @@ const AddRoomDetails = () => {
   };
 
   const handleDiscardChanges = () => {
+    // Clear unsaved-changes state synchronously so beforeRemove doesn't
+    // re-preventDefault when we dispatch the stored action.
+    hasUnsavedChangesRef.current = false;
+    setHasUnsavedChanges(false);
+    // Close the popup explicitly — Redux state is global, the modal sits on
+    // top of every screen otherwise.
+    dispatch(setToggleUnsavedChangesConfirmPopup(false));
     if (pendingNavigationAction) {
       navigation.dispatch(pendingNavigationAction);
       setPendingNavigationAction(null);

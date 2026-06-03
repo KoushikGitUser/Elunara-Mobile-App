@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TextInput, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
 import React, { useMemo, useRef } from "react";
 import { Search } from "lucide-react-native";
 import ArrowUpDownIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/ArrowUpDownIcon";
@@ -6,6 +6,7 @@ import FilterIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/Filt
 import { verticalScale } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { triggerToast } from "../../services/toast";
 
 const SearchIconsHeader = ({ searchQuery, setSearchQuery }) => {
   const navigation = useNavigation();
@@ -40,8 +41,34 @@ const SearchIconsHeader = ({ searchQuery, setSearchQuery }) => {
       <View
         style={[styles.iconsMain, { display: searchQuery ? "none" : "flex" }]}
       >
-        <ArrowUpDownIcon />
-        <FilterIcon />
+        <TouchableOpacity
+          onPress={() =>
+            triggerToast(
+              "Coming soon",
+              "Sorting option will be available soon",
+              "info",
+              3000,
+            )
+          }
+          activeOpacity={0.7}
+          style={{ padding: 4 }}
+        >
+          <ArrowUpDownIcon />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            triggerToast(
+              "Coming soon",
+              "Filter option will be available soon",
+              "info",
+              3000,
+            )
+          }
+          activeOpacity={0.7}
+          style={{ padding: 4 }}
+        >
+          <FilterIcon />
+        </TouchableOpacity>
       </View>
     </View>
   );

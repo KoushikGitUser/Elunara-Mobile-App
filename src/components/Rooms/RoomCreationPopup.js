@@ -121,7 +121,7 @@ const RoomCreationPopup = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.modalSheet}>
+            <View style={[styles.modalSheet, Platform.OS === 'ios' && { paddingBottom: keyboardHeight }]}>
               {/* Content */}
               <View style={styles.content}>
                 <View style={styles.closeModalMain}>
