@@ -93,7 +93,7 @@ const PaidPlanCard = ({ isLoading = false }) => {
 
             {!isPromoNotActivated && (
               <Text style={styles.infoText}>
-                Usage-based deduction — no expiry on Learning Points
+                Usage-based deduction — no expiry on Wallet
               </Text>
             )}
           </>
