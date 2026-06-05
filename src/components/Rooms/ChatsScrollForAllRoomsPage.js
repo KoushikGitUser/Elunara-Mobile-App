@@ -9,13 +9,15 @@ import {
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Check, MessageCircle, MoreVertical } from "lucide-react-native";
-import { scaleFont, verticalScale } from "../../utils/responsive";
+import { scaleFont, verticalScale, isTablet } from "../../utils/responsive";
 import RoomsOptionsPopup from "../Modals/Rooms/RoomsOptionsPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import FolderIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/FolderIcon";
+import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
+import { appColors } from "../../themes/appColors";
 import { setToggleAllChatsOptionsPopup } from "../../redux/slices/toggleSlice";
-import { setCurrentRoom } from "../../redux/slices/apiCommonSlice";
+import { setCurrentRoom, setCurrentActionChatDetails } from "../../redux/slices/apiCommonSlice";
 
 const ChatsScrollForAllRoomsPage = ({
   title,
@@ -162,13 +164,34 @@ const ChatsScrollForAllRoomsPage = ({
           <FolderIcon />
         </View>
 
-        {/* Text Content */}
+        {/* Text Content — truncate with ellipsis on phones only.
+            Tablets have enough width to render long names / descriptions. */}
         <View style={styles.textContainer}>
-          <Text style={styles.titleText}>{title}</Text>
+          <Text
+            style={styles.titleText}
+            numberOfLines={isTablet ? undefined : 1}
+            ellipsizeMode={isTablet ? undefined : "tail"}
+          >
+            {title}
+          </Text>
           <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitleText}>{subject}</Text>
+            <Text
+              style={[styles.subtitleText, !isTablet && { flexShrink: 1 }]}
+              numberOfLines={isTablet ? undefined : 1}
+              ellipsizeMode={isTablet ? undefined : "tail"}
+            >
+              {subject}
+            </Text>
           </View>
         </View>
+
+        {/* Pin Icon — mirrors ChatsComponent (AllChatsPage). Server marks the
+            room with is_pinned when the user pins it. */}
+        {room?.is_pinned && (
+          <View style={{ marginRight: 12 }}>
+            <PinIcon color={appColors.navyBlueShade} />
+          </View>
+        )}
 
         {/* Menu Icon */}
         <Pressable
@@ -180,6 +203,11 @@ const ChatsScrollForAllRoomsPage = ({
           onPress={() => {
             menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
               setPopupPosition({ top: pageY, right: 20 });
+              // Clear stale chat-details so RenameChatPopup falls back to
+              // currentRoom and renames the ROOM (not a previously-actioned
+              // chat). Without this, the rename popup tries to rename a stale
+              // chat id from a different screen's flow.
+              dispatch(setCurrentActionChatDetails(null));
               dispatch(setToggleAllChatsOptionsPopup(true));
               setOptionsIndex(index);
               if (room) {

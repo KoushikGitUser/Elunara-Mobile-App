@@ -20,9 +20,8 @@ import { Check, Trash2 } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice";
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
+import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
 import { commonFunctionForAPICalls, resetHighlightRoomId } from "../../redux/slices/apiCommonSlice";
-import SearchHistory from "../../components/Search/SearchHistory";
-import SearchResults from "../../components/Search/SearchResults";
 
 const AllRoomsLandingPage = () => {
   const insets = useSafeAreaInsets();
@@ -44,23 +43,17 @@ const AllRoomsLandingPage = () => {
   const roomPositionsRef = useRef({});
   const highlightRoomId = searchStates?.highlightRoomId;
 
-  // Search Debounce
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery.length >= 2) {
-        dispatch(
-          commonFunctionForAPICalls({
-            method: "GET",
-            url: "/search",
-            params: { q: searchQuery, type: "all" },
-            name: "search-global",
-          }),
-        );
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  // Client-side search: filter the already-loaded rooms list by name.
+  // No /search server call — this page should only surface Learning Labs,
+  // not chats or messages, so we don't need the global multi-type endpoint.
+  const filteredRooms = React.useMemo(() => {
+    const allRooms = roomsStates.rooms || [];
+    const q = searchQuery.trim().toLowerCase();
+    if (q.length === 0) return allRooms;
+    return allRooms.filter((room) =>
+      (room?.name || "").toLowerCase().includes(q),
+    );
+  }, [roomsStates.rooms, searchQuery]);
 
   // Fetch rooms on mount
   useEffect(() => {
@@ -127,8 +120,22 @@ const AllRoomsLandingPage = () => {
       }}
     >
       {toggleStates.toggleDeleteChatConfirmPopup && (
-        <DeleteConfirmPopup from="allRooms" />
+        <DeleteConfirmPopup
+          from="allRooms"
+          selectedRoomIds={selectedArray}
+          onBulkDeleteComplete={() => {
+            setSelectedArray([]);
+            setIsSelecting(false);
+            setChecked(false);
+          }}
+        />
       )}
+      {/* Mounted here so room-row → 3-dot → Rename actually shows the popup.
+          RenameChatPopup decides between chat-rename and room-rename based on
+          whether currentActionChatDetails is set; ChatsScrollForAllRoomsPage's
+          menu open clears it and sets currentRoom, so this renders as
+          "Rename Learning Lab". */}
+      {toggleStates.toggleRenameChatPopup && <RenameChatPopup />}
       <StatusBar
         backgroundColor="#ff0000ff"
         barStyle="dark-content"
@@ -187,63 +194,51 @@ const AllRoomsLandingPage = () => {
           />
         )}
 
-        {isSearching ? (
-          <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
-            {searchQuery.length === 0 ? (
-              <SearchHistory
-                onHistoryItemPress={(query) => {
-                  setSearchQuery(query);
-                }}
-              />
-            ) : (
-              <SearchResults />
-            )}
-          </View>
-        ) : (
-          <ScrollView
-            ref={scrollViewRef}
-            contentContainerStyle={{
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-            style={styles.allChatsScrollMain}
-          >
-            {roomsStates.fetchingRooms ? (
-              <ActivityIndicator
-                size="large"
-                color="#081A35"
-                style={{ marginTop: 50 }}
-              />
-            ) : roomsStates.rooms?.length > 0 ? (
-              roomsStates.rooms.map((room, roomIndex) => {
-                return (
-                  <ChatsScrollForAllRoomsPage
-                    key={room.uuid || roomIndex}
-                    index={room.uuid}
-                    title={room.name}
-                    subject={room.description || "No description"}
-                    isSelecting={isSelecting}
-                    selectedArray={selectedArray}
-                    setIsSelecting={setIsSelecting}
-                    setSelectedArray={setSelectedArray}
-                    room={room}
-                    isHighlighted={highlightedRoomId === room.uuid}
-                    onLayout={(event) => {
-                      const { y } = event.nativeEvent.layout;
-                      roomPositionsRef.current[room.uuid] = y;
-                    }}
-                  />
-                );
-              })
-            ) : (
-              <View style={{ marginTop: 50, alignItems: "center" }}>
-                <Text style={{ fontSize: scaleFont(16), color: "#6B7280" }}>
-                  No rooms yet. Create your first Learning Lab!
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        )}
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+          style={styles.allChatsScrollMain}
+        >
+          {roomsStates.fetchingRooms ? (
+            <ActivityIndicator
+              size="large"
+              color="#081A35"
+              style={{ marginTop: 50 }}
+            />
+          ) : filteredRooms.length > 0 ? (
+            filteredRooms.map((room, roomIndex) => {
+              return (
+                <ChatsScrollForAllRoomsPage
+                  key={room.uuid || roomIndex}
+                  index={room.uuid}
+                  title={room.name}
+                  subject={room.description || "No description"}
+                  isSelecting={isSelecting}
+                  selectedArray={selectedArray}
+                  setIsSelecting={setIsSelecting}
+                  setSelectedArray={setSelectedArray}
+                  room={room}
+                  isHighlighted={highlightedRoomId === room.uuid}
+                  onLayout={(event) => {
+                    const { y } = event.nativeEvent.layout;
+                    roomPositionsRef.current[room.uuid] = y;
+                  }}
+                />
+              );
+            })
+          ) : (
+            <View style={{ marginTop: 50, alignItems: "center" }}>
+              <Text style={{ fontSize: scaleFont(16), color: "#6B7280" }}>
+                {searchQuery.trim().length > 0
+                  ? "No Learning Labs match your search."
+                  : "No rooms yet. Create your first Learning Lab!"}
+              </Text>
+            </View>
+          )}
+        </ScrollView>
       </Animated.View>
     </SafeAreaView>
   );

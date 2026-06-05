@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import userImg from "../../assets/images/defaultUserPic.png";
 import corporateAvatar from "../../assets/images/Corporate2.png";
 import teacherAvatar from "../../assets/images/Teacher2.png";
@@ -22,7 +22,6 @@ const UserSection = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [isMobileVerified, setIsMobileVerified] = useState(true);
   const [profileImage, setProfileImage] = useState(userImg);
-  const [daysLeft, setDaysLeft] = useState(0);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
 
@@ -33,27 +32,48 @@ const UserSection = () => {
     checkMobileVerification();
   }, [settingsStates?.allProfileInfos?.phone_verified]);
 
-  // Calculate days left for mobile verification (10 days limit from creation date)
-  useEffect(() => {
-    // parseApiDate handles 6-digit-microsecond timestamps that Hermes
-    // (release engine) can't parse with a raw `new Date(...)`.
+  // Days-left for mobile verification — derived (NOT useState) so it always
+  // reflects the current source of truth (userData.created_at). The previous
+  // useState(0) + useEffect approach surfaced "0 days left" on a freshly
+  // logged-in account because the effect's `if (createdDate)` guard early-
+  // exited while userData was still loading, leaving the state at its
+  // initial 0. The fresh-account user then saw "0 days left" — which is the
+  // expired-grace value, not the loading value.
+  //
+  // 10-day grace window from account creation. Returns:
+  //   10 (full grace)  → no userData yet, OR account just created today
+  //   1..9             → grace decreasing day by day
+  //   0                → grace expired (compulsory verify popup gate triggers
+  //                      via the parallel calc in ChatScreen.js)
+  const daysLeft = useMemo(() => {
     const createdDate = parseApiDate(settingsStates?.userData?.created_at);
-    if (createdDate) {
-      const currentDate = new Date();
-      const diffTime = currentDate - createdDate;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      const remainingDays = 10 - diffDays;
-      setDaysLeft(remainingDays > 0 ? remainingDays : 0);
-    }
+    if (!createdDate) return 10;
+    const diffDays = Math.floor(
+      (new Date() - createdDate) / (1000 * 60 * 60 * 24),
+    );
+    const remaining = 10 - diffDays;
+    return remaining > 0 ? remaining : 0;
   }, [settingsStates?.userData?.created_at]);
 
   useEffect(() => {
-    const payload = {
-      method: "GET",
-      url: "/settings/profile",
-      name: "getAllProfileInfos",
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    // /settings/profile populates allProfileInfos (avatar, etc.)
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/settings/profile",
+        name: "getAllProfileInfos",
+      }),
+    );
+    // /user populates userData.created_at + phone_verified — required for the
+    // days-left calc above. Dispatched here so profile page works even when
+    // the user reached it via a flow that skipped SplashScreen/ChatScreen.
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/user",
+        name: "getUserData",
+      }),
+    );
   }, []);
 
   // Set profile image based on API data

@@ -13,6 +13,7 @@ import {
   Keyboard,
   Animated,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import { BlurView } from "@react-native-community/blur";
 import { Feather } from "@expo/vector-icons";
@@ -36,6 +37,13 @@ const RenameChatPopup = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [chatName, setChatName] = useState("");
+
+  // Rename-in-flight indicator. Chat rename and room rename use different
+  // loader flags — show the spinner / disable the button for either.
+  const isRenamingChat =
+    chatsStates?.loaderStates?.isChatTitleUpdated === "pending";
+  const isRenamingRoom = roomsStates?.updatingRoom === true;
+  const isRenaming = isRenamingChat || isRenamingRoom;
 
   useEffect(() => {
     if (roomsStates.currentRoom) {
@@ -78,11 +86,11 @@ const RenameChatPopup = () => {
     };
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 500);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     inputRef.current?.focus();
+  //   }, 500);
+  // }, []);
 
   // Set initial chat name from API data when modal opens
   // Set initial chat name from API data when modal opens
@@ -103,6 +111,31 @@ const RenameChatPopup = () => {
     chatsStates.allChatsDatas.currentActionChatDetails,
     roomsStates.currentRoom,
   ]);
+
+  // Track that WE initiated the room rename, so the close-effect below only
+  // fires when this popup is the one waiting on the API (not some other
+  // component that happens to be updating the room concurrently).
+  const initiatedRoomRenameRef = useRef(false);
+
+  // Close popup after room rename completes (success or failure).
+  // Watches the true → false transition of roomsStates.updatingRoom.
+  useEffect(() => {
+    if (initiatedRoomRenameRef.current && roomsStates?.updatingRoom === false) {
+      initiatedRoomRenameRef.current = false;
+      dispatch(setToggleRenameChatPopup(false));
+      // Defense-in-depth: refetch the rooms list so the AllRoomsLandingPage
+      // (and anywhere else that reads roomsStates.rooms) reflects fresh
+      // server data — covers pin/description/etc. fields that the PUT
+      // response may not echo back, and any stale list state.
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: "/rooms",
+          name: "get-rooms",
+        }),
+      );
+    }
+  }, [roomsStates?.updatingRoom]);
 
   // Handle success case
   useEffect(() => {
@@ -221,6 +254,7 @@ const RenameChatPopup = () => {
                   {/* Verify Button */}
                   <TouchableOpacity
                     onPress={() => {
+                      if (isRenaming) return;
                       // Check if we have currentActionChatDetails - if so, rename the chat
                       const chatUUID = chatsStates.allChatsDatas.currentActionChatDetails?.id;
 
@@ -234,7 +268,12 @@ const RenameChatPopup = () => {
                         };
                         dispatch(commonFunctionForAPICalls(payload));
                       } else if (roomsStates.currentRoom) {
-                        // No chat selected, rename the room instead
+                        // No chat selected, rename the room instead.
+                        // Popup stays open so the user sees the spinner; it
+                        // closes when handleUpdateRoom flips updatingRoom
+                        // back to false (success or failure) via the effect
+                        // above watching initiatedRoomRenameRef.
+                        initiatedRoomRenameRef.current = true;
                         const payload = {
                           method: "PUT",
                           url: `/rooms/${roomsStates.currentRoom.uuid || roomsStates.currentRoom.id}`,
@@ -244,8 +283,6 @@ const RenameChatPopup = () => {
                           },
                         };
                         dispatch(commonFunctionForAPICalls(payload));
-                        // Close popup immediately for room updates (toast is handled by the handler)
-                        dispatch(setToggleRenameChatPopup(false));
                       } else {
                         // Fallback to createdChatDetails
                         const fallbackChatUUID = chatsStates.allChatsDatas.createdChatDetails?.id;
@@ -271,20 +308,24 @@ const RenameChatPopup = () => {
                     }}
                     style={[
                       styles.verifyButton,
-                      !chatName && styles.verifyButtonDisabled,
+                      (!chatName || isRenaming) && styles.verifyButtonDisabled,
                       Platform.OS === 'ios' && keyboardHeight > 0 && { marginBottom: 5 },
                     ]}
                     activeOpacity={0.8}
-                    disabled={!chatName}
+                    disabled={!chatName || isRenaming}
                   >
-                    <Text
-                      style={[
-                        styles.verifyButtonText,
-                        { fontFamily: "Mukta-Regular" },
-                      ]}
-                    >
-                      Done
-                    </Text>
+                    {isRenaming ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text
+                        style={[
+                          styles.verifyButtonText,
+                          { fontFamily: "Mukta-Regular" },
+                        ]}
+                      >
+                        Done
+                      </Text>
+                    )}
                   </TouchableOpacity>
 
                   {/* Skip for now */}

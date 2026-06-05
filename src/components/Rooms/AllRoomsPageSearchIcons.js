@@ -5,16 +5,17 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Platform,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Search } from "lucide-react-native";
 import ArrowUpDownIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/ArrowUpDownIcon";
 import FilterIcon from "../../../assets/SvgIconsComponent/AllChatsPageIcons/FilterIcon";
 import FolderPlusIcon from "../../../assets/SvgIconsComponent/ChatMenuOptionsIcons/FolderPlusIcon";
-import { verticalScale } from "../../utils/responsive";
+import { verticalScale, scaleFont } from "../../utils/responsive";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { setToggleLearningLabUnlockPopup } from "../../redux/slices/toggleSlice";
+import { setToggleRoomCreationPopup } from "../../redux/slices/toggleSlice";
 import RoomsSortingPopup from "../Modals/Rooms/RoomsSortingPopup";
 import RoomsFilterPopup from "../Modals/Rooms/RoomsFilterPopup";
 
@@ -31,6 +32,17 @@ const AllRoomsPageSearchIcons = ({
   const inputRef = useRef();
   const [toggleSortingPopup, setToggleSortingPopup] = useState(false);
   const [toggleFilterPopup, setToggleFilterPopup] = useState(false);
+
+  // Match AllChatsPage SearchAndIcons behavior: when search mode exits (via
+  // the header's ArrowLeft), blur the input and clear the query — no inline
+  // Cancel button needed.
+  useEffect(() => {
+    if (!isSearching) {
+      inputRef.current?.blur();
+      if (searchQuery) setSearchQuery("");
+    }
+  }, [isSearching]);
+
   return (
     <View
       style={[styles.searchAndIcons, { paddingHorizontal: 20, marginTop: 15 }]}
@@ -38,7 +50,9 @@ const AllRoomsPageSearchIcons = ({
       <View
         style={[
           styles.searchInputMain,
-          { width: isSearching ? "100%" : "auto" },
+          isSearching
+            ? { width: "100%", maxWidth: "100%" }
+            : { width: "auto" },
         ]}
       >
         <Search
@@ -57,18 +71,6 @@ const AllRoomsPageSearchIcons = ({
           onFocus={() => setIsSearching(true)}
         />
       </View>
-      {isSearching && (
-        <TouchableOpacity
-          onPress={() => {
-            setIsSearching(false);
-            setSearchQuery("");
-          }}
-        >
-          <Text style={{ fontSize: scaleFont(14), color: "#081A35" }}>
-            Cancel
-          </Text>
-        </TouchableOpacity>
-      )}
       <View
         style={[styles.iconsMain, { display: isSearching ? "none" : "flex" }]}
       >
@@ -89,7 +91,7 @@ const AllRoomsPageSearchIcons = ({
           )}
         </View>
         <TouchableOpacity
-          onPress={() => dispatch(setToggleLearningLabUnlockPopup(true))}
+          onPress={() => dispatch(setToggleRoomCreationPopup(true))}
         >
           <FolderPlusIcon />
         </TouchableOpacity>
@@ -119,7 +121,10 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     width: "100%",
-    height: "100%",
+    // iOS-only: parent searchInputMain has no explicit height, so
+    // height: "100%" collapses the field to a thin line. Android's TextInput
+    // auto-sizes to content. Match the AllChats search field height (40).
+    height: Platform.OS === "ios" ? verticalScale(40) : "100%",
     borderWidth: 1,
     borderRadius: 16,
     borderColor: "#ABB8CC",

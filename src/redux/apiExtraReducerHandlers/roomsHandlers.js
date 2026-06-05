@@ -117,15 +117,23 @@ export const handleUpdateRoom = {
     state.roomsStates.updatingRoom = false;
     const updatedRoom = action?.payload?.data?.data;
     if (updatedRoom) {
-      const roomWithUuid = {
+      const incoming = {
         ...updatedRoom,
         uuid: updatedRoom.id || updatedRoom.uuid,
       };
+      // Merge (not replace): the PUT response is often partial — e.g. a
+      // rename only echoes back `{id, name}`. A naive replace would wipe
+      // is_pinned, description, instructions, llm, response_style etc. on
+      // the renamed room. Spread existing fields first so the response
+      // overwrites only the keys it actually includes.
       state.roomsStates.rooms = state.roomsStates.rooms.map((room) =>
-        room.uuid === roomWithUuid.uuid ? roomWithUuid : room
+        room.uuid === incoming.uuid ? { ...room, ...incoming } : room
       );
-      if (state.roomsStates.currentRoom?.uuid === roomWithUuid.uuid) {
-        state.roomsStates.currentRoom = roomWithUuid;
+      if (state.roomsStates.currentRoom?.uuid === incoming.uuid) {
+        state.roomsStates.currentRoom = {
+          ...state.roomsStates.currentRoom,
+          ...incoming,
+        };
       }
     }
     triggerToast("Success", "Learning Lab updated successfully", "success", 3000);

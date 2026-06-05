@@ -39,7 +39,12 @@ import Toaster from "../../../UniversalToaster/Toaster";
 
 const { width } = Dimensions.get("window");
 
-const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
+const DeleteConfirmPopup = ({
+  from,
+  selectedChatIds = [],
+  selectedRoomIds = [],
+  onBulkDeleteComplete,
+}) => {
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { globalDataStates } = useSelector((state) => state.Global);
   const { roomsStates, chatsStates } = useSelector((state) => state.API);
@@ -49,11 +54,19 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
 
   const isSingleDelete = from === "chat";
   const isBulkDelete = from === "allChats";
+  const isBulkRoomDelete = from === "allRooms";
   const chatCount = selectedChatIds.length;
+  const roomCount = selectedRoomIds.length;
+
+  // Track that WE initiated the bulk room delete so the success effect only
+  // fires for our action (not a concurrent rooms bulk op from elsewhere).
+  const initiatedBulkRoomDeleteRef = React.useRef(false);
 
   const isLoading = isBulkDelete
     ? chatsStates.loaderStates.isBulkOperationCompleted === "pending"
-    : chatsStates.loaderStates.isChatDeleted === "pending";
+    : isBulkRoomDelete
+      ? roomsStates.operatingBulkRooms === true
+      : chatsStates.loaderStates.isChatDeleted === "pending";
 
   // Handle delete success case
   useEffect(() => {
@@ -129,6 +142,30 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
     }
   }, [chatsStates.loaderStates.isBulkOperationCompleted]);
 
+  // Handle bulk ROOM delete success — operatingBulkRooms flips true → false
+  // after POST /rooms/bulk fulfilled. We close the popup, refetch the rooms
+  // list (the bulk handler doesn't surgically update the rooms array on its
+  // own), and notify the parent to clear its selection state.
+  useEffect(() => {
+    if (
+      initiatedBulkRoomDeleteRef.current &&
+      roomsStates.operatingBulkRooms === false
+    ) {
+      initiatedBulkRoomDeleteRef.current = false;
+      dispatch(setToggleDeleteChatConfirmPopup(false));
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: "/rooms",
+          name: "get-rooms",
+        }),
+      );
+      if (typeof onBulkDeleteComplete === "function") {
+        onBulkDeleteComplete();
+      }
+    }
+  }, [roomsStates.operatingBulkRooms]);
+
   // Handle undo delete success case
   useEffect(() => {
     if (chatsStates.loaderStates.isChatDeleteUndone === true) {
@@ -182,15 +219,19 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
               <Image source={deleteBin} style={styles.verifiedIcon} />
             </View>
 
-            {/* Title */}
+            {/* Title — driven by the `from` prop the parent passes, NOT by
+                the global deleteConfirmPopupFrom (which was leaking stale
+                values from previous flows like "chat" into the rooms title). */}
             <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
-              {globalDataStates.deleteConfirmPopupFrom == "chat"
+              {from === "chat"
                 ? "Delete Chat?"
-                : globalDataStates.deleteConfirmPopupFrom == "allChats"
+                : from === "allChats"
                   ? `Delete ${chatCount} chat${chatCount > 1 ? "s" : ""}?`
-                  : globalDataStates.deleteConfirmPopupFrom == "rooms"
+                  : from === "rooms"
                     ? "Delete Learning Lab?"
-                    : "Delete <10> Learning Labs?"}
+                    : from === "allRooms"
+                      ? `Delete ${roomCount} Learning Lab${roomCount > 1 ? "s" : ""}?`
+                      : "Delete?"}
             </Text>
 
             {/* Description */}
@@ -229,7 +270,13 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                  if (globalDataStates.deleteConfirmPopupFrom === "rooms") {
+                  // Branch driven by the `from` prop directly. The global
+                  // `globalDataStates.deleteConfirmPopupFrom` was unreliable
+                  // because not every callsite dispatches it before opening
+                  // the popup — leading to stale-flow misrouting (e.g. an
+                  // "allRooms" bulk delete falling into the single-chat
+                  // branch and deleting whichever chat was last actioned).
+                  if (from === "rooms") {
                     if (roomsStates.currentRoom) {
                       const roomUuid =
                         roomsStates.currentRoom.uuid ||
@@ -273,7 +320,7 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                       }, 300);
                     }
                   } else if (isBulkDelete) {
-                    // Bulk delete operation
+                    // Bulk CHAT delete
                     if (!selectedChatIds || selectedChatIds.length === 0) {
                       triggerToast("Error", "No chats selected", "error", 3000);
                       return;
@@ -290,6 +337,32 @@ const DeleteConfirmPopup = ({ from, selectedChatIds = [] }) => {
                     };
 
                     dispatch(commonFunctionForAPICalls(payload));
+                  } else if (isBulkRoomDelete) {
+                    // Bulk ROOM delete — mirrors the chat bulk pattern. The
+                    // success effect above watches operatingBulkRooms to close
+                    // the popup, refetch the rooms list, and clear selection
+                    // in the parent.
+                    if (!selectedRoomIds || selectedRoomIds.length === 0) {
+                      triggerToast(
+                        "Error",
+                        "No Learning Labs selected",
+                        "error",
+                        3000,
+                      );
+                      return;
+                    }
+                    initiatedBulkRoomDeleteRef.current = true;
+                    dispatch(
+                      commonFunctionForAPICalls({
+                        method: "POST",
+                        url: "/rooms/bulk",
+                        data: {
+                          action: "delete",
+                          room_ids: selectedRoomIds,
+                        },
+                        name: "bulk-operations",
+                      }),
+                    );
                   } else {
                     // Single delete operation
                     const chatId =

@@ -47,7 +47,11 @@ export const createStyles = (props = {}) =>
     },
     searchInput: {
       width: "100%",
-      height: "100%",
+      // iOS-only: parent searchInputMain has no explicit height, so
+      // height: "100%" collapses the field. Android's TextInput auto-sizes
+      // to its content, so it looked fine there. Give iOS a concrete height
+      // matching the Rooms search field (verticalScale(40)).
+      height: Platform.OS === "ios" ? verticalScale(40) : "100%",
       borderWidth: 1,
       borderRadius: 16,
       borderColor: "#ABB8CC",

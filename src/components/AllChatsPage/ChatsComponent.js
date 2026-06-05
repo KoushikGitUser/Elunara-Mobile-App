@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import PinIcon from "../../../assets/SvgIconsComponent/ChatHistorySidebarIcons/PinIcon";
 import { appColors } from "../../themes/appColors";
 import { setCurrentActionChatDetails, commonFunctionForAPICalls } from "../../redux/slices/apiCommonSlice";
+import { isTablet } from "../../utils/responsive";
 
 const ChatsComponent = ({
   title,
@@ -172,15 +173,38 @@ const ChatsComponent = ({
           <MessageCircle size={25} color="#9CA3AF" strokeWidth={1.5} />
         </View>
 
-        {/* Text Content */}
+        {/* Text Content — truncate with ellipsis on phones only. Tablets have
+            enough width to render long titles / room names in full. */}
         <View style={styles.textContainer}>
-          <Text style={styles.titleText}>{title}</Text>
+          <Text
+            style={styles.titleText}
+            numberOfLines={isTablet ? undefined : 1}
+            ellipsizeMode={isTablet ? undefined : "tail"}
+          >
+            {title}
+          </Text>
           <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitleText}>{subject}</Text>
+            <Text
+              style={[styles.subtitleText, !isTablet && { flexShrink: 1 }]}
+              numberOfLines={isTablet ? undefined : 1}
+              ellipsizeMode={isTablet ? undefined : "tail"}
+            >
+              {subject}
+            </Text>
             {roomName && (
               <>
                 <Text style={styles.dotSeparator}>•</Text>
-                <Text style={[styles.subtitleText,{fontWeight:500, fontFamily:"Mukta-Medium"}]}>{roomName}</Text>
+                <Text
+                  style={[
+                    styles.subtitleText,
+                    { fontWeight: 500, fontFamily: "Mukta-Medium" },
+                    !isTablet && { flexShrink: 1 },
+                  ]}
+                  numberOfLines={isTablet ? undefined : 1}
+                  ellipsizeMode={isTablet ? undefined : "tail"}
+                >
+                  {roomName}
+                </Text>
               </>
             )}
           </View>

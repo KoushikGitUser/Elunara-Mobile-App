@@ -511,11 +511,18 @@ const ChatScreen = () => {
       setShowCompulsoryVerifyPopup(false);
       return;
     }
-    if (settingsStates.isUserDataFetched !== true) return;
+    if (settingsStates.isUserDataFetched !== true) {
+      console.log("📵 VERIFY GATE: userData not fetched yet — skipping");
+      return;
+    }
     const userData = settingsStates.userData;
-    if (!userData) return;
+    if (!userData) {
+      console.log("📵 VERIFY GATE: userData is null/undefined — skipping");
+      return;
+    }
 
     if (userData.phone_verified === true) {
+      console.log("📵 VERIFY GATE: phone_verified=true — hiding popup");
       setShowCompulsoryVerifyPopup(false);
       return;
     }
@@ -523,11 +530,28 @@ const ChatScreen = () => {
     // (release engine) otherwise fails to parse — the reason this popup
     // didn't appear in release builds.
     const createdDate = parseApiDate(userData.created_at);
-    if (!createdDate) return;
+    if (!createdDate) {
+      console.log(
+        "📵 VERIFY GATE: created_at unparseable, raw value:",
+        userData.created_at,
+      );
+      return;
+    }
+    const now = new Date();
     const diffDays = Math.floor(
-      (new Date() - createdDate) / (1000 * 60 * 60 * 24),
+      (now - createdDate) / (1000 * 60 * 60 * 24),
     );
-    setShowCompulsoryVerifyPopup(diffDays >= 10);
+    const shouldShow = diffDays >= 10;
+    console.log("═══════════════════════════════════════════════════════");
+    console.log("📵 VERIFY GATE evaluation");
+    console.log("📵 phone_verified:", userData.phone_verified);
+    console.log("📵 created_at (raw):", userData.created_at);
+    console.log("📵 createdDate parsed:", createdDate.toISOString());
+    console.log("📵 now:", now.toISOString());
+    console.log("📵 diffDays:", diffDays);
+    console.log("📵 shouldShow (diffDays >= 10):", shouldShow);
+    console.log("═══════════════════════════════════════════════════════");
+    setShowCompulsoryVerifyPopup(shouldShow);
   }, [
     settingsStates.isUserDataFetched,
     settingsStates.userData?.phone_verified,
