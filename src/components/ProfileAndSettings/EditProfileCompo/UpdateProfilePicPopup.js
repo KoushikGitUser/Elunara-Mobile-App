@@ -27,6 +27,7 @@ import FemaleStudentAvatarIcon from "../../../../assets/SvgIconsComponent/EditPr
 import { setProfilePictureAvatar, setProfilePictureType } from "../../../redux/slices/globalDataSlice";
 import { appColors } from "../../../themes/appColors";
 import { Check } from "lucide-react-native";
+import Toaster from "../../UniversalToaster/Toaster";
 
 import corporateAvatar from '../../../assets/images/Corporate2.png';
 import teacherAvatar from '../../../assets/images/Teacher2.png';
@@ -154,6 +155,11 @@ const UpdateProfilePicPopup = ({setSelectedImage, onProfileUpdated}) => {
       animationType="slide"
       onRequestClose={() => dispatch(setToggleUpdateProfilePicPopup(false))}
     >
+      {/* Mounted inside the Modal because the app-level Toaster in App.js
+          sits behind any open Modal — without this, the success toast on
+          avatar/photo update fires but renders under the popup and is
+          invisible. Matches the pattern used by every other popup in the app. */}
+      <Toaster />
       <View style={styles.container}>
         {/* Blur Background */}
 

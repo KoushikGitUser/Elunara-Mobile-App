@@ -308,6 +308,7 @@ export const handleUpdateProfileImage = {
     state.settingsStates.uploadingProfileImage = false;
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
+    triggerToast("Profile Image Updated!", "", "success", 3000);
   },
   rejected: (state, action) => {
     state.settingsStates.uploadingProfileImage = false;
@@ -319,6 +320,7 @@ export const handleUpdateProfileAvatarImage = {
   fulfilled: (state, action) => {
     state.settingsStates.allProfileInfos.profile_image =
       action.payload.data.data.profile_image;
+    triggerToast("Profile Avatar Updated!", "", "success", 3000);
   },
   rejected: (state, action) => {},
 };
@@ -402,12 +404,7 @@ export const handleDeleteAcademicLink = {
   fulfilled: (state, action) => {
     state.settingsStates.deletingAcademicLink = false;
     state.settingsStates.academicLinkDeleted = true;
-    triggerToast(
-      "Link Deleted",
-      "Link has been deleted successfully",
-      "success",
-      3000,
-    );
+    triggerToast("Link deleted", "", "success", 3000);
   },
   rejected: (state, action) => {
     state.settingsStates.deletingAcademicLink = false;

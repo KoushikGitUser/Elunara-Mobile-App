@@ -140,7 +140,7 @@ const DeleteChatPopup = () => {
             </Text>
 
             {/* Description */}
-            <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+            <Text style={[styles.description, { fontFamily: "Mukta-Regular",marginBottom:20}]}>
               This action cannot be undone.
             </Text>
 
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: scaleFont(26),
     color: "#1F2937",
-    marginBottom: 32,
+    marginBottom: 8,
     letterSpacing: -0.5,
   },
   button: {

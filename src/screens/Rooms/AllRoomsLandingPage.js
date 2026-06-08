@@ -22,6 +22,8 @@ import { setToggleDeleteChatConfirmPopup } from "../../redux/slices/toggleSlice"
 import DeleteConfirmPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/DeleteConfirmPopup";
 import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
 import { commonFunctionForAPICalls, resetHighlightRoomId } from "../../redux/slices/apiCommonSlice";
+import { Ionicons } from "@expo/vector-icons";
+import { appColors } from "../../themes/appColors";
 
 const AllRoomsLandingPage = () => {
   const insets = useSafeAreaInsets();
@@ -168,10 +170,21 @@ const AllRoomsLandingPage = () => {
 
             {/* Right side - Selected count and Delete */}
             <View style={styles.rightContainer}>
-              <View style={styles.selectedBadge}>
+              <View style={[styles.selectedBadge,{flexDirection:"row",justifyContent:"space-between",alignItems:"center",gap:10}]}>
                 <Text style={styles.selectedText}>
                   {selectedArray.length} Selected
                 </Text>
+             
+                <Ionicons
+                  onPress={() => {
+                    setIsSelecting(false);
+                    setSelectedArray([]);
+                    setChecked(false);
+                  }}
+                  name="close-circle-sharp"
+                  size={24}
+                  color={appColors.navyBlueShade}
+                />
               </View>
 
               <TouchableOpacity
@@ -312,7 +325,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   selectedBadge: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
+    paddingLeft:13,
     paddingVertical: 5,
     borderRadius: 50,
     borderWidth: 1.5,

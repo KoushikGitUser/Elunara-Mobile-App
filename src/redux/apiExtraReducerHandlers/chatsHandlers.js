@@ -285,13 +285,61 @@ export const handleFetchAllUserChatsAvailable = {
     state.chatsStates.loaderStates.isAllUserChatsFetched = "pending";
   },
   fulfilled: (state, action) => {
-    state.chatsStates.allChatsDatas.allUserChatsAvailable =
-      action?.payload.data.data;
+    const responseBody = action?.payload?.data;
+    const newChats = responseBody?.data || [];
+
+    // Determine which page the request was for. Page > 1 means we're lazy-
+    // loading additional pages — APPEND to the existing list. Page 1 (or no
+    // page param) means a fresh fetch — REPLACE the list.
+    const requestUrl = action?.meta?.arg?.url || "";
+    const pageMatch = requestUrl.match(/[?&]page=(\d+)/);
+    const requestedPage = pageMatch ? parseInt(pageMatch[1], 10) : 1;
+
+    if (requestedPage > 1) {
+      const existing =
+        state.chatsStates.allChatsDatas.allUserChatsAvailable || [];
+      // Dedupe by id: the server can return overlapping items across pages
+      // (a chat created/edited between page fetches can shift positions and
+      // re-appear), which would otherwise cause React "two children with the
+      // same key" warnings and double-render.
+      const seen = new Set(existing.map((c) => c?.id).filter(Boolean));
+      const freshOnly = newChats.filter((c) => c?.id && !seen.has(c.id));
+      state.chatsStates.allChatsDatas.allUserChatsAvailable = [
+        ...existing,
+        ...freshOnly,
+      ];
+    } else {
+      state.chatsStates.allChatsDatas.allUserChatsAvailable = newChats;
+    }
+
+    // hasMoreChats drives the lazy-load guard in AllChatsPage. Prefer the
+    // server's pagination metadata when present, otherwise fall back to a
+    // simple "got a full page → probably more" heuristic.
+    const meta = responseBody?.meta || responseBody?.pagination || {};
+    const currentPage = meta.current_page ?? requestedPage;
+    const lastPage = meta.last_page ?? meta.total_pages;
+
+    if (typeof lastPage === "number") {
+      state.chatsStates.allChatsDatas.hasMoreChats = currentPage < lastPage;
+    } else {
+      const perPageMatch = requestUrl.match(/[?&]per_page=(\d+)/);
+      const perPage = perPageMatch ? parseInt(perPageMatch[1], 10) : 20;
+      state.chatsStates.allChatsDatas.hasMoreChats =
+        newChats.length >= perPage;
+    }
+
     state.chatsStates.loaderStates.isAllUserChatsFetched = true;
-    console.log(action?.payload.data.data, "all user chats");
+    console.log(
+      "📨 chats page",
+      requestedPage,
+      "—",
+      newChats.length,
+      "items, hasMore:",
+      state.chatsStates.allChatsDatas.hasMoreChats,
+    );
   },
   rejected: (state, { payload }) => {
-    console.log(payload.message);
+    console.log(payload?.message);
     state.chatsStates.loaderStates.isAllUserChatsFetched = false;
   },
 };

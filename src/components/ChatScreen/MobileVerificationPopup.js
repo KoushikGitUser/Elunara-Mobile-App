@@ -261,7 +261,24 @@ const MobileVerificationPopup = ({
             <View
               style={[
                 styles.modalSheet,
-                Platform.OS === "ios" && { paddingBottom: keyboardHeight },
+                // iOS keyboard handling:
+                // Instead of lifting by the full keyboard height (which pushes
+                // title/description off the top of the screen), lift only
+                // enough so that the input section + Verify button stay just
+                // above the keyboard. The content BELOW the Verify button
+                // (Skip / Resend button + footer note) intentionally slides
+                // behind the keyboard.
+                //
+                // The offset below approximates the height of the content
+                // below the Verify button:
+                //   - OTP screen (isCodeSent === true): Resend button only ≈ 120
+                //   - Phone entry screen: Skip button + footer note ≈ 220
+                Platform.OS === "ios" && {
+                  paddingBottom: Math.max(
+                    0,
+                    keyboardHeight - (isCodeSent ? 80 : 180),
+                  ),
+                },
               ]}
             >
               {/* Content */}

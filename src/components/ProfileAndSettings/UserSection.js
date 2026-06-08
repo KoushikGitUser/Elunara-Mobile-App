@@ -174,12 +174,22 @@ const UserSection = () => {
             ellipsizeMode="middle"
           >
            {formatEmail(settingsStates?.allProfileInfos?.email || "")}
-            {/* {formatEmail(item?.name)} */}
-            {/* {"vmjvbhbvhfbfdhgbhfbdshfbdhsfbdhbghgbghfb"} */}
           </Text>
-          {/* <Text style={{ fontSize: scaleFont(14), fontWeight: 400,color:"#757575",marginTop:3}}>
-            +91 9807649876
-          </Text> */}
+          {isMobileVerified && settingsStates?.allProfileInfos?.phone_number ? (
+            <Text
+              style={{
+                fontSize: scaleFont(14),
+                fontWeight: 400,
+                color: "#757575",
+                marginTop: 3,
+                fontFamily: "Mukta-Regular",
+              }}
+              numberOfLines={1}
+              ellipsizeMode="middle"
+            >
+              {settingsStates.allProfileInfos.phone_number}
+            </Text>
+          ) : null}
         </View>
         <TouchableOpacity
           onPress={() => {

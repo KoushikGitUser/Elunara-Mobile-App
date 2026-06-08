@@ -9,13 +9,15 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { scaleFont } from "../../utils/responsive";
+import { parseApiDate } from "../../utils/parseApiDate";
 import PencilIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/PencilIcon";
 import profilePic from "../../assets/images/defaultUserPic.png";
 import { Marker } from "react-native-svg";
 import InfoIcon from "../../../assets/SvgIconsComponent/ProfilePageOptionsIcons/InfoIcon";
 import { triggerToast } from "../../services/toast";
+import { Eye, EyeOff } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleUpdateProfilePicPopup } from "../../redux/slices/toggleSlice";
 import UpdateProfilePicPopup from "../../components/ProfileAndSettings/EditProfileCompo/UpdateProfilePicPopup";
@@ -48,6 +50,7 @@ const EditProfile = () => {
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
   const [password, setPassword] = React.useState("12345678");
   const [hasPassword, setHasPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [originalFirstName, setOriginalFirstName] = useState("");
@@ -83,7 +86,31 @@ const EditProfile = () => {
 
   useEffect(() => {
     fetchProfileInfo();
+    // Also fetch /user so userData.created_at is available for the
+    // days-left calc below — matches the pattern used in UserSection so
+    // the verify-mobile box works even when the user reached EditProfile
+    // without passing through ChatScreen.
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: "/user",
+        name: "getUserData",
+      }),
+    );
   }, []);
+
+  // 10-day grace window from account creation — mirrors UserSection so the
+  // two places stay in sync. Derived (not state) so it always reflects the
+  // current source of truth.
+  const daysLeft = useMemo(() => {
+    const createdDate = parseApiDate(settingsStates?.userData?.created_at);
+    if (!createdDate) return 10;
+    const diffDays = Math.floor(
+      (new Date() - createdDate) / (1000 * 60 * 60 * 24),
+    );
+    const remaining = 10 - diffDays;
+    return remaining > 0 ? remaining : 0;
+  }, [settingsStates?.userData?.created_at]);
 
 
   
@@ -296,6 +323,18 @@ const EditProfile = () => {
         <View style={[styles.inputSection, { width: "100%" }]}>
           <Text style={styles.inputLabel}>Password</Text>
           <View style={styles.input}>
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.passwordEyeBtn}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              {showPassword ? (
+                <EyeOff size={22} color="#000000" />
+              ) : (
+                <Eye size={22} color="#000000" />
+              )}
+            </TouchableOpacity>
             <TextInput
               editable={false}
               ref={passwordInputRef}
@@ -303,7 +342,7 @@ const EditProfile = () => {
               placeholder="Your password"
               placeholderTextColor="#9CA3AF"
               value={password}
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
               onChangeText={(text) => setPassword(text)}
               returnKeyType="done"
             />
@@ -369,7 +408,9 @@ const EditProfile = () => {
               <TouchableOpacity>
                 <InfoIcon />
               </TouchableOpacity>
-              <Text style={styles.title}>Verify Mobile number</Text>
+              <Text style={styles.title}>
+                Verify Mobile no. in {daysLeft} {daysLeft === 1 ? "Day" : "Days"}
+              </Text>
             </View>
             <Text style={styles.subtitle}>
               Verifying your mobile no. helps protect your account and enables
@@ -440,6 +481,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
     flex: 1,
     paddingVertical: 12,
+  },
+  passwordEyeBtn: {
+    paddingRight: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   otpContainer: {
     flexDirection: "row",

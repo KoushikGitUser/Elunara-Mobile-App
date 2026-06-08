@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,6 +35,8 @@ import ArchiveChatPopup from "../../components/AllChatsPage/ArchiveChatPopup";
 import RenameChatPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/RenameChatPopup";
 import AddChatToLearningLabPopup from "../../components/ChatScreen/ChatMiddleSection/ChatConversationActions/AddChatToLearningLabPopup";
 import { triggerToast } from "../../services/toast";
+import { Ionicons } from "@expo/vector-icons";
+import { appColors } from "../../themes/appColors";
 
 const AllChatsPage = () => {
   const insets = useSafeAreaInsets();
@@ -57,6 +60,16 @@ const AllChatsPage = () => {
   const [currentSort, setCurrentSort] = useState(null);
   const [highlightedChatId, setHighlightedChatId] = useState(null);
 
+  // ── Lazy-load state ────────────────────────────────────────────────────
+  // Track which page we've fetched up to and whether a "load more" call is
+  // currently in flight (so onEndReached doesn't fire multiple back-to-back
+  // dispatches as the user scrolls).
+  const PAGE_SIZE = 20;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const hasMoreChats =
+    chatsStates.allChatsDatas?.hasMoreChats !== false; // default to true until reducer says otherwise
+
   // Refs for scroll-to-highlight feature
   const scrollViewRef = useRef(null);
   const chatPositionsRef = useRef({});
@@ -65,14 +78,58 @@ const AllChatsPage = () => {
   const allUserChats = chatsStates.allChatsDatas.allUserChatsAvailable;
   const highlightChatId = searchStates?.highlightChatId;
 
+  // Centralised URL builder. Keeps sort/filter sticky across pages so
+  // page 2+ matches the page 1 result set.
+  const buildChatsUrl = (page, sortOverride, filterOverride) => {
+    const sortVal = sortOverride !== undefined ? sortOverride : currentSort;
+    const filterVal =
+      filterOverride !== undefined ? filterOverride : currentFilter;
+    let url = `/chats?page=${page}&per_page=${PAGE_SIZE}`;
+    if (filterVal) url += `&filter=${filterVal}`;
+    if (sortVal) url += `&sort=${sortVal}`;
+    return url;
+  };
+
   useEffect(() => {
-    const payload = {
-      method: "GET",
-      url: "/chats?page=1&per_page=20",
-      name: "fetchAllUserChatsAvailable"
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    setCurrentPage(1);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: buildChatsUrl(1),
+        name: "fetchAllUserChatsAvailable",
+      }),
+    );
   }, []);
+
+  // Fired by FlatList when the user scrolls near the bottom. Guarded so
+  // back-to-back fires (FlatList can call this more than once per threshold
+  // crossing) don't double-dispatch.
+  const loadMoreChats = () => {
+    if (loadingMore) return;
+    if (!hasMoreChats) return;
+    if (chatsStates.loaderStates.isAllUserChatsFetched === "pending") return;
+    if (isSearching) return; // search uses its own non-paginated endpoint
+    if (!allUserChats || allUserChats.length === 0) return;
+
+    const nextPage = currentPage + 1;
+    setLoadingMore(true);
+    setCurrentPage(nextPage);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: buildChatsUrl(nextPage),
+        name: "fetchAllUserChatsAvailable",
+      }),
+    )
+      .unwrap()
+      .catch(() => {
+        // Rollback page counter on failure so the next scroll-end re-tries.
+        setCurrentPage(currentPage);
+      })
+      .finally(() => {
+        setLoadingMore(false);
+      });
+  };
 
   useEffect(() => {
     if (chatsStates.loaderStates.isAllUserChatsFetched === true && isInitialLoad) {
@@ -90,13 +147,15 @@ const AllChatsPage = () => {
       setIsSelecting(false);
       setChecked(false);
 
-      // Refetch all chats
-      const payload = { 
-        method: "GET",
-        url: "/chats?page=1&per_page=20",
-        name: "fetchAllUserChatsAvailable"
-      };
-      dispatch(commonFunctionForAPICalls(payload));
+      // Refetch the first page (reset to top after bulk op).
+      setCurrentPage(1);
+      dispatch(
+        commonFunctionForAPICalls({
+          method: "GET",
+          url: buildChatsUrl(1),
+          name: "fetchAllUserChatsAvailable",
+        }),
+      );
 
       // Show toast after refetch with stored info
       if (bulkInfo) {
@@ -141,10 +200,14 @@ const AllChatsPage = () => {
         // Calculate approximate scroll position (assuming each chat item is ~80px height)
         const scrollPosition = chatIndex * 80;
 
-        // Scroll to the chat after a small delay to ensure layout is complete
+        // Scroll to the chat after a small delay to ensure layout is complete.
+        // FlatList uses scrollToOffset (vs ScrollView's scrollTo).
         setTimeout(() => {
-          if (scrollViewRef.current) {
-            scrollViewRef.current.scrollTo({ y: scrollPosition, animated: true });
+          if (scrollViewRef.current?.scrollToOffset) {
+            scrollViewRef.current.scrollToOffset({
+              offset: scrollPosition,
+              animated: true,
+            });
           }
         }, 300);
 
@@ -172,44 +235,39 @@ const AllChatsPage = () => {
 
   const handleSort = (sortValue) => {
     setCurrentSort(sortValue);
-    // Build URL with both filter and sort if filter exists
-    let url = `/chats?page=1&per_page=20`;
-    if (currentFilter) {
-      url += `&filter=${currentFilter}`;
-    }
-    url += `&sort=${sortValue}`;
-
-    const payload = {
-      method: "GET",
-      url,
-      name: "fetchAllUserChatsAvailable"
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    setCurrentPage(1);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: buildChatsUrl(1, sortValue, currentFilter),
+        name: "fetchAllUserChatsAvailable",
+      }),
+    );
   };
 
   const handleFilter = (filterValue) => {
     setCurrentFilter(filterValue);
-    // Build URL with both filter and sort if sort exists
-    let url = `/chats?page=1&per_page=20&filter=${filterValue}`;
-    if (currentSort) {
-      url += `&sort=${currentSort}`;
-    }
-
-    const payload = {
-      method: "GET",
-      url,
-      name: "fetchAllUserChatsAvailable"
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    setCurrentPage(1);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: buildChatsUrl(1, currentSort, filterValue),
+        name: "fetchAllUserChatsAvailable",
+      }),
+    );
   };
 
   const handleSearch = (searchText) => {
-    const payload = {
-      method: "GET",
-      url: searchText ? `/chats?search=${searchText}` : "/chats?page=1&per_page=20",
-      name: "fetchAllUserChatsAvailable"
-    };
-    dispatch(commonFunctionForAPICalls(payload));
+    setCurrentPage(1);
+    dispatch(
+      commonFunctionForAPICalls({
+        method: "GET",
+        url: searchText
+          ? `/chats?search=${searchText}`
+          : buildChatsUrl(1),
+        name: "fetchAllUserChatsAvailable",
+      }),
+    );
   };
 
   const handleBulkArchive = () => {
@@ -322,6 +380,16 @@ const AllChatsPage = () => {
                 <Text style={bulkStyles.selectedText}>
                   {selectedArray.length} Selected
                 </Text>
+                <Ionicons
+                  onPress={() => {
+                    setIsSelecting(false);
+                    setSelectedArray([]);
+                    setChecked(false);
+                  }}
+                  name="close-circle-sharp"
+                  size={24}
+                  color={appColors.navyBlueShade}
+                />
               </View>
 
               <TouchableOpacity
@@ -352,38 +420,47 @@ const AllChatsPage = () => {
             currentFilter={currentFilter}
           />
         )}
-        <ScrollView
+        <FlatList
           ref={scrollViewRef}
+          data={allUserChats || []}
+          keyExtractor={(item, index) =>
+            (item?.id && String(item.id)) || `chat-${index}`
+          }
+          renderItem={({ item: chat, index: chatsIndex }) => (
+            <ChatsComponent
+              index={chat.id}
+              title={chat.name}
+              subject={chat.subject?.name}
+              roomName={chat.room?.name}
+              isPinned={chat.is_pinned}
+              isSelecting={isSelecting}
+              selectedArray={selectedArray}
+              setIsSelecting={setIsSelecting}
+              setSelectedArray={setSelectedArray}
+              setPopupPosition={setPopupPosition}
+              chatData={chat}
+              isHighlighted={highlightedChatId === chat.id}
+              onLayout={(event) => {
+                const { y } = event.nativeEvent.layout;
+                chatPositionsRef.current[chat.id] = y;
+              }}
+            />
+          )}
           contentContainerStyle={{
             justifyContent: "space-between",
             alignItems: "center",
           }}
           style={styles.allChatsScrollMain}
-        >
-          {allUserChats.map((chat, chatsIndex) => {
-            return (
-              <ChatsComponent
-                key={chatsIndex}
-                index={chat.id}
-                title={chat.name}
-                subject={chat.subject?.name}
-                roomName={chat.room?.name}
-                isPinned={chat.is_pinned}
-                isSelecting={isSelecting}
-                selectedArray={selectedArray}
-                setIsSelecting={setIsSelecting}
-                setSelectedArray={setSelectedArray}
-                setPopupPosition={setPopupPosition}
-                chatData={chat}
-                isHighlighted={highlightedChatId === chat.id}
-                onLayout={(event) => {
-                  const { y } = event.nativeEvent.layout;
-                  chatPositionsRef.current[chat.id] = y;
-                }}
-              />
-            );
-          })}
-        </ScrollView>
+          onEndReached={loadMoreChats}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={{ paddingVertical: 20 }}>
+                <ActivityIndicator size="small" color="#081A35" />
+              </View>
+            ) : null
+          }
+        />
       </Animated.View>
       <OptionsPopup popupPosition={popupPosition} />
     </SafeAreaView>
@@ -427,15 +504,17 @@ const bulkStyles = StyleSheet.create({
   rightContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 10,
   },
   selectedBadge: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
     paddingVertical: 5,
+    paddingLeft: 12,
     borderRadius: 50,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "#D3DAE5",
     backgroundColor: "transparent",
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10
   },
   selectedText: {
     fontSize: scaleFont(12),

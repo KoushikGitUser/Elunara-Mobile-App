@@ -193,12 +193,14 @@ const ChatsScrollForAllRoomsPage = ({
           </View>
         )}
 
-        {/* Menu Icon */}
+        {/* Menu Icon — still rendered during selection but disabled (no press, faded) */}
         <Pressable
           ref={menuButtonRef}
+          disabled={isSelecting}
           style={({ pressed }) => [
             styles.menuButton,
-            pressed && styles.menuPressed,
+            pressed && !isSelecting && styles.menuPressed,
+            isSelecting && { opacity: 0.3 },
           ]}
           onPress={() => {
             menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
@@ -236,6 +238,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 8,
     paddingLeft: 10,
+    borderRadius:10
   },
   cardPressed: {
     backgroundColor: "#F9FAFB",

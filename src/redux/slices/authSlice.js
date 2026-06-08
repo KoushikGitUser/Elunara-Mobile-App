@@ -751,13 +751,34 @@ const authSlice = createSlice({
         state.authStates.isEmailChangeRequested = "pending";
         state.authStates.isOTPSentForEmailChange = "pending";
       })
-      .addCase(requestForEmailChange.fulfilled, (state, { payload }) => {
+      .addCase(requestForEmailChange.fulfilled, (state, action) => {
+        const { payload } = action;
         state.authStates.isEmailChangeRequested = true;
         state.authStates.isOTPSentForEmailChange = true;
         if (payload?.status === 200) {
+          // Mask the email so the toast reveals only the first 3 chars of the
+          // local part, e.g. "sam***@gmail.com". Falls back gracefully when
+          // the local part is shorter than 3 chars (e.g. "ab" → "ab***@…").
+          // The popup dispatches the thunk with { new_email, password }
+          // so the raw email lives at action.meta.arg.new_email. Tolerate
+          // alternative key shapes in case callers vary.
+          const rawEmail =
+            action.meta?.arg?.new_email ||
+            action.meta?.arg?.newEmail ||
+            action.meta?.arg?.email ||
+            "";
+          const maskEmail = (e) => {
+            if (!e || typeof e !== "string" || !e.includes("@")) return e;
+            const [local, domain] = e.split("@");
+            const visible = local.slice(0, Math.min(3, local.length));
+            return `${visible}***@${domain}`;
+          };
+          const masked = maskEmail(rawEmail);
           triggerToast(
-            "Verification email sent",
-            "Please check your new email address to verify the change.",
+            "Verification code has been sent!",
+            masked
+              ? `An OTP has been sent to your email id ${masked}.`
+              : "An OTP has been sent to your email id.",
             "success",
             3000
           );

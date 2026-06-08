@@ -174,7 +174,6 @@ const AppNavigator = () => {
           name="settingsInnerPages"
           component={SettingsProfileInnerPage}
           options={{
-            gestureEnabled: false,
             headerShown: false,
           }}
         />

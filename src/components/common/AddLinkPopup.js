@@ -26,6 +26,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [urlError, setUrlError] = useState("");
   const animatedValue = useState(new Animated.Value(0))[0];
   const { toggleStates } = useSelector((state) => state.Toggle);
   const dispatch = useDispatch();
@@ -133,15 +134,26 @@ const AddLinkPopup = ({ onLinkAdded }) => {
                 <Text style={styles.title}>Add Link</Text>
                 <View style={styles.inputSection}>
                   <TextInput
-                    style={styles.input}
+                    style={[
+                      styles.input,
+                      urlError && { borderColor: "#D00B0B" },
+                    ]}
                     placeholder="Add your link URL (https://example.com)"
                     placeholderTextColor="#9CA3AF"
                     value={url}
-                    onChangeText={setUrl}
+                    onChangeText={(text) => {
+                      setUrl(text);
+                      // Clear the error as soon as the user edits the URL,
+                      // so it doesn't keep showing while they're typing.
+                      if (urlError) setUrlError("");
+                    }}
                     keyboardType="url"
                     returnKeyType="next"
                     autoCapitalize="none"
                   />
+                  {urlError ? (
+                    <Text style={styles.errorText}>{urlError}</Text>
+                  ) : null}
                 </View>
                 <View style={styles.inputSection}>
                   <TextInput
@@ -162,15 +174,11 @@ const AddLinkPopup = ({ onLinkAdded }) => {
                     { marginBottom: Platform.OS === 'ios' && keyboardHeight > 0 ? 10 : 85 },
                   ]}
                   onPress={() => {
-                    // Basic URL validation
+                    // Basic URL validation — must start with http:// or
+                    // https:// and have some host content after.
                     const urlPattern = /^https?:\/\/.+/i;
-                    if (!urlPattern.test(url)) {
-                      triggerToast(
-                        "Invalid URL",
-                        "Please enter a valid URL starting with http:// or https://",
-                        "error",
-                        3000,
-                      );
+                    if (!urlPattern.test(url.trim())) {
+                      setUrlError("Invalid URL");
                       return;
                     }
 
@@ -196,6 +204,7 @@ const AddLinkPopup = ({ onLinkAdded }) => {
                     dispatch(setToggleAddLinkPopup(false));
                     setUrl("");
                     setDescription("");
+                    setUrlError("");
                   }}
                   activeOpacity={0.8}
                   disabled={!url}
@@ -345,6 +354,13 @@ const styles = StyleSheet.create({
     fontFamily: "Mukta-Regular",
     color: "#1F2937",
     letterSpacing: 0.2,
+  },
+  errorText: {
+    color: "#D00B0B",
+    fontSize: scaleFont(12),
+    fontFamily: "Mukta-Regular",
+    marginTop: 6,
+    marginLeft: 4,
   },
   verifyButton: {
     backgroundColor: "#081A35",

@@ -141,7 +141,18 @@ const ChatsComponent = ({
       onLayout={onLayout}
     >
       <TouchableOpacity
-        style={[styles.cardContainer, { backgroundColor: getBackgroundColor(), paddingLeft: isSelecting ? 10 : 0 }]}
+        style={[
+          styles.cardContainer,
+          {
+            backgroundColor: getBackgroundColor(),
+            paddingLeft: isSelecting ? 10 : 0,
+            // Minimal gap between chat cards while in multi-select mode, so
+            // adjacent highlighted (blue) cards don't visually merge into one
+            // continuous block. Slight rounding to match the highlight pill.
+            marginBottom: isSelecting ? 6 : 0,
+            borderRadius: isSelecting ? 10 : 0,
+          },
+        ]}
         onLongPress={() => {
         setIsSelecting(true);
         setSelectedArray([...selectedArray, index])
@@ -217,12 +228,14 @@ const ChatsComponent = ({
           </View>
         )}
 
-        {/* Menu Icon */}
+        {/* Menu Icon — still rendered during selection but disabled (no press, faded) */}
         <Pressable
           ref={menuButtonRef}
+          disabled={isSelecting}
           style={({ pressed }) => [
             styles.menuButton,
-            pressed && styles.menuPressed,
+            pressed && !isSelecting && styles.menuPressed,
+            isSelecting && { opacity: 0.3 },
           ]}
           onPress={(e) => {
             e.stopPropagation();

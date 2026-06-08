@@ -22,6 +22,7 @@ import { academicLinks } from "../../data/datas";
 import LinkIcon from "../../../assets/SvgIconsComponent/AcademicLinksIcon/LinkIcon";
 import { triggerToast } from "../../services/toast";
 import AddLinkPopup from "../../components/common/AddLinkPopup";
+import DeleteAcademicLinkPopup from "../../components/ProfileAndSettings/AcademicLinksCompo/DeleteAcademicLinkPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { setToggleAddLinkPopup } from "../../redux/slices/toggleSlice";
 import {
@@ -33,6 +34,7 @@ const { width, height } = Dimensions.get("window");
 
 const AcademicLinks = () => {
   const [activePopupIndex, setActivePopupIndex] = useState(null);
+  const [linkPendingDelete, setLinkPendingDelete] = useState(null);
   const { toggleStates } = useSelector((state) => state.Toggle);
   const { settingsStates } = useSelector((state) => state.API);
   const dispatch = useDispatch();
@@ -69,23 +71,25 @@ const AcademicLinks = () => {
     setActivePopupIndex(activePopupIndex === index ? null : index);
   };
 
-  const handleDelete = (id) => {
-    dispatch(
-      commonFunctionForAPICalls({
-        method: "DELETE",
-        url: `/settings/academic-links/${id}`,
-        name: "deleteAcademicLink",
-      }),
-    );
+  const handleDelete = (link, linkIndex) => {
+    // Resolve the API's identifier the same way the original code did:
+    // prefer link.index (a field on the API object), fall back to array
+    // position. Without this resolution the DELETE URL was undefined and
+    // the popup just closed without ever firing the request.
+    const deleteId =
+      link?.index !== undefined ? link.index : linkIndex;
+    setLinkPendingDelete({ link, deleteId });
     setActivePopupIndex(null);
   };
 
+  const userLinksCount = settingsStates.academicLinks?.userLinks?.length || 0;
+  const isAtLinkLimit = userLinksCount >= 2;
+
   const handleAddLink = () => {
-    const currentLinks = settingsStates.academicLinks?.userLinks || [];
-    if (currentLinks.length >= 2) {
+    if (isAtLinkLimit) {
       triggerToast(
-        "Limit reached",
-        "Only 2 academic links can be added",
+        "Limit Exceeded",
+        "You can add a maximum of 2 academic links. Remove one to add another.",
         "error",
         3000,
       );
@@ -97,6 +101,12 @@ const AcademicLinks = () => {
   return (
     <View style={styles.container}>
       {toggleStates.toggleAddLinkPopup && <AddLinkPopup />}
+      <DeleteAcademicLinkPopup
+        visible={!!linkPendingDelete}
+        link={linkPendingDelete?.link}
+        deleteId={linkPendingDelete?.deleteId}
+        onClose={() => setLinkPendingDelete(null)}
+      />
 
       <View style={styles.card}>
         {/* Header Section */}
@@ -138,8 +148,13 @@ const AcademicLinks = () => {
             </Text>
           </View>
 
-          {/* Plus Button - Centered to left content */}
-          <TouchableOpacity onPress={handleAddLink} style={styles.addButton}>
+          {/* Plus Button - Centered to left content. Visually disabled when
+              the user has reached the 2-link limit, but still tappable so the
+              "Limit Exceeded" toast fires on press. */}
+          <TouchableOpacity
+            onPress={handleAddLink}
+            style={[styles.addButton, isAtLinkLimit && { opacity: 0.4 }]}
+          >
             <Plus size={23} color="#1F2937" strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
@@ -158,16 +173,41 @@ const AcademicLinks = () => {
         (links, linkIndex) => {
           return (
             <View key={linkIndex} style={styles.linksMain}>
-              {/* Link Icon */}
-              <View style={styles.iconContainer}>
-                <LinkIcon />
-              </View>
+              {/* Link Icon + Details — tappable to open the URL in the
+                  device's default browser. The more-options button on the
+                  right is kept outside this touch area so users can still
+                  open the delete popup without accidentally opening the
+                  link. */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.linkTappableArea}
+                onPress={() => {
+                  const raw = (links?.url || "").trim();
+                  if (!raw) return;
+                  // Add scheme if user-saved URL was entered without one,
+                  // otherwise Linking.openURL fails silently on some devices.
+                  const href = /^https?:\/\//i.test(raw)
+                    ? raw
+                    : `https://${raw}`;
+                  Linking.openURL(href).catch(() => {
+                    triggerToast(
+                      "Couldn't open link",
+                      "The link could not be opened. Please check its format.",
+                      "error",
+                      3000,
+                    );
+                  });
+                }}
+              >
+                <View style={styles.iconContainer}>
+                  <LinkIcon />
+                </View>
 
-              {/* Link Details */}
-              <View style={styles.linkDetails}>
-                <Text style={styles.url}>{links.url} </Text>
-                <Text style={styles.description}>{links.description} </Text>
-              </View>
+                <View style={styles.linkDetails}>
+                  <Text style={styles.url}>{links.url} </Text>
+                  <Text style={styles.description}>{links.description} </Text>
+                </View>
+              </TouchableOpacity>
 
               {/* More Options Button */}
               <View style={styles.moreButtonContainer}>
@@ -192,13 +232,7 @@ const AcademicLinks = () => {
                       <View style={styles.deletePopup}>
                         <TouchableOpacity
                           style={styles.deleteOption}
-                          onPress={() =>
-                            handleDelete(
-                              links.index !== undefined
-                                ? links.index
-                                : linkIndex,
-                            )
-                          }
+                          onPress={() => handleDelete(links, linkIndex)}
                         >
                           <Trash2 size={18} color="#3A3A3A" strokeWidth={2} />
                           <Text style={styles.deleteText}>Delete</Text>
@@ -372,6 +406,12 @@ const styles = StyleSheet.create({
     gap: 14,
     alignSelf: "center",
     marginTop: 20,
+  },
+  linkTappableArea: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
   },
 });
 

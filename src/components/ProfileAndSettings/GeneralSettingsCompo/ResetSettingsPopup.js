@@ -27,7 +27,7 @@ const ResetSettingsPopup = () => {
     if (settingsStates.isGeneralSettingsRestored === true) {
       dispatch(setToggleResetSettingsPopup(false));
       navigation.navigate("profile");
-      triggerToast("Settings restored","Your all general settings restored to default","success",3000);
+      triggerToast("Settings Reset Successfully","Chat and General Settings are now reset. Your data is safe.","success",3000);
       dispatch(setIsAnythingChangedInGeneralSettings(true));
       dispatch(setIsGeneralSettingsRestored(false));
     }
