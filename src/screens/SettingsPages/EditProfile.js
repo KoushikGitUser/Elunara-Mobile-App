@@ -48,7 +48,7 @@ const EditProfile = () => {
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [mobileVerificationPopup, setMobileVerificationPopup] = useState(false);
-  const [password, setPassword] = React.useState("12345678");
+  const [password, setPassword] = React.useState("1234567890");
   const [hasPassword, setHasPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -329,11 +329,7 @@ const EditProfile = () => {
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              {showPassword ? (
-                <EyeOff size={22} color="#000000" />
-              ) : (
-                <Eye size={22} color="#000000" />
-              )}
+
             </TouchableOpacity>
             <TextInput
               editable={false}

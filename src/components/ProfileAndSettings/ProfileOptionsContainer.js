@@ -71,11 +71,14 @@ const ProfileOptionsContainer = ({ setToggleLogOutConfirmPopup }) => {
         );
       })}
 
-      {/* Upgrade button */}
+      {/* Upgrade button — lands on Payment and Billings page (not directly
+          the Make Payment screen) so the user sees their balance/plan
+          summary first. Matches the SidebarFooter and Low/NoBalanceModal
+          entry points. */}
       <TouchableOpacity style={styles.upgradeBtn} onPress={() => {
-        navigation.navigate("settingsInnerPages", { page: 11 });
-        dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Recharge Wallet" : "Activate Wallet"));
-        dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+        navigation.navigate("settingsInnerPages", { page: 2 });
+        dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
+        dispatch(setSettingsInnerPageComponentToRender("Payment and Billings"));
       }}>
         {/* <View style={styles.coinstar}>
           <AntDesign name="star" size={18} color={appColors.navyBlueShade} />

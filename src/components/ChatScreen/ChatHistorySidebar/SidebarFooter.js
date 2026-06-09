@@ -119,10 +119,22 @@ const SidebarFooter = ({ translateX }) => {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
+          // Slide the sidebar back to closed position. The redux flag alone
+          // doesn't close it visually — the translateX animation does (same
+          // pattern the Profile button uses above).
+          Animated.timing(translateX, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
           dispatch(setToggleChatHistorySidebar(false));
-          navigation.navigate("settingsInnerPages", { page: 11 });
-        dispatch(setSettingsInnerPageHeaderTitle(walletStates?.isInitialRechargeCompleted ? "Recharge Wallet" : "Activate Wallet"));
-          dispatch(setSettingsInnerPageComponentToRender("Make Payment"));
+          // Land on the Payment and Billings page (page 2), not directly on
+          // the Make Payment screen — matches the LowBalanceModal /
+          // NoBalanceModal entry point so the user sees their balance + plan
+          // before initiating a recharge.
+          navigation.navigate("settingsInnerPages", { page: 2 });
+          dispatch(setSettingsInnerPageHeaderTitle("Payment and Billings"));
+          dispatch(setSettingsInnerPageComponentToRender("Payment and Billings"));
         }}
         style={styles.upgradeBtn}
       >
