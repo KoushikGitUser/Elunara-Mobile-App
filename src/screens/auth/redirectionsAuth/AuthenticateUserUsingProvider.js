@@ -47,16 +47,29 @@ const AuthenticateUserUsingProvider = ({ route }) => {
       );
       return () => backHandler.remove(); // clean up
     } else {
-      // iOS: prevent navigating back via swipe / stack back
+      // iOS: prevent the user swipe-back gesture from returning to the
+      // auth flow after the OAuth round-trip, but allow programmatic
+      // navigation (RESET / REPLACE / NAVIGATE) so the success effect
+      // below can move the user to the chat screen.
+      //
+      // Earlier this listener called e.preventDefault() unconditionally,
+      // which silently cancelled the navigation.reset() to "chat" — the
+      // user was stuck on the "Redirecting…" UI forever. This was the
+      // bug behind Apple's Guideline 2.1(a) rejection (iPad Air M3,
+      // iPadOS 26.5). Only blocking POP / GO_BACK / POP_TO_TOP keeps the
+      // intent (no user-initiated back) while letting RESET through.
       const unsub = navigation.addListener("beforeRemove", (e) => {
-        e.preventDefault();
+        const type = e?.data?.action?.type;
+        if (type === "POP" || type === "GO_BACK" || type === "POP_TO_TOP") {
+          e.preventDefault();
+        }
       });
       return unsub;
     }
   }, [navigation]);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (isVerified == true) {
         // Reset the stack so OAuth/welcome screens are wiped — back from
         // chat must never land on the auth flow.
@@ -70,6 +83,7 @@ const AuthenticateUserUsingProvider = ({ route }) => {
         );
       }
     }, 2500);
+    return () => clearTimeout(timeoutId);
   }, [isVerified]);
 
   useEffect(() => {
