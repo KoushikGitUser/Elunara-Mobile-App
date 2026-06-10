@@ -15,7 +15,7 @@ import { setToggleAddItemsToInputPopup, setToggleUnlockMaxUploadLimitPopup } fro
 import { setSelecetdFiles, addUploadedAttachmentId, setIsUploadingAttachment } from "../../../redux/slices/globalDataSlice";
 import { addItemsOptions } from "../../../data/datas";
 import { Camera, File, Image } from "lucide-react-native";
-import { scaleFont } from "../../../utils/responsive";
+import { scaleFont, isProMaxIphone } from "../../../utils/responsive";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { triggerToast } from "../../../services/toast";
@@ -300,7 +300,7 @@ const AddItemsToInputPopup = () => {
                   ) : (
                     <Image size={22} strokeWidth={1.25}  />
                   )}
-                  <Text style={{fontSize:scaleFont(15), fontWeight: pressed ? 600 : 400,fontFamily:pressed?"Mukta-Bold":"Mukta-Regular"}}>{items?.text}</Text>
+                  <Text style={{fontSize:scaleFont(isProMaxIphone ? 17 : 15), fontWeight: pressed ? 600 : 400,fontFamily:pressed?"Mukta-Bold":"Mukta-Regular"}}>{items?.text}</Text>
                 </>
               )}
             </Pressable>

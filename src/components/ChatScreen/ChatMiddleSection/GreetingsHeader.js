@@ -4,12 +4,16 @@ import {
   moderateScale,
   scaleFont,
   verticalScale,
+  isProMaxIphone,
 } from "../../../utils/responsive";
 import SimpleGradientText from "../../common/SimpleGradientText";
 import { useFonts } from "expo-font";
 import { useSelector } from "react-redux";
 
-const GreetingsHeader = () => {
+const GreetingsHeader = ({ isFromRooms = false }) => {
+  // Scope the larger Pro Max font to ChatScreen only — Rooms uses the same
+  // GreetingsHeader and shouldn't be affected.
+  const usePromaxScale = isProMaxIphone && !isFromRooms;
   const [fontsLoaded] = useFonts({
     "Mukta-Bold": require("../../../../assets/fonts/Mukta-Bold.ttf"),
     "Mukta-Regular": require("../../../../assets/fonts/Mukta-Regular.ttf"),
@@ -57,7 +61,7 @@ const GreetingsHeader = () => {
         </View>
         <Text
           style={{
-            fontSize: scaleFont(15),
+            fontSize: scaleFont(usePromaxScale ? 17 : 15),
             color: "#9C9C9C",
             fontFamily: "Mukta-Regular",
           }}

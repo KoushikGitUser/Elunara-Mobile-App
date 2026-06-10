@@ -9,7 +9,7 @@ import {
   Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { scaleFont, verticalScale } from "../../../../../utils/responsive";
+import { scaleFont, verticalScale, isProMaxIphone } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -126,10 +126,24 @@ const ResponseStyleState = () => {
           </TouchableOpacity>
         </View>
         {/* Title */}
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Style</Text>
+        <Text
+          style={[
+            styles.title,
+            { fontFamily: "Mukta-Bold" },
+            isProMaxIphone && { fontSize: scaleFont(28) },
+          ]}
+        >
+          Response Style
+        </Text>
 
         {/* Description */}
-        <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+        <Text
+          style={[
+            styles.description,
+            { fontFamily: "Mukta-Regular" },
+            isProMaxIphone && { fontSize: scaleFont(15) },
+          ]}
+        >
           Set the tone of your AI companion - whether you need a mentor,
           explainer, or study buddy.
         </Text>

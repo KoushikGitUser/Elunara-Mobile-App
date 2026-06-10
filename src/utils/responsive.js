@@ -1,5 +1,5 @@
 // responsive.js
-import { Dimensions, PixelRatio } from 'react-native';
+import { Dimensions, PixelRatio, Platform } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -24,3 +24,19 @@ export const scaleFont = (size) =>
 // Optional: Detect small vs. large devices
 export const isSmallDevice = SCREEN_WIDTH < 360;
 export const isTablet = SCREEN_WIDTH >= 768;
+
+// Detect "Pro Max"-class iPhones. Also matches Plus models because they
+// share the same logical width as Pro Max (iPhone 12-17 Plus / Pro Max =
+// 428-430 pt). Regular and Pro models sit at 375-393 pt. Use this for
+// large-iPhone-only visual tweaks where the standard iPhone layout looks
+// sparse (e.g. enlarged decorative imagery on landing screens).
+export const isProMaxIphone =
+  Platform.OS === "ios" && SCREEN_WIDTH >= 428 && !isTablet;
+
+// Detect regular / "small" iPhones — every iOS phone that is NOT a Pro Max
+// or Plus. Includes iPhone SE, mini, standard, and Pro models (320-393 pt).
+// Excludes Android and iPad. Use this for slight typographic bumps that
+// only apply on the smaller iPhone form factor — leaving Android and iPad
+// unaffected.
+export const isRegularIphone =
+  Platform.OS === "ios" && SCREEN_WIDTH < 428 && !isTablet;

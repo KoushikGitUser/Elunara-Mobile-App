@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions, Platform } from "react-native";
 
 const { width: CARD_SCREEN_WIDTH } = Dimensions.get("screen");
 const IS_BIG_IPAD = CARD_SCREEN_WIDTH >= 1024;
@@ -7,7 +7,7 @@ import { createStyles } from "../ChatScreenCompo.styles";
 import { useSelector, useDispatch } from "react-redux";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import GradientText from "../../common/GradientText";
-import { moderateScale, scaleFont, verticalScale } from "../../../utils/responsive";
+import { moderateScale, scaleFont, verticalScale, isProMaxIphone, isRegularIphone } from "../../../utils/responsive";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 import { setToggleTopicsPopup, setToggleSubTopics } from "../../../redux/slices/toggleSlice";
 import { setCurrentSelectedTopic, setSelectedSubjectID } from "../../../redux/slices/globalDataSlice";
@@ -45,17 +45,32 @@ const CurriculumContentWrapper = () => {
 
   return (
     <View style={styles.chatMiddleSectionWrapper}>
-      {/* Chakra logo */}
+      {/* Chakra logo — matches the enlarged Pro Max / Plus styling used in
+          ChatMiddleWrapper so the curriculum view feels consistent on large
+          iPhones. Other devices keep their original size. */}
       <Image
         source={chakraLogo}
-        style={{
-          height: 115,
-          width: 80,
-          position: "absolute",
-          right: -20,
-          top: 120,
-          zIndex: 1,
-        }}
+        style={
+          isProMaxIphone
+            ? {
+              height: 135,
+              width: 115,
+              position: "absolute",
+              right: -30,
+              objectFit: "contain",
+              top: 120,
+              zIndex: 1,
+            }
+            : {
+              height: 115,
+              width: Platform.OS === 'ios' ? 85 : 80,
+              position: "absolute",
+              right: -24,
+              objectFit: "contain",
+              top: Platform.OS === 'ios' ? 80 : 120,
+              zIndex: 1,
+            }
+        }
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -94,7 +109,7 @@ const CurriculumContentWrapper = () => {
           )}
           <Text
             style={{
-              fontSize: scaleFont(15),
+              fontSize: scaleFont(isProMaxIphone ? 17 : 15),
               color: "#9C9C9C",
               fontFamily: "Mukta-Regular",
               marginTop: 4,
@@ -128,14 +143,30 @@ const CurriculumContentWrapper = () => {
                       ) : null}
                     </View>
                     <Text
-                      style={[cardStyles.topicTitle, { fontFamily: "Mukta-Bold" }]}
+                      style={[
+                        cardStyles.topicTitle,
+                        { fontFamily: "Mukta-Bold" },
+                        isProMaxIphone && { fontSize: moderateScale(16) },
+                        isRegularIphone && { fontSize: moderateScale(15) },
+                      ]}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
                       {subject.name}
                     </Text>
                     <Text
-                      style={[cardStyles.topicDesc, { fontFamily: "Mukta-Regular" }]}
+                      style={[
+                        cardStyles.topicDesc,
+                        { fontFamily: "Mukta-Regular" },
+                        isProMaxIphone && {
+                          fontSize: moderateScale(14),
+                          lineHeight: 18,
+                        },
+                        isRegularIphone && {
+                          fontSize: moderateScale(13),
+                          lineHeight: 16,
+                        },
+                      ]}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >

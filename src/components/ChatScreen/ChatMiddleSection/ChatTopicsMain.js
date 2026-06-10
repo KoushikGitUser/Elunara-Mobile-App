@@ -6,7 +6,7 @@ import { topicsSheetInitial } from "../../../data/datas";
 import Topics from "./Topics";
 import { useSelector } from "react-redux";
 
-const ChatTopicsMain = () => {
+const ChatTopicsMain = ({ isFromRooms = false }) => {
   const styleProps = {};
   const styles = useMemo(() => createStyles(styleProps), []);
   const navigation = useNavigation();
@@ -40,7 +40,14 @@ const ChatTopicsMain = () => {
     <View style={styles.topicsMainWrapper}>
       <View style={styles.grid}>
         {dynamicTopics.map((topics, topicIndex) => {
-          return <Topics index={topicIndex} key={topicIndex} item={topics} />;
+          return (
+            <Topics
+              index={topicIndex}
+              key={topicIndex}
+              item={topics}
+              isFromRooms={isFromRooms}
+            />
+          );
         })}
       </View>
     </View>

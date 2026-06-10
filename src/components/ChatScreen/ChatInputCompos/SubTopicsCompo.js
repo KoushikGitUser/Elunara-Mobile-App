@@ -25,7 +25,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "@react-native-community/blur";
 import { AntDesign } from "@expo/vector-icons";
 import { subTopics } from "../../../data/datas";
-import { scaleFont } from "../../../utils/responsive";
+import { scaleFont, isProMaxIphone } from "../../../utils/responsive";
 import SubTopicsCard from "./SubTopicsCard";
 import { ArrowLeft, Search } from "lucide-react-native";
 import {
@@ -308,11 +308,23 @@ const SubTopicsCompo = () => {
         />
       </View>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+      <Text
+        style={[
+          styles.title,
+          { fontFamily: "Mukta-Bold" },
+          isProMaxIphone && { fontSize: scaleFont(27) },
+        ]}
+      >
         {globalDataStates.currentSelectedTopic}{" "}
       </Text>
       {/* Description */}
-      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+      <Text
+        style={[
+          styles.description,
+          { fontFamily: "Mukta-Regular" },
+          isProMaxIphone && { fontSize: scaleFont(16) },
+        ]}
+      >
         Popular Topics
       </Text>
       <View style={styles.input}>

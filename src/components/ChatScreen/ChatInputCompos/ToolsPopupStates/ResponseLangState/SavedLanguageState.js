@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { moderateScale, scaleFont } from "../../../../../utils/responsive";
+import { moderateScale, scaleFont, isProMaxIphone } from "../../../../../utils/responsive";
 import { setSelectedLanguage, setToggleToolsPopup } from "../../../../../redux/slices/toggleSlice";
 
 const SavedLanguageState = () => {
@@ -86,9 +86,23 @@ const SavedLanguageState = () => {
   return (
     <>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Response Language</Text>
+      <Text
+        style={[
+          styles.title,
+          { fontFamily: "Mukta-Bold" },
+          isProMaxIphone && { fontSize: scaleFont(28) },
+        ]}
+      >
+        Response Language
+      </Text>
       {/* Description */}
-      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+      <Text
+        style={[
+          styles.description,
+          { fontFamily: "Mukta-Regular" },
+          isProMaxIphone && { fontSize: scaleFont(15) },
+        ]}
+      >
         Choose your response language — ideal for bilinguals or fluent speakers.
       </Text>
 

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { BlurView } from "@react-native-community/blur";
-import { scaleFont } from "../../../utils/responsive";
+import { scaleFont, isProMaxIphone } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -81,10 +81,24 @@ const ToolsOptionsPopup = () => {
               </TouchableOpacity>
             </View>
             {/* Title */}
-            <Text style={[styles.title,{fontFamily:"Mukta-Bold"}]}>Choose Tools</Text>
+            <Text
+              style={[
+                styles.title,
+                { fontFamily: "Mukta-Bold" },
+                isProMaxIphone && { fontSize: scaleFont(28) },
+              ]}
+            >
+              Choose Tools
+            </Text>
 
             {/* Description */}
-            <Text style={[styles.description,{fontFamily:"Mukta-Regular"}]}>
+            <Text
+              style={[
+                styles.description,
+                { fontFamily: "Mukta-Regular" },
+                isProMaxIphone && { fontSize: scaleFont(16) },
+              ]}
+            >
               Customise how Elunara responds - choose your model, tone,
               language, and citations
             </Text>

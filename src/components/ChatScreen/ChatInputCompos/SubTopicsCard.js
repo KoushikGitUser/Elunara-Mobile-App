@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import React from "react";
 import { ArrowUpRight, File } from "lucide-react-native";
-import { scaleFont } from "../../../utils/responsive";
+import { scaleFont, isProMaxIphone } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
 import {
@@ -142,7 +142,15 @@ const SubTopicsCard = ({ item }) => {
       <View style={styles.cardContent}>
         <View style={styles.leftContent}>
           <File size={22} strokeWidth={1.5} color="#888888" />
-          <Text style={[styles.cardTitle,{fontFamily:'Mukta-Regular'}]}>{item.name}</Text>
+          <Text
+            style={[
+              styles.cardTitle,
+              { fontFamily: "Mukta-Regular" },
+              isProMaxIphone && { fontSize: scaleFont(16), lineHeight: 22 },
+            ]}
+          >
+            {item.name}
+          </Text>
         </View>
         <ArrowUpRight strokeWidth={1.5} />
       </View>

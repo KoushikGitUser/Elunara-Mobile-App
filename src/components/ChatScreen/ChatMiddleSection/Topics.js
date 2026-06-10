@@ -12,6 +12,8 @@ import {
   moderateScale,
   scaleFont,
   verticalScale,
+  isProMaxIphone,
+  isRegularIphone,
 } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -23,12 +25,19 @@ import { setCurrentSelectedTopic, setSelectedSubjectID } from "../../../redux/sl
 import { useFonts } from "expo-font";
 import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice";
 
-const Topics = ({ item, index }) => {
+const Topics = ({ item, index, isFromRooms = false }) => {
 
 
   const dispatch = useDispatch();
   const { walletStates } = useSelector((state) => state.Toggle);
   const isZeroBalance = walletStates.walletBalance <= 0 && !walletStates.isPromotionalUser;
+  // Larger title/desc fonts only on Pro Max iPhones within ChatScreen — Rooms
+  // reuses this card and must stay at the standard size.
+  const usePromaxScale = isProMaxIphone && !isFromRooms;
+  // Subtle 1-pt bump on regular (non-Pro-Max) iPhones, also limited to
+  // ChatScreen. Mutually exclusive with usePromaxScale — exactly one of the
+  // two can be true on iOS, neither on Android/iPad.
+  const useSmallIphoneScale = isRegularIphone && !isFromRooms;
 
     const fetchAllTopicsOfSelectedSubjects = ()=>{
       const subjectId = parseInt(item?.id, 10);
@@ -88,15 +97,27 @@ const Topics = ({ item, index }) => {
         </View>
 
         <Text
-          style={[styles.topicTitle, { fontFamily: "Mukta-Bold" }]}
+          style={[
+            styles.topicTitle,
+            { fontFamily: "Mukta-Bold" },
+            usePromaxScale && { fontSize: moderateScale(16) },
+            useSmallIphoneScale && { fontSize: moderateScale(15) },
+          ]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {item?.name}
         </Text>
-        <Text style={[styles.topicDesc, { fontFamily: "Mukta-Regular" }]}
-        numberOfLines={2}
-        ellipsizeMode="tail">
+        <Text
+          style={[
+            styles.topicDesc,
+            { fontFamily: "Mukta-Regular" },
+            usePromaxScale && { fontSize: moderateScale(14), lineHeight: 18 },
+            useSmallIphoneScale && { fontSize: moderateScale(13), lineHeight: 16 },
+          ]}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
           {item.description}
         </Text>
       </View>

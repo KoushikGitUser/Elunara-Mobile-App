@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { moderateScale, scaleFont } from "../../../../../utils/responsive";
+import { moderateScale, scaleFont, isProMaxIphone } from "../../../../../utils/responsive";
 import LanguageDropdown from "./LanguageDropdown";
 import { languages } from "../../../../../data/datas";
 import { useDispatch, useSelector } from "react-redux";
@@ -80,9 +80,23 @@ const FirstLanguageSetState = ({setIsLanguageSaved}) => {
   return (
     <>
       {/* Title */}
-      <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Set Response Language</Text>
+      <Text
+        style={[
+          styles.title,
+          { fontFamily: "Mukta-Bold" },
+          isProMaxIphone && { fontSize: scaleFont(28) },
+        ]}
+      >
+        Set Response Language
+      </Text>
       {/* Description */}
-      <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+      <Text
+        style={[
+          styles.description,
+          { fontFamily: "Mukta-Regular" },
+          isProMaxIphone && { fontSize: scaleFont(15) },
+        ]}
+      >
         Choose up to 3 languages to toggle between. Update anytime in Settings.
       </Text>
 

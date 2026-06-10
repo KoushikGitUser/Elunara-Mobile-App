@@ -15,6 +15,7 @@ import {
   moderateScale,
   scaleFont,
   verticalScale,
+  isProMaxIphone,
 } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import DropDowns from "../DropDowns";
@@ -158,12 +159,24 @@ const LLMState = () => {
             </TouchableOpacity>
           </View>
           {/* Title */}
-          <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>
+          <Text
+            style={[
+              styles.title,
+              { fontFamily: "Mukta-Bold" },
+              isProMaxIphone && { fontSize: scaleFont(28) },
+            ]}
+          >
             Choose LLM
           </Text>
 
           {/* Description */}
-          <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+          <Text
+            style={[
+              styles.description,
+              { fontFamily: "Mukta-Regular" },
+              isProMaxIphone && { fontSize: scaleFont(16) },
+            ]}
+          >
             Receive responses in your preferred LLMs! Pick up to 3 now to easily
             toggle between them
           </Text>

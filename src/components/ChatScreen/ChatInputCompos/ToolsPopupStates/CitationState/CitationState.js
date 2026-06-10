@@ -7,7 +7,7 @@ import {
   Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { moderateScale, scaleFont } from "../../../../../utils/responsive";
+import { moderateScale, scaleFont, isProMaxIphone } from "../../../../../utils/responsive";
 import { ArrowLeft } from "lucide-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -117,10 +117,24 @@ const CitationState = () => {
             />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.title, { fontFamily: "Mukta-Bold" }]}>Citation Format</Text>
+        <Text
+          style={[
+            styles.title,
+            { fontFamily: "Mukta-Bold" },
+            isProMaxIphone && { fontSize: scaleFont(28) },
+          ]}
+        >
+          Citation Format
+        </Text>
 
         {/* Description */}
-        <Text style={[styles.description, { fontFamily: "Mukta-Regular" }]}>
+        <Text
+          style={[
+            styles.description,
+            { fontFamily: "Mukta-Regular" },
+            isProMaxIphone && { fontSize: scaleFont(15) },
+          ]}
+        >
           Select your preferred popular citation style — APA or Harvard for your
           submissions.
         </Text>

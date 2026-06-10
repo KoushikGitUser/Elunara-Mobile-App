@@ -10,6 +10,7 @@ import UserMessageBox from "../Messages/UserMessageBox";
 import AIMessageBox from "../Messages/AIMessageBox";
 import chakraLogo from "../../../assets/images/Knowledge Chakra 2.png";
 import chatLoader from "../../../assets/images/Loading chat mob.gif";
+import { isProMaxIphone } from "../../../utils/responsive";
 
 const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
   const styleProps = {};
@@ -56,17 +57,30 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
 
   return (
     <View style={styles.chatMiddleSectionWrapper}>
-      {/* Chakra logo - positioned outside ScrollView for independent positioning */}
+      {/* Chakra logo - positioned outside ScrollView for independent positioning.
+          On Pro Max / Plus iPhones, enlarge it and drop its top position so it
+          sits next to the greetings section instead of floating up by the
+          header — the standard size looks sparse on these wider screens. */}
       <Image
         source={chakraLogo}
         style={
           toggleStates.toggleIsChattingWithAI
             ? styles.chakraLogoRight
-            : {
-                height: Platform.OS === 'ios' ? 100 : 115,
-                width: Platform.OS === 'ios' ? 70 : 80,
+            : isProMaxIphone
+            ? {
+                height: 135,
+                width: 115,
                 position: "absolute",
-                right: -20,
+                right: -30,
+                objectFit: "contain",
+                top: 120,
+                zIndex: 1,
+              }
+            : {
+                height:  115,
+                width: Platform.OS === 'ios' ? 85 : 80,
+                position: "absolute",
+                right: -24,
                 objectFit:"contain",
                 top: Platform.OS === 'ios' ?80:120,
                 zIndex: 1,
@@ -154,8 +168,8 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
           }}
           style={{ flex: 1, width: "100%",zIndex:2 }}
         >
-          <GreetingsHeader />
-          <ChatTopicsMain />
+          <GreetingsHeader isFromRooms={isFromRooms} />
+          <ChatTopicsMain isFromRooms={isFromRooms} />
         </ScrollView>
       )}
     </View>

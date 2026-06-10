@@ -7,7 +7,7 @@ import {
   GraduationCap,
   Languages,
 } from "lucide-react-native";
-import { moderateScale } from "../../../utils/responsive";
+import { moderateScale, isProMaxIphone } from "../../../utils/responsive";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setToggleToolsPopup,
@@ -73,7 +73,7 @@ const ToolsContainers = () => {
             >
               {tools.icon}
 
-              <Text style={{ fontSize: moderateScale(16),fontFamily:"Mukta-Regular" }}>
+              <Text style={{ fontSize: moderateScale(isProMaxIphone ? 18 : 16),fontFamily:"Mukta-Regular" }}>
                 {tools.title}{" "}
               </Text>
             </View>
@@ -86,7 +86,7 @@ const ToolsContainers = () => {
               }}
             >
               <View style={styles.selectedOption}>
-                <Text style={{ fontSize: moderateScale(12),fontFamily:"Mukta-Regular" }}>
+                <Text style={{ fontSize: moderateScale(isProMaxIphone ? 14 : 12),fontFamily:"Mukta-Regular" }}>
                   {getSelectedValue(toolIndex)}{" "}
                 </Text>
               </View>
