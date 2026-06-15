@@ -127,22 +127,13 @@ const ChatHeader = forwardRef(({ translateX }, ref) => {
           styles.chatHeader,
           {
             top: headerTop,
-            ...(Platform.OS === 'ios' ? {
-              borderWidth: 0,
-              borderBottomWidth:
-                toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
-                  globalDataStates.selectedFiles.length > 0 ||
-                  toggleStates.toggleIsChattingWithAI
-                  ? 1
-                  : 0,
-            } : {
-              borderWidth:
-                toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
-                  globalDataStates.selectedFiles.length > 0 ||
-                  toggleStates.toggleIsChattingWithAI
-                  ? 1
-                  : 0,
-            }),
+            borderWidth: 0,
+            borderBottomWidth:
+              toggleStates.toggleKeyboardVisibilityOnChatScreen == true ||
+                globalDataStates.selectedFiles.length > 0 ||
+                toggleStates.toggleIsChattingWithAI
+                ? 1
+                : 0,
           },
         ]}
       >

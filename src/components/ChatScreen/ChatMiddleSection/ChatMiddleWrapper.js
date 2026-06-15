@@ -78,7 +78,7 @@ const  ChatMiddleWrapper = ({ isFromRooms = false }) => {
               }
             : {
                 height:  115,
-                width: Platform.OS === 'ios' ? 85 : 80,
+                width: Platform.OS === 'ios' ? 85 : 85,
                 position: "absolute",
                 right: -24,
                 objectFit:"contain",

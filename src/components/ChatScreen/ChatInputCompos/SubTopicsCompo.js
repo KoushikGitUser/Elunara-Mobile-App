@@ -27,7 +27,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { subTopics } from "../../../data/datas";
 import { scaleFont, isProMaxIphone } from "../../../utils/responsive";
 import SubTopicsCard from "./SubTopicsCard";
-import { ArrowLeft, Search } from "lucide-react-native";
+import { ArrowLeft, Search, ChevronDown, ArrowDown } from "lucide-react-native";
 import {
   setToggleSubTopics,
   setToggleTopicsPopup,
@@ -44,6 +44,7 @@ import { commonFunctionForAPICalls } from "../../../redux/slices/apiCommonSlice"
 import SendIcon from "../../../../assets/SvgIconsComponent/ChatInputIcons/SendIcon";
 import { useFonts } from "expo-font";
 import authLoader from "../../../assets/images/authLoader.gif";
+import { appColors } from "../../../themes/appColors";
 const screenHeight = Dimensions.get("window").height;
 const SubTopicsCompo = () => {
   const { toggleStates, chatCustomisationStates } = useSelector((state) => state.Toggle);
@@ -65,6 +66,7 @@ const SubTopicsCompo = () => {
   const [belowSearchText, setBelowSearchText] = useState("");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [showAllTopics, setShowAllTopics] = useState(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const textBeforeRecordingRef = useRef("");
   const speechModule = NativeModules.SpeechToTextModule;
@@ -166,6 +168,18 @@ const SubTopicsCompo = () => {
       : allTopics.filter((topic) =>
           topic.name?.toLowerCase()?.includes(searchText.toLowerCase()),
         );
+
+  // Determine which topics to display - show all if searching or "View More" clicked
+  const displayedTopics = (searchText.trim() !== "" || showAllTopics)
+    ? filteredTopics
+    : filteredTopics.slice(0, 5);
+
+  const hasMoreTopics = filteredTopics.length > 5 && searchText.trim() === "";
+
+  // Reset showAllTopics when subject changes (new topics fetched)
+  useEffect(() => {
+    setShowAllTopics(false);
+  }, [globalDataStates.selectedSubjectID]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -359,10 +373,22 @@ const SubTopicsCompo = () => {
           </View>
         ) : (
           <View style={styles.grid}>
-            {filteredTopics.length > 0 ? (
-              filteredTopics.map((topics, topicIndex) => {
-                return <SubTopicsCard key={topicIndex} item={topics} />;
-              })
+            {displayedTopics.length > 0 ? (
+              <>
+                {displayedTopics.map((topics, topicIndex) => {
+                  return <SubTopicsCard key={topicIndex} item={topics} />;
+                })}
+                {hasMoreTopics && !showAllTopics && (
+                  <TouchableOpacity
+                    style={styles.viewMoreButton}
+                    onPress={() => setShowAllTopics(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.viewMoreText}>View More</Text>
+                    <ArrowDown size={18} color="#FFFFFF" />
+                  </TouchableOpacity>
+                )}
+              </>
             ) : (
               <View style={styles.noResultsContainer}>
                 <Text style={[styles.noResultsText, { fontFamily: "Mukta-Regular" }]}>
@@ -596,7 +622,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 64,
+    paddingBottom: 0,
   },
   grid: {
     flexDirection: "column",
@@ -673,6 +699,22 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(14),
     color: "#6B7280",
     textAlign: "center",
+  },
+  viewMoreButton: {
+    alignSelf: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    backgroundColor: appColors.navyBlueShade,
+    borderRadius: 50,
+
+  },
+  viewMoreText: {
+    fontSize: scaleFont(10),
+    color: "#FFFFFF",
+    fontFamily: "Mukta-Regular",
   },
 });
 
